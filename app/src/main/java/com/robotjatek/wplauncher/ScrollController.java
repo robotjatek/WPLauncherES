@@ -15,7 +15,7 @@ public class ScrollController {
     private float _maxOffset = 0;
     private float _scrollOffset = 0;
     private float _smoothDelta = 16.67f;
-    private float[] _recentVelocities = new float[3];
+    private final float[] _recentVelocities = new float[3];
     private int _velocityIndex = 0;
 
     public void update(float delta) {

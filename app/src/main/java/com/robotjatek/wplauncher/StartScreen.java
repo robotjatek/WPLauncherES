@@ -97,7 +97,7 @@ public class StartScreen {
         _x = x;
         _y = y;
 
-        _pages.get(_currentPage).touchStart(y);
+        _pages.get(_currentPage).touchStart(x, y);
     }
 
     public void onTouchEnd(float x, float y) {
@@ -116,8 +116,9 @@ public class StartScreen {
             isScrolling = false;
             totalDeltaX = 0;
             totalDeltaY = 0;
+        } else {
+            _pages.get(_currentPage).touchEnd(x, y);
         }
-        _pages.get(_currentPage).touchEnd(y);
     }
 
     public void onResize(int width, int height) {

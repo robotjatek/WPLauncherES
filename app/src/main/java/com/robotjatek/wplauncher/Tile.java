@@ -7,6 +7,7 @@ public class Tile {
     public int rowSpan;
     public String title;
     public int textureId;
+    public Color color = new Color(1, 0, 0); // TODO: remove this when the texture generator is implemented
 
     public Tile(int x, int y, int colSpan, int rowSpan, String title) {
         this.x = x;

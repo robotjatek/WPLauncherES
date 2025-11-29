@@ -1,9 +1,12 @@
 package com.robotjatek.wplauncher;
 
 import android.opengl.Matrix;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 public class TileGrid implements Page {
 
@@ -11,7 +14,10 @@ public class TileGrid implements Page {
 
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
     private final float[] modelMatrix = new float[16]; // Reused model matrix for the individual tiles
-    private Color color = new Color(1, 0, 0); // TODO: Get tile color from an options service
+    private boolean _isTouching = false;
+    private long _tapTimer = 0;
+    private float _touchStartX = 0;
+    private float _touchStartY = 0;
 
     private final Tile tile1 = new Tile(0, 0, 2, 2, ""); // 2x2 tile
     private final Tile tile2 = new Tile(0, 2, 1, 1, ""); // 1x1 tile
@@ -44,7 +50,9 @@ public class TileGrid implements Page {
             Matrix.multiplyMM(modelMatrix, 0, scrollMatrix, 0, modelMatrix, 0);
             Matrix.multiplyMM(modelMatrix, 0, viewMatrix, 0, modelMatrix, 0);
 
-            renderer.setColor(color);
+
+
+            renderer.setColor(t.color);
             renderer.draw(projMatrix, modelMatrix);
         }
     }
@@ -59,18 +67,30 @@ public class TileGrid implements Page {
     }
 
     @Override
-    public void touchStart(float y) {
+    public void touchStart(float x, float y) {
         // TODO: determine if its a simple touch, or scroll
+        // TODO: start timer
+        // TODO: stop timer on move up & touchmove. in update: if touchtimer > "threshold" => pass tap event
+        _touchStartX = x;
+        _touchStartY = y;
+        _tapTimer = System.nanoTime();
+        _isTouching = true;
         scroll.onTouchStart(y);
     }
 
     @Override
     public void touchMove(float y) {
+        _isTouching = false; // TODO:  maybe fine-tune this to ignore random noises
         scroll.onTouchMove(y);
     }
 
     @Override
-    public void touchEnd(float y) {
+    public void touchEnd(float x, float y) {
+        if (_isTouching) { // TODO: &&!_longPress)
+            handleTap(x, y);
+            _isTouching = false;
+        }
+
         scroll.onTouchEnd();
     }
 
@@ -97,5 +117,24 @@ public class TileGrid implements Page {
             if (bottom > max) max = bottom;
         }
         return max;
+    }
+
+    private void handleTap(float x, float y) {
+        var r = new Random();
+        var tile = getTileAt(x, y);
+        tile.ifPresent(value ->
+                value.color = new Color(r.nextFloat(), r.nextFloat(), r.nextFloat()));
+    }
+
+    private Optional<Tile> getTileAt(float x, float y) {
+        return tiles.stream().filter(t -> {
+            var scrollPosition = scroll.getScrollOffset();
+            var left = tileX(t);
+            var top = tileY(t) + scrollPosition;
+            var right = left + tileWidth(t);
+            var bottom = top + tileHeight(t);
+
+            return x >= left && x <= right && y >= top && y <= bottom;
+        }).findFirst();
     }
 }

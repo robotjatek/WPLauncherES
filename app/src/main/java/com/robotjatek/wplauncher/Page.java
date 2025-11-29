@@ -5,8 +5,8 @@ public interface Page {
 
     void touchMove(float y);
 
-    void touchStart(float y);
+    void touchStart(float x, float y);
 
-    void touchEnd(float y);
+    void touchEnd(float x, float y);
 }
 

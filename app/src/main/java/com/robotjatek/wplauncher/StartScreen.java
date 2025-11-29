@@ -102,7 +102,7 @@ public class StartScreen {
 
     public void onTouchEnd(float x, float y) {
         if (isSwiping) {
-            float threshold = _screenWidth / 2f;
+            float threshold = _screenWidth / 3f;
             if (_pageOffset > threshold && _currentPage > 0) {
                 _currentPage--;
             }

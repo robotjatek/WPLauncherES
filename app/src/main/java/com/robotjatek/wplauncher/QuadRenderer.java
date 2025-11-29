@@ -80,7 +80,7 @@ public class QuadRenderer {
         GLES20.glEnableVertexAttribArray(positionLoc);
         GLES20.glVertexAttribPointer(positionLoc,
                 3, GLES20.GL_FLOAT, false,
-                3 * 4, 0); // Offset 0 for the position vector, this is the same position in the shader file
+                3 * 4, 0);
 
         _shader.setVec4Uniform("color", _color.r(), _color.g(), _color.b(), 1);
 

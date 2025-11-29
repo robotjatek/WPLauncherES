@@ -32,4 +32,9 @@ public class AppList implements Page {
     public void touchStart(float y) {
         // TODO: handle scrolling
     }
+
+    @Override
+    public void touchEnd(float y) {
+        // TODO: handle touch end
+    }
 }

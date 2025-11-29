@@ -5,21 +5,13 @@ import android.opengl.Matrix;
 import java.util.ArrayList;
 import java.util.List;
 
-interface Page {
-    void draw(float delta, float[] projMatrix, float[] viewMatrix);
-
-    void touchMove(float y);
-
-    void touchStart(float y);
-}
-
 /**
  * The start screen has two pages: the TileGrid and the Application list
  * The pages are rendered side-by-side
  * Both page can be scrolled independently
  * Swiping left and right changes between the pages
 
- * @implNote  This essentially became a carousel view with 2 hardcoded pages
+ * <p>NOTE: This essentially became a carousel view with 2 hardcoded pages</p>
  */
 public class StartScreen {
 
@@ -125,6 +117,7 @@ public class StartScreen {
             totalDeltaX = 0;
             totalDeltaY = 0;
         }
+        _pages.get(_currentPage).touchEnd(y);
     }
 
     public void onResize(int width, int height) {

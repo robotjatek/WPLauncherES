@@ -2,10 +2,13 @@ package com.robotjatek.wplauncher;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 public class LauncherRenderer implements GLSurfaceView.Renderer {
-    private float _x, _y;
     private float lastTime = System.nanoTime();
+
+    private int frameCount = 0;
+    private long fpsTime = System.currentTimeMillis();
 
     private StartScreen _startScreen;
 
@@ -24,6 +27,12 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         var now = System.nanoTime();
         var delta = (now - lastTime) / 1000000f;
         lastTime = now;
+
+        frameCount++;
+        if (System.currentTimeMillis() - fpsTime > 1000) {
+            frameCount = 0;
+            fpsTime = System.currentTimeMillis();
+        }
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         _startScreen.draw(delta);
     }
@@ -36,8 +45,6 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     }
 
     public void handleTouchDown(float x, float y) {
-        _x = x;
-        _y = y;
         _startScreen.onTouchStart(x, y);
     }
 
@@ -46,12 +53,6 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     }
 
     public void handleTouchMove(float x, float y) {
-        float dx = x - _x;
-        float dy = y - _y;
-
-        _x = x;
-        _y = y;
-
         _startScreen.onTouchMove(x, y);
     }
 

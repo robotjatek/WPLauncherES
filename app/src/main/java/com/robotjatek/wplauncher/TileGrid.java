@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher;
 
 import android.opengl.Matrix;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class TileGrid implements Page {
 
     @Override
     public void touchStart(float y) {
+        // TODO: determine if its a simple touch, or scroll
         scroll.onTouchStart(y);
     }
 

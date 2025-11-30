@@ -1,7 +1,7 @@
 package com.robotjatek.wplauncher;
 
 import android.opengl.Matrix;
-import android.util.Log;
+import android.view.ViewConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ public class TileGrid implements Page {
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
     private final float[] modelMatrix = new float[16]; // Reused model matrix for the individual tiles
     private boolean _isTouching = false;
-    private long _tapTimer = 0;
+    private long _touchStart = 0;
     private float _touchStartX = 0;
     private float _touchStartY = 0;
 
@@ -38,6 +38,15 @@ public class TileGrid implements Page {
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
         scroll.update(delta);
+
+       if (_isTouching) {
+            var deltaTouchTime = System.currentTimeMillis() - _touchStart;
+            if (deltaTouchTime > ViewConfiguration.getLongPressTimeout()) {
+                _touchStart = 0;
+                _isTouching = false;
+                handleLongPress(_touchStartX, _touchStartY);
+            }
+       }
 
         Matrix.setIdentityM(scrollMatrix, 0);
         Matrix.translateM(scrollMatrix, 0, 0, scroll.getScrollOffset(), 0);
@@ -68,27 +77,26 @@ public class TileGrid implements Page {
 
     @Override
     public void touchStart(float x, float y) {
-        // TODO: determine if its a simple touch, or scroll
-        // TODO: start timer
-        // TODO: stop timer on move up & touchmove. in update: if touchtimer > "threshold" => pass tap event
         _touchStartX = x;
         _touchStartY = y;
-        _tapTimer = System.nanoTime();
+        _touchStart = System.currentTimeMillis();
         _isTouching = true;
         scroll.onTouchStart(y);
     }
 
     @Override
     public void touchMove(float y) {
-        _isTouching = false; // TODO:  maybe fine-tune this to ignore random noises
+        _isTouching = false; // TODO: maybe fine-tune this to ignore random noises
+        _touchStart = 0;
         scroll.onTouchMove(y);
     }
 
     @Override
     public void touchEnd(float x, float y) {
-        if (_isTouching) { // TODO: &&!_longPress)
+        if (_isTouching) {
             handleTap(x, y);
             _isTouching = false;
+            _touchStart = 0;
         }
 
         scroll.onTouchEnd();
@@ -111,7 +119,7 @@ public class TileGrid implements Page {
     }
 
     private float getContentHeight() {
-        float max = 0;
+        var max = 0f;
         for (var t : tiles) {
             float bottom = tileY(t) + tileHeight(t) + PAGE_PADDING_PX;
             if (bottom > max) max = bottom;
@@ -122,8 +130,12 @@ public class TileGrid implements Page {
     private void handleTap(float x, float y) {
         var r = new Random();
         var tile = getTileAt(x, y);
-        tile.ifPresent(value ->
-                value.color = new Color(r.nextFloat(), r.nextFloat(), r.nextFloat()));
+        tile.ifPresent(t -> t.color = new Color(r.nextFloat(), r.nextFloat(), r.nextFloat()));
+    }
+
+    private void handleLongPress(float x, float y) {
+        var tile = getTileAt(x, y);
+        tile.ifPresent(t -> t.color = new Color(0, 0, 1));
     }
 
     private Optional<Tile> getTileAt(float x, float y) {

@@ -1,12 +1,34 @@
 package com.robotjatek.wplauncher;
 
 import android.opengl.Matrix;
+import android.util.Log;
 import android.view.ViewConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+
+record Position(float x, float y) {}
+
+class DragInfo {
+    public float startX = 0f;
+    public float startY = 0f;
+    public float totalX = 0f;
+    public float totalY = 0f;
+
+    public void start(float startX, float startY) {
+        this.startX = startX;
+        this.startY = startY;
+        this.totalX = 0;
+        this.totalY = 0;
+    }
+
+    public void update(float x, float y) {
+        this.totalX = x - startX;
+        this.totalY = y - startY;
+    }
+}
 
 public class TileGrid implements Page {
 
@@ -20,6 +42,8 @@ public class TileGrid implements Page {
     private float _touchStartY = 0;
 
     private Tile _selectedTile;
+    private final DragInfo _dragInfo = new DragInfo(); // Reused drag information to mitigate GC pressure
+    private boolean _isDragging = false;
 
     private final Tile tile1 = new Tile(0, 0, 2, 2, ""); // 2x2 tile
     private final Tile tile2 = new Tile(0, 2, 1, 1, ""); // 1x1 tile
@@ -48,7 +72,7 @@ public class TileGrid implements Page {
             if (deltaTouchTime > ViewConfiguration.getLongPressTimeout()) {
                 _touchStart = 0;
                 _isTouching = false;
-                handleLongPress(_touchStartX, _touchStartY);
+                handleLongPress(_touchStartX, _touchStartY); // TODO: is really out of place here in the draw routine
             }
        }
 
@@ -80,7 +104,9 @@ public class TileGrid implements Page {
             var yDiff = (height - tileHeight(_selectedTile)) / 2;
 
             Matrix.setIdentityM(modelMatrix, 0);
-            Matrix.translateM(modelMatrix, 0, tileX(_selectedTile) - xDiff, tileY(_selectedTile) - yDiff, 0f);
+            Matrix.translateM(modelMatrix, 0,
+                    tileX(_selectedTile) + _dragInfo.totalX - xDiff,
+                    tileY(_selectedTile) + _dragInfo.totalY - yDiff, 0f);
             Matrix.scaleM(modelMatrix, 0, width, height, 1);
             Matrix.multiplyMM(modelMatrix, 0, scrollMatrix, 0, modelMatrix, 0);
             Matrix.multiplyMM(modelMatrix, 0, viewMatrix, 0, modelMatrix, 0);
@@ -109,10 +135,16 @@ public class TileGrid implements Page {
     }
 
     @Override
-    public void touchMove(float y) {
+    public void touchMove(float x, float y) {
         _isTouching = false; // TODO: maybe fine-tune this to ignore random noises
         _touchStart = 0;
-        scroll.onTouchMove(y);
+        if (_selectedTile == null) {
+            scroll.onTouchMove(y);
+        } else {
+            // Update pan info of the selected tile
+            _isDragging = true;
+            _dragInfo.update(x, y);
+        }
     }
 
     @Override
@@ -123,7 +155,62 @@ public class TileGrid implements Page {
             _touchStart = 0;
         }
 
+        if (_isDragging) {
+            // TODO: calc new tile pos on grid +++ IsInBounds
+            var newPosition = calculateNewPosition(_dragInfo);
+            var collidingTiles = getCollidingTiles(newPosition);
+            // TODO: push down all colliding tiles and all tiles bellow so they dont collide anymore
+            // TODO: remove empty rows between tiles
+
+            Log.d("", collidingTiles.size() + "");
+            _isDragging = false;
+            _selectedTile = null; // TODO: drop tile to its new location, recalculate new tile positions
+        }
+
         scroll.onTouchEnd();
+    }
+
+    private Position calculateNewPosition(DragInfo args)
+    {
+        var calculatedTranslationX = args.totalX / (tileSizePx + TILE_GAP_PX);
+        var calculatedTranslationY = args.totalY / (tileSizePx + TILE_GAP_PX);
+
+        var calculatedColumn = Math.round(_selectedTile.x + calculatedTranslationX);
+        var calculatedRow = Math.round(_selectedTile.y + calculatedTranslationY);
+
+        return new Position(calculatedColumn, calculatedRow);
+    }
+
+    /**
+     * Calculates the collisions of the selected tile with other tiles on its final calculated position
+     * It does not take the visual position during drag into consideration.
+     * Used for reflow calculations.
+     * <p>
+     *     Note: a 1 by 1 tile can only overlap with at most 1 tile as its position is snapped its final position not its visual pos during dragging
+     * </p>
+     * @param newPosition The supposed new position of the selected tile
+     * @return The list of the colliding tiles on its new position
+     */
+    private List<Tile> getCollidingTiles(Position newPosition) {
+        var colliding = new ArrayList<Tile>();
+
+        for (var tile : tiles)
+        {
+            if (tile == _selectedTile) {
+                continue;
+            }
+            var collisionX = tile.x < newPosition.x() + _selectedTile.colSpan &&
+                    tile.x + tile.colSpan > newPosition.x();
+
+            var collisionY = tile.y < newPosition.y() + _selectedTile.rowSpan &&
+                    tile.y + tile.rowSpan > newPosition.y();
+
+            if (collisionX && collisionY) {
+                colliding.add(tile);
+            }
+        }
+
+        return colliding;
     }
 
     private float tileX(Tile t) {
@@ -161,6 +248,7 @@ public class TileGrid implements Page {
                 // Tap different tile
                 selectTile(tappedTile.get());
             }
+            _dragInfo.start(x, y);
             return;
         }
 
@@ -171,8 +259,7 @@ public class TileGrid implements Page {
     private void handleLongPress(float x, float y) {
         var tile = getTileAt(x, y);
         tile.ifPresent(this::selectTile);
-        // TODO: set grid to edit mode
-        // TODO: drag tile to a new position
+        _dragInfo.start(x, y);
     }
 
     private Optional<Tile> getTileAt(float x, float y) {
@@ -195,5 +282,10 @@ public class TileGrid implements Page {
         if (_selectedTile != null) {
             _selectedTile = null;
         }
+    }
+
+    @Override
+    public boolean isCatchingGestures() {
+        return _selectedTile != null;
     }
 }

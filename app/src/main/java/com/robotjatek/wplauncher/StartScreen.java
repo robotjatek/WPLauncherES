@@ -62,7 +62,7 @@ public class StartScreen {
 
         if (!isSwiping && !isScrolling) {
             if (Math.abs(totalDeltaX) > 30 && Math.abs(totalDeltaX) > Math.abs(totalDeltaY)) {
-                isSwiping = true;
+                isSwiping = true; // TODO: restict swipe when a child page takes the touch gesture (no swipe while moving tiles)
             }
             else if (Math.abs(totalDeltaY) > 10 && Math.abs(totalDeltaY) > Math.abs(totalDeltaX)) {
                 isScrolling = true;
@@ -70,9 +70,10 @@ public class StartScreen {
         }
 
         if (isScrolling) {
-            _pages.get(_currentPage).touchMove(y);
+            _pages.get(_currentPage).touchMove(x, y);
         }
 
+        // TODO: restict swipe when a child page takes the touch gesture (no swipe while moving tiles)
         if (isSwiping) {
             _pageOffset += dx;
 
@@ -126,5 +127,9 @@ public class StartScreen {
         _screenWidth = width;
         Matrix.orthoM(projMatrix, 0, 0, width, height, 0, -1, 1);
         _tileGrid.onSizeChanged(width, height);
+    }
+
+    public boolean allowGestures() {
+        return _pages.stream().noneMatch(Page::isCatchingGestures);
     }
 }

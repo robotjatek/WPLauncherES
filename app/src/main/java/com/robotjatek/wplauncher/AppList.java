@@ -24,7 +24,7 @@ public class AppList implements Page {
     }
 
     @Override
-    public void touchMove(float y) {
+    public void touchMove(float x, float y) {
         // TODO: handle scrolling
     }
 
@@ -36,5 +36,10 @@ public class AppList implements Page {
     @Override
     public void touchEnd(float x, float y) {
         // TODO: handle touch end
+    }
+
+    @Override
+    public boolean isCatchingGestures() {
+        return false;
     }
 }

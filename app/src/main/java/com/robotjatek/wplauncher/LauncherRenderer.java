@@ -2,7 +2,8 @@ package com.robotjatek.wplauncher;
 
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
-import android.util.Log;
+
+import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 public class LauncherRenderer implements GLSurfaceView.Renderer {
     private float lastTime = System.nanoTime();

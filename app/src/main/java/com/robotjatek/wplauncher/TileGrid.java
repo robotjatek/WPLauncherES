@@ -72,7 +72,6 @@ public class TileGrid implements Page {
             if (deltaTouchTime > ViewConfiguration.getLongPressTimeout()) {
                 _touchStart = 0;
                 _isTouching = false;
-                handleLongPress(_touchStartX, _touchStartY); // TODO: is really out of place here in the draw routine
             }
        }
 
@@ -256,7 +255,7 @@ public class TileGrid implements Page {
         tappedTile.ifPresent(t -> t.color = new Color(r.nextFloat(), r.nextFloat(), r.nextFloat()));
     }
 
-    private void handleLongPress(float x, float y) {
+    public void handleLongPress(float x, float y) {
         var tile = getTileAt(x, y);
         tile.ifPresent(this::selectTile);
         _dragInfo.start(x, y);

@@ -39,7 +39,7 @@ public class AppList implements Page {
     }
 
     @Override
-    public boolean isCatchingGestures() {
-        return false;
+    public void handleLongPress(float x, float y) {
+        // TODO: handle long press
     }
 }

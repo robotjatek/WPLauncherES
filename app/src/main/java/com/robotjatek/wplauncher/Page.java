@@ -9,6 +9,10 @@ public interface Page {
 
     void touchEnd(float x, float y);
 
-    boolean isCatchingGestures();
+    void handleLongPress(float x, float y);
+
+    default boolean isCatchingGestures() {
+        return false;
+    }
 }
 

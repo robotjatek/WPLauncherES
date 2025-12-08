@@ -1,13 +1,13 @@
 package com.robotjatek.wplauncher;
 
 import android.opengl.Matrix;
-import android.util.Log;
 import android.view.ViewConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 record Position(float x, float y) {}
 
@@ -52,7 +52,7 @@ public class TileGrid implements Page {
     private final Tile tile5 = new Tile(0, 20, 4, 4, ""); // 4x4 large tile far down
     private final Tile tile6 = new Tile(2, 0, 2, 2, ""); // 2x2 tile
     private final Tile tile7 = new Tile(2, 2, 2, 2, ""); // 2x2 tile
-    private final List<Tile> tiles = new ArrayList<>(List.of(tile1, tile2, tile3, tile4, tile5, tile6, tile7));
+    private final List<Tile> _tiles = new ArrayList<>(List.of(tile1, tile2, tile3, tile4, tile5, tile6, tile7));
 
     private static final int COLUMNS = 4;
     private static final float TOP_MARGIN = 128;
@@ -78,7 +78,7 @@ public class TileGrid implements Page {
         Matrix.setIdentityM(scrollMatrix, 0);
         Matrix.translateM(scrollMatrix, 0, 0, scroll.getScrollOffset(), 0);
 
-        for (var t : tiles) {
+        for (var t : _tiles) {
             // Do not render the selected tile here
             if (t == _selectedTile) {
                 continue;
@@ -155,20 +155,35 @@ public class TileGrid implements Page {
         }
 
         if (_isDragging) {
-            // TODO: calc new tile pos on grid +++ IsInBounds
+            // drop tile to its new location, recalculate new tile positions
             var newPosition = calculateNewPosition(_dragInfo);
-            var collidingTiles = getCollidingTiles(newPosition);
-            // TODO: push down all colliding tiles and all tiles bellow so they dont collide anymore
-            // TODO: remove empty rows between tiles
+            if (isInbounds(newPosition)) {
+                var collidingTiles = getCollidingTiles(newPosition);
+                var lowestPoint = calculateGroupLowestPoint(collidingTiles);
+                var nonCollidingBelow = getTilesBelowGroup(collidingTiles, lowestPoint);
+                var offset = calculateReflowOffset(collidingTiles, newPosition);
 
-            Log.d("", collidingTiles.size() + "");
+                pushDownTiles(collidingTiles, offset);
+                pushDownTiles(nonCollidingBelow, offset);
+                // TODO: remove empty rows between tiles
+                compactGrid();
+
+                _selectedTile.x = (int) newPosition.x();
+                _selectedTile.y = (int) newPosition.y();
+            }
+
             _isDragging = false;
-            _selectedTile = null; // TODO: drop tile to its new location, recalculate new tile positions
+            _selectedTile = null;
         }
 
         scroll.onTouchEnd();
     }
 
+    /**
+     * Calculate the new tile position after a drag
+     * @param args Drag information
+     * @return The calculated position of the tile
+     */
     private Position calculateNewPosition(DragInfo args)
     {
         var calculatedTranslationX = args.totalX / (tileSizePx + TILE_GAP_PX);
@@ -178,6 +193,11 @@ public class TileGrid implements Page {
         var calculatedRow = Math.round(_selectedTile.y + calculatedTranslationY);
 
         return new Position(calculatedColumn, calculatedRow);
+    }
+
+    private boolean isInbounds(Position position) {
+        return position.x() >= 0 && position.x() + _selectedTile.colSpan <= COLUMNS
+                && position.y() >= 0;
     }
 
     /**
@@ -193,7 +213,7 @@ public class TileGrid implements Page {
     private List<Tile> getCollidingTiles(Position newPosition) {
         var colliding = new ArrayList<Tile>();
 
-        for (var tile : tiles)
+        for (var tile : _tiles)
         {
             if (tile == _selectedTile) {
                 continue;
@@ -210,6 +230,58 @@ public class TileGrid implements Page {
         }
 
         return colliding;
+    }
+
+    private int calculateGroupLowestPoint(List<Tile> group) {
+        return group.stream().mapToInt(t -> t.y + t.rowSpan).max().orElse(0);
+    }
+
+    /**
+     * Calculates the offset for the new tile position after a move
+     * @param group The group of tiles which should be moved
+     * @param newPosition The new position of the colliding tile
+     * @return The new offset for the tile group
+     */
+    private int calculateReflowOffset(List<Tile> group, Position newPosition) {
+        if (group.isEmpty()) {
+            return 0;
+        }
+        var bottom = newPosition.y() + _selectedTile.rowSpan;
+        var minY = group.stream().mapToInt(t -> t.y).min().orElse(0);
+        return (int)bottom - minY;
+    }
+
+    private List<Tile> getTilesBelowGroup(List<Tile> collidedGroup, int groupHeight) {
+        // filter out the collided and the selected tiles
+        var nonCollided = _tiles.stream().filter(t -> !collidedGroup.contains(t) && t != _selectedTile);
+        var below = nonCollided.filter(t -> t.y >= groupHeight);
+
+
+        return below.collect(Collectors.toList());
+    }
+
+    /**
+     * Push down a given group of tiles with an offset.
+     * The move will be relative to the tiles original position.
+     * @param tiles The group of tiles to move together
+     * @param offset The offset of the move
+     */
+    private void pushDownTiles(List<Tile> tiles, int offset) {
+        for (var tile: tiles) {
+            tile.y += offset;
+        }
+    }
+
+    private void compactGrid() {
+        // TODO: implement
+
+        // (current row) = 0
+        // group = tiles below 'current row'
+        // if group.size = 0: return
+        // calc offset for the group: offset = (current row) - (top of the group)
+        // pushdowntiles(-offset)
+        // currentrow++
+        // repeat
     }
 
     private float tileX(Tile t) {
@@ -230,7 +302,7 @@ public class TileGrid implements Page {
 
     private float getContentHeight() {
         var max = 0f;
-        for (var t : tiles) {
+        for (var t : _tiles) {
             float bottom = tileY(t) + tileHeight(t) + PAGE_PADDING_PX;
             if (bottom > max) max = bottom;
         }
@@ -262,7 +334,7 @@ public class TileGrid implements Page {
     }
 
     private Optional<Tile> getTileAt(float x, float y) {
-        return tiles.stream().filter(t -> {
+        return _tiles.stream().filter(t -> {
             var scrollPosition = scroll.getScrollOffset();
             var left = tileX(t);
             var top = tileY(t) + scrollPosition;

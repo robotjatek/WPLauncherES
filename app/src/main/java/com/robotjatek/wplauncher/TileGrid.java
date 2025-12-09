@@ -62,6 +62,7 @@ public class TileGrid implements Page {
     private final QuadRenderer renderer = new QuadRenderer();
 
     private float tileSizePx;
+    private float _pageHeight;
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
@@ -118,10 +119,8 @@ public class TileGrid implements Page {
     public void onSizeChanged(int width, int height) {
         var usableWidth = width - 2 * PAGE_PADDING_PX - (COLUMNS - 1) * TILE_GAP_PX;
         tileSizePx = usableWidth / COLUMNS;
-
-        var contentHeight = getContentHeight();
-        var min = Math.min(0, height - contentHeight - TOP_MARGIN);
-        scroll.setBounds(min, TOP_MARGIN);
+        _pageHeight = height;
+        setScrollBounds();
     }
 
     @Override
@@ -158,22 +157,23 @@ public class TileGrid implements Page {
             // drop tile to its new location, recalculate new tile positions
             var newPosition = calculateNewPosition(_dragInfo);
             if (isInbounds(newPosition)) {
-                var collidingTiles = getCollidingTiles(newPosition);
+                var collidingTiles = getCollidingTiles(newPosition); // TODO: ha csak 1 tilelal ütközik akkor lehet hogy jobb lenne ha helyet cserélnének
                 var lowestPoint = calculateGroupLowestPoint(collidingTiles);
                 var nonCollidingBelow = getTilesBelowGroup(collidingTiles, lowestPoint);
                 var offset = calculateReflowOffset(collidingTiles, newPosition);
 
                 pushDownTiles(collidingTiles, offset);
                 pushDownTiles(nonCollidingBelow, offset);
-                // TODO: remove empty rows between tiles
-                compactGrid();
 
                 _selectedTile.x = (int) newPosition.x();
                 _selectedTile.y = (int) newPosition.y();
+
+                compactGrid();
             }
 
             _isDragging = false;
             _selectedTile = null;
+            setScrollBounds();
         }
 
         scroll.onTouchEnd();
@@ -255,8 +255,6 @@ public class TileGrid implements Page {
         // filter out the collided and the selected tiles
         var nonCollided = _tiles.stream().filter(t -> !collidedGroup.contains(t) && t != _selectedTile);
         var below = nonCollided.filter(t -> t.y >= groupHeight);
-
-
         return below.collect(Collectors.toList());
     }
 
@@ -273,21 +271,52 @@ public class TileGrid implements Page {
     }
 
     private void compactGrid() {
-        // TODO: implement
+        var maxRow = calculateGroupLowestPoint(_tiles);
+        for (var i = 0; i < maxRow; i++) {
+            if (!isRowEmpty(i)) {
+                continue;
+            }
 
-        // (current row) = 0
-        // group = tiles below 'current row'
-        // if group.size = 0: return
-        // calc offset for the group: offset = (current row) - (top of the group)
-        // pushdowntiles(-offset)
-        // currentrow++
-        // repeat
+            final int currentRow = i;
+            var group = _tiles.stream()
+                    .filter(t -> t.y > currentRow)
+                    .collect(Collectors.toList());
+
+            if (group.isEmpty()) {
+                continue;
+            }
+
+            var top = getTopOfTheGroup(group);
+            var offset = currentRow - top;
+
+            if (offset < 0) {
+                pushDownTiles(group, offset);
+            }
+        }
     }
 
+    private boolean isRowEmpty(int row) {
+        return _tiles.stream().noneMatch(t -> row >= t.y && row < t.y + t.rowSpan);
+    }
+
+    private int getTopOfTheGroup(List<Tile> group) {
+        return group.stream().mapToInt(t -> t.y).min().orElse(0);
+    }
+
+    /**
+     * Calculates screen space X position of a tile
+     * @param t The tile to measure
+     * @return Screen space Y positon
+     */
     private float tileX(Tile t) {
         return PAGE_PADDING_PX + t.x * (tileSizePx + TILE_GAP_PX);
     }
 
+    /**
+     * Calculates screen space Y position of a tile
+     * @param t The tile to measure
+     * @return Screen space Y positon
+     */
     private float tileY(Tile t) {
         return PAGE_PADDING_PX + t.y * (tileSizePx + TILE_GAP_PX);
     }
@@ -358,5 +387,11 @@ public class TileGrid implements Page {
     @Override
     public boolean isCatchingGestures() {
         return _selectedTile != null;
+    }
+
+    private void setScrollBounds() {
+        var contentHeight = getContentHeight();
+        var min = Math.min(0, _pageHeight - contentHeight - TOP_MARGIN);
+        scroll.setBounds(min, TOP_MARGIN);
     }
 }

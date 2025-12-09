@@ -106,4 +106,9 @@ public class ScrollController {
     private float clampOffset(float value) {
         return Math.max(_minOffset, Math.min(_maxOffset, value));
     }
+
+    public void adjustOffset(float amount) {
+        _scrollOffset += amount;
+        _scrollOffset = clampOffset(_scrollOffset);
+    }
 }

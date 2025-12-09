@@ -32,7 +32,7 @@ class DragInfo {
 
 public class TileGrid implements Page {
 
-    private final ScrollController scroll = new ScrollController();
+    private final ScrollController _scroll = new ScrollController();
 
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
     private final float[] modelMatrix = new float[16]; // Reused model matrix for the individual tiles
@@ -66,7 +66,17 @@ public class TileGrid implements Page {
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
-        scroll.update(delta);
+        _scroll.update(delta);
+
+        if(_isDragging) {
+            var screenPosY = tileY(_selectedTile) + _dragInfo.totalY + _scroll.getScrollOffset();
+            var scrollSpeed = 2 * delta;
+            if (screenPosY + tileHeight(_selectedTile) > _pageHeight - 200) { // reached bottom while dragging
+                _scroll.adjustOffset(-scrollSpeed);
+            } else if (screenPosY < 200) { // reached top while draggind
+                _scroll.adjustOffset(scrollSpeed);
+            }
+        }
 
        if (_isTouching) {
             var deltaTouchTime = System.currentTimeMillis() - _touchStart;
@@ -77,7 +87,7 @@ public class TileGrid implements Page {
        }
 
         Matrix.setIdentityM(scrollMatrix, 0);
-        Matrix.translateM(scrollMatrix, 0, 0, scroll.getScrollOffset(), 0);
+        Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset(), 0);
 
         for (var t : _tiles) {
             // Do not render the selected tile here
@@ -129,7 +139,7 @@ public class TileGrid implements Page {
         _touchStartY = y;
         _touchStart = System.currentTimeMillis();
         _isTouching = true;
-        scroll.onTouchStart(y);
+        _scroll.onTouchStart(y);
     }
 
     @Override
@@ -137,7 +147,7 @@ public class TileGrid implements Page {
         _isTouching = false; // TODO: maybe fine-tune this to ignore random noises
         _touchStart = 0;
         if (_selectedTile == null) {
-            scroll.onTouchMove(y);
+            _scroll.onTouchMove(y);
         } else {
             // Update pan info of the selected tile
             _isDragging = true;
@@ -176,7 +186,7 @@ public class TileGrid implements Page {
             setScrollBounds();
         }
 
-        scroll.onTouchEnd();
+        _scroll.onTouchEnd();
     }
 
     /**
@@ -364,7 +374,7 @@ public class TileGrid implements Page {
 
     private Optional<Tile> getTileAt(float x, float y) {
         return _tiles.stream().filter(t -> {
-            var scrollPosition = scroll.getScrollOffset();
+            var scrollPosition = _scroll.getScrollOffset();
             var left = tileX(t);
             var top = tileY(t) + scrollPosition;
             var right = left + tileWidth(t);
@@ -392,6 +402,6 @@ public class TileGrid implements Page {
     private void setScrollBounds() {
         var contentHeight = getContentHeight();
         var min = Math.min(0, _pageHeight - contentHeight - TOP_MARGIN);
-        scroll.setBounds(min, TOP_MARGIN);
+        _scroll.setBounds(min, TOP_MARGIN);
     }
 }

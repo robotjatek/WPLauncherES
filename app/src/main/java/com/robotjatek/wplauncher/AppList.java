@@ -10,6 +10,8 @@ public class AppList implements Page {
     private final float[] testModel = new float[16];;
     private final QuadRenderer testRenderer = new QuadRenderer(); // TODO: this is just to show some test data as content
 
+    private int tempTexId = TileUtil.createTextTexture("hello", 512, 256, 0xffffffff);
+
     public AppList() {}
 
     @Override
@@ -17,10 +19,10 @@ public class AppList implements Page {
         Matrix.setIdentityM(testModel, 0);
         Matrix.scaleM(testModel, 0, 300, 150, 1);
 
-        float[] vm = new float[16];
+        var vm = new float[16];
         Matrix.multiplyMM(vm, 0, viewMatrix, 0, testModel, 0);
 
-        testRenderer.draw(projMatrix, vm);
+        testRenderer.draw(projMatrix, vm, tempTexId);
     }
 
     @Override

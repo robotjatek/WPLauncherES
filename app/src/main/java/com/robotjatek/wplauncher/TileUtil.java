@@ -7,8 +7,8 @@ import android.graphics.Paint;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
-// TODO: ne csak textutil legyen, generálja ki a háttért és az ikont is
-public class TextUtil {
+// TODO: place icon on the tile
+public class TileUtil {
     public static int createTextTexture(String text, int width, int height, int textColor) {
 
         var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -28,6 +28,7 @@ public class TextUtil {
         var fontMetrics = paint.getFontMetrics();
         var x = width / 2f;
         var y = height / 2f - (fontMetrics.ascent + fontMetrics.descent) / 2f;
+        canvas.drawColor(0xff0000ff); // TODO: pass color as param
         canvas.drawText(text, x, y, paint);
 
         var ids = new int[1];

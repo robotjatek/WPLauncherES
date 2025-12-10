@@ -11,17 +11,23 @@ public class Shader {
     // TODO: load file via path
     public Shader(String vertexPath, String fragmentPath) {
         var vertexShaderCode =
-                "attribute vec4 vPosition;" +
+                        "attribute vec4 vPosition;" +
+                        "attribute vec2 aTexCoord;" +
+                        "varying vec2 vTexCoord;" +
                         "uniform mat4 uMVP;" +
                         "void main() {" +
                         "  gl_Position = uMVP * vPosition;" +
+                        "  vTexCoord = aTexCoord;" +
                         "}";
 
         String fragmentShaderCode =
-                "precision mediump float;" +
+                        "precision mediump float;" +
                         "uniform vec4 color;" +
+                        "uniform sampler2D uTexture;" +
+                        "varying vec2 vTexCoord;" +
                         "void main() {" +
-                        "  gl_FragColor = color;" +
+                        "  vec4 texColor = texture2D(uTexture, vTexCoord);" +
+                        "  gl_FragColor = texColor;" +
                         "}";
 
         var vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
@@ -58,6 +64,12 @@ public class Shader {
         this.use();
         var location = GLES20.glGetUniformLocation(_shaderProgram, name);
         GLES20.glUniformMatrix4fv(location, 1, false, matrix, 0);
+    }
+
+    public void setIntUniform(String name, int value) {
+        this.use();
+        var location = GLES20.glGetUniformLocation(_shaderProgram, name);
+        GLES20.glUniform1i(location, value);
     }
 
     private static int loadShader(int type, String shaderCode){

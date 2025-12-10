@@ -45,8 +45,8 @@ public class TileGrid implements Page {
     private final DragInfo _dragInfo = new DragInfo(); // Reused drag information to mitigate GC pressure
     private boolean _isDragging = false;
 
-    private final Tile tile1 = new Tile(0, 0, 2, 2, ""); // 2x2 tile
-    private final Tile tile2 = new Tile(0, 2, 1, 1, ""); // 1x1 tile
+    private final Tile tile1 = new Tile(0, 0, 2, 2, "Első"); // 2x2 tile
+    private final Tile tile2 = new Tile(0, 2, 1, 1, "Második"); // 1x1 tile
     private final Tile tile3 = new Tile(0, 4, 4, 2, ""); // Wide tile
     private final Tile tile4 = new Tile(0, 8, 4, 2, ""); // Wide tile
     private final Tile tile5 = new Tile(0, 20, 4, 4, ""); // 4x4 large tile far down
@@ -102,8 +102,7 @@ public class TileGrid implements Page {
             Matrix.multiplyMM(modelMatrix, 0, scrollMatrix, 0, modelMatrix, 0);
             Matrix.multiplyMM(modelMatrix, 0, viewMatrix, 0, modelMatrix, 0);
 
-            renderer.setColor(t.color);
-            renderer.draw(projMatrix, modelMatrix);
+            renderer.draw(projMatrix, modelMatrix, t.textureId);
         }
 
         // render the selected tile
@@ -120,8 +119,7 @@ public class TileGrid implements Page {
             Matrix.scaleM(modelMatrix, 0, width, height, 1);
             Matrix.multiplyMM(modelMatrix, 0, scrollMatrix, 0, modelMatrix, 0);
             Matrix.multiplyMM(modelMatrix, 0, viewMatrix, 0, modelMatrix, 0);
-            renderer.setColor(new Color(0, 1, 0)); // TODO: remove this later
-            renderer.draw(projMatrix, modelMatrix);
+            renderer.draw(projMatrix, modelMatrix, _selectedTile.textureId);
         }
 
     }
@@ -362,8 +360,7 @@ public class TileGrid implements Page {
             return;
         }
 
-        var r = new Random();
-        tappedTile.ifPresent(t -> t.color = new Color(r.nextFloat(), r.nextFloat(), r.nextFloat()));
+        tappedTile.ifPresent(t -> {});
     }
 
     public void handleLongPress(float x, float y) {

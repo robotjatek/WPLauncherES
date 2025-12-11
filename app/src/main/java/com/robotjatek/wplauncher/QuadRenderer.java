@@ -11,8 +11,6 @@ import java.nio.ByteOrder;
  */
 public class QuadRenderer {
 
-    private Color _color = new Color(1, 0, 0);
-
     private final int _vboId;
     private final int _iboId;
     private final int _texCoordVBOId;
@@ -109,8 +107,6 @@ public class QuadRenderer {
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, _texCoordVBOId);
         GLES20.glEnableVertexAttribArray(_texCoordLoc);
         GLES20.glVertexAttribPointer(_texCoordLoc, 2, GLES20.GL_FLOAT, false, 2 * 4, 0);
-
-        _shader.setVec4Uniform("color", _color.r(), _color.g(), _color.b(), 1);
 
         Matrix.multiplyMM(_mvp, 0, projMatrix, 0, modelMatrix, 0);
         _shader.setMat4Uniform("uMVP", _mvp);

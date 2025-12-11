@@ -7,7 +7,7 @@ import android.opengl.Matrix;
 public class AppList implements Page {
 
     private final float[] pageMatrix = new float[16]; // scroll position transformation
-    private final float[] testModel = new float[16];;
+    private final float[] testModel = new float[16];
     private final QuadRenderer testRenderer = new QuadRenderer(); // TODO: this is just to show some test data as content
 
     private int tempTexId = TileUtil.createTextTexture("hello", 512, 256, 0xffffffff);

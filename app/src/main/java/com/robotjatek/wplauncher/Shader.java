@@ -22,7 +22,6 @@ public class Shader {
 
         String fragmentShaderCode =
                         "precision mediump float;" +
-                        "uniform vec4 color;" +
                         "uniform sampler2D uTexture;" +
                         "varying vec2 vTexCoord;" +
                         "void main() {" +

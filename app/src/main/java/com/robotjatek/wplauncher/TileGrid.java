@@ -6,7 +6,6 @@ import android.view.ViewConfiguration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 record Position(float x, float y) {}
@@ -30,6 +29,7 @@ class DragInfo {
     }
 }
 
+// TODO: resize tile
 public class TileGrid implements Page {
 
     private final ScrollController _scroll = new ScrollController();
@@ -47,9 +47,9 @@ public class TileGrid implements Page {
 
     private final Tile tile1 = new Tile(0, 0, 2, 2, "Első"); // 2x2 tile
     private final Tile tile2 = new Tile(0, 2, 1, 1, "Második"); // 1x1 tile
-    private final Tile tile3 = new Tile(0, 4, 4, 2, ""); // Wide tile
+    private final Tile tile3 = new Tile(0, 4, 4, 2, "Wide tile"); // Wide tile
     private final Tile tile4 = new Tile(0, 8, 4, 2, ""); // Wide tile
-    private final Tile tile5 = new Tile(0, 20, 4, 4, ""); // 4x4 large tile far down
+    private final Tile tile5 = new Tile(0, 20, 4, 4, "Úristen, very big"); // 4x4 large tile far down
     private final Tile tile6 = new Tile(2, 0, 2, 2, ""); // 2x2 tile
     private final Tile tile7 = new Tile(2, 2, 2, 2, ""); // 2x2 tile
     private final List<Tile> _tiles = new ArrayList<>(List.of(tile1, tile2, tile3, tile4, tile5, tile6, tile7));

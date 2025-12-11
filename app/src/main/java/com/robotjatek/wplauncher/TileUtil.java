@@ -2,34 +2,30 @@ package com.robotjatek.wplauncher;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
 // TODO: place icon on the tile
 public class TileUtil {
+
+    private static final int TILE_PADDING_PX = 20;
+
     public static int createTextTexture(String text, int width, int height, int textColor) {
 
         var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         var canvas = new Canvas(bitmap);
-        canvas.drawColor(Color.TRANSPARENT);
+        canvas.drawColor(0xff0000ff); // TODO: pass color as param
 
         var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(textColor);
-        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTypeface(Typeface.create("sans-serif-light", Typeface.BOLD));
+        paint.setTextSize(48);
+        //var textWidth = paint.measureText(text);
 
-        var textSize = height * 0.6f;
-        paint.setTextSize(textSize);
-
-        var textWidth = paint.measureText(text);
-        // scale down here?
-
-        var fontMetrics = paint.getFontMetrics();
-        var x = width / 2f;
-        var y = height / 2f - (fontMetrics.ascent + fontMetrics.descent) / 2f;
-        canvas.drawColor(0xff0000ff); // TODO: pass color as param
-        canvas.drawText(text, x, y, paint);
+        canvas.drawText(text, TILE_PADDING_PX, height - TILE_PADDING_PX, paint);
 
         var ids = new int[1];
         GLES20.glGenTextures(1, ids, 0);

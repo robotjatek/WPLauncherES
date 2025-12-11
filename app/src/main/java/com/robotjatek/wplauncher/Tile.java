@@ -1,6 +1,8 @@
 package com.robotjatek.wplauncher;
 
 public class Tile {
+    private static final int TEXTURE_UNIT_PX = 256;
+
     public int x;
     public int y;
     public int colSpan;
@@ -14,6 +16,6 @@ public class Tile {
         this.colSpan = colSpan;
         this.rowSpan = rowSpan;
         this.title = title;
-        this.textureId = TileUtil.createTextTexture(title, 512, 512, 0xffffffff);
+        this.textureId = TileUtil.createTextTexture(title, TEXTURE_UNIT_PX * colSpan, TEXTURE_UNIT_PX * rowSpan, 0xffffffff);
     }
 }

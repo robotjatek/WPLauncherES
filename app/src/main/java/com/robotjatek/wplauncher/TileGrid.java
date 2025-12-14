@@ -55,7 +55,7 @@ public class TileGrid implements Page {
     private final List<Tile> _tiles = new ArrayList<>(List.of(tile1, tile2, tile3, tile4, tile5, tile6, tile7));
 
     private static final int COLUMNS = 4;
-    private static final float TOP_MARGIN = 128;
+    private static final float TOP_MARGIN_PX = 128;
     private static final float PAGE_PADDING_PX = 24;
     private static final float TILE_GAP_PX = 32;
 
@@ -73,7 +73,7 @@ public class TileGrid implements Page {
             var scrollSpeed = 2 * delta;
             if (screenPosY + tileHeight(_selectedTile) > _pageHeight - 200) { // reached bottom while dragging
                 _scroll.adjustOffset(-scrollSpeed);
-            } else if (screenPosY < 200) { // reached top while draggind
+            } else if (screenPosY < 200) { // reached top while dragging
                 _scroll.adjustOffset(scrollSpeed);
             }
         }
@@ -87,7 +87,7 @@ public class TileGrid implements Page {
        }
 
         Matrix.setIdentityM(scrollMatrix, 0);
-        Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset(), 0);
+        Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
 
         for (var t : _tiles) {
             // Do not render the selected tile here
@@ -340,7 +340,7 @@ public class TileGrid implements Page {
     private float getContentHeight() {
         var max = 0f;
         for (var t : _tiles) {
-            float bottom = tileY(t) + tileHeight(t) + PAGE_PADDING_PX;
+            var bottom = tileY(t) + tileHeight(t) + PAGE_PADDING_PX;
             if (bottom > max) max = bottom;
         }
         return max;
@@ -373,7 +373,7 @@ public class TileGrid implements Page {
         return _tiles.stream().filter(t -> {
             var scrollPosition = _scroll.getScrollOffset();
             var left = tileX(t);
-            var top = tileY(t) + scrollPosition;
+            var top = tileY(t) + scrollPosition + TOP_MARGIN_PX;
             var right = left + tileWidth(t);
             var bottom = top + tileHeight(t);
 
@@ -398,7 +398,12 @@ public class TileGrid implements Page {
 
     private void setScrollBounds() {
         var contentHeight = getContentHeight();
-        var min = Math.min(0, _pageHeight - contentHeight - TOP_MARGIN);
-        _scroll.setBounds(min, TOP_MARGIN);
+        var min = Math.min(0, _pageHeight - contentHeight - TOP_MARGIN_PX);
+        _scroll.setBounds(min, 0);
+    }
+
+    public void dispose() {
+        _tiles.forEach(Tile::dispose);
+        renderer.dispose();
     }
 }

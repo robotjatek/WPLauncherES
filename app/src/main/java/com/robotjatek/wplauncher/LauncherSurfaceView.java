@@ -31,4 +31,8 @@ public class LauncherSurfaceView extends GLSurfaceView {
         }
         return true;
     }
+
+    public void dispose() {
+        _renderer.dispose();
+    }
 }

@@ -30,4 +30,10 @@ public class MainActivity extends Activity {
         super.onResume();
         _surface.onResume();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        _surface.dispose();
+    }
 }

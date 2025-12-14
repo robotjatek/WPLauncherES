@@ -40,4 +40,10 @@ public class TileUtil {
 
         return ids[0];
     }
+
+    public static void deleteTexture(int handle) {
+        if (handle != -1) {
+            GLES20.glDeleteTextures(1, new int[] {handle}, 0);
+        }
+    }
 }

@@ -108,6 +108,7 @@ public class StartScreen {
         _screenWidth = width;
         Matrix.orthoM(projMatrix, 0, 0, width, height, 0, -1, 1);
         _tileGrid.onSizeChanged(width, height);
+        _appList.onSizeChanged(width, height);
     }
 
     public Page getCurrentPage() {
@@ -148,5 +149,9 @@ public class StartScreen {
             return;
         }
         _currentPage--;
+    }
+
+    public void dispose() {
+        _pages.forEach(Page::dispose);
     }
 }

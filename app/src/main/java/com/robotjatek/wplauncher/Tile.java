@@ -18,4 +18,9 @@ public class Tile {
         this.title = title;
         this.textureId = TileUtil.createTextTexture(title, TEXTURE_UNIT_PX * colSpan, TEXTURE_UNIT_PX * rowSpan, 0xffffffff);
     }
+
+    public void dispose() {
+        TileUtil.deleteTexture(textureId);
+        textureId = -1;
+    }
 }

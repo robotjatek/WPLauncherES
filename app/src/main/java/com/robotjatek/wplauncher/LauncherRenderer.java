@@ -59,4 +59,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
 
     public void handleTouchCancel() {
     }
+
+    public void dispose() {
+        _startScreen.dispose();
+    }
 }

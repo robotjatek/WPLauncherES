@@ -14,5 +14,9 @@ public interface Page {
     default boolean isCatchingGestures() {
         return false;
     }
+
+    void onSizeChanged(int width, int height);
+
+    void dispose();
 }
 

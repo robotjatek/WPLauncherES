@@ -2,7 +2,7 @@ package com.robotjatek.wplauncher.StartPage;
 
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.AppList;
+import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.StartPage.States.ChildControlState;
 import com.robotjatek.wplauncher.StartPage.States.IGestureState;
@@ -12,7 +12,7 @@ import com.robotjatek.wplauncher.StartPage.States.ScrollState;
 import com.robotjatek.wplauncher.StartPage.States.SwipingState;
 import com.robotjatek.wplauncher.StartPage.States.TappedState;
 import com.robotjatek.wplauncher.StartPage.States.TouchingState;
-import com.robotjatek.wplauncher.TileGrid;
+import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 import java.util.ArrayList;
 import java.util.List;

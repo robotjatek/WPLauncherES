@@ -360,7 +360,7 @@ public class TileGrid implements Page {
             return;
         }
 
-        tappedTile.ifPresent(t -> {});
+        tappedTile.ifPresent(t -> {}); // TODO: handle tap: start application
     }
 
     public void handleLongPress(float x, float y) {

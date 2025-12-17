@@ -119,7 +119,8 @@ public class AppList implements Page {
 
     @Override
     public void handleLongPress(float x, float y) {
-        // TODO: handle long press
+        var tappedItem = getItemAt(y);
+        tappedItem.ifPresent(i -> i.setLabel("Long press"));
     }
 
     @Override
@@ -150,9 +151,7 @@ public class AppList implements Page {
 
     private void handleTap(float x, float y) {
         var tappedItem = getItemAt(y);
-        tappedItem.ifPresent(i -> {
-            i.setLabel("Tapped");
-        }); // TODO: handle tap, start app
+        tappedItem.ifPresent(i -> i.setLabel("Tapped")); // TODO: handle tap, start app
     }
 
     private Optional<ListItem> getItemAt(float y) {

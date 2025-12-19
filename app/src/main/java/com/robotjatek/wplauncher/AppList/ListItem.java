@@ -32,6 +32,10 @@ class ListItem {
         return _textureId;
     }
 
+    public void draw(float delta) {
+
+    }
+
     public void update(float delta) {
         // TODO: queue up opengl events into a command list
         if (_dirty) {

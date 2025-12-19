@@ -6,6 +6,7 @@ import android.view.ViewConfiguration;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
+import com.robotjatek.wplauncher.Shader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 // TODO: resize tile
-public class TileGrid implements Page {
+public class TileGrid implements Page, TileDrawContext {
 
     private final ScrollController _scroll = new ScrollController();
 
@@ -28,13 +29,13 @@ public class TileGrid implements Page {
     private final DragInfo _dragInfo = new DragInfo(); // Reused drag information to mitigate GC pressure
     private boolean _isDragging = false;
 
-    private final Tile tile1 = new Tile(0, 0, 2, 2, "Első"); // 2x2 tile
-    private final Tile tile2 = new Tile(0, 2, 1, 1, "Második"); // 1x1 tile
-    private final Tile tile3 = new Tile(0, 4, 4, 2, "Wide tile"); // Wide tile
-    private final Tile tile4 = new Tile(0, 8, 4, 2, ""); // Wide tile
-    private final Tile tile5 = new Tile(0, 20, 4, 4, "Úristen, very big"); // 4x4 large tile far down
-    private final Tile tile6 = new Tile(2, 0, 2, 2, ""); // 2x2 tile
-    private final Tile tile7 = new Tile(2, 2, 2, 2, ""); // 2x2 tile
+    private final Tile tile1 = new Tile(0, 0, 2, 2, "Első", this); // 2x2 tile
+    private final Tile tile2 = new Tile(0, 2, 1, 1, "Második", this); // 1x1 tile
+    private final Tile tile3 = new Tile(0, 4, 4, 2, "Wide tile", this); // Wide tile
+    private final Tile tile4 = new Tile(0, 8, 4, 2, "", this); // Wide tile
+    private final Tile tile5 = new Tile(0, 20, 4, 4, "Úristen, very big", this); // 4x4 large tile far down
+    private final Tile tile6 = new Tile(2, 0, 2, 2, "", this); // 2x2 tile
+    private final Tile tile7 = new Tile(2, 2, 2, 2, "", this); // 2x2 tile
     private final List<Tile> _tiles = new ArrayList<>(List.of(tile1, tile2, tile3, tile4, tile5, tile6, tile7));
 
     private static final int COLUMNS = 4;
@@ -42,8 +43,9 @@ public class TileGrid implements Page {
     private static final float PAGE_PADDING_PX = 24;
     private static final float TILE_GAP_PX = 32;
 
-    private final QuadRenderer renderer = new QuadRenderer();
-
+    // TODO: pass it inside the tile?
+    private final Shader _shader = new Shader("", "");
+    private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private float tileSizePx;
     private float _pageHeight;
 
@@ -71,38 +73,20 @@ public class TileGrid implements Page {
 
         Matrix.setIdentityM(scrollMatrix, 0);
         Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
+        Matrix.multiplyMM(scrollMatrix, 0, scrollMatrix, 0, viewMatrix, 0);
 
-        for (var t : _tiles) {
+        for (var tile : _tiles) {
             // Do not render the selected tile here
-            if (t == _selectedTile) {
+            if (tile == _selectedTile) {
                 continue;
             }
-
-            Matrix.setIdentityM(modelMatrix, 0);
-            Matrix.translateM(modelMatrix, 0, tileX(t), tileY(t), 0);
-            Matrix.scaleM(modelMatrix, 0, tileWidth(t), tileHeight(t), 1);
-
-            Matrix.multiplyMM(modelMatrix, 0, scrollMatrix, 0, modelMatrix, 0);
-            Matrix.multiplyMM(modelMatrix, 0, viewMatrix, 0, modelMatrix, 0);
-
-            renderer.draw(projMatrix, modelMatrix, t.textureId);
+            tile.draw(delta, projMatrix, scrollMatrix);
         }
 
         // render the selected tile
         if (_selectedTile != null) {
-            var width = tileWidth(_selectedTile) * 1.05f;
-            var height = tileHeight(_selectedTile) * 1.05f;
-            var xDiff = (width - tileWidth(_selectedTile)) / 2;
-            var yDiff = (height - tileHeight(_selectedTile)) / 2;
-
-            Matrix.setIdentityM(modelMatrix, 0);
-            Matrix.translateM(modelMatrix, 0,
-                    tileX(_selectedTile) + _dragInfo.totalX - xDiff,
-                    tileY(_selectedTile) + _dragInfo.totalY - yDiff, 0f);
-            Matrix.scaleM(modelMatrix, 0, width, height, 1);
-            Matrix.multiplyMM(modelMatrix, 0, scrollMatrix, 0, modelMatrix, 0);
-            Matrix.multiplyMM(modelMatrix, 0, viewMatrix, 0, modelMatrix, 0);
-            renderer.draw(projMatrix, modelMatrix, _selectedTile.textureId);
+            _selectedTile.drawScaled(delta, projMatrix, scrollMatrix,
+                    1.05f, new Position(_dragInfo.totalX, _dragInfo.totalY));
         }
 
     }
@@ -299,7 +283,7 @@ public class TileGrid implements Page {
      * @param t The tile to measure
      * @return Screen space Y positon
      */
-    private float tileX(Tile t) {
+    public float tileX(Tile t) {
         return PAGE_PADDING_PX + t.x * (tileSizePx + TILE_GAP_PX);
     }
 
@@ -308,16 +292,20 @@ public class TileGrid implements Page {
      * @param t The tile to measure
      * @return Screen space Y positon
      */
-    private float tileY(Tile t) {
+    public float tileY(Tile t) {
         return PAGE_PADDING_PX + t.y * (tileSizePx + TILE_GAP_PX);
     }
 
-    private float tileWidth(Tile t) {
+    public float tileWidth(Tile t) {
         return t.colSpan * tileSizePx + (t.colSpan - 1) * TILE_GAP_PX;
     }
 
-    private float tileHeight(Tile t) {
+    public float tileHeight(Tile t) {
         return t.rowSpan * tileSizePx + (t.rowSpan - 1) * TILE_GAP_PX;
+    }
+
+    public QuadRenderer getRenderer() {
+        return _renderer;
     }
 
     private float getContentHeight() {
@@ -387,6 +375,7 @@ public class TileGrid implements Page {
 
     public void dispose() {
         _tiles.forEach(Tile::dispose);
-        renderer.dispose();
+        _renderer.dispose();
+        _shader.delete();
     }
 }

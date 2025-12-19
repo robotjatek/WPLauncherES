@@ -5,11 +5,55 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
+import com.robotjatek.wplauncher.Shader;
+import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+class MenuOption {
+
+    private final String _label;
+    private final Runnable _action;
+    private final int _width;
+    private final int _height;
+
+    private final int _textureId;
+
+    public MenuOption(String label, Runnable action, int width, int height) {
+        _label = label;
+        _action = action;
+        _width = width;
+        _height = height;
+        _textureId = TileUtil.createTextTexture(label, width, height, 0xffffffff); // TODO: más text alignmentet is supportálni
+    }
+
+    public void onTap() {
+        if (_action != null) {
+            _action.run();
+        }
+    }
+}
+
+class ContextMenu {
+
+    List<MenuOption> _options = new ArrayList<>();
+
+    public ContextMenu(List<MenuOption> options, float x, float y) {
+
+    }
+
+    public void draw(float delta, float[] proj, float[] view) {
+
+        // TODO: model matrix
+
+        // TODO: draw bg
+        // TODO: draw each option -> transparent bg, white textColor
+    }
+
+}
 
 // TODO: a scrollingot kiszervezni egy külön (base?)osztályba -- manual scroll.onTouch* calls are error prone
 // TODO: meg a view alapú render logicot is...
@@ -18,8 +62,9 @@ public class AppList implements Page {
     private final float[] scrollMatrix = new float[16]; // scroll position transformation
     private final float[] modelMatrix = new float[16];
 
-    // TODO: List item renderer
-    private final QuadRenderer testRenderer = new QuadRenderer(); // TODO: this is just to show some test data as content
+    // TODO: List item renderer?
+    private final Shader _shader = new Shader("", "");
+    private final QuadRenderer testRenderer = new QuadRenderer(_shader); // TODO: this is just to show some test data as content
     private final ScrollController _scroll = new ScrollController();
 
     private List<ListItem> _items = new ArrayList<>();
@@ -31,6 +76,8 @@ public class AppList implements Page {
     private int _listWidth;
     private boolean _isTouching = false;
 
+    private ContextMenu _contextMenu;
+
     public AppList() {}
 
     @Override
@@ -40,7 +87,12 @@ public class AppList implements Page {
         Matrix.setIdentityM(scrollMatrix, 0);
         Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
 
+        if (_contextMenu != null) {
+            _contextMenu.draw(delta, projMatrix, viewMatrix);
+        }
+
         for (var i = 0; i < _items.size(); i++) {
+            // TODO: listitem internal draw
             var item = _items.get(i);
             item.update(delta);
 
@@ -127,6 +179,6 @@ public class AppList implements Page {
     public void dispose() {
         _items.forEach(ListItem::dispose);
         _items.clear();
-        testRenderer.dispose();
+        _shader.delete();
     }
 }

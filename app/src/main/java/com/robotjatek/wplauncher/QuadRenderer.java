@@ -16,10 +16,10 @@ public class QuadRenderer {
     private final int _texCoordVBOId;
     private final Shader _shader;
 
-    int positionLoc;
+    int _positionLoc;
     int _texCoordLoc;
 
-    private static final float[] vertices = {
+    private static final float[] VERTICES = {
             // x,    y,    z
             0f,   0f,   0f,
             1f,   0f,   0f,
@@ -28,12 +28,12 @@ public class QuadRenderer {
     };
 
     // Two triangles: 0-1-2 and 0-2-3
-    private static final short[] indices = {
+    private static final short[] INDICES = {
             0, 1, 2,
             0, 2, 3
     };
 
-    private static final float[] _texCoords = {
+    private static final float[] TEX_COORDS = {
             0f,  0f,  // bottom-left
             1f,  0f,  // bottom-right
             1f,  1f,  // top-right
@@ -42,49 +42,49 @@ public class QuadRenderer {
 
     float[] _mvp = new float[16];
 
-    public QuadRenderer() {
+    public QuadRenderer(Shader shader) {
         var buffers = new int[1];
 
         // Upload vertices here, only one set of vertices, multiple draw calls per objects with different model matrices per objects
-        var vertexBuffer = ByteBuffer.allocateDirect(vertices.length * 4) // 4 bytes per float
+        var vertexBuffer = ByteBuffer.allocateDirect(VERTICES.length * 4) // 4 bytes per float
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer();
-        vertexBuffer.put(vertices).position(0);
+        vertexBuffer.put(VERTICES).position(0);
 
         GLES20.glGenBuffers(1, buffers, 0);
         _vboId = buffers[0];
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, _vboId);
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, vertices.length * 4, vertexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, VERTICES.length * 4, vertexBuffer, GLES20.GL_STATIC_DRAW);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
         var texCoordBuffer = ByteBuffer
-                .allocateDirect(_texCoords.length * 4)
+                .allocateDirect(TEX_COORDS.length * 4)
                 .order(ByteOrder.nativeOrder())
                 .asFloatBuffer();
-        texCoordBuffer.put(_texCoords).position(0);
+        texCoordBuffer.put(TEX_COORDS).position(0);
 
         GLES20.glGenBuffers(1, buffers, 0);
         _texCoordVBOId = buffers[0];
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, _texCoordVBOId);
-        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, _texCoords.length * 4, texCoordBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ARRAY_BUFFER, TEX_COORDS.length * 4, texCoordBuffer, GLES20.GL_STATIC_DRAW);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
 
         var indexBuffer = ByteBuffer
-                .allocateDirect(indices.length * 2)
+                .allocateDirect(INDICES.length * 2)
                 .order(ByteOrder.nativeOrder())
                 .asShortBuffer();
-        indexBuffer.put(indices).position(0);
+        indexBuffer.put(INDICES).position(0);
         GLES20.glGenBuffers(1, buffers, 0);
         _iboId = buffers[0];
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, _iboId);
-        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, indices.length * 2, indexBuffer, GLES20.GL_STATIC_DRAW);
+        GLES20.glBufferData(GLES20.GL_ELEMENT_ARRAY_BUFFER, INDICES.length * 2, indexBuffer, GLES20.GL_STATIC_DRAW);
 
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        _shader = new Shader("", "");
+        _shader = shader;
         _shader.use();
-        positionLoc = GLES20.glGetAttribLocation(_shader.getId(), "vPosition");
+        _positionLoc = GLES20.glGetAttribLocation(_shader.getId(), "vPosition");
         _texCoordLoc = GLES20.glGetAttribLocation(_shader.getId(), "aTexCoord");
     }
 
@@ -100,8 +100,8 @@ public class QuadRenderer {
 
         // position
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, _vboId);
-        GLES20.glEnableVertexAttribArray(positionLoc);
-        GLES20.glVertexAttribPointer(positionLoc, 3, GLES20.GL_FLOAT, false, 3 * 4, 0);
+        GLES20.glEnableVertexAttribArray(_positionLoc);
+        GLES20.glVertexAttribPointer(_positionLoc, 3, GLES20.GL_FLOAT, false, 3 * 4, 0);
 
         // texcoords
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, _texCoordVBOId);
@@ -113,16 +113,15 @@ public class QuadRenderer {
 
         GLES20.glDrawElements(
                 GLES20.GL_TRIANGLES,
-                indices.length,
+                INDICES.length,
                 GLES20.GL_UNSIGNED_SHORT,
                 0);
 
-        GLES20.glDisableVertexAttribArray(positionLoc);
+        GLES20.glDisableVertexAttribArray(_positionLoc);
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, 0);
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     public void dispose() {
-        _shader.delete();
     }
 }

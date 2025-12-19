@@ -13,7 +13,7 @@ public class Tile {
     public int colSpan;
     public int rowSpan;
     public String title;
-    public int textureId;
+    private int textureId;
     private final float[] _modelMatrix = new float[16];
 
     private static final Position NO_OFFSET = new Position(0, 0);

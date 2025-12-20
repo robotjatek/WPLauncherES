@@ -35,8 +35,8 @@ public class ListItem {
 
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
         Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, _context.x(this), _context.y(this), 0);
-        Matrix.scaleM(_modelMatrix, 0, _context.width(this), _context.height(this), 0);
+        Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
+        Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), _context.heightOf(this), 0);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         _context.getRenderer().draw(projMatrix, _modelMatrix, _textureId);
     }

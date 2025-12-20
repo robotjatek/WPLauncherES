@@ -33,6 +33,7 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
     private static final int ITEM_GAP_PX = 5;
     private static final int PAGE_PADDING_PX = 24;
     private int _listWidth;
+    private int _viewPortHeight;
     private boolean _isTouching = false;
 
     private ContextMenu _contextMenu;
@@ -95,6 +96,7 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
 
     @Override
     public void onSizeChanged(int width, int height) {
+        _viewPortHeight = height;
         _listWidth = width - 2 * PAGE_PADDING_PX;
         _items.forEach(ListItem::dispose);
         var labels = List.of("Első", "Második", "Harmadik", "Negyedik", "Ötödik", "Hatodik",
@@ -147,29 +149,34 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
 
     // TODO: composition over inheritance?
     @Override
-    public float x(ContextMenu item) {
-        // TODO: confine to screen
-        return item._position.x();
+    public float x(ContextMenu menu) {
+        // confine to screen
+        return Math.clamp(menu.position.x(), 0, _listWidth - this.width(menu));
     }
 
     @Override
-    public float y(ContextMenu item) {
-        // TODO: confine to screen
-        return item._position.y();
+    public float y(ContextMenu menu) {
+        // confine to screen
+        return Math.clamp(menu.position.y(), 0, _viewPortHeight - this.height(menu));
     }
 
     @Override
-    public float width(ContextMenu item) {
+    public float width(ContextMenu menu) {
         return 400; // TODO: implement
     }
 
     @Override
-    public float x(ListItem item) {
+    public float height(ContextMenu menu) {
+        return menu.calculateHeight();
+    }
+
+    @Override
+    public float xOf(ListItem item) {
         return PAGE_PADDING_PX;
     }
 
     @Override
-    public float y(ListItem item) {
+    public float yOf(ListItem item) {
         var index = _items.indexOf(item);
         if (index == -1) {
             throw new RuntimeException("List item not found");
@@ -178,12 +185,12 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
     }
 
     @Override
-    public float width(ListItem item) {
+    public float widthOf(ListItem item) {
         return _listWidth - PAGE_PADDING_PX;
     }
 
     @Override
-    public float height(ListItem item) {
+    public float heightOf(ListItem item) {
         return ITEM_HEIGHT_PX;
     }
 

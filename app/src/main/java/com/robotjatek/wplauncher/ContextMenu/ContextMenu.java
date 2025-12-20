@@ -13,13 +13,13 @@ public class ContextMenu implements IMenuItemDrawContext {
 
     private final IContextMenuDrawContext _context;
     private final List<MenuOption> _options = new ArrayList<>();
-    public final Position _position;
+    public final Position position;
     private final float[] _modelMatrix = new float[16];
     private final int _bgId;
 
     public ContextMenu(Position position, com.robotjatek.wplauncher.ContextMenu.IContextMenuDrawContext context) {
         _context = context;
-        _position = position;
+        this.position = position;
         Matrix.setIdentityM(_modelMatrix, 0);
         _bgId = TileUtil.createTextTexture("", 1, 1, 0, 0xff000000); // TODO: no text, bg only version
     }
@@ -27,7 +27,7 @@ public class ContextMenu implements IMenuItemDrawContext {
     private static final float ITEM_HEIGHT_PX = 100;
 
     public void draw(float delta, float[] proj, float[] view) {
-        var menuHeight = _options.size() * ITEM_HEIGHT_PX;
+        var menuHeight = calculateHeight();
         // draw bg
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, _context.x(this), _context.y(this), 0); // TODO: x,y should consider the w and h of the menu so it resides in the confines of the parent
@@ -68,25 +68,29 @@ public class ContextMenu implements IMenuItemDrawContext {
     }
 
     @Override
-    public float x(MenuOption item) {
+    public float xOf(MenuOption item) {
         return _context.x(this);
     }
 
     @Override
-    public float y(MenuOption item) {
+    public float yOf(MenuOption item) {
         // Y is based on the index of the option
         var itemId = _options.indexOf(item);
         return _context.y(this) + itemId * ITEM_HEIGHT_PX;
     }
 
     @Override
-    public float width(MenuOption item) {
+    public float widthOf(MenuOption item) {
         return _context.width(this);
     }
 
     @Override
-    public float height(MenuOption item) {
+    public float heightOf(MenuOption item) {
         // fixed height
         return ITEM_HEIGHT_PX;
+    }
+
+    public float calculateHeight() {
+        return _options.size() * ITEM_HEIGHT_PX;
     }
 }

@@ -16,7 +16,7 @@ public class MenuOption {
     public MenuOption(String label, Runnable action, IMenuItemDrawContext context) {
         _action = action;
         _context = context;
-        _textureId = TileUtil.createTextTexture(label, (int) context.width(this), (int) context.height(this), 0xffffffff, 0x00000000); // TODO: más text alignmentet is supportálni
+        _textureId = TileUtil.createTextTexture(label, (int) context.widthOf(this), (int) context.heightOf(this), 0xffffffff, 0x00000000); // TODO: más text alignmentet is supportálni
     }
 
     public void onTap() {
@@ -27,8 +27,8 @@ public class MenuOption {
 
     public void draw(float delta, float[] proj, float[] view) {
         Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, _context.x(this), _context.y(this), 0);
-        Matrix.scaleM(_modelMatrix, 0, _context.width(this), _context.height(this), 0);
+        Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
+        Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), _context.heightOf(this), 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         _context.getRenderer().draw(proj, _modelMatrix, _textureId);
     }

@@ -2,65 +2,24 @@ package com.robotjatek.wplauncher.AppList;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
+import com.robotjatek.wplauncher.ContextMenu.IContextMenuDrawContext;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
-import com.robotjatek.wplauncher.TileUtil;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-class MenuOption {
-
-    private final String _label;
-    private final Runnable _action;
-    private final int _width;
-    private final int _height;
-
-    private final int _textureId;
-
-    public MenuOption(String label, Runnable action, int width, int height) {
-        _label = label;
-        _action = action;
-        _width = width;
-        _height = height;
-        _textureId = TileUtil.createTextTexture(label, width, height, 0xffffffff); // TODO: más text alignmentet is supportálni
-    }
-
-    public void onTap() {
-        if (_action != null) {
-            _action.run();
-        }
-    }
-}
-
-class ContextMenu {
-
-    List<MenuOption> _options = new ArrayList<>();
-
-    public ContextMenu(List<MenuOption> options, float x, float y) {
-
-    }
-
-    public void draw(float delta, float[] proj, float[] view) {
-
-        // TODO: model matrix
-
-        // TODO: draw bg
-        // TODO: draw each option -> transparent bg, white textColor
-    }
-
-}
-
 // TODO: a scrollingot kiszervezni egy külön (base?)osztályba -- manual scroll.onTouch* calls are error prone
 // TODO: meg a view alapú render logicot is...
-public class AppList implements Page, ListItemDrawContext {
+public class AppList implements Page, IListItemDrawContext, IContextMenuDrawContext {
 
     private final float[] scrollMatrix = new float[16]; // scroll position transformation
-    private final float[] modelMatrix = new float[16];
 
     // TODO: List item renderer?
     private final Shader _shader = new Shader("", "");
@@ -88,14 +47,15 @@ public class AppList implements Page, ListItemDrawContext {
         Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
         Matrix.multiplyMM(scrollMatrix, 0, scrollMatrix, 0, viewMatrix, 0);
 
-        if (_contextMenu != null) {
-            _contextMenu.draw(delta, projMatrix, viewMatrix);
-        }
-
         for (var i = 0; i < _items.size(); i++) {
             var item = _items.get(i);
             item.update(delta);
             item.draw(delta, projMatrix, scrollMatrix);
+        }
+
+        // Draw the context menu last so it shows up above everything else
+        if (_contextMenu != null) {
+            _contextMenu.draw(delta, projMatrix, viewMatrix);
         }
     }
 
@@ -123,7 +83,14 @@ public class AppList implements Page, ListItemDrawContext {
     @Override
     public void handleLongPress(float x, float y) {
         var tappedItem = getItemAt(y);
-        tappedItem.ifPresent(i -> i.setLabel("Long press"));
+        tappedItem.ifPresent(i -> {
+            i.setLabel("Long press");
+            if (_contextMenu != null) {
+                _contextMenu.dispose();
+            }
+            // TODO: always draw inside screen-bounds
+            _contextMenu = ContextMenu.CreateAppListContextMenu(new Position(x, y), this);
+        });
     }
 
     @Override
@@ -153,6 +120,12 @@ public class AppList implements Page, ListItemDrawContext {
     }
 
     private void handleTap(float x, float y) {
+        if (_contextMenu != null) {
+            _contextMenu.dispose();
+            _contextMenu = null; // TODO: áttérni state machinere, mert a childcontrol state a parentben áthív ide touchendkor
+            return;
+        }
+
         var tappedItem = getItemAt(y);
         tappedItem.ifPresent(i -> i.setLabel("Tapped")); // TODO: handle tap, start app
     }
@@ -170,6 +143,24 @@ public class AppList implements Page, ListItemDrawContext {
     @Override
     public QuadRenderer getRenderer() {
         return testRenderer;
+    }
+
+    // TODO: composition over inheritance?
+    @Override
+    public float x(ContextMenu item) {
+        // TODO: confine to screen
+        return item._position.x();
+    }
+
+    @Override
+    public float y(ContextMenu item) {
+        // TODO: confine to screen
+        return item._position.y();
+    }
+
+    @Override
+    public float width(ContextMenu item) {
+        return 400; // TODO: implement
     }
 
     @Override
@@ -195,6 +186,12 @@ public class AppList implements Page, ListItemDrawContext {
     public float height(ListItem item) {
         return ITEM_HEIGHT_PX;
     }
+
+    // TODO: uncomment after state machine transition
+//    @Override
+//    public boolean isCatchingGestures() {
+//        return _contextMenu != null;
+//    }
 
     @Override
     public void dispose() {

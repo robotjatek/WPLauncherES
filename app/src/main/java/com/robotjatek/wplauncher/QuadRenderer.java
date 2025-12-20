@@ -98,6 +98,9 @@ public class QuadRenderer {
 
         GLES20.glBindBuffer(GLES20.GL_ELEMENT_ARRAY_BUFFER, _iboId);
 
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+
         // position
         GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, _vboId);
         GLES20.glEnableVertexAttribArray(_positionLoc);

@@ -2,7 +2,7 @@ package com.robotjatek.wplauncher.AppList;
 
 import com.robotjatek.wplauncher.QuadRenderer;
 
-public interface ListItemDrawContext {
+public interface IListItemDrawContext {
     QuadRenderer getRenderer();
     float x(ListItem item);
     float y(ListItem item);

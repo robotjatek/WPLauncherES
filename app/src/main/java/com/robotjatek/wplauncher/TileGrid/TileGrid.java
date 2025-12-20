@@ -304,6 +304,7 @@ public class TileGrid implements Page, TileDrawContext {
         return t.rowSpan * tileSizePx + (t.rowSpan - 1) * TILE_GAP_PX;
     }
 
+    @Override
     public QuadRenderer getRenderer() {
         return _renderer;
     }

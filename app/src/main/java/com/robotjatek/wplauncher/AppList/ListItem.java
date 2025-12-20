@@ -9,18 +9,18 @@ import com.robotjatek.wplauncher.TileUtil;
 public class ListItem {
     private String _label;
     private int _textureId;
-    private int _width;
-    private int _height;
+    private final int _width;
+    private final int _height;
     private final float[] _modelMatrix = new float[16];
-    private final ListItemDrawContext _context;
+    private final IListItemDrawContext _context;
 
     private boolean _dirty = true;
 
-    public ListItem(String label, int width, int height, ListItemDrawContext context) {
+    public ListItem(String label, int width, int height, IListItemDrawContext context) {
         _label = label;
         _width = width;
         _height = height;
-        _textureId = TileUtil.createTextTexture(label, width, height, 0xffffffff);
+        _textureId = TileUtil.createTextTexture(label, width, height, 0xffffffff, 0xff0000ff);
         _context = context;
     }
 
@@ -45,7 +45,7 @@ public class ListItem {
         // TODO: queue up opengl events into a command list
         if (_dirty) {
             TileUtil.deleteTexture(_textureId);
-            _textureId = TileUtil.createTextTexture(_label, _width, _height, 0xffffffff);
+            _textureId = TileUtil.createTextTexture(_label, _width, _height, 0xffffffff, 0xff0000ff);
             _dirty = false;
         }
     }

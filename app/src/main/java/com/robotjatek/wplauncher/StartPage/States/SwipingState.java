@@ -27,7 +27,7 @@ public class SwipingState extends BaseState {
 
     @Override
     public void handleTouchEnd(float x, float y) {
-        float threshold = _context.getScreenWidth() / 3f;
+        float threshold = _context.getScreenWidth() / 10f;
         if (_context.getPageOffset() > threshold) {
             _context.previousPage();
         }

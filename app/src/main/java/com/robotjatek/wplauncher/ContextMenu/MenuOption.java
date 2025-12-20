@@ -1,0 +1,35 @@
+package com.robotjatek.wplauncher.ContextMenu;
+
+import android.opengl.Matrix;
+
+import com.robotjatek.wplauncher.TileUtil;
+
+public class MenuOption {
+
+    private final Runnable _action;
+    private final IMenuItemDrawContext _context;
+
+    private final float[] _modelMatrix = new float[16];
+
+    private final int _textureId;
+
+    public MenuOption(String label, Runnable action, IMenuItemDrawContext context) {
+        _action = action;
+        _context = context;
+        _textureId = TileUtil.createTextTexture(label, (int) context.width(this), (int) context.height(this), 0xffffffff, 0x00000000); // TODO: más text alignmentet is supportálni
+    }
+
+    public void onTap() {
+        if (_action != null) {
+            _action.run();
+        }
+    }
+
+    public void draw(float delta, float[] proj, float[] view) {
+        Matrix.setIdentityM(_modelMatrix, 0);
+        Matrix.translateM(_modelMatrix, 0, _context.x(this), _context.y(this), 0);
+        Matrix.scaleM(_modelMatrix, 0, _context.width(this), _context.height(this), 0);
+        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
+        _context.getRenderer().draw(proj, _modelMatrix, _textureId);
+    }
+}

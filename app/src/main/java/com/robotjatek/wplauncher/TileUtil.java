@@ -12,11 +12,11 @@ public class TileUtil {
 
     private static final int CONTENT_PADDING_PX = 20;
 
-    public static int createTextTexture(String text, int width, int height, int textColor) {
+    public static int createTextTexture(String text, int width, int height, int textColor, int bgColor) {
 
         var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         var canvas = new Canvas(bitmap);
-        canvas.drawColor(0xff0000ff); // TODO: pass bgcolor as param
+        canvas.drawColor(bgColor);
 
         var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(textColor);

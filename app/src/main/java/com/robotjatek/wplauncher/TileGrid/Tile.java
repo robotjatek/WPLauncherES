@@ -25,7 +25,7 @@ public class Tile {
         this.colSpan = colSpan;
         this.rowSpan = rowSpan;
         this.title = title;
-        this.textureId = TileUtil.createTextTexture(title, TEXTURE_UNIT_PX * colSpan, TEXTURE_UNIT_PX * rowSpan, 0xffffffff);
+        this.textureId = TileUtil.createTextTexture(title, TEXTURE_UNIT_PX * colSpan, TEXTURE_UNIT_PX * rowSpan, 0xffffffff, 0xff0000ff);
     }
 
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {

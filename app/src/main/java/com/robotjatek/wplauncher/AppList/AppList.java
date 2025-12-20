@@ -4,6 +4,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.ContextMenu.IContextMenuDrawContext;
+import com.robotjatek.wplauncher.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
@@ -89,8 +90,10 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
             if (_contextMenu != null) {
                 _contextMenu.dispose();
             }
-            // TODO: always draw inside screen-bounds
-            _contextMenu = ContextMenu.CreateAppListContextMenu(new Position(x, y), this);
+            _contextMenu = createAppListContextMenu(
+                    new Position(x, y), this,
+                    () -> tappedItem.get().setLabel("pin"),
+                    () -> tappedItem.get().setLabel("uninstall"));
         });
     }
 
@@ -123,6 +126,10 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
 
     private void handleTap(float x, float y) {
         if (_contextMenu != null) {
+            if (_contextMenu.isTappedOn(x, y)) {
+                _contextMenu.onTap(x, y);
+            }
+
             _contextMenu.dispose();
             _contextMenu = null; // TODO: áttérni state machinere, mert a childcontrol state a parentben áthív ide touchendkor
             return;
@@ -149,25 +156,45 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
 
     // TODO: composition over inheritance?
     @Override
-    public float x(ContextMenu menu) {
+    public float xOf(ContextMenu menu) {
         // confine to screen
-        return Math.clamp(menu.position.x(), 0, _listWidth - this.width(menu));
+        return Math.clamp(menu.position.x(), 0, _listWidth - this.widthOf(menu));
     }
 
     @Override
-    public float y(ContextMenu menu) {
+    public float yOf(ContextMenu menu) {
         // confine to screen
-        return Math.clamp(menu.position.y(), 0, _viewPortHeight - this.height(menu));
+        return Math.clamp(menu.position.y(), 0, _viewPortHeight - this.heightOf(menu));
     }
 
     @Override
-    public float width(ContextMenu menu) {
-        return 400; // TODO: implement
+    public float widthOf(ContextMenu menu) {
+        return 400;
     }
 
     @Override
-    public float height(ContextMenu menu) {
+    public float heightOf(ContextMenu menu) {
         return menu.calculateHeight();
+    }
+
+    /**
+     * Creates a new context menu instance for the applist. It position is always absolute screen position
+     * @param position Absolute screen position
+     * @param context The context of the drawing.
+     *                This component helps determine the position and size of the menu.
+     *                Usually this is the parent component of the context menu
+     * @param pin The action to run when pinning an application
+     * @param uninstall The action to run when tapping uninstall
+     * @return The context menu on applist with Pin and uninstall options
+     */
+    private ContextMenu createAppListContextMenu(Position position, IContextMenuDrawContext context,
+                                                 Runnable pin, Runnable uninstall) {
+        var menu = new ContextMenu(position, context);
+        var options = List.of(
+                new MenuOption("Pin", pin, menu),
+                new MenuOption("Uninstall", uninstall, menu));
+        menu.addOptions(options);
+        return menu;
     }
 
     @Override
@@ -194,7 +221,7 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
         return ITEM_HEIGHT_PX;
     }
 
-    // TODO: uncomment after state machine transition
+    // TODO: uncomment after state machine implementation
 //    @Override
 //    public boolean isCatchingGestures() {
 //        return _contextMenu != null;
@@ -205,5 +232,8 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
         _items.forEach(ListItem::dispose);
         _items.clear();
         _shader.delete();
+        if (_contextMenu != null) {
+            _contextMenu.dispose();
+        }
     }
 }

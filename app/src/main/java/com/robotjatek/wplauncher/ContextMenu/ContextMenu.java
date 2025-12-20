@@ -8,58 +8,51 @@ import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ContextMenu implements IMenuItemDrawContext {
 
+    private static final float ITEM_HEIGHT_PX = 100;
     private final IContextMenuDrawContext _context;
     private final List<MenuOption> _options = new ArrayList<>();
     public final Position position;
     private final float[] _modelMatrix = new float[16];
     private final int _bgId;
 
-    public ContextMenu(Position position, com.robotjatek.wplauncher.ContextMenu.IContextMenuDrawContext context) {
+    public ContextMenu(Position position, IContextMenuDrawContext context) {
         _context = context;
         this.position = position;
         Matrix.setIdentityM(_modelMatrix, 0);
         _bgId = TileUtil.createTextTexture("", 1, 1, 0, 0xff000000); // TODO: no text, bg only version
     }
 
-    private static final float ITEM_HEIGHT_PX = 100;
-
     public void draw(float delta, float[] proj, float[] view) {
         var menuHeight = calculateHeight();
         // draw bg
         Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, _context.x(this), _context.y(this), 0); // TODO: x,y should consider the w and h of the menu so it resides in the confines of the parent
-        Matrix.scaleM(_modelMatrix, 0, _context.width(this), menuHeight, 0); // Menu height is based on the number of items
+        Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
+        Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0); // Menu height is based on the number of items
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         _context.getRenderer().draw(proj, _modelMatrix, _bgId);
 
         // Draw options on top of the background
-        Matrix.translateM(_modelMatrix, 0, _context.x(this), _context.y(this), 0);
-        Matrix.scaleM(_modelMatrix, 0, _context.width(this), menuHeight, 0);
+        Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
+        Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0);
         for (var i = 0; i < _options.size(); i++) {
             // draw each option
             _options.get(i).draw(delta, proj, view);
         }
     }
 
-    public static ContextMenu CreateAppListContextMenu(Position position, com.robotjatek.wplauncher.ContextMenu.IContextMenuDrawContext context) {
-        var menu = new ContextMenu(position, context);
-        var options = List.of(
-                new MenuOption("Pin", () -> {
-                }, menu),
-                new MenuOption("Uninstall", () -> {
-                }, menu));
-        menu.addOptions(options);
-        return menu;
-    }
 
     public void addOptions(List<MenuOption> options) {
         _options.addAll(options);
     }
 
     public void dispose() {
+        TileUtil.deleteTexture(_bgId);
+        _options.forEach(MenuOption::dispose);
+        _options.clear();
     }
 
     @Override
@@ -69,19 +62,19 @@ public class ContextMenu implements IMenuItemDrawContext {
 
     @Override
     public float xOf(MenuOption item) {
-        return _context.x(this);
+        return _context.xOf(this);
     }
 
     @Override
     public float yOf(MenuOption item) {
         // Y is based on the index of the option
         var itemId = _options.indexOf(item);
-        return _context.y(this) + itemId * ITEM_HEIGHT_PX;
+        return _context.yOf(this) + itemId * ITEM_HEIGHT_PX;
     }
 
     @Override
     public float widthOf(MenuOption item) {
-        return _context.width(this);
+        return _context.widthOf(this);
     }
 
     @Override
@@ -92,5 +85,26 @@ public class ContextMenu implements IMenuItemDrawContext {
 
     public float calculateHeight() {
         return _options.size() * ITEM_HEIGHT_PX;
+    }
+
+    public void onTap(float x, float y) {
+        var tappedItem = getOptionAt(x, y);
+        tappedItem.ifPresent(MenuOption::onTap);
+    }
+
+    public boolean isTappedOn(float x, float y) {
+        return x >= position.x() && x <= position.x() + _context.widthOf(this) &&
+                y >= position.y() && y <= position.y() + _context.heightOf(this);
+    }
+
+    private Optional<MenuOption> getOptionAt(float x, float y) {
+        return _options.stream().filter(o -> {
+            var left = xOf(o);
+            var top = yOf(o);
+            var right = left + widthOf(o);
+            var bottom = top + heightOf(o);
+
+            return x >= left && x <= right && y >= top && y <= bottom;
+        }).findFirst();
     }
 }

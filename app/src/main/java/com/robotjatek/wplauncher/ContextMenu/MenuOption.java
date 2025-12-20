@@ -32,4 +32,8 @@ public class MenuOption {
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         _context.getRenderer().draw(proj, _modelMatrix, _textureId);
     }
+
+    public void dispose() {
+        TileUtil.deleteTexture(_textureId);
+    }
 }

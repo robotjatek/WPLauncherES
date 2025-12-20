@@ -12,16 +12,17 @@ import java.util.Optional;
 
 public class ContextMenu implements IMenuItemDrawContext {
 
-    private static final float ITEM_HEIGHT_PX = 100;
+    private static final float ITEM_HEIGHT_PX = 150;
     private final IContextMenuDrawContext _context;
     private final List<MenuOption> _options = new ArrayList<>();
-    public final Position position;
+    public Position position;
     private final float[] _modelMatrix = new float[16];
     private final int _bgId;
 
     public ContextMenu(Position position, IContextMenuDrawContext context) {
         _context = context;
         this.position = position;
+        this.position = new Position(_context.xOf(this), _context.yOf(this)); // recalculate position after confining the menu into the viewport
         Matrix.setIdentityM(_modelMatrix, 0);
         _bgId = TileUtil.createTextTexture("", 1, 1, 0, 0xff000000); // TODO: no text, bg only version
     }
@@ -93,8 +94,8 @@ public class ContextMenu implements IMenuItemDrawContext {
     }
 
     public boolean isTappedOn(float x, float y) {
-        return x >= position.x() && x <= position.x() + _context.widthOf(this) &&
-                y >= position.y() && y <= position.y() + _context.heightOf(this);
+        return x >= _context.xOf(this) && x <= _context.xOf(this) + _context.widthOf(this) &&
+                y >= _context.yOf(this) && y <= _context.yOf(this) + _context.heightOf(this);
     }
 
     private Optional<MenuOption> getOptionAt(float x, float y) {

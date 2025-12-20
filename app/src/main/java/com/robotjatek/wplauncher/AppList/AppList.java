@@ -89,9 +89,10 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
             i.setLabel("Long press");
             if (_contextMenu != null) {
                 _contextMenu.dispose();
+                _contextMenu = null;
             }
             _contextMenu = createAppListContextMenu(
-                    new Position(x, y), this,
+                    new Position(x, y),
                     () -> tappedItem.get().setLabel("pin"),
                     () -> tappedItem.get().setLabel("uninstall"));
         });
@@ -180,16 +181,12 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
     /**
      * Creates a new context menu instance for the applist. It position is always absolute screen position
      * @param position Absolute screen position
-     * @param context The context of the drawing.
-     *                This component helps determine the position and size of the menu.
-     *                Usually this is the parent component of the context menu
      * @param pin The action to run when pinning an application
      * @param uninstall The action to run when tapping uninstall
      * @return The context menu on applist with Pin and uninstall options
      */
-    private ContextMenu createAppListContextMenu(Position position, IContextMenuDrawContext context,
-                                                 Runnable pin, Runnable uninstall) {
-        var menu = new ContextMenu(position, context);
+    private ContextMenu createAppListContextMenu(Position position, Runnable pin, Runnable uninstall) {
+        var menu = new ContextMenu(position, this);
         var options = List.of(
                 new MenuOption("Pin", pin, menu),
                 new MenuOption("Uninstall", uninstall, menu));

@@ -136,7 +136,7 @@ public class TileService {
                 tileJson.put("colSpan", tile.colSpan);
                 tileJson.put("rowSpan", tile.rowSpan);
                 tileJson.put("title", tile.title);
-                if (!tile.getPackageName().isEmpty()) {
+                if (tile.getPackageName() != null && !tile.getPackageName().isEmpty()) {
                     tileJson.put("packageName", tile.getPackageName());
                 }
                 tileArray.put(tileJson);

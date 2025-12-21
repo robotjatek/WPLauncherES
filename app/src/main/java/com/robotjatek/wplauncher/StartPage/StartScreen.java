@@ -14,6 +14,7 @@ import com.robotjatek.wplauncher.StartPage.States.SwipingState;
 import com.robotjatek.wplauncher.StartPage.States.TappedState;
 import com.robotjatek.wplauncher.StartPage.States.TouchingState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
+import com.robotjatek.wplauncher.TileService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,18 +74,21 @@ public class StartScreen {
     private int _currentPage = 0;
     private float _pageOffset = 0;
     private final List<Page> _pages;
+    private final TileService _tileService;
 
     float[] projMatrix = new float[16];
     float[] pageMatrix = new float[16]; // stores the page translation relative to each other
 
     public StartScreen(Context context) {
         _state = IDLE_STATE();
-        _tileGrid = new TileGrid();
-        _appList = new AppList(context);
+        _tileService = new TileService();
+        _tileGrid = new TileGrid(_tileService);
+        _appList = new AppList(context, _tileService);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
     }
 
     public void draw(float delta) {
+        _tileService.executeCommands();
         for (var i = 0; i < _pages.size(); i++) {
             var xOffset = (i - _currentPage) * _screenWidth + _pageOffset;
             Matrix.setIdentityM(pageMatrix, 0);
@@ -157,5 +161,6 @@ public class StartScreen {
 
     public void dispose() {
         _pages.forEach(Page::dispose);
+        _tileService.dispose();
     }
 }

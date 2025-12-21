@@ -13,6 +13,7 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.TileGrid.Position;
+import com.robotjatek.wplauncher.TileService;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,7 +28,7 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
     private final float[] scrollMatrix = new float[16]; // scroll position transformation
 
     private final Shader _shader = new Shader("", "");
-    private final QuadRenderer renderer = new QuadRenderer(_shader);
+    private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private final ScrollController _scroll = new ScrollController();
 
     private List<ListItem<App>> _items = new ArrayList<>();
@@ -43,12 +44,14 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
     private ContextMenu _contextMenu;
     private final List<App> _apps;
     private final Context _context;
+    private final TileService _tileService;
 
-    public AppList(Context context) {
+    public AppList(Context context, TileService tileService) {
         // TODO: extract method
         // TODO: cache results
         // TODO: reload results after app install/uninstall
         _context = context;
+        _tileService = tileService;
         var pm = _context.getPackageManager();
         var intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -114,7 +117,10 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
             _contextMenu = createAppListContextMenu(
                     new Position(x, y),
                     () -> pinApp(i.getPayload()),
-                    () -> uninstallApp(i.getPayload().packageName()));
+                    () ->  {
+                        uninstallApp(i.getPayload().packageName());
+                        _tileService.unpinTile(i.getPayload());
+                    });
         });
     }
 
@@ -168,7 +174,7 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
 
     @Override
     public QuadRenderer getRenderer() {
-        return renderer;
+        return _renderer;
     }
 
     // TODO: composition over inheritance?
@@ -238,13 +244,11 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
         var intent = new Intent(Intent.ACTION_DELETE);
         intent.setData(Uri.parse("package:" + packageName));
         _context.startActivity(intent);
+        // TODO: remove from tilelist if pinned
     }
 
     private void pinApp(App app) {
-        // TODO: implement
-        // TODO: tileservice => calcs new tile position => creates a new tile => emits tilelist changed event
-        // TODO: tilePage sub to tilelist change
-        // TODO: tilePage get tileList from
+        _tileService.pinTile(app);
     }
 
     // TODO: uncomment after state machine implementation
@@ -258,6 +262,7 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
         _items.forEach(ListItem::dispose);
         _items.clear();
         _shader.delete();
+        _renderer.dispose();
         if (_contextMenu != null) {
             _contextMenu.dispose();
         }

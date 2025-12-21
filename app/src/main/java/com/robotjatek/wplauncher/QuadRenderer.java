@@ -126,5 +126,6 @@ public class QuadRenderer {
     }
 
     public void dispose() {
+        GLES20.glDeleteBuffers(2, new int[] { _vboId, _iboId }, 0);
     }
 }

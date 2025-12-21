@@ -38,6 +38,10 @@ public class TileUtil {
 
         bitmap.recycle();
 
+        if (ids[0] < 1) {
+            throw new RuntimeException("Failed to create a texture. This may be an off main-thread call");
+        }
+
         return ids[0];
     }
 

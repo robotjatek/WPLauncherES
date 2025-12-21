@@ -3,10 +3,12 @@ package com.robotjatek.wplauncher.TileGrid;
 import android.opengl.Matrix;
 import android.view.ViewConfiguration;
 
+import com.robotjatek.wplauncher.ITileListChangedListener;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
+import com.robotjatek.wplauncher.TileService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,40 +16,33 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 // TODO: resize tile
-public class TileGrid implements Page, TileDrawContext {
+public class TileGrid implements Page, TileDrawContext, ITileListChangedListener {
 
     private final ScrollController _scroll = new ScrollController();
-
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
-    private final float[] modelMatrix = new float[16]; // Reused model matrix for the individual tiles
     private boolean _isTouching = false;
     private long _touchStart = 0;
     private float _touchStartX = 0;
     private float _touchStartY = 0;
-
     private Tile _selectedTile;
     private final DragInfo _dragInfo = new DragInfo(); // Reused drag information to mitigate GC pressure
     private boolean _isDragging = false;
-
-    private final Tile tile1 = new Tile(0, 0, 2, 2, "Első", this); // 2x2 tile
-    private final Tile tile2 = new Tile(0, 2, 1, 1, "Második", this); // 1x1 tile
-    private final Tile tile3 = new Tile(0, 4, 4, 2, "Wide tile", this); // Wide tile
-    private final Tile tile4 = new Tile(0, 8, 4, 2, "", this); // Wide tile
-    private final Tile tile5 = new Tile(0, 20, 4, 4, "Úristen, very big", this); // 4x4 large tile far down
-    private final Tile tile6 = new Tile(2, 0, 2, 2, "", this); // 2x2 tile
-    private final Tile tile7 = new Tile(2, 2, 2, 2, "", this); // 2x2 tile
-    private final List<Tile> _tiles = new ArrayList<>(List.of(tile1, tile2, tile3, tile4, tile5, tile6, tile7));
-
+    private List<Tile> _tiles;
     private static final int COLUMNS = 4;
     private static final float TOP_MARGIN_PX = 128;
     private static final float PAGE_PADDING_PX = 24;
     private static final float TILE_GAP_PX = 32;
-
-    // TODO: pass it inside the tile?
     private final Shader _shader = new Shader("", "");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private float tileSizePx;
     private float _pageHeight;
+    private final TileService _tileService;
+
+    public TileGrid(TileService tileService) {
+        _tileService = tileService;
+        _tiles = tileService.getTiles();
+        _tileService.subscribe(this);
+    }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
@@ -80,13 +75,13 @@ public class TileGrid implements Page, TileDrawContext {
             if (tile == _selectedTile) {
                 continue;
             }
-            tile.draw(delta, projMatrix, scrollMatrix);
+            tile.draw(delta, projMatrix, scrollMatrix, this);
         }
 
         // render the selected tile
         if (_selectedTile != null) {
             _selectedTile.drawScaled(delta, projMatrix, scrollMatrix,
-                    1.05f, new Position(_dragInfo.totalX, _dragInfo.totalY));
+                    1.05f, new Position(_dragInfo.totalX, _dragInfo.totalY), this);
         }
 
     }
@@ -245,6 +240,10 @@ public class TileGrid implements Page, TileDrawContext {
         }
     }
 
+    /**
+     * Removes empty rows between tiles
+     * Note: this works on a row-by-row basis so its not very efficient
+     */
     private void compactGrid() {
         var maxRow = calculateGroupLowestPoint(_tiles);
         for (var i = 0; i < maxRow; i++) {
@@ -332,7 +331,7 @@ public class TileGrid implements Page, TileDrawContext {
             return;
         }
 
-        tappedTile.ifPresent(t -> {}); // TODO: handle tap: start application
+        tappedTile.ifPresent(Tile::onTap);
     }
 
     public void handleLongPress(float x, float y) {
@@ -374,8 +373,14 @@ public class TileGrid implements Page, TileDrawContext {
         _scroll.setBounds(min, 0);
     }
 
+    @Override
+    public void tileListChanged() {
+        _tiles = _tileService.getTiles();
+        compactGrid();
+        setScrollBounds();
+    }
+
     public void dispose() {
-        _tiles.forEach(Tile::dispose);
         _renderer.dispose();
         _shader.delete();
     }

@@ -27,7 +27,7 @@ public class ContextMenu implements IMenuItemDrawContext {
         _bgId = TileUtil.createTextTexture("", 1, 1, 0, 0xff000000); // TODO: no text, bg only version
     }
 
-    public void draw(float delta, float[] proj, float[] view) {
+    public void draw(float[] proj, float[] view) {
         var menuHeight = calculateHeight();
         // draw bg
         Matrix.setIdentityM(_modelMatrix, 0);
@@ -41,7 +41,7 @@ public class ContextMenu implements IMenuItemDrawContext {
         Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0);
         for (var i = 0; i < _options.size(); i++) {
             // draw each option
-            _options.get(i).draw(delta, proj, view);
+            _options.get(i).draw(proj, view);
         }
     }
 

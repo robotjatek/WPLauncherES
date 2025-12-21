@@ -11,7 +11,7 @@ public class MenuOption {
 
     private final float[] _modelMatrix = new float[16];
 
-    private final int _textureId;
+    private int _textureId;
 
     public MenuOption(String label, Runnable action, IMenuItemDrawContext context) {
         _action = action;
@@ -25,7 +25,7 @@ public class MenuOption {
         }
     }
 
-    public void draw(float delta, float[] proj, float[] view) {
+    public void draw(float[] proj, float[] view) {
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
         Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), _context.heightOf(this), 0);
@@ -35,5 +35,6 @@ public class MenuOption {
 
     public void dispose() {
         TileUtil.deleteTexture(_textureId);
+        _textureId = -1;
     }
 }

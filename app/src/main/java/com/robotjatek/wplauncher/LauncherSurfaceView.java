@@ -10,7 +10,7 @@ public class LauncherSurfaceView extends GLSurfaceView {
 
     public LauncherSurfaceView(Context context) {
         super(context);
-        _renderer = new LauncherRenderer();
+        _renderer = new LauncherRenderer(context);
 
         setEGLContextClientVersion(2);
         setRenderer(_renderer);

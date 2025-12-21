@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher;
 
+import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
@@ -12,15 +13,17 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private long fpsTime = System.currentTimeMillis();
 
     private StartScreen _startScreen;
+    private Context _context;
 
-    public LauncherRenderer() {
+    public LauncherRenderer(Context context) {
+        _context = context;
     }
 
     @Override
     public void onSurfaceCreated(javax.microedition.khronos.opengles.GL10 glUnused,
                                  javax.microedition.khronos.egl.EGLConfig config) {
         GLES20.glClearColor(0f, 0f, 0f, 1f);
-        _startScreen = new StartScreen(); // Init startscreen here so no accidental gl calls before the surface is ready
+        _startScreen = new StartScreen(_context); // Init startscreen here so no accidental gl calls before the surface is ready
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.StartPage;
 
+import android.content.Context;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.AppList;
@@ -66,18 +67,21 @@ public class StartScreen {
     private int _screenWidth;
     private int _screenHeight;
 
-    private final TileGrid _tileGrid = new TileGrid();
-    private final AppList _appList = new AppList();
+    private final TileGrid _tileGrid;
+    private final AppList _appList;
 
     private int _currentPage = 0;
     private float _pageOffset = 0;
-    private final List<Page> _pages = new ArrayList<>(List.of(_tileGrid, _appList));
+    private final List<Page> _pages;
 
     float[] projMatrix = new float[16];
     float[] pageMatrix = new float[16]; // stores the page translation relative to each other
 
-    public StartScreen() {
+    public StartScreen(Context context) {
         _state = IDLE_STATE();
+        _tileGrid = new TileGrid();
+        _appList = new AppList(context);
+        _pages = new ArrayList<>(List.of(_tileGrid, _appList));
     }
 
     public void draw(float delta) {

@@ -1,5 +1,8 @@
 package com.robotjatek.wplauncher.AppList;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
@@ -12,22 +15,22 @@ import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 // TODO: a scrollingot kiszervezni egy külön (base?)osztályba -- manual scroll.onTouch* calls are error prone
 // TODO: meg a view alapú render logicot is...
-public class AppList implements Page, IListItemDrawContext, IContextMenuDrawContext {
+public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDrawContext {
 
     private final float[] scrollMatrix = new float[16]; // scroll position transformation
 
-    // TODO: List item renderer?
     private final Shader _shader = new Shader("", "");
-    private final QuadRenderer testRenderer = new QuadRenderer(_shader); // TODO: this is just to show some test data as content
+    private final QuadRenderer renderer = new QuadRenderer(_shader);
     private final ScrollController _scroll = new ScrollController();
 
-    private List<ListItem> _items = new ArrayList<>();
+    private List<ListItem<App>> _items = new ArrayList<>();
 
     private static final int TOP_MARGIN_PX = 152;
     private static final int ITEM_HEIGHT_PX = 128;
@@ -38,8 +41,26 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
     private boolean _isTouching = false;
 
     private ContextMenu _contextMenu;
+    private final List<App> _apps;
+    private final Context _context;
 
-    public AppList() {}
+    public AppList(Context context) {
+        // TODO: extract method
+        // TODO: cache results
+        // TODO: reload results after app install/uninstall
+        _context = context;
+        var pm = _context.getPackageManager();
+        var intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        var activities = pm.queryIntentActivities(intent, 0);
+        _apps = activities.stream().map(resolveInfo -> {
+            var label = resolveInfo.loadLabel(pm).toString();
+            var packageName = resolveInfo.activityInfo.packageName;
+            var icon = resolveInfo.loadIcon(pm); // TODO: icon (convert into texture?) + dispose(?)
+            var launchIntent = pm.getLaunchIntentForPackage(packageName);
+            return new App(label, packageName, () -> context.startActivity(launchIntent)); // TODO: internal apps
+        }).sorted(Comparator.comparing(App::name)).toList();
+    }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
@@ -51,13 +72,13 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
 
         for (var i = 0; i < _items.size(); i++) {
             var item = _items.get(i);
-            item.update(delta);
-            item.draw(delta, projMatrix, scrollMatrix);
+            item.update();
+            item.draw(projMatrix, scrollMatrix);
         }
 
         // Draw the context menu last so it shows up above everything else
         if (_contextMenu != null) {
-            _contextMenu.draw(delta, projMatrix, viewMatrix);
+            _contextMenu.draw(projMatrix, viewMatrix);
         }
     }
 
@@ -86,15 +107,14 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
     public void handleLongPress(float x, float y) {
         var tappedItem = getItemAt(y);
         tappedItem.ifPresent(i -> {
-            i.setLabel("Long press");
             if (_contextMenu != null) {
                 _contextMenu.dispose();
                 _contextMenu = null;
             }
             _contextMenu = createAppListContextMenu(
                     new Position(x, y),
-                    () -> tappedItem.get().setLabel("pin"),
-                    () -> tappedItem.get().setLabel("uninstall"));
+                    () -> pinApp(i.getPayload()),
+                    () -> uninstallApp(i.getPayload().packageName()));
         });
     }
 
@@ -103,16 +123,12 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
         _viewPortHeight = height;
         _listWidth = width - 2 * PAGE_PADDING_PX;
         _items.forEach(ListItem::dispose);
-        var labels = List.of("Első", "Második", "Harmadik", "Negyedik", "Ötödik", "Hatodik",
-                "Első", "Második", "Harmadik", "Negyedik", "Ötödik", "Hatodik",
-                "Első", "Második", "Harmadik", "Negyedik", "Ötödik", "Hatodik",
-                "Első", "Második", "Harmadik", "Negyedik", "Ötödik", "Hatodik"); // TODO: remove later
-        _items = createItems(labels, _listWidth);
+        _items = createItems(_apps, _listWidth);
 
         var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX);
 
-        // content fits on screen, don't allow scrolling
         if (contentHeight <= height) {
+            // content fits on screen, don't allow scrolling
             _scroll.setBounds(0, 0);
         } else {
             var minScroll = -(contentHeight - height) - TOP_MARGIN_PX;
@@ -120,8 +136,8 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
         }
     }
 
-    private List<ListItem> createItems(List<String> labels, int width) {
-        return labels.stream().map(l -> new ListItem(l, width, ITEM_HEIGHT_PX, this))
+    private List<ListItem<App>> createItems(List<App> apps, int width) {
+        return apps.stream().map(a -> new ListItem<>(a.name(), width, ITEM_HEIGHT_PX, this, a.action(), a))
                 .collect(Collectors.toList());
     }
 
@@ -137,10 +153,10 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
         }
 
         var tappedItem = getItemAt(y);
-        tappedItem.ifPresent(i -> i.setLabel("Tapped")); // TODO: handle tap, start app
+        tappedItem.ifPresent(ListItem::onTap);
     }
 
-    private Optional<ListItem> getItemAt(float y) {
+    private Optional<ListItem<App>> getItemAt(float y) {
         var adjustedY = y - (_scroll.getScrollOffset() + TOP_MARGIN_PX);
         var index = (int)(adjustedY / (ITEM_HEIGHT_PX + ITEM_GAP_PX));
         if (index >= 0 && index < _items.size()) {
@@ -152,7 +168,7 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
 
     @Override
     public QuadRenderer getRenderer() {
-        return testRenderer;
+        return renderer;
     }
 
     // TODO: composition over inheritance?
@@ -195,12 +211,12 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
     }
 
     @Override
-    public float xOf(ListItem item) {
+    public float xOf(ListItem<App> item) {
         return PAGE_PADDING_PX;
     }
 
     @Override
-    public float yOf(ListItem item) {
+    public float yOf(ListItem<App> item) {
         var index = _items.indexOf(item);
         if (index == -1) {
             throw new RuntimeException("List item not found");
@@ -209,13 +225,26 @@ public class AppList implements Page, IListItemDrawContext, IContextMenuDrawCont
     }
 
     @Override
-    public float widthOf(ListItem item) {
+    public float widthOf(ListItem<App> item) {
         return _listWidth - PAGE_PADDING_PX;
     }
 
     @Override
-    public float heightOf(ListItem item) {
+    public float heightOf(ListItem<App> item) {
         return ITEM_HEIGHT_PX;
+    }
+
+    private void uninstallApp(String packageName) {
+        var intent = new Intent(Intent.ACTION_DELETE);
+        intent.setData(Uri.parse("package:" + packageName));
+        _context.startActivity(intent);
+    }
+
+    private void pinApp(App app) {
+        // TODO: implement
+        // TODO: tileservice => calcs new tile position => creates a new tile => emits tilelist changed event
+        // TODO: tilePage sub to tilelist change
+        // TODO: tilePage get tileList from
     }
 
     // TODO: uncomment after state machine implementation

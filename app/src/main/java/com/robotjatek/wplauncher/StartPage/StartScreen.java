@@ -81,7 +81,7 @@ public class StartScreen {
 
     public StartScreen(Context context) {
         _state = IDLE_STATE();
-        _tileService = new TileService();
+        _tileService = new TileService(context);
         _tileGrid = new TileGrid(_tileService);
         _appList = new AppList(context, _tileService);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));

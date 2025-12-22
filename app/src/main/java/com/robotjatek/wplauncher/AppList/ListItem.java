@@ -11,13 +11,12 @@ public class ListItem<T> {
     private final int _width;
     private final int _height;
     private final float[] _modelMatrix = new float[16];
-    private final IListItemDrawContext _context;
+    private final IListItemDrawContext<T> _context;
     private final Runnable _onTap;
     private boolean _dirty = true;
+    private final T _payload;
 
-    private T _payload;
-
-    public ListItem(String label, int width, int height, IListItemDrawContext context, Runnable onTap, T payload) {
+    public ListItem(String label, int width, int height, IListItemDrawContext<T> context, Runnable onTap, T payload) {
         _label = label;
         _width = width;
         _height = height;

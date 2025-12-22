@@ -1,4 +1,5 @@
 package com.robotjatek.wplauncher.AppList;
 
-// TODO: icon
-public record App(String name, String packageName, Runnable action) {}
+import android.graphics.drawable.Drawable;
+
+public record App(String name, String packageName, Drawable icon, Runnable action) {}

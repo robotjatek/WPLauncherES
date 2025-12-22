@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.AppList.App;
@@ -87,16 +88,19 @@ public class TileService {
                 if (obj.has("packageName")) {
                     var packageName = obj.getString("packageName");
                     var intent = _context.getPackageManager().getLaunchIntentForPackage(packageName);
-                    if (intent != null) { // handle if the package was uninstalled elsewhere
-                        app = new App(title, packageName, () -> _context.startActivity(intent));
+                    if (intent == null) { // the package was uninstalled
+                        Log.w("loadPersistedTiles", "Could not find package: " + packageName);
+                        continue;
                     }
+                    var icon = _context.getPackageManager().getApplicationIcon(packageName);
+                    app = new App(title, packageName, icon, () -> _context.startActivity(intent));
                 }
 
                 tiles.add(new Tile(x, y, colSpan, rowSpan, title, app));
             }
 
             return tiles;
-        } catch (JSONException e) {
+        } catch (JSONException | PackageManager.NameNotFoundException e) {
             Log.e("loadPersistedTiles", Objects.requireNonNull(e.getMessage()));
             return List.of();
         }
@@ -126,7 +130,7 @@ public class TileService {
         return new Tile((int)position.x(), (int)position.y(), 2, 2, title, app);
     }
 
-    private void persistTiles() {
+    public void persistTiles() {
         try {
             var tileArray = new JSONArray();
             for (var tile : _tiles) {

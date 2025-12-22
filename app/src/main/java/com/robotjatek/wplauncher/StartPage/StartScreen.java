@@ -160,6 +160,7 @@ public class StartScreen {
     }
 
     public void dispose() {
+        _tileService.persistTiles();
         _pages.forEach(Page::dispose);
         _tileService.dispose();
     }

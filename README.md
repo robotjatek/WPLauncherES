@@ -8,7 +8,7 @@ The goal remains the same: a WP7/8 style launcher, now with no external UI frame
 - WP7/8 style live tiles
 - App list
 - Pin apps to the screen
-- "System" and Custom apps
+- Installed apps and custom "widgets"
 - Resizable tiles
 - 4/6 column mode
 
@@ -16,23 +16,6 @@ The goal remains the same: a WP7/8 style launcher, now with no external UI frame
 - Java 
 - OpenGL ES2.0
 - API Level 34
-
-## Planned live custom tiles / "widgets"
-
-Widgets with live data
-
-- Me (Timeline / notifications / tasks / slideshows / weather info / travel info / clock / twitter / fb / etc.)
-- Photos slideshow
-- Messages
-- Weather
-- Clock / Time
-- News feed
-- Tasks
-- Calendar
-- Email
-- Hungarian name days
-
-*Information gathering via public API-s. When public API-s are not available extract information from system notifications if its possible*
 
 ## Milestones
 
@@ -42,7 +25,7 @@ M1 is all about laying the groundwork. Don't expect anything fancy here. At this
 
 - [x] 4 columns
 - [x] Show *something* on the tiles
-- [ ] Show app icon on tiles
+- [x] Show app icon on tiles
 - [x] Listview for the installed apps
 - [x] Swipe between start page and application list page
 - [x] Handle tap event on tiles
@@ -82,7 +65,6 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
   - [ ] Button
   - [ ] Dropdown
   - [ ] Switch / checkbox
-- [ ] Make repository public
 
 ### M3
 
@@ -106,3 +88,20 @@ M3 is the preparation for a first public beta release.
 ### Current progress
 
 M1 is in progress
+
+## Planned live custom tiles / "widgets"
+
+Widgets with live data
+
+- Me (Timeline / notifications / tasks / slideshows / weather info / travel info / clock / twitter / fb / etc.)
+- Photos slideshow
+- Messages
+- Weather
+- Clock / Time
+- News feed
+- Tasks
+- Calendar
+- Email
+- Hungarian name days
+
+*Information gathering via public API-s. When public API-s are not available extract information from system notifications if its possible*

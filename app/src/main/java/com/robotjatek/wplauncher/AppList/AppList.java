@@ -59,9 +59,9 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
         _apps = activities.stream().map(resolveInfo -> {
             var label = resolveInfo.loadLabel(pm).toString();
             var packageName = resolveInfo.activityInfo.packageName;
-            var icon = resolveInfo.loadIcon(pm); // TODO: icon (convert into texture?) + dispose(?)
+            var icon = resolveInfo.loadIcon(pm);
             var launchIntent = pm.getLaunchIntentForPackage(packageName);
-            return new App(label, packageName, () -> context.startActivity(launchIntent)); // TODO: internal apps
+            return new App(label, packageName, icon, () -> context.startActivity(launchIntent)); // TODO: internal apps
         }).sorted(Comparator.comparing(App::name)).toList();
     }
 

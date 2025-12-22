@@ -75,12 +75,12 @@ public class TileGrid implements Page, TileDrawContext, ITileListChangedListener
             if (tile == _selectedTile) {
                 continue;
             }
-            tile.draw(delta, projMatrix, scrollMatrix, this);
+            tile.draw(projMatrix, scrollMatrix, this);
         }
 
         // render the selected tile
         if (_selectedTile != null) {
-            _selectedTile.drawScaled(delta, projMatrix, scrollMatrix,
+            _selectedTile.drawWithOffsetScaled(projMatrix, scrollMatrix,
                     1.05f, new Position(_dragInfo.totalX, _dragInfo.totalY), this);
         }
 
@@ -139,6 +139,7 @@ public class TileGrid implements Page, TileDrawContext, ITileListChangedListener
                 _selectedTile.y = (int) newPosition.y();
 
                 compactGrid();
+                _tileService.persistTiles();
             }
 
             _isDragging = false;

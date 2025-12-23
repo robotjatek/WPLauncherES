@@ -19,11 +19,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 // TODO: a scrollingot kiszervezni egy külön (base?)osztályba -- manual scroll.onTouch* calls are error prone
 // TODO: meg a view alapú render logicot is...
 public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDrawContext {
+
+    final Queue<Runnable> _commandQueue = new ConcurrentLinkedQueue<>();
 
     private final float[] scrollMatrix = new float[16]; // scroll position transformation
 
@@ -67,6 +71,7 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
+        executeCommands();
         _scroll.update(delta);
 
         Matrix.setIdentityM(scrollMatrix, 0);
@@ -88,6 +93,11 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
     @Override
     public void touchMove(float x, float y) {
         _scroll.onTouchMove(y);
+        if (_contextMenu != null) {
+            final var oldMenu = _contextMenu;
+            _commandQueue.add(oldMenu::dispose);
+            _contextMenu = null;
+        }
     }
 
     @Override
@@ -111,7 +121,8 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
         var tappedItem = getItemAt(y);
         tappedItem.ifPresent(i -> {
             if (_contextMenu != null) {
-                _contextMenu.dispose();
+                final var oldMenu = _contextMenu;
+                _commandQueue.add(oldMenu::dispose);
                 _contextMenu = null;
             }
             _contextMenu = createAppListContextMenu(
@@ -119,7 +130,7 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
                     () -> pinApp(i.getPayload()),
                     () ->  {
                         uninstallApp(i.getPayload().packageName());
-                        _tileService.unpinTile(i.getPayload());
+                        _tileService.unpinTile(i.getPayload().packageName());
                     });
         });
     }
@@ -256,6 +267,13 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
 //    public boolean isCatchingGestures() {
 //        return _contextMenu != null;
 //    }
+
+    private void executeCommands() {
+        Runnable command;
+        while ((command = _commandQueue.poll()) != null) {
+            command.run();
+        }
+    }
 
     @Override
     public void dispose() {

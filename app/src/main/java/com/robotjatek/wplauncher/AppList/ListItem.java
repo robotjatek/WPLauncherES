@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.AppList;
 
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.opengl.Matrix;
 
@@ -68,7 +69,8 @@ public class ListItem<T> {
         // TODO: queue up opengl events into a command list
         if (_dirty) {
             TileUtil.deleteTexture(_textureId);
-            _textureId = TileUtil.createTextTexture(_label, _labelW, (int)_context.heightOf(this), 0xffffffff, 0x000000ff, VerticalAlign.CENTER);
+            _textureId = TileUtil.createTextTexture(_label, _labelW, (int)_context.heightOf(this), 60,
+                    Typeface.NORMAL, 0xffbbbbbb, 0, VerticalAlign.CENTER);
             TileUtil.deleteTexture(_iconTextureId);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(_icon, (int)_context.heightOf(this), (int)_context.heightOf(this));
             _dirty = false;
@@ -83,6 +85,8 @@ public class ListItem<T> {
 
     public void dispose() {
         TileUtil.deleteTexture(_textureId);
+        TileUtil.deleteTexture(_iconTextureId);
         _textureId = -1;
+        _iconTextureId = -1;
     }
 }

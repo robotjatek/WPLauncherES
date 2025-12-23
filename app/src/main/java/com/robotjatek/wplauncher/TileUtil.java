@@ -11,7 +11,8 @@ public class TileUtil {
 
     private static final int CONTENT_PADDING_PX = 20;
 
-    public static int createTextTexture(String text, int width, int height, int textColor, int bgColor, VerticalAlign textAlign) {
+    public static int createTextTexture(String text, int width, int height, int textSize,
+                                        int typefaceStyle, int textColor, int bgColor, VerticalAlign textAlign) {
 
         var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         var canvas = new Canvas(bitmap);
@@ -20,8 +21,8 @@ public class TileUtil {
         var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(textColor);
         paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTypeface(Typeface.create("sans-serif-light", Typeface.BOLD));
-        paint.setTextSize(48);
+        paint.setTypeface(Typeface.create("sans-serif-light", typefaceStyle));
+        paint.setTextSize(textSize);
         //var textWidth = paint.measureText(text);
 
         switch (textAlign) {

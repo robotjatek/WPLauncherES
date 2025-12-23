@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.ContextMenu;
 
+import android.graphics.Typeface;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.VerticalAlign;
@@ -20,6 +21,8 @@ public class MenuOption {
         _textureId = TileUtil.createTextTexture(label,
                 (int) context.widthOf(this),
                 (int) context.heightOf(this),
+                48,
+                Typeface.BOLD,
                 0xffffffff,
                 0xff222222,
                 VerticalAlign.CENTER);

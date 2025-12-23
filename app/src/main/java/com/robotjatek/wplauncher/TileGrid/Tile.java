@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.TileGrid;
 
+import android.graphics.Typeface;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.App;
@@ -49,7 +50,8 @@ public class Tile {
             TileUtil.deleteTexture(_textureId);
             TileUtil.deleteTexture(_iconTextureId);
             var bgColor = 0xff1a1a2e; // TODO: bg color from config service
-            _textureId = TileUtil.createTextTexture(title, TEXTURE_UNIT_PX * colSpan, TEXTURE_UNIT_PX * rowSpan, 0xffffffff, bgColor, VerticalAlign.BOTTOM);
+            _textureId = TileUtil.createTextTexture(title, TEXTURE_UNIT_PX * colSpan,
+                    TEXTURE_UNIT_PX * rowSpan, 48, Typeface.BOLD, 0xffffffff, bgColor, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(_app.icon(), ICON_SIZE_PX, ICON_SIZE_PX);
             _dirty = false;
         }

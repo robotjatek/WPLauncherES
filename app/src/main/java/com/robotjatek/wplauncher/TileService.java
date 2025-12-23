@@ -50,9 +50,9 @@ public class TileService {
         });
     }
 
-    public void unpinTile(App app) {
+    public void unpinTile(String packageName) {
         var tile = _tiles.stream()
-                .filter(t -> t.getPackageName().equals(app.packageName()))
+                .filter(t -> t.getPackageName().equals(packageName))
                 .findFirst();
         tile.ifPresent(t -> _tileCommands.add(() -> {
             _tiles.remove(t);

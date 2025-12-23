@@ -129,7 +129,7 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
         _viewPortHeight = height;
         _listWidth = width - 2 * PAGE_PADDING_PX;
         _items.forEach(ListItem::dispose);
-        _items = createItems(_apps, _listWidth);
+        _items = createItems(_apps);
 
         var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX);
 
@@ -142,8 +142,8 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
         }
     }
 
-    private List<ListItem<App>> createItems(List<App> apps, int width) {
-        return apps.stream().map(a -> new ListItem<>(a.name(), width, ITEM_HEIGHT_PX, this, a.action(), a))
+    private List<ListItem<App>> createItems(List<App> apps) {
+        return apps.stream().map(a -> new ListItem<>(a.name(), a.icon(), this, a.action(), a))
                 .collect(Collectors.toList());
     }
 

@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.ContextMenu;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
 
 public class MenuOption {
@@ -16,7 +17,12 @@ public class MenuOption {
     public MenuOption(String label, Runnable action, IMenuItemDrawContext context) {
         _action = action;
         _context = context;
-        _textureId = TileUtil.createTextTexture(label, (int) context.widthOf(this), (int) context.heightOf(this), 0xffffffff, 0x00000000); // TODO: más text alignmentet is supportálni
+        _textureId = TileUtil.createTextTexture(label,
+                (int) context.widthOf(this),
+                (int) context.heightOf(this),
+                0xffffffff,
+                0xff222222,
+                VerticalAlign.CENTER);
     }
 
     public void onTap() {

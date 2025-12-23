@@ -4,7 +4,6 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
-import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,28 +16,19 @@ public class ContextMenu implements IMenuItemDrawContext {
     private final List<MenuOption> _options = new ArrayList<>();
     public Position position;
     private final float[] _modelMatrix = new float[16];
-    private final int _bgId;
 
     public ContextMenu(Position position, IContextMenuDrawContext context) {
         _context = context;
         this.position = position;
         this.position = new Position(_context.xOf(this), _context.yOf(this)); // recalculate position after confining the menu into the viewport
         Matrix.setIdentityM(_modelMatrix, 0);
-        _bgId = TileUtil.createTextTexture("", 1, 1, 0, 0xff000000); // TODO: no text, bg only version
     }
 
     public void draw(float[] proj, float[] view) {
         var menuHeight = calculateHeight();
-        // draw bg
-        Matrix.setIdentityM(_modelMatrix, 0);
+        // Currently I only draw the child elementss
         Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
         Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0); // Menu height is based on the number of items
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        _context.getRenderer().draw(proj, _modelMatrix, _bgId);
-
-        // Draw options on top of the background
-        Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
-        Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0);
         for (var i = 0; i < _options.size(); i++) {
             // draw each option
             _options.get(i).draw(proj, view);
@@ -51,7 +41,6 @@ public class ContextMenu implements IMenuItemDrawContext {
     }
 
     public void dispose() {
-        TileUtil.deleteTexture(_bgId);
         _options.forEach(MenuOption::dispose);
         _options.clear();
     }

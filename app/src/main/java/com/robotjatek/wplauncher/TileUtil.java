@@ -7,12 +7,11 @@ import android.graphics.Typeface;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
-// TODO: place icon on the tile
 public class TileUtil {
 
     private static final int CONTENT_PADDING_PX = 20;
 
-    public static int createTextTexture(String text, int width, int height, int textColor, int bgColor) {
+    public static int createTextTexture(String text, int width, int height, int textColor, int bgColor, VerticalAlign textAlign) {
 
         var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         var canvas = new Canvas(bitmap);
@@ -25,7 +24,15 @@ public class TileUtil {
         paint.setTextSize(48);
         //var textWidth = paint.measureText(text);
 
-        canvas.drawText(text, CONTENT_PADDING_PX, height - CONTENT_PADDING_PX, paint);
+        switch (textAlign) {
+            case CENTER -> {
+                var fm = paint.getFontMetrics();
+                var textHeight = fm.descent - fm.ascent;
+                var y = (height - textHeight) / 2 - fm.ascent;
+                canvas.drawText(text, CONTENT_PADDING_PX, y, paint);
+            }
+            case BOTTOM -> canvas.drawText(text, CONTENT_PADDING_PX, height - CONTENT_PADDING_PX, paint);
+        }
 
         var ids = new int[1];
         GLES20.glGenTextures(1, ids, 0);

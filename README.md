@@ -27,6 +27,7 @@ M1 is all about laying the groundwork. Don't expect anything fancy here. At this
 - [x] Show *something* on the tiles
 - [x] Show app icon on tiles
 - [x] Listview for the installed apps
+- [x] Icon on list elements
 - [x] Swipe between start page and application list page
 - [x] Handle tap event on tiles
 - [x] Long press on tiles
@@ -61,6 +62,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Resize tiles / Multi size app tiles
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Generic carousel view
+- [ ] Stack view
 - [ ] UI elements
   - [ ] Button
   - [ ] Dropdown

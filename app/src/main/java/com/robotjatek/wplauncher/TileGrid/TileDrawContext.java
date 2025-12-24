@@ -1,26 +1,48 @@
 package com.robotjatek.wplauncher.TileGrid;
 
+import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 
-public interface TileDrawContext {
+public class TileDrawContext implements IDrawContext<Tile> {
 
-    /**
-     * Calculates screen space X position of a tile
-     * @param t The tile to measure
-     * @return Screen space Y positon
-     */
-    float tileX(Tile t);
+    private final float PAGE_PADDING_PX;
+    private final float TILE_GAP_PX;
+    private float _tileSizePx;
+    private final QuadRenderer _renderer;
 
-    /**
-     * Calculates screen space Y position of a tile
-     * @param t The tile to measure
-     * @return Screen space Y positon
-     */
-    float tileY(Tile t);
+    public TileDrawContext(float padding, float gap, float tileSize, QuadRenderer renderer) {
+        PAGE_PADDING_PX = padding;
+        TILE_GAP_PX = gap;
+        _tileSizePx = tileSize;
+        _renderer = renderer;
+    }
 
-    float tileWidth(Tile t);
+    public void onResize(float tileSize) {
+        _tileSizePx = tileSize;
+    }
 
-    float tileHeight(Tile t);
+    @Override
+    public float xOf(Tile t) {
+        return PAGE_PADDING_PX + t.x * (_tileSizePx + TILE_GAP_PX);
+    }
 
-    QuadRenderer getRenderer();
+    @Override
+    public float yOf(Tile t) {
+        return PAGE_PADDING_PX + t.y * (_tileSizePx + TILE_GAP_PX);
+    }
+
+    @Override
+    public float widthOf(Tile t) {
+        return t.colSpan * _tileSizePx + (t.colSpan - 1) * TILE_GAP_PX;
+    }
+
+    @Override
+    public float heightOf(Tile t) {
+        return t.rowSpan * _tileSizePx + (t.rowSpan - 1) * TILE_GAP_PX;
+    }
+
+    @Override
+    public QuadRenderer getRenderer() {
+        return _renderer;
+    }
 }

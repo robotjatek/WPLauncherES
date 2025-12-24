@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
 
@@ -37,14 +38,14 @@ public class Tile {
     /**
      * Draw the tile normally on its determined position
      */
-    public void draw(float[] projMatrix, float[] viewMatrix, TileDrawContext drawContext) {
+    public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<Tile> drawContext) {
         drawWithOffsetScaled(projMatrix, viewMatrix, 1.0f, NO_OFFSET, drawContext);
     }
 
     /**
      * Draw matrix with an offset of its original position. Scaling can be applied
      */
-    public void drawWithOffsetScaled(float[] projMatrix, float[] viewMatrix, float scale, Position offset, TileDrawContext drawContext) {
+    public void drawWithOffsetScaled(float[] projMatrix, float[] viewMatrix, float scale, Position offset, IDrawContext<Tile> drawContext) {
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);
@@ -55,13 +56,13 @@ public class Tile {
             _iconTextureId = BitmapUtil.createTextureFromDrawable(_app.icon(), ICON_SIZE_PX, ICON_SIZE_PX);
             _dirty = false;
         }
-        var width = drawContext.tileWidth(this) * scale;
-        var height = drawContext.tileHeight(this) * scale;
-        var xDiff = (width - drawContext.tileWidth(this)) / 2; // correction for the scaling
-        var yDiff = (height - drawContext.tileHeight(this)) / 2; // correction for the scaling
+        var width = drawContext.widthOf(this) * scale;
+        var height = drawContext.heightOf(this) * scale;
+        var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
+        var yDiff = (height - drawContext.heightOf(this)) / 2; // correction for the scaling
 
-        var correctedX = drawContext.tileX(this) + offset.x() - xDiff; // x corrected by the scaling and the offset
-        var correctedY = drawContext.tileY(this) + offset.y() - yDiff; // y corrected by the scaling and the offset
+        var correctedX = drawContext.xOf(this) + offset.x() - xDiff; // x corrected by the scaling and the offset
+        var correctedY = drawContext.yOf(this) + offset.y() - yDiff; // y corrected by the scaling and the offset
 
         // Background
         Matrix.setIdentityM(_modelMatrix, 0);

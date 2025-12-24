@@ -23,9 +23,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 // TODO: resize tile
-public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext, ITileListChangedListener {
+public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedListener {
 
     private final ScrollController _scroll = new ScrollController();
+    private final TileDrawContext _tileDrawContext;
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
     private boolean _isTouching = false;
     private long _touchStart = 0;
@@ -51,13 +52,15 @@ public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext
         _tileService = tileService;
         _tiles = tileService.getTiles();
         _tileService.subscribe(this);
+        _tileDrawContext = new TileDrawContext(PAGE_PADDING_PX, TILE_GAP_PX, tileSizePx, _renderer);
+        var adornerDrawContext = new AdornerDrawContext<>(_tileDrawContext, _renderer, this);
         var icon = ContextCompat.getDrawable(context, R.drawable.close_circle);
         _unpinButton = new Adorner(() -> _commands.add(() -> {
             if (_selectedTile != null) {
                 _tileService.unpinTile(_selectedTile.getPackageName());
                 _selectedTile = null;
             }
-        }), icon, this);
+        }), icon, adornerDrawContext);
     }
 
     @Override
@@ -66,9 +69,9 @@ public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext
         _scroll.update(delta);
 
         if(_isDragging) {
-            var screenPosY = tileY(_selectedTile) + _dragInfo.totalY + _scroll.getScrollOffset();
+            var screenPosY = _tileDrawContext.yOf(_selectedTile) + _dragInfo.totalY + _scroll.getScrollOffset();
             var scrollSpeed = 2 * delta;
-            if (screenPosY + tileHeight(_selectedTile) > _pageHeight - 200) { // reached bottom while dragging
+            if (screenPosY + _tileDrawContext.heightOf(_selectedTile) > _pageHeight - 200) { // reached bottom while dragging
                 _scroll.adjustOffset(-scrollSpeed);
             } else if (screenPosY < 200) { // reached top while dragging
                 _scroll.adjustOffset(scrollSpeed);
@@ -93,13 +96,13 @@ public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext
                 continue;
             }
             var scale = _selectedTile == null ? 1.0f : 0.95f;
-            tile.drawWithOffsetScaled(projMatrix, scrollMatrix, scale, new Position(0,0), this);
+            tile.drawWithOffsetScaled(projMatrix, scrollMatrix, scale, new Position(0,0), _tileDrawContext);
         }
 
         // render the selected tile
         if (_selectedTile != null) {
             _selectedTile.drawWithOffsetScaled(projMatrix, scrollMatrix,
-                    1.00f, new Position(_dragInfo.totalX, _dragInfo.totalY), this);
+                    1.00f, new Position(_dragInfo.totalX, _dragInfo.totalY), _tileDrawContext);
             if (!_isDragging) {
                 _unpinButton.draw(projMatrix, scrollMatrix);
             }
@@ -111,6 +114,7 @@ public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext
         var usableWidth = width - 2 * PAGE_PADDING_PX - (COLUMNS - 1) * TILE_GAP_PX;
         tileSizePx = usableWidth / COLUMNS;
         _pageHeight = height;
+        _tileDrawContext.onResize(tileSizePx);
         setScrollBounds();
     }
 
@@ -299,41 +303,10 @@ public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext
         return group.stream().mapToInt(t -> t.y).min().orElse(0);
     }
 
-    /**
-     * Calculates screen space X position of a tile
-     * @param t The tile to measure
-     * @return Screen space Y positon
-     */
-    public float tileX(Tile t) {
-        return PAGE_PADDING_PX + t.x * (tileSizePx + TILE_GAP_PX);
-    }
-
-    /**
-     * Calculates screen space Y position of a tile
-     * @param t The tile to measure
-     * @return Screen space Y positon
-     */
-    public float tileY(Tile t) {
-        return PAGE_PADDING_PX + t.y * (tileSizePx + TILE_GAP_PX);
-    }
-
-    public float tileWidth(Tile t) {
-        return t.colSpan * tileSizePx + (t.colSpan - 1) * TILE_GAP_PX;
-    }
-
-    public float tileHeight(Tile t) {
-        return t.rowSpan * tileSizePx + (t.rowSpan - 1) * TILE_GAP_PX;
-    }
-
-    @Override
-    public QuadRenderer getRenderer() {
-        return _renderer;
-    }
-
     private float getContentHeight() {
         var max = 0f;
         for (var t : _tiles) {
-            var bottom = tileY(t) + tileHeight(t) + PAGE_PADDING_PX;
+            var bottom =  _tileDrawContext.yOf(t) + _tileDrawContext.heightOf(t) + PAGE_PADDING_PX;
             if (bottom > max) max = bottom;
         }
         return max;
@@ -370,10 +343,10 @@ public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext
     private Optional<Tile> getTileAt(float x, float y) {
         return _tiles.stream().filter(t -> {
             var scrollPosition = _scroll.getScrollOffset();
-            var left = tileX(t);
-            var top = tileY(t) + scrollPosition + TOP_MARGIN_PX;
-            var right = left + tileWidth(t);
-            var bottom = top + tileHeight(t);
+            var left = _tileDrawContext.xOf(t);
+            var top = _tileDrawContext.yOf(t) + scrollPosition + TOP_MARGIN_PX;
+            var right = left + _tileDrawContext.widthOf(t);
+            var bottom = top + _tileDrawContext.heightOf(t);
 
             return x >= left && x <= right && y >= top && y <= bottom;
         }).findFirst();
@@ -408,37 +381,16 @@ public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext
         _tileService.persistTiles();
     }
 
-    @Override
-    public float xOf(Adorner adorner) {
-        if (adorner == null || _selectedTile == null) {
-            throw new RuntimeException();
-        }
-        return tileWidth(_selectedTile) + tileX(_selectedTile) - widthOf(adorner) / 2;
-    }
-
-    @Override
-    public float yOf(Adorner adorner) {
-        if (adorner == null || _selectedTile == null) {
-            throw new RuntimeException();
-        }
-        return tileY(_selectedTile) - heightOf(adorner) / 2;
-    }
-
-    @Override
-    public float widthOf(Adorner adorner) {
-        return 96;
-    }
-
-    @Override
-    public float heightOf(Adorner adorner) {
-        return 96;
-    }
-
     private void executeCommands() {
         Runnable command;
         while ((command = _commands.poll()) != null) {
             command.run();
         }
+    }
+
+    @Override
+    public Tile getAdornedTile() {
+        return _selectedTile;
     }
 
     public void dispose() {

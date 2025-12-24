@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
-import com.robotjatek.wplauncher.ContextMenu.IContextMenuDrawContext;
+import com.robotjatek.wplauncher.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -25,18 +25,14 @@ import java.util.stream.Collectors;
 
 // TODO: a scrollingot kiszervezni egy külön (base?)osztályba -- manual scroll.onTouch* calls are error prone
 // TODO: meg a view alapú render logicot is...
-public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDrawContext {
+public class AppList implements Page, IItemListContainer<App> {
 
-    final Queue<Runnable> _commandQueue = new ConcurrentLinkedQueue<>();
-
+    private final Queue<Runnable> _commandQueue = new ConcurrentLinkedQueue<>();
     private final float[] scrollMatrix = new float[16]; // scroll position transformation
-
     private final Shader _shader = new Shader("", "");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private final ScrollController _scroll = new ScrollController();
-
     private List<ListItem<App>> _items = new ArrayList<>();
-
     private static final int TOP_MARGIN_PX = 152;
     private static final int ITEM_HEIGHT_PX = 128;
     private static final int ITEM_GAP_PX = 5;
@@ -44,18 +40,19 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
     private int _listWidth;
     private int _viewPortHeight;
     private boolean _isTouching = false;
-
     private ContextMenu _contextMenu;
     private final List<App> _apps;
     private final Context _context;
     private final TileService _tileService;
+    private final ListItemDrawContext<App, AppList> _listItemDrawContext;
+    private final ContextMenuDrawContext _contextMenuDrawContext;
 
     public AppList(Context context, TileService tileService) {
-        // TODO: extract method
-        // TODO: cache results
         // TODO: reload results after app install/uninstall
         _context = context;
         _tileService = tileService;
+        _listItemDrawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this, _renderer);
+        _contextMenuDrawContext = new ContextMenuDrawContext(_listWidth, _viewPortHeight, _renderer);
         var pm = _context.getPackageManager();
         var intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -139,6 +136,9 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
     public void onSizeChanged(int width, int height) {
         _viewPortHeight = height;
         _listWidth = width - 2 * PAGE_PADDING_PX;
+        _listItemDrawContext.onResize(_listWidth);
+        _contextMenuDrawContext.onResize(_listWidth, height);
+
         _items.forEach(ListItem::dispose);
         _items = createItems(_apps);
 
@@ -154,7 +154,7 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
     }
 
     private List<ListItem<App>> createItems(List<App> apps) {
-        return apps.stream().map(a -> new ListItem<>(a.name(), a.icon(), this, a.action(), a))
+        return apps.stream().map(a -> new ListItem<>(a.name(), a.icon(), _listItemDrawContext, a.action(), a))
                 .collect(Collectors.toList());
     }
 
@@ -183,32 +183,8 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
         return Optional.empty();
     }
 
-    @Override
-    public QuadRenderer getRenderer() {
-        return _renderer;
-    }
-
-    // TODO: composition over inheritance?
-    @Override
-    public float xOf(ContextMenu menu) {
-        // confine to screen
-        return Math.clamp(menu.position.x(), 0, _listWidth - this.widthOf(menu));
-    }
-
-    @Override
-    public float yOf(ContextMenu menu) {
-        // confine to screen
-        return Math.clamp(menu.position.y(), 0, _viewPortHeight - this.heightOf(menu));
-    }
-
-    @Override
-    public float widthOf(ContextMenu menu) {
-        return 400;
-    }
-
-    @Override
-    public float heightOf(ContextMenu menu) {
-        return menu.calculateHeight();
+    public List<ListItem<App>> getItems() {
+        return _items;
     }
 
     /**
@@ -219,36 +195,12 @@ public class AppList implements Page, IListItemDrawContext<App>, IContextMenuDra
      * @return The context menu on applist with Pin and uninstall options
      */
     private ContextMenu createAppListContextMenu(Position position, Runnable pin, Runnable uninstall) {
-        var menu = new ContextMenu(position, this);
+        var menu = new ContextMenu(position, _contextMenuDrawContext);
         var options = List.of(
                 new MenuOption("Pin", pin, menu),
                 new MenuOption("Uninstall", uninstall, menu));
         menu.addOptions(options);
         return menu;
-    }
-
-    @Override
-    public float xOf(ListItem<App> item) {
-        return PAGE_PADDING_PX;
-    }
-
-    @Override
-    public float yOf(ListItem<App> item) {
-        var index = _items.indexOf(item);
-        if (index == -1) {
-            throw new RuntimeException("List item not found");
-        }
-        return index * (ITEM_HEIGHT_PX + ITEM_GAP_PX);
-    }
-
-    @Override
-    public float widthOf(ListItem<App> item) {
-        return _listWidth - PAGE_PADDING_PX;
-    }
-
-    @Override
-    public float heightOf(ListItem<App> item) {
-        return ITEM_HEIGHT_PX;
     }
 
     private void uninstallApp(String packageName) {

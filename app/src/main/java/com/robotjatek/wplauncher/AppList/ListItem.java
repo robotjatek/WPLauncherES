@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
 
@@ -14,13 +15,13 @@ public class ListItem<T> {
     private int _iconTextureId;
     private int _textureId;
     private final float[] _modelMatrix = new float[16];
-    private final IListItemDrawContext<T> _context;
+    private final IDrawContext<ListItem<T>> _context;
     private final Runnable _onTap;
     private boolean _dirty = true;
     private final T _payload;
     private final int _labelW;
 
-    public ListItem(String label, Drawable icon, IListItemDrawContext<T> context, Runnable onTap, T payload) {
+    public ListItem(String label, Drawable icon, IDrawContext<ListItem<T>> context, Runnable onTap, T payload) {
         _label = label;
         _context = context;
         _onTap = onTap;

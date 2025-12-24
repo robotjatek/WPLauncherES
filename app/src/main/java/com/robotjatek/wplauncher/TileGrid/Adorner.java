@@ -4,15 +4,16 @@ import android.graphics.drawable.Drawable;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.TileUtil;
 
 public class Adorner {
-    private final IAdornerRenderingContext _context;
+    private final IDrawContext<Adorner> _context;
     private final Runnable _onTap;
     private final int _textureId;
     private final float[] _modelMatrix = new float[16];
 
-    public Adorner(Runnable onTap, Drawable icon, IAdornerRenderingContext context) {
+    public Adorner(Runnable onTap, Drawable icon, IDrawContext<Adorner> context) {
         _context = context;
         _onTap = onTap;
         _textureId = BitmapUtil.createTextureFromDrawable(icon, 96, 96);

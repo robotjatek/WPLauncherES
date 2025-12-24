@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.ContextMenu;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
@@ -9,15 +10,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ContextMenu implements IMenuItemDrawContext {
+public class ContextMenu implements IDrawContext<MenuOption> {
 
     private static final float ITEM_HEIGHT_PX = 150;
-    private final IContextMenuDrawContext _context;
+    private final IDrawContext<ContextMenu> _context;
     private final List<MenuOption> _options = new ArrayList<>();
     public Position position;
     private final float[] _modelMatrix = new float[16];
 
-    public ContextMenu(Position position, IContextMenuDrawContext context) {
+    public ContextMenu(Position position, IDrawContext<ContextMenu> context) {
         _context = context;
         this.position = position;
         this.position = new Position(_context.xOf(this), _context.yOf(this)); // recalculate position after confining the menu into the viewport

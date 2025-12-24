@@ -50,6 +50,14 @@ public class TileService {
         });
     }
 
+    /**
+     * Removes and disposes tile.
+     * Execution is delayed until calling {@link #executeCommands()}.
+     * Calls to this method can be off main-thread.
+     * To avoid crashes this method puts its calls into a queue.
+     * Execution of these commands must be fired on the main thread using {@link #executeCommands()}
+     * @param packageName The name of the package the tile corresponds to
+     */
     public void unpinTile(String packageName) {
         var tile = _tiles.stream()
                 .filter(t -> t.getPackageName().equals(packageName))
@@ -57,6 +65,7 @@ public class TileService {
         tile.ifPresent(t -> _tileCommands.add(() -> {
             _tiles.remove(t);
             t.dispose();
+            notifySubscribers();
             persistTiles();
         }));
     }

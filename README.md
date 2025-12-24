@@ -34,7 +34,7 @@ M1 is all about laying the groundwork. Don't expect anything fancy here. At this
 - [x] Long press on list items
 - [x] Context menu
 - [x] Pin installed apps to the screen
-- [ ] Unpin installed apps from the main screen
+- [x] Unpin installed apps from the main screen
 - [x] Launch app from the app list
 - [x] Launch pinned apps
 - [x] Uninstall app

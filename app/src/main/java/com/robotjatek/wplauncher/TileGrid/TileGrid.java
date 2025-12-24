@@ -1,11 +1,16 @@
 package com.robotjatek.wplauncher.TileGrid;
 
+import android.content.Context;
 import android.opengl.Matrix;
 import android.view.ViewConfiguration;
 
+import androidx.core.content.ContextCompat;
+
 import com.robotjatek.wplauncher.ITileListChangedListener;
+
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.TileService;
@@ -13,10 +18,12 @@ import com.robotjatek.wplauncher.TileService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 // TODO: resize tile
-public class TileGrid implements Page, TileDrawContext, ITileListChangedListener {
+public class TileGrid implements Page, TileDrawContext, IAdornerRenderingContext, ITileListChangedListener {
 
     private final ScrollController _scroll = new ScrollController();
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
@@ -30,22 +37,32 @@ public class TileGrid implements Page, TileDrawContext, ITileListChangedListener
     private List<Tile> _tiles;
     private static final int COLUMNS = 4;
     private static final float TOP_MARGIN_PX = 128;
-    private static final float PAGE_PADDING_PX = 24;
+    private static final float PAGE_PADDING_PX = 48;
     private static final float TILE_GAP_PX = 32;
     private final Shader _shader = new Shader("", "");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private float tileSizePx;
     private float _pageHeight;
     private final TileService _tileService;
+    private final Adorner _unpinButton;
+    private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
 
-    public TileGrid(TileService tileService) {
+    public TileGrid(TileService tileService, Context context) {
         _tileService = tileService;
         _tiles = tileService.getTiles();
         _tileService.subscribe(this);
+        var icon = ContextCompat.getDrawable(context, R.drawable.close_circle);
+        _unpinButton = new Adorner(() -> _commands.add(() -> {
+            if (_selectedTile != null) {
+                _tileService.unpinTile(_selectedTile.getPackageName());
+                _selectedTile = null;
+            }
+        }), icon, this);
     }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
+        executeCommands();
         _scroll.update(delta);
 
         if(_isDragging) {
@@ -75,13 +92,17 @@ public class TileGrid implements Page, TileDrawContext, ITileListChangedListener
             if (tile == _selectedTile) {
                 continue;
             }
-            tile.draw(projMatrix, scrollMatrix, this);
+            var scale = _selectedTile == null ? 1.0f : 0.95f;
+            tile.drawWithOffsetScaled(projMatrix, scrollMatrix, scale, new Position(0,0), this);
         }
 
         // render the selected tile
         if (_selectedTile != null) {
             _selectedTile.drawWithOffsetScaled(projMatrix, scrollMatrix,
-                    1.05f, new Position(_dragInfo.totalX, _dragInfo.totalY), this);
+                    1.00f, new Position(_dragInfo.totalX, _dragInfo.totalY), this);
+            if (!_isDragging) {
+                _unpinButton.draw(projMatrix, scrollMatrix);
+            }
         }
 
     }
@@ -143,7 +164,7 @@ public class TileGrid implements Page, TileDrawContext, ITileListChangedListener
             }
 
             _isDragging = false;
-            _selectedTile = null;
+            cancelSelection();
             setScrollBounds();
         }
 
@@ -319,6 +340,11 @@ public class TileGrid implements Page, TileDrawContext, ITileListChangedListener
     }
 
     private void handleTap(float x, float y) {
+        if (_selectedTile != null && !_isDragging && _unpinButton.isTapped(x, y - _scroll.getScrollOffset() - TOP_MARGIN_PX)) {
+            _unpinButton.onTap();
+            return;
+        }
+
         var tappedTile = getTileAt(x, y);
         if (_selectedTile != null) {
             // Tapped same tile or empty space, deselect
@@ -359,7 +385,7 @@ public class TileGrid implements Page, TileDrawContext, ITileListChangedListener
 
     private void cancelSelection() {
         if (_selectedTile != null) {
-            _selectedTile = null;
+            _commands.add(() -> _selectedTile = null);
         }
     }
 
@@ -379,10 +405,45 @@ public class TileGrid implements Page, TileDrawContext, ITileListChangedListener
         _tiles = _tileService.getTiles();
         compactGrid();
         setScrollBounds();
+        _tileService.persistTiles();
+    }
+
+    @Override
+    public float xOf(Adorner adorner) {
+        if (adorner == null || _selectedTile == null) {
+            throw new RuntimeException();
+        }
+        return tileWidth(_selectedTile) + tileX(_selectedTile) - widthOf(adorner) / 2;
+    }
+
+    @Override
+    public float yOf(Adorner adorner) {
+        if (adorner == null || _selectedTile == null) {
+            throw new RuntimeException();
+        }
+        return tileY(_selectedTile) - heightOf(adorner) / 2;
+    }
+
+    @Override
+    public float widthOf(Adorner adorner) {
+        return 96;
+    }
+
+    @Override
+    public float heightOf(Adorner adorner) {
+        return 96;
+    }
+
+    private void executeCommands() {
+        Runnable command;
+        while ((command = _commands.poll()) != null) {
+            command.run();
+        }
     }
 
     public void dispose() {
         _renderer.dispose();
         _shader.delete();
+        _unpinButton.dispose();
     }
 }

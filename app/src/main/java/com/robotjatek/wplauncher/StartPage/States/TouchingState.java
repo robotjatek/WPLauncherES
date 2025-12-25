@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher.StartPage.States;
 import android.util.Log;
 import android.view.ViewConfiguration;
 
+import com.robotjatek.wplauncher.IGestureState;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 public class TouchingState extends BaseState {

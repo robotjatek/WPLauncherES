@@ -19,6 +19,7 @@ public class ScrollState extends BaseState {
 
     @Override
     public void handleTouchEnd(float x, float y) {
+        _context.getCurrentPage().touchEnd(x, y);
         _context.changeState(_context.IDLE_STATE());
     }
 

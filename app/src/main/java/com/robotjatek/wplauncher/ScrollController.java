@@ -5,7 +5,7 @@ public class ScrollController {
     private static final float FRICTION = 0.0025f; // Deceleration in pixels/ms2
     private static final float FLING_THRESHOLD = 1.5f;
     private static final float MIN_VELOCITY = 0.01f;
-    private static final float MAX_VELOCITY = 10f;
+    private static final float MAX_VELOCITY = 2f;
 
     private boolean _isFlinging = false;
     private float _lastY = 0;

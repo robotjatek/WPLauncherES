@@ -6,7 +6,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.StartPage.States.ChildControlState;
-import com.robotjatek.wplauncher.StartPage.States.IGestureState;
+import com.robotjatek.wplauncher.IGestureState;
 import com.robotjatek.wplauncher.StartPage.States.IdleState;
 import com.robotjatek.wplauncher.StartPage.States.LongPressState;
 import com.robotjatek.wplauncher.StartPage.States.ScrollState;
@@ -27,7 +27,7 @@ import java.util.List;
 
  * <p>NOTE: This essentially became a carousel view with 2 hardcoded pages</p>
  */
-public class StartScreen {
+public class StartScreen implements IPageNavigator {
 
     private IGestureState _state;
 
@@ -83,7 +83,7 @@ public class StartScreen {
         _state = IDLE_STATE();
         _tileService = new TileService(context);
         _tileGrid = new TileGrid(_tileService, context);
-        _appList = new AppList(context, _tileService);
+        _appList = new AppList(context, this, _tileService);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
     }
 

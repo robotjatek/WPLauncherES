@@ -5,6 +5,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.AppList.States.IdleState;
+import com.robotjatek.wplauncher.AppList.States.ContextMenuState;
+import com.robotjatek.wplauncher.AppList.States.ScrollState;
+import com.robotjatek.wplauncher.AppList.States.TappedState;
+import com.robotjatek.wplauncher.AppList.States.TouchingState;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.ContextMenu.MenuOption;
@@ -12,13 +17,15 @@ import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
+import com.robotjatek.wplauncher.StartPage.IPageNavigator;
+import com.robotjatek.wplauncher.StartPage.StartScreen;
+import com.robotjatek.wplauncher.IGestureState;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileService;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -27,29 +34,52 @@ import java.util.stream.Collectors;
 // TODO: meg a view alapú render logicot is...
 public class AppList implements Page, IItemListContainer<App> {
 
+    public IGestureState IDLE_STATE() {
+        return new IdleState(this);
+    }
+
+    public IGestureState TOUCHING_STATE(float x, float y) {
+        return new TouchingState(this, x, y);
+    }
+
+    public IGestureState TAPPED_STATE(float y) {
+        return new TappedState(this, y);
+    }
+
+    public IGestureState CONTEXT_MENU_STATE(float x, float y) {
+        return new ContextMenuState(this, x, y);
+    }
+
+    public IGestureState SCROLL_STATE(float y) {
+        return new ScrollState(this, y);
+    }
+
+    private IGestureState _state = IDLE_STATE();
+
     private final Queue<Runnable> _commandQueue = new ConcurrentLinkedQueue<>();
     private final float[] scrollMatrix = new float[16]; // scroll position transformation
     private final Shader _shader = new Shader("", "");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private final ScrollController _scroll = new ScrollController();
     private List<ListItem<App>> _items = new ArrayList<>();
-    private static final int TOP_MARGIN_PX = 152;
-    private static final int ITEM_HEIGHT_PX = 128;
-    private static final int ITEM_GAP_PX = 5;
+    public static final int TOP_MARGIN_PX = 152;
+    public static final int ITEM_HEIGHT_PX = 128;
+    public static final int ITEM_GAP_PX = 5;
     private static final int PAGE_PADDING_PX = 24;
     private int _listWidth;
     private int _viewPortHeight;
-    private boolean _isTouching = false;
     private ContextMenu _contextMenu;
     private final List<App> _apps;
     private final Context _context;
     private final TileService _tileService;
     private final ListItemDrawContext<App, AppList> _listItemDrawContext;
     private final ContextMenuDrawContext _contextMenuDrawContext;
+    private final IPageNavigator _navigator;
 
-    public AppList(Context context, TileService tileService) {
+    public AppList(Context context, IPageNavigator navigator, TileService tileService) {
         // TODO: reload results after app install/uninstall
         _context = context;
+        _navigator = navigator;
         _tileService = tileService;
         _listItemDrawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this, _renderer);
         _contextMenuDrawContext = new ContextMenuDrawContext(_listWidth, _viewPortHeight, _renderer);
@@ -63,13 +93,13 @@ public class AppList implements Page, IItemListContainer<App> {
             var icon = resolveInfo.loadIcon(pm);
             var launchIntent = pm.getLaunchIntentForPackage(packageName);
             return new App(label, packageName, icon, () -> context.startActivity(launchIntent)); // TODO: internal apps
-        }).sorted(Comparator.comparing(App::name)).toList();
+        }).sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER)).toList();
     }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
+        _state.update(delta);
         executeCommands();
-        _scroll.update(delta);
 
         Matrix.setIdentityM(scrollMatrix, 0);
         Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
@@ -89,47 +119,51 @@ public class AppList implements Page, IItemListContainer<App> {
 
     @Override
     public void touchMove(float x, float y) {
-        _scroll.onTouchMove(y);
+        _state.handleMove(x, y);
+    }
+
+    @Override
+    public void touchStart(float x, float y) {
+        _state.handleTouchStart(x, y);
+    }
+
+    @Override
+    public void touchEnd(float x, float y) {
+        _state.handleTouchEnd(x, y);
+    }
+
+    @Override
+    public void handleLongPress(float x, float y) {
+    }
+
+    public void changeState(IGestureState state) {
+        _state.exit();
+        _state = state;
+        _state.enter();
+    }
+
+    public ScrollController getScroll() {
+        return this._scroll;
+    }
+
+    public ContextMenu openContextMenu(float x, float y, App app) {
+            _contextMenu = createAppListContextMenu(
+            new Position(x, y),
+            () -> pinApp(app),
+            () ->  {
+                uninstallApp(app.packageName());
+                _tileService.unpinTile(app.packageName());
+            });
+
+            return _contextMenu;
+    }
+
+    public void closeContextMenu() {
         if (_contextMenu != null) {
             final var oldMenu = _contextMenu;
             _commandQueue.add(oldMenu::dispose);
             _contextMenu = null;
         }
-    }
-
-    @Override
-    public void touchStart(float x, float y) {
-        _scroll.onTouchStart(y);
-        _isTouching = true;
-    }
-
-    @Override
-    public void touchEnd(float x, float y) {
-        _scroll.onTouchEnd();
-
-        if (_isTouching) {
-            handleTap(x, y);
-            _isTouching = false;
-        }
-    }
-
-    @Override
-    public void handleLongPress(float x, float y) {
-        var tappedItem = getItemAt(y);
-        tappedItem.ifPresent(i -> {
-            if (_contextMenu != null) {
-                final var oldMenu = _contextMenu;
-                _commandQueue.add(oldMenu::dispose);
-                _contextMenu = null;
-            }
-            _contextMenu = createAppListContextMenu(
-                    new Position(x, y),
-                    () -> pinApp(i.getPayload()),
-                    () ->  {
-                        uninstallApp(i.getPayload().packageName());
-                        _tileService.unpinTile(i.getPayload().packageName());
-                    });
-        });
     }
 
     @Override
@@ -158,31 +192,6 @@ public class AppList implements Page, IItemListContainer<App> {
                 .collect(Collectors.toList());
     }
 
-    private void handleTap(float x, float y) {
-        if (_contextMenu != null) {
-            if (_contextMenu.isTappedOn(x, y)) {
-                _contextMenu.onTap(x, y);
-            }
-
-            _contextMenu.dispose();
-            _contextMenu = null; // TODO: áttérni state machinere, mert a childcontrol state a parentben áthív ide touchendkor
-            return;
-        }
-
-        var tappedItem = getItemAt(y);
-        tappedItem.ifPresent(ListItem::onTap);
-    }
-
-    private Optional<ListItem<App>> getItemAt(float y) {
-        var adjustedY = y - (_scroll.getScrollOffset() + TOP_MARGIN_PX);
-        var index = (int)(adjustedY / (ITEM_HEIGHT_PX + ITEM_GAP_PX));
-        if (index >= 0 && index < _items.size()) {
-            return Optional.of(_items.get(index));
-        }
-
-        return Optional.empty();
-    }
-
     public List<ListItem<App>> getItems() {
         return _items;
     }
@@ -207,18 +216,18 @@ public class AppList implements Page, IItemListContainer<App> {
         var intent = new Intent(Intent.ACTION_DELETE);
         intent.setData(Uri.parse("package:" + packageName));
         _context.startActivity(intent);
-        // TODO: remove from tilelist if pinned
+        _tileService.unpinTile(packageName);
     }
 
     private void pinApp(App app) {
         _tileService.pinTile(app);
+        _navigator.previousPage();
     }
 
-    // TODO: uncomment after state machine implementation
-//    @Override
-//    public boolean isCatchingGestures() {
-//        return _contextMenu != null;
-//    }
+    @Override
+    public boolean isCatchingGestures() {
+        return _contextMenu != null;
+    }
 
     private void executeCommands() {
         Runnable command;

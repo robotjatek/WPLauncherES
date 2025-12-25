@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.StartPage.States;
 
 import android.util.Log;
 
+import com.robotjatek.wplauncher.IGestureState;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 public class LongPressState extends BaseState {

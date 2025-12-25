@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.StartPage.States;
+package com.robotjatek.wplauncher;
 
 public interface IGestureState {
     void enter();

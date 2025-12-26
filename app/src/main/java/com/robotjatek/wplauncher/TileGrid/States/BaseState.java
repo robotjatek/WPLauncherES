@@ -2,13 +2,13 @@ package com.robotjatek.wplauncher.TileGrid.States;
 
 import android.util.Log;
 
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 import java.util.Optional;
 
-public class BaseState implements IGestureState {
+public class BaseState implements IState {
 
     protected TileGrid _context;
 
@@ -18,7 +18,7 @@ public class BaseState implements IGestureState {
 
     @Override
     public void enter() {
-        Log.d(IGestureState.class.toString(), this.getClass().toString());
+        Log.d(IState.class.toString(), this.getClass().toString());
     }
 
     @Override

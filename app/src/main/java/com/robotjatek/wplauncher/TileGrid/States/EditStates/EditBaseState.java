@@ -1,10 +1,10 @@
 package com.robotjatek.wplauncher.TileGrid.States.EditStates;
 
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
-public abstract class EditBaseState implements IGestureState {
+public abstract class EditBaseState implements IState {
 
     protected EditState _context;
     protected final TileGrid _tilegrid;

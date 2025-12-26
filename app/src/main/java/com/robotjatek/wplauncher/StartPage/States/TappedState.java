@@ -2,7 +2,7 @@ package com.robotjatek.wplauncher.StartPage.States;
 
 import android.util.Log;
 
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 public class TappedState extends BaseState {
@@ -18,17 +18,17 @@ public class TappedState extends BaseState {
 
     @Override
     public void handleTouchStart(float x, float y) {
-        Log.w(IGestureState.class.toString(), "Touch start shouldn't happen here");
+        Log.w(IState.class.toString(), "Touch start shouldn't happen here");
     }
 
     @Override
     public void handleTouchEnd(float x, float y) {
-        Log.w(IGestureState.class.toString(), "Touch end shouldn't happen here");
+        Log.w(IState.class.toString(), "Touch end shouldn't happen here");
     }
 
     @Override
     public void handleMove(float x, float y) {
-        Log.w(IGestureState.class.toString(), "Touch end shouldn't happen here");
+        Log.w(IState.class.toString(), "Touch end shouldn't happen here");
     }
 
     @Override

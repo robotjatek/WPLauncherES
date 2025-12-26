@@ -8,11 +8,11 @@ import android.util.Log;
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.AppList.ListItem;
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 
 import java.util.Optional;
 
-public abstract class BaseState implements IGestureState {
+public abstract class BaseState implements IState {
 
     protected final AppList _context;
 
@@ -22,7 +22,7 @@ public abstract class BaseState implements IGestureState {
 
     @Override
     public void enter() {
-        Log.d(IGestureState.class.toString(), this.getClass().toString());
+        Log.d(IState.class.toString(), this.getClass().toString());
     }
 
     @Override

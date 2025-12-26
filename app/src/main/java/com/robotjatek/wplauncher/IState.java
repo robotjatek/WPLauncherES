@@ -1,6 +1,6 @@
 package com.robotjatek.wplauncher;
 
-public interface IGestureState {
+public interface IState {
     void enter();
     void exit();
     void handleTouchStart(float x, float y);

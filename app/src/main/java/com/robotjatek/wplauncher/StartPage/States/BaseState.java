@@ -2,10 +2,10 @@ package com.robotjatek.wplauncher.StartPage.States;
 
 import android.util.Log;
 
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
-public abstract class BaseState implements IGestureState {
+public abstract class BaseState implements IState {
 
     protected final StartScreen _context;
 
@@ -15,7 +15,7 @@ public abstract class BaseState implements IGestureState {
 
     @Override
     public void enter() {
-        Log.d(IGestureState.class.toString(), this.getClass().toString());
+        Log.d(IState.class.toString(), this.getClass().toString());
     }
 
     @Override

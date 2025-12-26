@@ -5,7 +5,7 @@ import android.opengl.Matrix;
 
 import androidx.core.content.ContextCompat;
 
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.ITileListChangedListener;
 
 import com.robotjatek.wplauncher.Page;
@@ -28,27 +28,27 @@ import java.util.stream.Collectors;
 // TODO: resize tile
 public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedListener {
 
-    public IGestureState IDLE_STATE() {
+    public IState IDLE_STATE() {
         return new IdleState(this);
     }
 
-    public IGestureState TOUCHING_STATE(float x, float y) {
+    public IState TOUCHING_STATE(float x, float y) {
         return new TouchingState(this, x, y);
     }
 
-    public IGestureState TAPPED_STATE(float x, float y) {
+    public IState TAPPED_STATE(float x, float y) {
         return new TappedState(this, x, y);
     }
 
-    public IGestureState SCROLL_STATE(float y) {
+    public IState SCROLL_STATE(float y) {
         return new ScrollState(this, y);
     }
 
-    public IGestureState EDIT_STATE(float x, float y) {
+    public IState EDIT_STATE(float x, float y) {
         return new EditState(this, x, y);
     }
 
-    private IGestureState _state = IDLE_STATE();
+    private IState _state = IDLE_STATE();
 
     private final ScrollController _scroll = new ScrollController();
     private final TileDrawContext _tileDrawContext;
@@ -112,7 +112,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     }
 
-    public void changeState(IGestureState state) {
+    public void changeState(IState state) {
         _state.exit();
         _state = state;
         _state.enter();
@@ -239,11 +239,10 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     public void selectTile(Tile tile) {
-        if (tile == null) {
-            throw new RuntimeException("NEVER EVER CALL THIS WITH NULL! Use cancelSelection()!");
-        }
-        _selectedTile = tile;
-        _selectedTile.getDragInfo().reset();
+        _commands.add(() -> {
+            _selectedTile = tile;
+            _selectedTile.getDragInfo().reset();
+        });
     }
 
     public void cancelSelection() {

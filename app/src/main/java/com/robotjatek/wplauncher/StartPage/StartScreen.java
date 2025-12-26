@@ -6,7 +6,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.StartPage.States.ChildControlState;
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.States.IdleState;
 import com.robotjatek.wplauncher.StartPage.States.LongPressState;
 import com.robotjatek.wplauncher.StartPage.States.ScrollState;
@@ -29,37 +29,37 @@ import java.util.List;
  */
 public class StartScreen implements IPageNavigator {
 
-    private IGestureState _state;
+    private IState _state;
 
-    public IGestureState IDLE_STATE() {
+    public IState IDLE_STATE() {
         return new IdleState(this);
     }
 
-    public IGestureState TOUCHING_STATE(float x, float y) {
+    public IState TOUCHING_STATE(float x, float y) {
         return new TouchingState(this, x, y);
     }
 
-    public IGestureState TAPPED_STATE(float x, float y) {
+    public IState TAPPED_STATE(float x, float y) {
         return new TappedState(this, x, y);
     }
 
-    public IGestureState LONG_PRESS_STATE(float x, float y) {
+    public IState LONG_PRESS_STATE(float x, float y) {
         return new LongPressState(this, x, y);
     }
 
-    public IGestureState CHILD_CONTROL_STATE() {
+    public IState CHILD_CONTROL_STATE() {
         return new ChildControlState(this);
     }
 
-    public IGestureState SCROLL_STATE() {
+    public IState SCROLL_STATE() {
         return new ScrollState(this);
     }
 
-    public IGestureState SWIPE_STATE(float initialX) {
+    public IState SWIPE_STATE(float initialX) {
         return new SwipingState(this, initialX);
     }
 
-    public void changeState(IGestureState state) {
+    public void changeState(IState state) {
         _state.exit();
         _state = state;
         _state.enter();

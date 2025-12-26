@@ -3,7 +3,7 @@ package com.robotjatek.wplauncher.StartPage.States;
 import android.util.Log;
 import android.view.ViewConfiguration;
 
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 public class TouchingState extends BaseState {
@@ -27,7 +27,7 @@ public class TouchingState extends BaseState {
     @Override
     public void handleTouchStart(float x, float y) {
         // NO-OP: already in touch state
-        Log.w(IGestureState.class.toString(), "Already in touch state, this shouldn't happen");
+        Log.w(IState.class.toString(), "Already in touch state, this shouldn't happen");
     }
 
     @Override

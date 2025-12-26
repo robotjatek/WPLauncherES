@@ -18,7 +18,7 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.StartPage.IPageNavigator;
-import com.robotjatek.wplauncher.IGestureState;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileService;
 
@@ -33,27 +33,27 @@ import java.util.stream.Collectors;
 // TODO: meg a view alapú render logicot is...
 public class AppList implements Page, IItemListContainer<App> {
 
-    public IGestureState IDLE_STATE() {
+    public IState IDLE_STATE() {
         return new IdleState(this);
     }
 
-    public IGestureState TOUCHING_STATE(float x, float y) {
+    public IState TOUCHING_STATE(float x, float y) {
         return new TouchingState(this, x, y);
     }
 
-    public IGestureState TAPPED_STATE(float y) {
+    public IState TAPPED_STATE(float y) {
         return new TappedState(this, y);
     }
 
-    public IGestureState CONTEXT_MENU_STATE(float x, float y) {
+    public IState CONTEXT_MENU_STATE(float x, float y) {
         return new ContextMenuState(this, x, y);
     }
 
-    public IGestureState SCROLL_STATE(float y) {
+    public IState SCROLL_STATE(float y) {
         return new ScrollState(this, y);
     }
 
-    private IGestureState _state = IDLE_STATE();
+    private IState _state = IDLE_STATE();
 
     private final Queue<Runnable> _commandQueue = new ConcurrentLinkedQueue<>();
     private final float[] scrollMatrix = new float[16]; // scroll position transformation
@@ -135,7 +135,7 @@ public class AppList implements Page, IItemListContainer<App> {
     public void handleLongPress(float x, float y) {
     }
 
-    public void changeState(IGestureState state) {
+    public void changeState(IState state) {
         _state.exit();
         _state = state;
         _state.enter();

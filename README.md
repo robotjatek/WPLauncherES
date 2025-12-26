@@ -42,6 +42,15 @@ M1 is all about laying the groundwork. Don't expect anything fancy here. At this
 - [x] Rearrange tiles on the grid
 - [x] Persist tile arrangement
 
+### M1.5
+
+Consolidation
+
+- [x] Extracting draw contexts
+- [x] Applist state machine (also fixed fling to keep momentum)
+- [x] Tilegrid state machine
+- [x] Fix de-select bug when rearranging tiles
+
 ### M2
 
 M2 is the beginning to make the launcher usable in everyday use-cases.

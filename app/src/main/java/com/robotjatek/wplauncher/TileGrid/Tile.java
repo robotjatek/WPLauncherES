@@ -23,8 +23,7 @@ public class Tile {
     private final float[] _modelMatrix = new float[16];
     private final App _app;
     private boolean _dirty = true;
-
-    private static final Position NO_OFFSET = new Position(0, 0);
+    private final DragInfo _dragInfo = new DragInfo();
 
     public Tile(int x, int y, int colSpan, int rowSpan, String title, App app) {
         this.x = x;
@@ -39,7 +38,7 @@ public class Tile {
      * Draw the tile normally on its determined position
      */
     public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<Tile> drawContext) {
-        drawWithOffsetScaled(projMatrix, viewMatrix, 1.0f, NO_OFFSET, drawContext);
+        drawWithOffsetScaled(projMatrix, viewMatrix, 1.0f, Position.ZERO, drawContext);
     }
 
     /**
@@ -94,6 +93,10 @@ public class Tile {
             return "";
         }
         return _app.packageName();
+    }
+
+    public DragInfo getDragInfo() {
+        return _dragInfo;
     }
 
     public void dispose() {

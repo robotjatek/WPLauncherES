@@ -1,11 +1,11 @@
-package com.robotjatek.wplauncher.AppList.States;
+package com.robotjatek.wplauncher.TileGrid.States;
 
-import com.robotjatek.wplauncher.AppList.AppList;
+import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class ScrollState extends BaseState {
     private final float _startY;
 
-    public ScrollState(AppList context, float y) {
+    public ScrollState(TileGrid context, float y) {
         super(context);
         _startY = y;
     }

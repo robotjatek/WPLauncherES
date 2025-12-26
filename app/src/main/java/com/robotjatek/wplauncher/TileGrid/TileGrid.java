@@ -2,10 +2,10 @@ package com.robotjatek.wplauncher.TileGrid;
 
 import android.content.Context;
 import android.opengl.Matrix;
-import android.view.ViewConfiguration;
 
 import androidx.core.content.ContextCompat;
 
+import com.robotjatek.wplauncher.IGestureState;
 import com.robotjatek.wplauncher.ITileListChangedListener;
 
 import com.robotjatek.wplauncher.Page;
@@ -13,11 +13,14 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
+import com.robotjatek.wplauncher.TileGrid.States.EditState;
+import com.robotjatek.wplauncher.TileGrid.States.IdleState;
+import com.robotjatek.wplauncher.TileGrid.States.ScrollState;
+import com.robotjatek.wplauncher.TileGrid.States.TappedState;
+import com.robotjatek.wplauncher.TileGrid.States.TouchingState;
 import com.robotjatek.wplauncher.TileService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -25,21 +28,37 @@ import java.util.stream.Collectors;
 // TODO: resize tile
 public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedListener {
 
+    public IGestureState IDLE_STATE() {
+        return new IdleState(this);
+    }
+
+    public IGestureState TOUCHING_STATE(float x, float y) {
+        return new TouchingState(this, x, y);
+    }
+
+    public IGestureState TAPPED_STATE(float x, float y) {
+        return new TappedState(this, x, y);
+    }
+
+    public IGestureState SCROLL_STATE(float y) {
+        return new ScrollState(this, y);
+    }
+
+    public IGestureState EDIT_STATE(float x, float y) {
+        return new EditState(this, x, y);
+    }
+
+    private IGestureState _state = IDLE_STATE();
+
     private final ScrollController _scroll = new ScrollController();
     private final TileDrawContext _tileDrawContext;
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
-    private boolean _isTouching = false;
-    private long _touchStart = 0;
-    private float _touchStartX = 0;
-    private float _touchStartY = 0;
     private Tile _selectedTile;
-    private final DragInfo _dragInfo = new DragInfo(); // Reused drag information to mitigate GC pressure
-    private boolean _isDragging = false;
     private List<Tile> _tiles;
-    private static final int COLUMNS = 4;
-    private static final float TOP_MARGIN_PX = 128;
+    public static final int COLUMNS = 4;
+    public static final float TOP_MARGIN_PX = 128;
     private static final float PAGE_PADDING_PX = 48;
-    private static final float TILE_GAP_PX = 32;
+    public static final float TILE_GAP_PX = 32;
     private final Shader _shader = new Shader("", "");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private float tileSizePx;
@@ -65,26 +84,9 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
-        executeCommands();
+        _state.update(delta);
         _scroll.update(delta);
-
-        if(_isDragging) {
-            var screenPosY = _tileDrawContext.yOf(_selectedTile) + _dragInfo.totalY + _scroll.getScrollOffset();
-            var scrollSpeed = 2 * delta;
-            if (screenPosY + _tileDrawContext.heightOf(_selectedTile) > _pageHeight - 200) { // reached bottom while dragging
-                _scroll.adjustOffset(-scrollSpeed);
-            } else if (screenPosY < 200) { // reached top while dragging
-                _scroll.adjustOffset(scrollSpeed);
-            }
-        }
-
-       if (_isTouching) {
-            var deltaTouchTime = System.currentTimeMillis() - _touchStart;
-            if (deltaTouchTime > ViewConfiguration.getLongPressTimeout()) {
-                _touchStart = 0;
-                _isTouching = false;
-            }
-       }
+        executeCommands();
 
         Matrix.setIdentityM(scrollMatrix, 0);
         Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
@@ -96,18 +98,40 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                 continue;
             }
             var scale = _selectedTile == null ? 1.0f : 0.95f;
-            tile.drawWithOffsetScaled(projMatrix, scrollMatrix, scale, new Position(0,0), _tileDrawContext);
+            tile.drawWithOffsetScaled(projMatrix, scrollMatrix, scale, Position.ZERO, _tileDrawContext);
         }
 
-        // render the selected tile
+        // render the selected tile with different scaling, and on its current drag position
         if (_selectedTile != null) {
             _selectedTile.drawWithOffsetScaled(projMatrix, scrollMatrix,
-                    1.00f, new Position(_dragInfo.totalX, _dragInfo.totalY), _tileDrawContext);
-            if (!_isDragging) {
+                    1.00f,
+                    new Position(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
+                    _tileDrawContext);
                 _unpinButton.draw(projMatrix, scrollMatrix);
-            }
         }
 
+    }
+
+    public void changeState(IGestureState state) {
+        _state.exit();
+        _state = state;
+        _state.enter();
+    }
+
+    public Tile getSelectedTile() {
+        return _selectedTile;
+    }
+
+    public Adorner getUnpinButton() {
+        return _unpinButton;
+    }
+
+    public TileService getTileService() {
+        return _tileService;
+    }
+
+    public float getPageHeight() {
+        return _pageHeight;
     }
 
     public void onSizeChanged(int width, int height) {
@@ -120,138 +144,21 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     @Override
     public void touchStart(float x, float y) {
-        _touchStartX = x;
-        _touchStartY = y;
-        _touchStart = System.currentTimeMillis();
-        _isTouching = true;
-        _scroll.onTouchStart(y);
+        _state.handleTouchStart(x, y);
     }
 
     @Override
     public void touchMove(float x, float y) {
-        _isTouching = false; // TODO: maybe fine-tune this to ignore random noises
-        _touchStart = 0;
-        if (_selectedTile == null) {
-            _scroll.onTouchMove(y);
-        } else {
-            // Update pan info of the selected tile
-            _isDragging = true;
-            _dragInfo.update(x, y);
-        }
+        _state.handleMove(x, y);
     }
 
     @Override
     public void touchEnd(float x, float y) {
-        if (_isTouching) {
-            handleTap(x, y);
-            _isTouching = false;
-            _touchStart = 0;
-        }
-
-        if (_isDragging) {
-            // drop tile to its new location, recalculate new tile positions
-            var newPosition = calculateNewPosition(_dragInfo);
-            if (isInbounds(newPosition)) {
-                var collidingTiles = getCollidingTiles(newPosition); // TODO: ha csak 1 tilelal ütközik akkor lehet hogy jobb lenne ha helyet cserélnének
-                var lowestPoint = calculateGroupLowestPoint(collidingTiles);
-                var nonCollidingBelow = getTilesBelowGroup(collidingTiles, lowestPoint);
-                var offset = calculateReflowOffset(collidingTiles, newPosition);
-
-                pushDownTiles(collidingTiles, offset);
-                pushDownTiles(nonCollidingBelow, offset);
-
-                _selectedTile.x = (int) newPosition.x();
-                _selectedTile.y = (int) newPosition.y();
-
-                compactGrid();
-                _tileService.persistTiles();
-            }
-
-            _isDragging = false;
-            cancelSelection();
-            setScrollBounds();
-        }
-
-        _scroll.onTouchEnd();
-    }
-
-    /**
-     * Calculate the new tile position after a drag
-     * @param args Drag information
-     * @return The calculated position of the tile
-     */
-    private Position calculateNewPosition(DragInfo args)
-    {
-        var calculatedTranslationX = args.totalX / (tileSizePx + TILE_GAP_PX);
-        var calculatedTranslationY = args.totalY / (tileSizePx + TILE_GAP_PX);
-
-        var calculatedColumn = Math.round(_selectedTile.x + calculatedTranslationX);
-        var calculatedRow = Math.round(_selectedTile.y + calculatedTranslationY);
-
-        return new Position(calculatedColumn, calculatedRow);
-    }
-
-    private boolean isInbounds(Position position) {
-        return position.x() >= 0 && position.x() + _selectedTile.colSpan <= COLUMNS
-                && position.y() >= 0;
-    }
-
-    /**
-     * Calculates the collisions of the selected tile with other tiles on its final calculated position
-     * It does not take the visual position during drag into consideration.
-     * Used for reflow calculations.
-     * <p>
-     *     Note: a 1 by 1 tile can only overlap with at most 1 tile as its position is snapped its final position not its visual pos during dragging
-     * </p>
-     * @param newPosition The supposed new position of the selected tile
-     * @return The list of the colliding tiles on its new position
-     */
-    private List<Tile> getCollidingTiles(Position newPosition) {
-        var colliding = new ArrayList<Tile>();
-
-        for (var tile : _tiles)
-        {
-            if (tile == _selectedTile) {
-                continue;
-            }
-            var collisionX = tile.x < newPosition.x() + _selectedTile.colSpan &&
-                    tile.x + tile.colSpan > newPosition.x();
-
-            var collisionY = tile.y < newPosition.y() + _selectedTile.rowSpan &&
-                    tile.y + tile.rowSpan > newPosition.y();
-
-            if (collisionX && collisionY) {
-                colliding.add(tile);
-            }
-        }
-
-        return colliding;
+        _state.handleTouchEnd(x, y);
     }
 
     private int calculateGroupLowestPoint(List<Tile> group) {
         return group.stream().mapToInt(t -> t.y + t.rowSpan).max().orElse(0);
-    }
-
-    /**
-     * Calculates the offset for the new tile position after a move
-     * @param group The group of tiles which should be moved
-     * @param newPosition The new position of the colliding tile
-     * @return The new offset for the tile group
-     */
-    private int calculateReflowOffset(List<Tile> group, Position newPosition) {
-        if (group.isEmpty()) {
-            return 0;
-        }
-        var bottom = newPosition.y() + _selectedTile.rowSpan;
-        var minY = group.stream().mapToInt(t -> t.y).min().orElse(0);
-        return (int)bottom - minY;
-    }
-
-    private List<Tile> getTilesBelowGroup(List<Tile> collidedGroup, int groupHeight) {
-        // filter out the collided and the selected tiles
-        var nonCollided = _tiles.stream().filter(t -> !collidedGroup.contains(t) && t != _selectedTile);
-        var below = nonCollided.filter(t -> t.y >= groupHeight);
-        return below.collect(Collectors.toList());
     }
 
     /**
@@ -260,7 +167,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
      * @param tiles The group of tiles to move together
      * @param offset The offset of the move
      */
-    private void pushDownTiles(List<Tile> tiles, int offset) {
+    public void pushDownTiles(List<Tile> tiles, int offset) {
         for (var tile: tiles) {
             tile.y += offset;
         }
@@ -270,7 +177,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
      * Removes empty rows between tiles
      * Note: this works on a row-by-row basis so its not very efficient
      */
-    private void compactGrid() {
+    public void compactGrid() {
         var maxRow = calculateGroupLowestPoint(_tiles);
         for (var i = 0; i < maxRow; i++) {
             if (!isRowEmpty(i)) {
@@ -312,51 +219,34 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         return max;
     }
 
-    private void handleTap(float x, float y) {
-        if (_selectedTile != null && !_isDragging && _unpinButton.isTapped(x, y - _scroll.getScrollOffset() - TOP_MARGIN_PX)) {
-            _unpinButton.onTap();
-            return;
-        }
-
-        var tappedTile = getTileAt(x, y);
-        if (_selectedTile != null) {
-            // Tapped same tile or empty space, deselect
-            if (tappedTile.isEmpty() || tappedTile.get() == _selectedTile) {
-                cancelSelection();
-            } else {
-                // Tap different tile
-                selectTile(tappedTile.get());
-            }
-            _dragInfo.start(x, y);
-            return;
-        }
-
-        tappedTile.ifPresent(Tile::onTap);
-    }
-
     public void handleLongPress(float x, float y) {
-        var tile = getTileAt(x, y);
-        tile.ifPresent(this::selectTile);
-        _dragInfo.start(x, y);
     }
 
-    private Optional<Tile> getTileAt(float x, float y) {
-        return _tiles.stream().filter(t -> {
-            var scrollPosition = _scroll.getScrollOffset();
-            var left = _tileDrawContext.xOf(t);
-            var top = _tileDrawContext.yOf(t) + scrollPosition + TOP_MARGIN_PX;
-            var right = left + _tileDrawContext.widthOf(t);
-            var bottom = top + _tileDrawContext.heightOf(t);
-
-            return x >= left && x <= right && y >= top && y <= bottom;
-        }).findFirst();
+    public List<Tile> getTiles() {
+        return _tiles;
     }
 
-    private void selectTile(Tile tile) {
+    public ScrollController getScroll() {
+        return _scroll;
+    }
+
+    public TileDrawContext getDrawContext() {
+        return _tileDrawContext;
+    }
+
+    public float getTileSizePx() {
+        return tileSizePx;
+    }
+
+    public void selectTile(Tile tile) {
+        if (tile == null) {
+            throw new RuntimeException("NEVER EVER CALL THIS WITH NULL! Use cancelSelection()!");
+        }
         _selectedTile = tile;
+        _selectedTile.getDragInfo().reset();
     }
 
-    private void cancelSelection() {
+    public void cancelSelection() {
         if (_selectedTile != null) {
             _commands.add(() -> _selectedTile = null);
         }
@@ -367,7 +257,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         return _selectedTile != null;
     }
 
-    private void setScrollBounds() {
+    public void setScrollBounds() {
         var contentHeight = getContentHeight();
         var min = Math.min(0, _pageHeight - contentHeight - TOP_MARGIN_PX);
         _scroll.setBounds(min, 0);
@@ -376,7 +266,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     @Override
     public void tileListChanged() {
         _tiles = _tileService.getTiles();
-        compactGrid();
+        compactGrid(); // after uninstall i have to do a reflow, because ta pinned tile could have been uninstalled
         setScrollBounds();
         _tileService.persistTiles();
     }

@@ -18,7 +18,6 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.StartPage.IPageNavigator;
-import com.robotjatek.wplauncher.StartPage.StartScreen;
 import com.robotjatek.wplauncher.IGestureState;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileService;

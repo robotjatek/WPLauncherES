@@ -5,6 +5,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
+import com.robotjatek.wplauncher.TileService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class EditDragState extends EditBaseState {
     private final float _x;
     private final float _y;
     private final Tile _selectedTile;
+    private final TileService _tileService;
 
 
     public EditDragState(EditState context, TileGrid tilegrid, float x, float y) {
@@ -21,6 +23,7 @@ public class EditDragState extends EditBaseState {
         _x = x;
         _y = y;
         _selectedTile = tilegrid.getSelectedTile();
+        _tileService = tilegrid.getTileService();
     }
 
     @Override
@@ -69,19 +72,17 @@ public class EditDragState extends EditBaseState {
             var nonCollidingBelow = getTilesBelowGroup(collidingTiles, lowestPoint);
             var offset = calculateReflowOffset(collidingTiles, newPosition);
 
-            _tilegrid.pushDownTiles(collidingTiles, offset);
-            _tilegrid.pushDownTiles(nonCollidingBelow, offset);
+            _tileService.pushDownTiles(collidingTiles, offset);
+            _tileService.pushDownTiles(nonCollidingBelow, offset);
 
             _selectedTile.x = (int) newPosition.x();
             _selectedTile.y = (int) newPosition.y();
 
-            _tilegrid.compactGrid();
-            _tilegrid.getTileService().persistTiles();
+            _tileService.compactGrid();
+            _tileService.persistTiles();
         }
 
         _tilegrid.cancelSelection();
-        _tilegrid.setScrollBounds();
-
         _tilegrid.changeState(_tilegrid.IDLE_STATE());
     }
 

@@ -23,7 +23,6 @@ import com.robotjatek.wplauncher.TileService;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
 
 // TODO: resize tile
 public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedListener {
@@ -157,59 +156,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         _state.handleTouchEnd(x, y);
     }
 
-    private int calculateGroupLowestPoint(List<Tile> group) {
-        return group.stream().mapToInt(t -> t.y + t.rowSpan).max().orElse(0);
-    }
-
-    /**
-     * Push down a given group of tiles with an offset.
-     * The move will be relative to the tiles original position.
-     * @param tiles The group of tiles to move together
-     * @param offset The offset of the move
-     */
-    public void pushDownTiles(List<Tile> tiles, int offset) {
-        for (var tile: tiles) {
-            tile.y += offset;
-        }
-    }
-
-    /**
-     * Removes empty rows between tiles
-     * Note: this works on a row-by-row basis so its not very efficient
-     */
-    public void compactGrid() {
-        var maxRow = calculateGroupLowestPoint(_tiles);
-        for (var i = 0; i < maxRow; i++) {
-            if (!isRowEmpty(i)) {
-                continue;
-            }
-
-            final int currentRow = i;
-            var group = _tiles.stream()
-                    .filter(t -> t.y > currentRow)
-                    .collect(Collectors.toList());
-
-            if (group.isEmpty()) {
-                continue;
-            }
-
-            var top = getTopOfTheGroup(group);
-            var offset = currentRow - top;
-
-            if (offset < 0) {
-                pushDownTiles(group, offset);
-            }
-        }
-    }
-
-    private boolean isRowEmpty(int row) {
-        return _tiles.stream().noneMatch(t -> row >= t.y && row < t.y + t.rowSpan);
-    }
-
-    private int getTopOfTheGroup(List<Tile> group) {
-        return group.stream().mapToInt(t -> t.y).min().orElse(0);
-    }
-
     private float getContentHeight() {
         var max = 0f;
         for (var t : _tiles) {
@@ -256,7 +202,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         return _selectedTile != null;
     }
 
-    public void setScrollBounds() {
+    private void setScrollBounds() {
         var contentHeight = getContentHeight();
         var min = Math.min(0, _pageHeight - contentHeight - TOP_MARGIN_PX);
         _scroll.setBounds(min, 0);
@@ -265,9 +211,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     @Override
     public void tileListChanged() {
         _tiles = _tileService.getTiles();
-        compactGrid(); // after uninstall i have to do a reflow, because ta pinned tile could have been uninstalled
         setScrollBounds();
-        _tileService.persistTiles();
     }
 
     private void executeCommands() {

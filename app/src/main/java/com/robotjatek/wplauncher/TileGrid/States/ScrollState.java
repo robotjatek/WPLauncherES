@@ -19,7 +19,7 @@ public class ScrollState extends BaseState {
     @Override
     public void handleTouchEnd(float x, float y) {
         _context.getScroll().onTouchEnd();
-        _context.changeState(_context.IDLE_STATE());
+        _context.changeState(_context.IDLE_STATE()); // TODO: low prio fix: remain in scroll state while flinging
     }
 
     @Override

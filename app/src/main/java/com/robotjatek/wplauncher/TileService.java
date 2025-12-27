@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 
 public class TileService {
@@ -66,6 +67,7 @@ public class TileService {
             _tiles.remove(t);
             t.dispose();
             notifySubscribers();
+            compactGrid();
             persistTiles();
         }));
     }
@@ -162,6 +164,60 @@ public class TileService {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Push down a given group of tiles with an offset.
+     * The move will be relative to the tiles original position.
+     * @param tiles The group of tiles to move together
+     * @param offset The offset of the move
+     */
+    public void pushDownTiles(List<Tile> tiles, int offset) {
+        for (var tile: tiles) {
+            tile.y += offset;
+        }
+    }
+
+    /**
+     * Removes empty rows between tiles
+     * Note: this works on a row-by-row basis so its not very efficient
+     */
+    public void compactGrid() {
+        var maxRow = calculateGroupLowestPoint(_tiles);
+        for (var i = 0; i < maxRow; i++) {
+            if (!isRowEmpty(i)) {
+                continue;
+            }
+
+            final int currentRow = i;
+            var group = _tiles.stream()
+                    .filter(t -> t.y > currentRow)
+                    .collect(Collectors.toList());
+
+            if (group.isEmpty()) {
+                continue;
+            }
+
+            var top = getTopOfTheGroup(group);
+            var offset = currentRow - top;
+
+            if (offset < 0) {
+                pushDownTiles(group, offset);
+            }
+        }
+        notifySubscribers();
+    }
+
+    private int calculateGroupLowestPoint(List<Tile> group) {
+        return group.stream().mapToInt(t -> t.y + t.rowSpan).max().orElse(0);
+    }
+
+    private boolean isRowEmpty(int row) {
+        return _tiles.stream().noneMatch(t -> row >= t.y && row < t.y + t.rowSpan);
+    }
+
+    private int getTopOfTheGroup(List<Tile> group) {
+        return group.stream().mapToInt(t -> t.y).min().orElse(0);
     }
 
     public void dispose() {

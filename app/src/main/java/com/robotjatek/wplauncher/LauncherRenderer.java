@@ -13,7 +13,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private long fpsTime = System.currentTimeMillis();
 
     private StartScreen _startScreen;
-    private Context _context;
+    private final Context _context;
 
     public LauncherRenderer(Context context) {
         _context = context;
@@ -61,6 +61,10 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     }
 
     public void handleTouchCancel() {
+    }
+
+    public void onBackPressed() {
+        _startScreen.onBackPressed();
     }
 
     public void dispose() {

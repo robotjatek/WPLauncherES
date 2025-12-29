@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
@@ -22,7 +21,7 @@ public class MainActivity extends ComponentActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Log.d("", "dasdasasd");
+                _surface.onBackPressed();
             }
         });
     }

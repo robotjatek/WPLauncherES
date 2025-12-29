@@ -116,6 +116,16 @@ public class StartScreen implements IPageNavigator {
         _appList.onSizeChanged(width, height);
     }
 
+    @Override
+    public void onBackPressed() {
+        // TODO: if internalApp => pop stack
+
+        // Navigate to page 0 set scroll offset to 0
+        _currentPage = 0;
+        _tileGrid.getScroll().setScrollOffset(0);
+        _appList.getScroll().setScrollOffset(0);
+    }
+
     public Page getCurrentPage() {
         return _pages.get(_currentPage);
     }

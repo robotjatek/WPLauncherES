@@ -111,4 +111,8 @@ public class ScrollController {
         _scrollOffset += amount;
         _scrollOffset = clampOffset(_scrollOffset);
     }
+
+    public void setScrollOffset(float value) {
+        _scrollOffset = value;
+    }
 }

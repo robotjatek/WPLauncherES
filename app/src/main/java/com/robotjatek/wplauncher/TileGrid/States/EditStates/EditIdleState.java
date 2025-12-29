@@ -4,7 +4,7 @@ import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class EditIdleState extends EditBaseState {
-    private static final float MOVEMENT_THRESHOLD = 15;
+    private static final float MOVEMENT_THRESHOLD = 25;
     private final float _startX;
     private final float _startY;
 

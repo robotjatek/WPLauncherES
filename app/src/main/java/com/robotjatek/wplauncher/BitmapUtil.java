@@ -7,6 +7,8 @@ import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
+import java.util.Objects;
+
 public class BitmapUtil {
 
     /**
@@ -23,8 +25,9 @@ public class BitmapUtil {
 
     private static Bitmap toBitmap(Drawable drawable, int width, int height) {
         if (drawable instanceof BitmapDrawable bitmapDrawable) {
+            var bitmap = bitmapDrawable.getBitmap();
             if (bitmapDrawable.getBitmap() != null) {
-                return Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), width, height, true);
+                return Bitmap.createScaledBitmap(bitmap.copy(Objects.requireNonNull(bitmap.getConfig()), false), width, height, true);
             }
         }
 
@@ -41,8 +44,7 @@ public class BitmapUtil {
         if (bitmap == null) {
             return -1;
         }
-
-        final int[] ids = new int[1];
+        final var ids = new int[1];
         GLES20.glGenTextures(1, ids, 0);
         if (ids[0] == 0) {
             throw new RuntimeException("failed to create texture");

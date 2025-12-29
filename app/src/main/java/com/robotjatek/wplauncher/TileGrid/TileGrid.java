@@ -75,7 +75,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         var icon = ContextCompat.getDrawable(context, R.drawable.close_circle);
         _unpinButton = new Adorner(() -> _commands.add(() -> {
             if (_selectedTile != null) {
-                _tileService.unpinTile(_selectedTile.getPackageName());
+                _tileService.queueUnpinTile(_selectedTile.getPackageName());
                 _selectedTile = null;
             }
         }), icon, adornerDrawContext);

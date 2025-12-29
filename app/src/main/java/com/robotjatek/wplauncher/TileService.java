@@ -28,9 +28,11 @@ public class TileService {
     private final Queue<Runnable> _tileCommands = new ConcurrentLinkedQueue<>();
     private final List<Tile> _tiles = new ArrayList<>();
     private final Context _context;
+    private final InternalAppsService _internalAppsService;
 
-    public TileService(Context context) {
+    public TileService(Context context, InternalAppsService internalAppsService) {
         _context = context;
+        _internalAppsService = internalAppsService;
         _tiles.addAll(loadPersistedTiles());
     }
 
@@ -42,7 +44,7 @@ public class TileService {
      * Execution of these commands must be fired on the main thread using {@link #executeCommands()}
      * @param app The app to pin on the TileScreen
      */
-    public void pinTile(App app) {
+    public void queuePinTile(App app) {
         var lowestPoint = _tiles.stream().mapToInt(t -> t.y + t.rowSpan).max().orElse(0);
         _tileCommands.add(() -> {
             var tile = createTile(app.name(), new Position(0, lowestPoint), app);
@@ -59,7 +61,7 @@ public class TileService {
      * Execution of these commands must be fired on the main thread using {@link #executeCommands()}
      * @param packageName The name of the package the tile corresponds to
      */
-    public void unpinTile(String packageName) {
+    public void queueUnpinTile(String packageName) {
         var tile = _tiles.stream()
                 .filter(t -> t.getPackageName().equals(packageName))
                 .findFirst();
@@ -81,7 +83,7 @@ public class TileService {
         var tiles = new ArrayList<Tile>();
         try {
             var prefs = _context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-            String tilesJson = prefs.getString(TILES, null);
+            var tilesJson = prefs.getString(TILES, null);
             if (tilesJson == null) {
                 return List.of();
             }
@@ -94,17 +96,20 @@ public class TileService {
                 var colSpan = obj.getInt("colSpan");
                 var rowSpan = obj.getInt("rowSpan");
                 var title = obj.getString("title");
-
                 App app = null;
                 if (obj.has("packageName")) {
                     var packageName = obj.getString("packageName");
-                    var intent = _context.getPackageManager().getLaunchIntentForPackage(packageName);
-                    if (intent == null) { // the package was uninstalled
-                        Log.w("loadPersistedTiles", "Could not find package: " + packageName);
-                        continue;
+                    if (packageName.startsWith("launcher:")) {
+                        app = _internalAppsService.getApp(title, packageName);
+                    } else {
+                        var intent = _context.getPackageManager().getLaunchIntentForPackage(packageName);
+                        if (intent == null) { // the package was uninstalled
+                            Log.w("loadPersistedTiles", "Could not find package: " + packageName);
+                            continue;
+                        }
+                        var icon = _context.getPackageManager().getApplicationIcon(packageName);
+                        app = new App(title, packageName, icon, () -> _context.startActivity(intent));
                     }
-                    var icon = _context.getPackageManager().getApplicationIcon(packageName);
-                    app = new App(title, packageName, icon, () -> _context.startActivity(intent));
                 }
 
                 tiles.add(new Tile(x, y, colSpan, rowSpan, title, app));
@@ -151,9 +156,7 @@ public class TileService {
                 tileJson.put("colSpan", tile.colSpan);
                 tileJson.put("rowSpan", tile.rowSpan);
                 tileJson.put("title", tile.title);
-                if (tile.getPackageName() != null && !tile.getPackageName().isEmpty()) {
-                    tileJson.put("packageName", tile.getPackageName());
-                }
+                tileJson.put("packageName", tile.getPackageName());
                 tileArray.put(tileJson);
             }
 
@@ -205,6 +208,7 @@ public class TileService {
                 pushDownTiles(group, offset);
             }
         }
+        persistTiles();
         notifySubscribers();
     }
 

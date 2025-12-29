@@ -27,7 +27,7 @@ public class ContextMenu implements IDrawContext<MenuOption> {
 
     public void draw(float[] proj, float[] view) {
         var menuHeight = calculateHeight();
-        // Currently I only draw the child elementss
+        // Currently I only draw the child elements
         Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
         Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0); // Menu height is based on the number of items
         for (var i = 0; i < _options.size(); i++) {

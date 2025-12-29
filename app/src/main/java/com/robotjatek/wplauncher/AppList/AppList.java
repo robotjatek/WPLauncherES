@@ -13,6 +13,7 @@ import com.robotjatek.wplauncher.AppList.States.TouchingState;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.ContextMenu.MenuOption;
+import com.robotjatek.wplauncher.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // TODO: a scrollingot kiszervezni egy külön (base?)osztályba -- manual scroll.onTouch* calls are error prone
 // TODO: meg a view alapú render logicot is...
@@ -68,31 +70,21 @@ public class AppList implements Page, IItemListContainer<App> {
     private int _listWidth;
     private int _viewPortHeight;
     private ContextMenu _contextMenu;
-    private final List<App> _apps;
     private final Context _context;
     private final TileService _tileService;
     private final ListItemDrawContext<App, AppList> _listItemDrawContext;
     private final ContextMenuDrawContext _contextMenuDrawContext;
     private final IPageNavigator _navigator;
+    private final InternalAppsService _internalAppsService;
 
-    public AppList(Context context, IPageNavigator navigator, TileService tileService) {
+    public AppList(Context context, IPageNavigator navigator, TileService tileService, InternalAppsService internalAppsService) {
         // TODO: reload results after app install/uninstall
         _context = context;
         _navigator = navigator;
         _tileService = tileService;
         _listItemDrawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this, _renderer);
         _contextMenuDrawContext = new ContextMenuDrawContext(_listWidth, _viewPortHeight, _renderer);
-        var pm = _context.getPackageManager();
-        var intent = new Intent(Intent.ACTION_MAIN, null);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        var activities = pm.queryIntentActivities(intent, 0);
-        _apps = activities.stream().map(resolveInfo -> {
-            var label = resolveInfo.loadLabel(pm).toString();
-            var packageName = resolveInfo.activityInfo.packageName;
-            var icon = resolveInfo.loadIcon(pm);
-            var launchIntent = pm.getLaunchIntentForPackage(packageName);
-            return new App(label, packageName, icon, () -> context.startActivity(launchIntent)); // TODO: internal apps
-        }).sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER)).toList();
+        _internalAppsService = internalAppsService;
     }
 
     @Override
@@ -151,7 +143,7 @@ public class AppList implements Page, IItemListContainer<App> {
             () -> pinApp(app),
             () ->  {
                 uninstallApp(app.packageName());
-                _tileService.unpinTile(app.packageName());
+                _tileService.queueUnpinTile(app.packageName());
             });
 
             return _contextMenu;
@@ -172,8 +164,9 @@ public class AppList implements Page, IItemListContainer<App> {
         _listItemDrawContext.onResize(_listWidth);
         _contextMenuDrawContext.onResize(_listWidth, height);
 
+        var apps = loadAppList();
         _items.forEach(ListItem::dispose);
-        _items = createItems(_apps);
+        _items = createItems(apps);
 
         var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX);
 
@@ -184,6 +177,23 @@ public class AppList implements Page, IItemListContainer<App> {
             var minScroll = -(contentHeight - height) - TOP_MARGIN_PX;
             _scroll.setBounds(minScroll, 0);
         }
+    }
+
+    private List<App> loadAppList() {
+        var internalApps = _internalAppsService.getInternalApps().stream();
+        var pm = _context.getPackageManager();
+        var intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        var activities = pm.queryIntentActivities(intent, 0);
+        var installedApps = activities.stream().map(resolveInfo -> {
+            var label = resolveInfo.loadLabel(pm).toString();
+            var packageName = resolveInfo.activityInfo.packageName;
+            var icon = resolveInfo.loadIcon(pm);
+            var launchIntent = pm.getLaunchIntentForPackage(packageName);
+            return new App(label, packageName, icon, () -> _context.startActivity(launchIntent));
+        }).sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER));
+
+        return Stream.concat(internalApps, installedApps).toList();
     }
 
     private List<ListItem<App>> createItems(List<App> apps) {
@@ -215,11 +225,11 @@ public class AppList implements Page, IItemListContainer<App> {
         var intent = new Intent(Intent.ACTION_DELETE);
         intent.setData(Uri.parse("package:" + packageName));
         _context.startActivity(intent);
-        _tileService.unpinTile(packageName);
+        _tileService.queueUnpinTile(packageName);
     }
 
     private void pinApp(App app) {
-        _tileService.pinTile(app);
+        _tileService.queuePinTile(app);
         _navigator.previousPage();
     }
 

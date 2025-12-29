@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.AppList;
+import com.robotjatek.wplauncher.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.StartPage.States.ChildControlState;
 import com.robotjatek.wplauncher.IState;
@@ -81,9 +82,10 @@ public class StartScreen implements IPageNavigator {
 
     public StartScreen(Context context) {
         _state = IDLE_STATE();
-        _tileService = new TileService(context);
+        var _internalAppsService = new InternalAppsService(context);
+        _tileService = new TileService(context, _internalAppsService);
         _tileGrid = new TileGrid(_tileService, context);
-        _appList = new AppList(context, this, _tileService);
+        _appList = new AppList(context, this, _tileService, _internalAppsService);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
     }
 

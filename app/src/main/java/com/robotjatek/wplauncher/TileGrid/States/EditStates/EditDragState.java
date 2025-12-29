@@ -79,7 +79,6 @@ public class EditDragState extends EditBaseState {
             _selectedTile.y = (int) newPosition.y();
 
             _tileService.compactGrid();
-            _tileService.persistTiles();
         }
 
         _tilegrid.cancelSelection();

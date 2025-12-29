@@ -56,6 +56,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private List<Tile> _tiles;
     public static final int COLUMNS = 4;
     public static final float TOP_MARGIN_PX = 128;
+    public static final float BOTTOM_MARGIN_PX = 192;
     private static final float PAGE_PADDING_PX = 48;
     public static final float TILE_GAP_PX = 32;
     private final Shader _shader = new Shader("", "");
@@ -204,7 +205,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     private void setScrollBounds() {
         var contentHeight = getContentHeight();
-        var min = Math.min(0, _pageHeight - contentHeight - TOP_MARGIN_PX);
+        var min = Math.min(0, _pageHeight - (contentHeight + PAGE_PADDING_PX + BOTTOM_MARGIN_PX));
         _scroll.setBounds(min, 0);
     }
 

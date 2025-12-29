@@ -1,12 +1,14 @@
 package com.robotjatek.wplauncher;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 
+import androidx.activity.ComponentActivity;
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends ComponentActivity {
 
     private LauncherSurfaceView _surface;
 
@@ -17,6 +19,12 @@ public class MainActivity extends Activity {
         _surface = new LauncherSurfaceView(this);
         _surface.setPreserveEGLContextOnPause(true);
         setContentView(_surface);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Log.d("", "dasdasasd");
+            }
+        });
     }
 
     @Override

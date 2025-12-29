@@ -67,16 +67,12 @@ public class StartScreen implements IPageNavigator {
     }
 
     private int _screenWidth;
-    private int _screenHeight;
-
     private final TileGrid _tileGrid;
     private final AppList _appList;
-
     private int _currentPage = 0;
     private float _pageOffset = 0;
     private final List<Page> _pages;
     private final TileService _tileService;
-
     float[] projMatrix = new float[16];
     float[] pageMatrix = new float[16]; // stores the page translation relative to each other
 
@@ -114,7 +110,6 @@ public class StartScreen implements IPageNavigator {
     }
 
     public void onResize(int width, int height) {
-        _screenHeight = height;
         _screenWidth = width;
         Matrix.orthoM(projMatrix, 0, 0, width, height, 0, -1, 1);
         _tileGrid.onSizeChanged(width, height);

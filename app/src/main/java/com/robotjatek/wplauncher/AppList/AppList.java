@@ -64,6 +64,7 @@ public class AppList implements Page, IItemListContainer<App> {
     private final ScrollController _scroll = new ScrollController();
     private List<ListItem<App>> _items = new ArrayList<>();
     public static final int TOP_MARGIN_PX = 152;
+    public static final int BOTTOM_MARGIN_PX = 800;
     public static final int ITEM_HEIGHT_PX = 128;
     public static final int ITEM_GAP_PX = 5;
     private static final int PAGE_PADDING_PX = 24;
@@ -167,16 +168,13 @@ public class AppList implements Page, IItemListContainer<App> {
         var apps = loadAppList();
         _items.forEach(ListItem::dispose);
         _items = createItems(apps);
+        setScrollBounds();
+    }
 
-        var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX);
-
-        if (contentHeight <= height) {
-            // content fits on screen, don't allow scrolling
-            _scroll.setBounds(0, 0);
-        } else {
-            var minScroll = -(contentHeight - height) - TOP_MARGIN_PX;
-            _scroll.setBounds(minScroll, 0);
-        }
+    private void setScrollBounds() {
+        var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + TOP_MARGIN_PX;
+        var min = Math.min(-PAGE_PADDING_PX, _viewPortHeight - contentHeight - TOP_MARGIN_PX);
+        _scroll.setBounds(min, 0);
     }
 
     private List<App> loadAppList() {

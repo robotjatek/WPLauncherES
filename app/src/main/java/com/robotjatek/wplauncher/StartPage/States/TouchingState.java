@@ -8,7 +8,6 @@ import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 public class TouchingState extends BaseState {
 
-    private long _touchStartTime = 0;
     private final float _touchStartX;
     private final float _touchStartY;
 
@@ -21,7 +20,6 @@ public class TouchingState extends BaseState {
     @Override
     public void enter() {
         _context.getCurrentPage().touchStart(_touchStartX, _touchStartY);
-        _touchStartTime = System.currentTimeMillis();
     }
 
     @Override
@@ -50,16 +48,6 @@ public class TouchingState extends BaseState {
             _context.changeState(_context.SWIPE_STATE(x));
         } else if (Math.abs(_totalDeltaY) > 10 && Math.abs(_totalDeltaY) > Math.abs(_totalDeltaX)) {
             _context.changeState(_context.SCROLL_STATE());
-        }
-    }
-
-    @Override
-    public void update(float delta) {
-        super.update(delta);
-        // Transition to long tap if enough time has passed
-        var deltaTime = System.currentTimeMillis() - _touchStartTime;
-        if (deltaTime > ViewConfiguration.getLongPressTimeout()) {
-            _context.changeState(_context.LONG_PRESS_STATE(_touchStartX, _touchStartY));
         }
     }
 

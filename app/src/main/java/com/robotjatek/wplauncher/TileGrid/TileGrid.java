@@ -166,15 +166,16 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         return max;
     }
 
-    public void handleLongPress(float x, float y) {
-    }
-
     public List<Tile> getTiles() {
         return _tiles;
     }
 
     public ScrollController getScroll() {
         return _scroll;
+    }
+
+    public void resetScroll() {
+        _scroll.setScrollOffset(0);
     }
 
     public TileDrawContext getDrawContext() {

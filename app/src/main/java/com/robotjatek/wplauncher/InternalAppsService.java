@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.AppList.App;
+import com.robotjatek.wplauncher.InternalApps.Settings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,11 +19,12 @@ public class InternalAppsService {
     private final Map<String, Drawable> _appIcons = new HashMap<>();
     private final List<App> _internalApps = new ArrayList<>();
 
-    public InternalAppsService(Context context) {
+    public InternalAppsService(Context context, IScreenNavigator navigator) {
         _context = context;
         initAppIcons();
 
-        var setting = new App("Launcher Settings", SETTINGS_NAME, getAppIcon(SETTINGS_NAME),  () -> {});
+        var setting = new App("Launcher Settings", SETTINGS_NAME, getAppIcon(SETTINGS_NAME),
+                () -> navigator.push(new Settings(navigator)));
         _internalApps.add(setting);
     }
 

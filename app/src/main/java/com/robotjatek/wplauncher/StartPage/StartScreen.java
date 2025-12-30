@@ -4,12 +4,13 @@ import android.content.Context;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.AppList;
+import com.robotjatek.wplauncher.IScreen;
+import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.StartPage.States.ChildControlState;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.States.IdleState;
-import com.robotjatek.wplauncher.StartPage.States.LongPressState;
 import com.robotjatek.wplauncher.StartPage.States.ScrollState;
 import com.robotjatek.wplauncher.StartPage.States.SwipingState;
 import com.robotjatek.wplauncher.StartPage.States.TappedState;
@@ -28,7 +29,7 @@ import java.util.List;
 
  * <p>NOTE: This essentially became a carousel view with 2 hardcoded pages</p>
  */
-public class StartScreen implements IPageNavigator {
+public class StartScreen implements IPageNavigator, IScreen {
 
     private IState _state;
 
@@ -42,10 +43,6 @@ public class StartScreen implements IPageNavigator {
 
     public IState TAPPED_STATE(float x, float y) {
         return new TappedState(this, x, y);
-    }
-
-    public IState LONG_PRESS_STATE(float x, float y) {
-        return new LongPressState(this, x, y);
     }
 
     public IState CHILD_CONTROL_STATE() {
@@ -73,19 +70,18 @@ public class StartScreen implements IPageNavigator {
     private float _pageOffset = 0;
     private final List<Page> _pages;
     private final TileService _tileService;
-    float[] projMatrix = new float[16];
-    float[] pageMatrix = new float[16]; // stores the page translation relative to each other
+    private final float[] pageMatrix = new float[16]; // stores the page translation relative to each other
 
-    public StartScreen(Context context) {
+    public StartScreen(Context context, IScreenNavigator navigator) {
         _state = IDLE_STATE();
-        var _internalAppsService = new InternalAppsService(context);
+        var _internalAppsService = new InternalAppsService(context, navigator);
         _tileService = new TileService(context, _internalAppsService);
         _tileGrid = new TileGrid(_tileService, context);
         _appList = new AppList(context, this, _tileService, _internalAppsService);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
     }
 
-    public void draw(float delta) {
+    public void draw(float delta, float[] projMatrix) {
         _tileService.executeCommands();
         for (var i = 0; i < _pages.size(); i++) {
             var xOffset = (i - _currentPage) * _screenWidth + _pageOffset;
@@ -111,19 +107,16 @@ public class StartScreen implements IPageNavigator {
 
     public void onResize(int width, int height) {
         _screenWidth = width;
-        Matrix.orthoM(projMatrix, 0, 0, width, height, 0, -1, 1);
         _tileGrid.onSizeChanged(width, height);
         _appList.onSizeChanged(width, height);
     }
 
     @Override
     public void onBackPressed() {
-        // TODO: if internalApp => pop stack
-
         // Navigate to page 0 set scroll offset to 0
         _currentPage = 0;
-        _tileGrid.getScroll().setScrollOffset(0);
-        _appList.getScroll().setScrollOffset(0);
+        _tileGrid.resetScroll();
+        _appList.resetScroll();
     }
 
     public Page getCurrentPage() {

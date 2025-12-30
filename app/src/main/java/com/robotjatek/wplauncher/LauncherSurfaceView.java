@@ -27,7 +27,6 @@ public class LauncherSurfaceView extends GLSurfaceView {
             case MotionEvent.ACTION_DOWN -> _renderer.handleTouchDown(x, y);
             case MotionEvent.ACTION_UP -> _renderer.handleTouchUp(x, y);
             case MotionEvent.ACTION_MOVE -> _renderer.handleTouchMove(x, y);
-            case MotionEvent.ACTION_CANCEL -> _renderer.handleTouchCancel();
         }
         return true;
     }

@@ -64,7 +64,6 @@ public class AppList implements Page, IItemListContainer<App> {
     private final ScrollController _scroll = new ScrollController();
     private List<ListItem<App>> _items = new ArrayList<>();
     public static final int TOP_MARGIN_PX = 152;
-    public static final int BOTTOM_MARGIN_PX = 800;
     public static final int ITEM_HEIGHT_PX = 128;
     public static final int ITEM_GAP_PX = 5;
     private static final int PAGE_PADDING_PX = 24;
@@ -124,10 +123,6 @@ public class AppList implements Page, IItemListContainer<App> {
         _state.handleTouchEnd(x, y);
     }
 
-    @Override
-    public void handleLongPress(float x, float y) {
-    }
-
     public void changeState(IState state) {
         _state.exit();
         _state = state;
@@ -136,6 +131,10 @@ public class AppList implements Page, IItemListContainer<App> {
 
     public ScrollController getScroll() {
         return this._scroll;
+    }
+
+    public void resetScroll() {
+        _scroll.setScrollOffset(0);
     }
 
     public ContextMenu openContextMenu(float x, float y, App app) {

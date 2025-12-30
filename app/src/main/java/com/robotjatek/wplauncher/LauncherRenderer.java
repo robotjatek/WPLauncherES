@@ -3,17 +3,21 @@ package com.robotjatek.wplauncher;
 import android.content.Context;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
-public class LauncherRenderer implements GLSurfaceView.Renderer {
-    private float lastTime = System.nanoTime();
+import java.util.ArrayDeque;
+import java.util.Deque;
 
+public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigator {
+    private float lastTime = System.nanoTime();
     private int frameCount = 0;
     private long fpsTime = System.currentTimeMillis();
 
-    private StartScreen _startScreen;
+    private final Deque<IScreen> _navigationStack = new ArrayDeque<>();
     private final Context _context;
+    private final float[] _projMatrix = new float[16];
 
     public LauncherRenderer(Context context) {
         _context = context;
@@ -23,7 +27,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(javax.microedition.khronos.opengles.GL10 glUnused,
                                  javax.microedition.khronos.egl.EGLConfig config) {
         GLES20.glClearColor(0f, 0f, 0f, 1f);
-        _startScreen = new StartScreen(_context); // Init startscreen here so no accidental gl calls before the surface is ready
+        // Init screens in surfaceCreated so no accidental gl calls before the surface is ready
+        _navigationStack.push(new StartScreen(_context, this));
     }
 
     @Override
@@ -33,41 +38,49 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         lastTime = now;
 
         frameCount++;
-        if (System.currentTimeMillis() - fpsTime > 1000) {
+        if (System.currentTimeMillis() - fpsTime >= 1000) {
             frameCount = 0;
             fpsTime = System.currentTimeMillis();
         }
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        _startScreen.draw(delta);
+        _navigationStack.getFirst().draw(delta, _projMatrix); // TODO: animation
     }
 
     @Override
     public void onSurfaceChanged(javax.microedition.khronos.opengles.GL10 glUnused, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
-        _startScreen.onResize(width, height);
-
+        Matrix.orthoM(_projMatrix, 0, 0, width, height, 0, -1, 1);
+        _navigationStack.forEach(s -> s.onResize(width, height));
     }
 
     public void handleTouchDown(float x, float y) {
-        _startScreen.onTouchStart(x, y);
+        _navigationStack.getFirst().onTouchStart(x, y);
     }
 
     public void handleTouchUp(float x, float y) {
-        _startScreen.onTouchEnd(x, y);
+        _navigationStack.getFirst().onTouchEnd(x, y);
     }
 
     public void handleTouchMove(float x, float y) {
-        _startScreen.onTouchMove(x, y);
-    }
-
-    public void handleTouchCancel() {
+        _navigationStack.getFirst().onTouchMove(x, y);
     }
 
     public void onBackPressed() {
-        _startScreen.onBackPressed();
+        _navigationStack.getFirst().onBackPressed();
+    }
+
+    @Override
+    public void push(IScreen screen) {
+        _navigationStack.push(screen);
+    }
+
+    @Override
+    public void pop() {
+        var screen = _navigationStack.pop();
+        screen.dispose();
     }
 
     public void dispose() {
-        _startScreen.dispose();
+        _navigationStack.forEach(IScreen::dispose);
     }
 }

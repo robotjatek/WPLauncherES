@@ -100,7 +100,7 @@ public class TileService {
                 if (obj.has("packageName")) {
                     var packageName = obj.getString("packageName");
                     if (packageName.startsWith("launcher:")) {
-                        app = _internalAppsService.getApp(title, packageName);
+                        app = _internalAppsService.getApp(packageName);
                     } else {
                         var intent = _context.getPackageManager().getLaunchIntentForPackage(packageName);
                         if (intent == null) { // the package was uninstalled

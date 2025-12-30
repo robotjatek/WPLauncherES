@@ -70,11 +70,12 @@ public class StartScreen implements IPageNavigator, IScreen {
     private float _pageOffset = 0;
     private final List<Page> _pages;
     private final TileService _tileService;
+    private final InternalAppsService _internalAppsService;
     private final float[] pageMatrix = new float[16]; // stores the page translation relative to each other
 
     public StartScreen(Context context, IScreenNavigator navigator) {
         _state = IDLE_STATE();
-        var _internalAppsService = new InternalAppsService(context, navigator);
+        _internalAppsService = new InternalAppsService(context, navigator);
         _tileService = new TileService(context, _internalAppsService);
         _tileGrid = new TileGrid(_tileService, context);
         _appList = new AppList(context, this, _tileService, _internalAppsService);
@@ -163,5 +164,6 @@ public class StartScreen implements IPageNavigator, IScreen {
         _tileService.persistTiles();
         _pages.forEach(Page::dispose);
         _tileService.dispose();
+        _internalAppsService.dispose();
     }
 }

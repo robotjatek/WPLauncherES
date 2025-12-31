@@ -1,14 +1,13 @@
 package com.robotjatek.wplauncher.InternalApps;
 
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
+import com.robotjatek.wplauncher.InternalApps.Components.Label.Label;
+import com.robotjatek.wplauncher.InternalApps.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Shader;
-import com.robotjatek.wplauncher.TileUtil;
-import com.robotjatek.wplauncher.VerticalAlign;
 
 /**
  * TODO: settings page should be completely STATELESS as its a singleton!
@@ -16,22 +15,25 @@ import com.robotjatek.wplauncher.VerticalAlign;
 public class Settings implements IScreen {
 
     private final IScreenNavigator _navigator;
+    private final StackLayout _layout;
     private final Shader _shader = new Shader("","");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
 
-    private final int _texId ;
-
     public Settings(IScreenNavigator navigator) {
         _navigator = navigator;
-        _texId = TileUtil.createTextTexture("Hello", 200, 400, 48, Typeface.NORMAL, 0xffffffff, 0x0, VerticalAlign.CENTER);
+        _layout = new StackLayout(_renderer);
+
+        _layout.addChild(new Label("LAUNCHER SETTINGS", 52, Typeface.NORMAL, 0xffffffff, 0));
+        _layout.addChild(new Label("theme", 160, Typeface.NORMAL, 0xffffffff, 0));
+        _layout.addChild(new Label("Harmadik meg bold", 78, Typeface.BOLD, 0xffffffff, 0xffff0000));
+
+        // TODO: Background color dropdown
+        // TODO: Accent color dropdown
     }
 
     @Override
     public void draw(float delta, float[] projMatrix) {
-        var modelM = new float[16];
-        Matrix.setIdentityM(modelM, 0);
-        Matrix.scaleM(modelM, 0, modelM, 0, 200, 400, 0);
-        _renderer.draw(projMatrix, modelM, _texId);
+        _layout.draw(delta, projMatrix);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class Settings implements IScreen {
 
     @Override
     public void onResize(int width, int height) {
-
+        _layout.onResize(width, height);
     }
 
     @Override

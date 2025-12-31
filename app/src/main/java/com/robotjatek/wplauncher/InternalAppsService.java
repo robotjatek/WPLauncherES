@@ -50,4 +50,8 @@ public class InternalAppsService {
     public void dispose() {
         _settingsScreen.dispose();
     }
+
+    public void onSizeChanged(int width, int height) {
+        _settingsScreen.onResize(width, height);
+    }
 }

@@ -11,9 +11,7 @@ public class MenuOption {
 
     private final Runnable _action;
     private final IDrawContext<MenuOption> _context;
-
     private final float[] _modelMatrix = new float[16];
-
     private int _textureId;
 
     public MenuOption(String label, Runnable action, IDrawContext<MenuOption> context) {

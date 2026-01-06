@@ -77,7 +77,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [x] Generic list view
 - [x] Stack view
 - [ ] UI elements
-  - [ ] Button
+  - [x] Button
   - [ ] Dropdown
   - [ ] Switch / checkbox
 

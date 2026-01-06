@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher.ContextMenu;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
@@ -22,8 +23,8 @@ public class MenuOption {
                 (int) context.heightOf(this),
                 48,
                 Typeface.BOLD,
-                0xffffffff,
-                0xff222222,
+                Colors.WHITE,
+                Colors.CONTEXT_MENU_GRAY,
                 VerticalAlign.CENTER);
     }
 

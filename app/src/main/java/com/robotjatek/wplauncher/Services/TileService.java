@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher;
+package com.robotjatek.wplauncher.Services;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

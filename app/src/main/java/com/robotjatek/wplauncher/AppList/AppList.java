@@ -13,7 +13,7 @@ import com.robotjatek.wplauncher.AppList.States.TouchingState;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.ContextMenu.MenuOption;
-import com.robotjatek.wplauncher.InternalAppsService;
+import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
@@ -21,7 +21,7 @@ import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.StartPage.IPageNavigator;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.TileGrid.Position;
-import com.robotjatek.wplauncher.TileService;
+import com.robotjatek.wplauncher.Services.TileService;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -63,10 +63,11 @@ public class AppList implements Page, IItemListContainer<App> {
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private final ScrollController _scroll = new ScrollController();
     private List<ListItem<App>> _items = new ArrayList<>();
-    public static final int TOP_MARGIN_PX = 152;
+    public static final int TOP_MARGIN_PX = 0;
+    public static final float BOTTOM_MARGIN_PX = 192;
     public static final int ITEM_HEIGHT_PX = 128;
     public static final int ITEM_GAP_PX = 5;
-    private static final int PAGE_PADDING_PX = 24;
+    private static final int PAGE_PADDING_PX = 60;
     private int _listWidth;
     private int _viewPortHeight;
     private ContextMenu _contextMenu;
@@ -98,8 +99,8 @@ public class AppList implements Page, IItemListContainer<App> {
 
         for (var i = 0; i < _items.size(); i++) {
             var item = _items.get(i);
-            item.update();
-            item.draw(projMatrix, scrollMatrix);
+            item.update(_listItemDrawContext);
+            item.draw(projMatrix, scrollMatrix, _listItemDrawContext);
         }
 
         // Draw the context menu last so it shows up above everything else
@@ -172,7 +173,7 @@ public class AppList implements Page, IItemListContainer<App> {
 
     private void setScrollBounds() {
         var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + TOP_MARGIN_PX;
-        var min = Math.min(-PAGE_PADDING_PX, _viewPortHeight - contentHeight - TOP_MARGIN_PX);
+        var min = Math.min(0, _viewPortHeight - (contentHeight + PAGE_PADDING_PX + BOTTOM_MARGIN_PX));
         _scroll.setBounds(min, 0);
     }
 

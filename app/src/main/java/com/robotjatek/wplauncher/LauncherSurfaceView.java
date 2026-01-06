@@ -35,6 +35,10 @@ public class LauncherSurfaceView extends GLSurfaceView {
         _renderer.onBackPressed();
     }
 
+    public LauncherRenderer getRenderer() {
+        return _renderer;
+    }
+
     public void dispose() {
         _renderer.dispose();
     }

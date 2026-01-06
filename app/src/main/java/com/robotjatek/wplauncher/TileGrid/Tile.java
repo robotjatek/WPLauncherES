@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
@@ -51,7 +52,7 @@ public class Tile {
             TileUtil.deleteTexture(_iconTextureId);
             var bgColor = 0xff1a1a2e; // TODO: bg color from config service
             _textureId = TileUtil.createTextTexture(title, TEXTURE_UNIT_PX * colSpan,
-                    TEXTURE_UNIT_PX * rowSpan, 48, Typeface.BOLD, 0xffffffff, bgColor, VerticalAlign.BOTTOM);
+                    TEXTURE_UNIT_PX * rowSpan, 48, Typeface.BOLD, Colors.WHITE, bgColor, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(_app.icon(), ICON_SIZE_PX, ICON_SIZE_PX);
             _dirty = false;
         }

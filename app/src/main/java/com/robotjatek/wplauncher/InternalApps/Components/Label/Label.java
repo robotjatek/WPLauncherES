@@ -18,7 +18,7 @@ public class Label implements UIElement {
     private int _textColor;
     private int _bgColor;
     private boolean _dirty = true;
-    private int _textureId;
+    private int _textureId = -1;
 
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
         _text = text;
@@ -37,6 +37,9 @@ public class Label implements UIElement {
         var h = context.heightOf(this);
 
         if (_dirty) {
+            if (_textureId > 0) {
+                TileUtil.deleteTexture(_textureId);
+            }
             _textureId = TileUtil.createTextTexture(_text,
                     (int) w,
                     (int) h,
@@ -87,7 +90,13 @@ public class Label implements UIElement {
         return _typeFace;
     }
 
-    void dispose() {
+    @Override
+    public void onTap() {
+        // do nothing
+    }
+
+    @Override
+    public void dispose() {
         TileUtil.deleteTexture(_textureId);
     }
 

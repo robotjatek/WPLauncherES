@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher;
+package com.robotjatek.wplauncher.Services;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -6,7 +6,10 @@ import android.graphics.drawable.Drawable;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.InternalApps.Settings;
+import com.robotjatek.wplauncher.IScreen;
+import com.robotjatek.wplauncher.IScreenNavigator;
+import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
+import com.robotjatek.wplauncher.R;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,11 +22,11 @@ public class InternalAppsService {
     private final Map<String, App> _internalApps = new HashMap<>();
     private final IScreen _settingsScreen;
 
-    public InternalAppsService(Context context, IScreenNavigator navigator) {
+    public InternalAppsService(Context context, SettingsService settings, IScreenNavigator navigator) {
         _context = context;
         initAppIcons();
 
-        _settingsScreen = new Settings(navigator);
+        _settingsScreen = new Settings(navigator, settings, context);
         var setting = new App("Launcher Settings", SETTINGS_NAME, getAppIcon(SETTINGS_NAME),
                 () -> navigator.push(_settingsScreen));
 

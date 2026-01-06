@@ -18,6 +18,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     private final Deque<IScreen> _navigationStack = new ArrayDeque<>();
     private final Context _context;
     private final float[] _projMatrix = new float[16];
+    private int _topInset = 0;
 
     public LauncherRenderer(Context context) {
         _context = context;
@@ -50,19 +51,20 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     public void onSurfaceChanged(javax.microedition.khronos.opengles.GL10 glUnused, int width, int height) {
         GLES20.glViewport(0, 0, width, height);
         Matrix.orthoM(_projMatrix, 0, 0, width, height, 0, -1, 1);
+        Matrix.translateM(_projMatrix, 0, 0, _topInset, 0);
         _navigationStack.forEach(s -> s.onResize(width, height));
     }
 
     public void handleTouchDown(float x, float y) {
-        _navigationStack.getFirst().onTouchStart(x, y);
+        _navigationStack.getFirst().onTouchStart(x, y - _topInset);
     }
 
     public void handleTouchUp(float x, float y) {
-        _navigationStack.getFirst().onTouchEnd(x, y);
+        _navigationStack.getFirst().onTouchEnd(x, y - _topInset);
     }
 
     public void handleTouchMove(float x, float y) {
-        _navigationStack.getFirst().onTouchMove(x, y);
+        _navigationStack.getFirst().onTouchMove(x, y - _topInset);
     }
 
     public void onBackPressed() {
@@ -81,5 +83,9 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
     public void dispose() {
         _navigationStack.forEach(IScreen::dispose);
+    }
+
+    public void setInsets(int left, int top, int right, int bottom) {
+        _topInset = top;
     }
 }

@@ -77,7 +77,7 @@ public class StartScreen implements IPageNavigator, IScreen {
 
     public StartScreen(Context context, IScreenNavigator navigator) {
         _state = IDLE_STATE();
-        _settingsService = new SettingsService();
+        _settingsService = new SettingsService(context);
         _internalAppsService = new InternalAppsService(context, _settingsService, navigator);
         _tileService = new TileService(context, _internalAppsService, _settingsService);
         _tileGrid = new TileGrid(_tileService, context);

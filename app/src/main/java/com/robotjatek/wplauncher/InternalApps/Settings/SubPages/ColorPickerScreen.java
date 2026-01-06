@@ -9,9 +9,11 @@ import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
+import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ColorPickerScreen implements IScreen {
@@ -19,6 +21,7 @@ public class ColorPickerScreen implements IScreen {
     private final IScreenNavigator _navigator;
     private final float[] viewMatrix = new float[16];
     private final ListView<AccentColor> _view;
+    private final List<OnChangeListener<AccentColor>> _changeListeners = new ArrayList<>();
 
     public ColorPickerScreen(QuadRenderer renderer, IScreenNavigator navigator) {
         _navigator = navigator;
@@ -28,10 +31,20 @@ public class ColorPickerScreen implements IScreen {
     }
 
     private List<ListItem<AccentColor>> createItems(ListItemDrawContext<AccentColor, ListView<AccentColor>> drawContext) {
-        return Colors.ACCENT_COLORS.stream().map(i -> {
-           return new ListItem<>(i.name(), new ColorDrawable(i.color()), drawContext, () -> {}, i);
-            // TODO: onTap runnable
-        }).toList();
+        return Colors.ACCENT_COLORS.stream().map(i ->
+                new ListItem<>(i.name(),
+                        new ColorDrawable(i.color()),
+                        drawContext,
+                        () -> selectColor(i), i)).toList();
+    }
+
+    public void subscribe(OnChangeListener<AccentColor> listener) {
+        _changeListeners.add(listener);
+    }
+
+    private void selectColor(AccentColor color) {
+        _changeListeners.forEach(l -> l.changed(color));
+        _navigator.pop();
     }
 
     @Override

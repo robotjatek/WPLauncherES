@@ -15,8 +15,8 @@ import com.robotjatek.wplauncher.VerticalAlign;
 public class Button implements UIElement {
 
     private final float[] _modelMatrix = new float[16];
-    private final String _text;
-    private final Drawable _icon;
+    private String _text;
+    private Drawable _icon;
     private final Runnable _onTap;
     private int _bgTexture = -1;
     private int _foreground = -1;
@@ -38,6 +38,8 @@ public class Button implements UIElement {
 
         if (_isDirty) {
             // 1 px white border
+            TileUtil.deleteTexture(_foreground);
+            TileUtil.deleteTexture(_iconTexture);
             _bgTexture = TileUtil.createTextTexture("", w, h, 0, Typeface.NORMAL, Colors.TRANSPARENT, Colors.WHITE, VerticalAlign.CENTER);
             _foreground = TileUtil.createTextTexture(_text, w - 1, h - 1, 48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, VerticalAlign.CENTER);
             if (_icon != null) {
@@ -82,6 +84,16 @@ public class Button implements UIElement {
     @Override
     public Size measure() {
         return new Size(0, 100); // TODO: configure height
+    }
+
+    public void setText(String text) {
+        _text = text;
+        _isDirty = true;
+    }
+
+    public void setIcon(Drawable icon) {
+        _icon = icon;
+        _isDirty = true;
     }
 
     @Override

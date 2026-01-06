@@ -3,20 +3,21 @@ package com.robotjatek.wplauncher.ContextMenu;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
 
-public class MenuOption {
+import java.util.function.Consumer;
 
-    private final Runnable _action;
-    private final IDrawContext<MenuOption> _context;
+public class MenuOption<T> {
 
+    private final Consumer<T> _action;
+    private final IDrawContext<MenuOption<T>> _context;
     private final float[] _modelMatrix = new float[16];
-
     private int _textureId;
 
-    public MenuOption(String label, Runnable action, IDrawContext<MenuOption> context) {
+    public MenuOption(String label, Consumer<T> action, IDrawContext<MenuOption<T>> context) {
         _action = action;
         _context = context;
         _textureId = TileUtil.createTextTexture(label,
@@ -24,14 +25,14 @@ public class MenuOption {
                 (int) context.heightOf(this),
                 48,
                 Typeface.BOLD,
-                0xffffffff,
-                0xff222222,
+                Colors.WHITE,
+                Colors.CONTEXT_MENU_GRAY,
                 VerticalAlign.CENTER);
     }
 
-    public void onTap() {
+    public void onTap(T payload) {
         if (_action != null) {
-            _action.run();
+            _action.accept(payload);
         }
     }
 

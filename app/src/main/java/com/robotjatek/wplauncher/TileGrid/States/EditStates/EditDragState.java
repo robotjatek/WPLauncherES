@@ -5,7 +5,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
-import com.robotjatek.wplauncher.TileService;
+import com.robotjatek.wplauncher.Services.TileService;
 
 import java.util.ArrayList;
 import java.util.List;

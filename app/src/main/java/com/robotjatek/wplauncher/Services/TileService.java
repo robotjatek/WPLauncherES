@@ -1,10 +1,11 @@
-package com.robotjatek.wplauncher;
+package com.robotjatek.wplauncher.Services;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.AppList.App;
+import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 
@@ -20,7 +21,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 
 
-public class TileService {
+public class TileService implements OnChangeListener<AccentColor> {
 
     private static final String PREF_NAME = "WPLAUNCHER";
     private static final String TILES = "TILES";
@@ -29,10 +30,13 @@ public class TileService {
     private final List<Tile> _tiles = new ArrayList<>();
     private final Context _context;
     private final InternalAppsService _internalAppsService;
+    private final SettingsService _settingsService;
 
-    public TileService(Context context, InternalAppsService internalAppsService) {
+    public TileService(Context context, InternalAppsService internalAppsService, SettingsService settingsService) {
         _context = context;
         _internalAppsService = internalAppsService;
+        _settingsService = settingsService;
+        _settingsService.subscribe(this);
         _tiles.addAll(loadPersistedTiles());
     }
 
@@ -112,7 +116,7 @@ public class TileService {
                     }
                 }
 
-                tiles.add(new Tile(x, y, colSpan, rowSpan, title, app));
+                tiles.add(new Tile(x, y, colSpan, rowSpan, title, app, _settingsService.getAccentColor().color()));
             }
 
             return tiles;
@@ -143,7 +147,7 @@ public class TileService {
     }
 
     private Tile createTile(String title, Position position, App app) {
-        return new Tile((int)position.x(), (int)position.y(), 2, 2, title, app);
+        return new Tile((int)position.x(), (int)position.y(), 2, 2, title, app, _settingsService.getAccentColor().color());
     }
 
     public void persistTiles() {
@@ -227,5 +231,10 @@ public class TileService {
     public void dispose() {
         _tiles.forEach(Tile::dispose);
         _tiles.clear();
+    }
+
+    @Override
+    public void changed(AccentColor changed) {
+        _tiles.forEach(t -> t.setBgColor(changed.color()));
     }
 }

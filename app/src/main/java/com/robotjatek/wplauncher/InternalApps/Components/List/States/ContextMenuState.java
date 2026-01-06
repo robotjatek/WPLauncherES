@@ -1,16 +1,16 @@
-package com.robotjatek.wplauncher.AppList.States;
+package com.robotjatek.wplauncher.InternalApps.Components.List.States;
 
-import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
 
-public class ContextMenuState extends BaseState {
+public class ContextMenuState<T> extends BaseState<T> {
 
     private final float _x;
     private final float _y;
-    private ContextMenu _menu;
+    private ContextMenu<T> _menu;
     private boolean _acceptsInput = false;
 
-    public ContextMenuState(AppList context, float x, float y) {
+    public ContextMenuState(ListView<T> context, float x, float y) {
         super(context);
         _x = x;
         _y = y;

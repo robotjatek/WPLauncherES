@@ -1,11 +1,11 @@
-package com.robotjatek.wplauncher.AppList.States;
+package com.robotjatek.wplauncher.InternalApps.Components.List.States;
 
-import com.robotjatek.wplauncher.AppList.AppList;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
 
-public class ScrollState extends BaseState {
+public class ScrollState<T> extends BaseState<T> {
     private final float _startY;
 
-    public ScrollState(AppList context, float y) {
+    public ScrollState(ListView<T> context, float y) {
         super(context);
         _startY = y;
     }

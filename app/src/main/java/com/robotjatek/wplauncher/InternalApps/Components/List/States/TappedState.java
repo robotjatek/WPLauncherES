@@ -1,16 +1,16 @@
-package com.robotjatek.wplauncher.AppList.States;
+package com.robotjatek.wplauncher.InternalApps.Components.List.States;
 
-import com.robotjatek.wplauncher.AppList.AppList;
-import com.robotjatek.wplauncher.AppList.ListItem;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListItem;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
 
 /**
  * Handles regular tap event then moves to {@link IdleState}
  */
-public class TappedState extends BaseState {
+public class TappedState<T> extends BaseState<T> {
 
     private final float _y;
 
-    public TappedState(AppList context, float y) {
+    public TappedState(ListView<T> context, float y) {
         super(context);
         _y = y;
     }

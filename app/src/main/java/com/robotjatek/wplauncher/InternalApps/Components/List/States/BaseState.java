@@ -1,44 +1,47 @@
-package com.robotjatek.wplauncher.AppList.States;
+package com.robotjatek.wplauncher.InternalApps.Components.List.States;
 
-import static com.robotjatek.wplauncher.AppList.AppList.ITEM_GAP_PX;
-import static com.robotjatek.wplauncher.AppList.AppList.ITEM_HEIGHT_PX;
 
-import android.util.Log;
+import static com.robotjatek.wplauncher.InternalApps.Components.List.ListView.ITEM_GAP_PX;
+import static com.robotjatek.wplauncher.InternalApps.Components.List.ListView.ITEM_HEIGHT_PX;
+import static com.robotjatek.wplauncher.InternalApps.Components.List.ListView.TOP_MARGIN_PX;
 
-import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.AppList.AppList;
-import com.robotjatek.wplauncher.AppList.ListItem;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListItem;
 import com.robotjatek.wplauncher.IState;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
 
 import java.util.Optional;
 
-public abstract class BaseState implements IState {
+public class BaseState<T> implements IState {
 
-    protected final AppList _context;
+    ListView<T> _context;
 
-    public BaseState(AppList context) {
+    protected BaseState(ListView<T> context) {
         _context = context;
     }
 
     @Override
     public void enter() {
-        Log.d(IState.class.toString(), this.getClass().toString());
+
     }
 
     @Override
     public void exit() {
+
     }
 
     @Override
     public void handleTouchStart(float x, float y) {
+
     }
 
     @Override
     public void handleTouchEnd(float x, float y) {
+
     }
 
     @Override
     public void handleMove(float x, float y) {
+
     }
 
     @Override
@@ -46,8 +49,8 @@ public abstract class BaseState implements IState {
         _context.getScroll().update(delta);
     }
 
-    protected Optional<ListItem<App>> getItemAt(float y) {
-        var adjustedY = y - (_context.getScroll().getScrollOffset() + AppList.TOP_MARGIN_PX);
+    protected Optional<ListItem<T>> getItemAt(float y) {
+        var adjustedY = y - (_context.getScroll().getScrollOffset() + TOP_MARGIN_PX);
         var index = (int)(adjustedY / (ITEM_HEIGHT_PX + ITEM_GAP_PX));
         if (index >= 0 && index < _context.getItems().size()) {
             return Optional.of(_context.getItems().get(index));

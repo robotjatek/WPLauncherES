@@ -3,7 +3,7 @@ package com.robotjatek.wplauncher.ContextMenu;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 
-public class ContextMenuDrawContext implements IDrawContext<ContextMenu> {
+public class ContextMenuDrawContext<T> implements IDrawContext<ContextMenu<T>> {
 
     private int _listWidth;
     private int _viewPortHeight;
@@ -21,24 +21,24 @@ public class ContextMenuDrawContext implements IDrawContext<ContextMenu> {
     }
 
     @Override
-    public float xOf(ContextMenu menu) {
+    public float xOf(ContextMenu<T> menu) {
         // confine to screen
-        return Math.clamp(menu.position.x(), 0, _listWidth - this.widthOf(menu));
+        return Math.clamp(menu._position.x(), 0, _listWidth - this.widthOf(menu));
     }
 
     @Override
-    public float yOf(ContextMenu menu) {
+    public float yOf(ContextMenu<T> menu) {
         // confine to screen
-        return Math.clamp(menu.position.y(), 0, _viewPortHeight - this.heightOf(menu));
+        return Math.clamp(menu._position.y(), 0, _viewPortHeight - this.heightOf(menu));
     }
 
     @Override
-    public float widthOf(ContextMenu menu) {
+    public float widthOf(ContextMenu<T> menu) {
         return 400;
     }
 
     @Override
-    public float heightOf(ContextMenu menu) {
+    public float heightOf(ContextMenu<T> menu) {
         return menu.calculateHeight();
     }
 

@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
@@ -21,6 +22,16 @@ public class BitmapUtil {
         var texId = createTextureFromBitmap(bitmap);
         bitmap.recycle();
         return texId;
+    }
+
+    public static Bitmap createRect(int width, int height, int padding, int color) {
+        var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        var canvas = new Canvas(bitmap);
+        canvas.drawColor(0xff000000);
+        var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(color);
+        canvas.drawRect(padding, padding, width - padding, height - padding, paint);
+        return bitmap;
     }
 
     private static Bitmap toBitmap(Drawable drawable, int width, int height) {

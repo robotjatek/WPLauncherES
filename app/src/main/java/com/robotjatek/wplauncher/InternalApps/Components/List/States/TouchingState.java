@@ -1,8 +1,8 @@
-package com.robotjatek.wplauncher.AppList.States;
+package com.robotjatek.wplauncher.InternalApps.Components.List.States;
 
 import android.view.ViewConfiguration;
 
-import com.robotjatek.wplauncher.AppList.AppList;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
 
 /**
  * Measures touch time
@@ -11,13 +11,13 @@ import com.robotjatek.wplauncher.AppList.AppList;
  * Transitions to {@link TappedState} if the finger was released before the long-press timeout
  * Transitions to {@link IdleState} if the finger starts moving while trying to measure hold time
  */
-public class TouchingState extends BaseState {
+public class TouchingState<T> extends BaseState<T> {
 
     private final float _touchStartX;
     private final float _touchStartY;
     private long _touchStartTime = -1;
 
-    public TouchingState(AppList context, float x, float y) {
+    public TouchingState(ListView<T> context, float x, float y) {
         super(context);
         _touchStartX = x;
         _touchStartY = y;
@@ -33,7 +33,7 @@ public class TouchingState extends BaseState {
     public void update(float delta) {
         // measure hold time, if it exceeds the LongPressTimeout move into ContextMenu state
         var deltaTime = System.currentTimeMillis() - _touchStartTime;
-        if (deltaTime > ViewConfiguration.getLongPressTimeout()) {
+        if (deltaTime > ViewConfiguration.getLongPressTimeout() && _context.hasContextMenu()) {
             _context.changeState(_context.CONTEXT_MENU_STATE(_touchStartX, _touchStartY));
         }
     }

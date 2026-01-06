@@ -6,8 +6,9 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
-import com.robotjatek.wplauncher.InternalAppsService;
+import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
+import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.StartPage.States.ChildControlState;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.States.IdleState;
@@ -16,7 +17,7 @@ import com.robotjatek.wplauncher.StartPage.States.SwipingState;
 import com.robotjatek.wplauncher.StartPage.States.TappedState;
 import com.robotjatek.wplauncher.StartPage.States.TouchingState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
-import com.robotjatek.wplauncher.TileService;
+import com.robotjatek.wplauncher.Services.TileService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,12 +72,14 @@ public class StartScreen implements IPageNavigator, IScreen {
     private final List<Page> _pages;
     private final TileService _tileService;
     private final InternalAppsService _internalAppsService;
+    private final SettingsService _settingsService;
     private final float[] pageMatrix = new float[16]; // stores the page translation relative to each other
 
     public StartScreen(Context context, IScreenNavigator navigator) {
         _state = IDLE_STATE();
-        _internalAppsService = new InternalAppsService(context, navigator);
-        _tileService = new TileService(context, _internalAppsService);
+        _settingsService = new SettingsService(context);
+        _internalAppsService = new InternalAppsService(context, _settingsService, navigator);
+        _tileService = new TileService(context, _internalAppsService, _settingsService);
         _tileGrid = new TileGrid(_tileService, context);
         _appList = new AppList(context, this, _tileService, _internalAppsService);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
@@ -110,6 +113,7 @@ public class StartScreen implements IPageNavigator, IScreen {
         _screenWidth = width;
         _tileGrid.onSizeChanged(width, height);
         _appList.onSizeChanged(width, height);
+        _internalAppsService.onSizeChanged(width, height);
     }
 
     @Override
@@ -165,5 +169,6 @@ public class StartScreen implements IPageNavigator, IScreen {
         _pages.forEach(Page::dispose);
         _tileService.dispose();
         _internalAppsService.dispose();
+        _settingsService.dispose();
     }
 }

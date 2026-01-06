@@ -3,79 +3,44 @@ package com.robotjatek.wplauncher.AppList;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.AppList.States.IdleState;
-import com.robotjatek.wplauncher.AppList.States.ContextMenuState;
-import com.robotjatek.wplauncher.AppList.States.ScrollState;
-import com.robotjatek.wplauncher.AppList.States.TappedState;
-import com.robotjatek.wplauncher.AppList.States.TouchingState;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.ContextMenu.MenuOption;
-import com.robotjatek.wplauncher.InternalAppsService;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListItem;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListItemDrawContext;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
+import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.StartPage.IPageNavigator;
-import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.TileGrid.Position;
-import com.robotjatek.wplauncher.TileService;
+import com.robotjatek.wplauncher.Services.TileService;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: a scrollingot kiszervezni egy külön (base?)osztályba -- manual scroll.onTouch* calls are error prone
-// TODO: meg a view alapú render logicot is...
 public class AppList implements Page, IItemListContainer<App> {
 
-    public IState IDLE_STATE() {
-        return new IdleState(this);
-    }
-
-    public IState TOUCHING_STATE(float x, float y) {
-        return new TouchingState(this, x, y);
-    }
-
-    public IState TAPPED_STATE(float y) {
-        return new TappedState(this, y);
-    }
-
-    public IState CONTEXT_MENU_STATE(float x, float y) {
-        return new ContextMenuState(this, x, y);
-    }
-
-    public IState SCROLL_STATE(float y) {
-        return new ScrollState(this, y);
-    }
-
-    private IState _state = IDLE_STATE();
-
-    private final Queue<Runnable> _commandQueue = new ConcurrentLinkedQueue<>();
-    private final float[] scrollMatrix = new float[16]; // scroll position transformation
     private final Shader _shader = new Shader("", "");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
-    private final ScrollController _scroll = new ScrollController();
     private List<ListItem<App>> _items = new ArrayList<>();
-    public static final int TOP_MARGIN_PX = 152;
     public static final int ITEM_HEIGHT_PX = 128;
     public static final int ITEM_GAP_PX = 5;
-    private static final int PAGE_PADDING_PX = 24;
+    private static final int PAGE_PADDING_PX = 60;
     private int _listWidth;
     private int _viewPortHeight;
-    private ContextMenu _contextMenu;
     private final Context _context;
     private final TileService _tileService;
     private final ListItemDrawContext<App, AppList> _listItemDrawContext;
-    private final ContextMenuDrawContext _contextMenuDrawContext;
+    private final ContextMenuDrawContext<App> _contextMenuDrawContext;
     private final IPageNavigator _navigator;
     private final InternalAppsService _internalAppsService;
+    private final ListView<App> _list;
 
     public AppList(Context context, IPageNavigator navigator, TileService tileService, InternalAppsService internalAppsService) {
         // TODO: reload results after app install/uninstall
@@ -83,78 +48,34 @@ public class AppList implements Page, IItemListContainer<App> {
         _navigator = navigator;
         _tileService = tileService;
         _listItemDrawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this, _renderer);
-        _contextMenuDrawContext = new ContextMenuDrawContext(_listWidth, _viewPortHeight, _renderer);
+        _contextMenuDrawContext = new ContextMenuDrawContext<>(_listWidth, _viewPortHeight, _renderer);
         _internalAppsService = internalAppsService;
+        _list = new ListView<>(_renderer);
+        _list.addItems(createItems(loadAppList()));
     }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
-        _state.update(delta);
-        executeCommands();
-
-        Matrix.setIdentityM(scrollMatrix, 0);
-        Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
-        Matrix.multiplyMM(scrollMatrix, 0, scrollMatrix, 0, viewMatrix, 0);
-
-        for (var i = 0; i < _items.size(); i++) {
-            var item = _items.get(i);
-            item.update();
-            item.draw(projMatrix, scrollMatrix);
-        }
-
-        // Draw the context menu last so it shows up above everything else
-        if (_contextMenu != null) {
-            _contextMenu.draw(projMatrix, viewMatrix);
-        }
+        _list.draw(delta, projMatrix, viewMatrix);
     }
 
     @Override
     public void touchMove(float x, float y) {
-        _state.handleMove(x, y);
+        _list.touchMove(x, y);
     }
 
     @Override
     public void touchStart(float x, float y) {
-        _state.handleTouchStart(x, y);
+        _list.touchStart(x, y);
     }
 
     @Override
     public void touchEnd(float x, float y) {
-        _state.handleTouchEnd(x, y);
-    }
-
-    public void changeState(IState state) {
-        _state.exit();
-        _state = state;
-        _state.enter();
-    }
-
-    public ScrollController getScroll() {
-        return this._scroll;
+        _list.touchEnd(x, y);
     }
 
     public void resetScroll() {
-        _scroll.setScrollOffset(0);
-    }
-
-    public ContextMenu openContextMenu(float x, float y, App app) {
-            _contextMenu = createAppListContextMenu(
-            new Position(x, y),
-            () -> pinApp(app),
-            () ->  {
-                uninstallApp(app.packageName());
-                _tileService.queueUnpinTile(app.packageName());
-            });
-
-            return _contextMenu;
-    }
-
-    public void closeContextMenu() {
-        if (_contextMenu != null) {
-            final var oldMenu = _contextMenu;
-            _commandQueue.add(oldMenu::dispose);
-            _contextMenu = null;
-        }
+        _list.resetScroll();
     }
 
     @Override
@@ -167,13 +88,21 @@ public class AppList implements Page, IItemListContainer<App> {
         var apps = loadAppList();
         _items.forEach(ListItem::dispose);
         _items = createItems(apps);
-        setScrollBounds();
+
+        _list.onSizeChanged(width, height);
+        _list.setContextMenu(createContextMenu());
     }
 
-    private void setScrollBounds() {
-        var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + TOP_MARGIN_PX;
-        var min = Math.min(-PAGE_PADDING_PX, _viewPortHeight - contentHeight - TOP_MARGIN_PX);
-        _scroll.setBounds(min, 0);
+    private ContextMenu<App> createContextMenu() {
+        var menu = new ContextMenu<>(new Position(0, 0), _contextMenuDrawContext);
+        var options = List.of(
+                new MenuOption<>("Pin", this::pinApp, menu),
+                new MenuOption<>("Uninstall", (a) -> {
+                    uninstallApp(a.packageName());
+                    _tileService.queueUnpinTile(a.packageName());
+                }, menu));
+        menu.addOptions(options);
+        return menu;
     }
 
     private List<App> loadAppList() {
@@ -194,28 +123,12 @@ public class AppList implements Page, IItemListContainer<App> {
     }
 
     private List<ListItem<App>> createItems(List<App> apps) {
-        return apps.stream().map(a -> new ListItem<>(a.name(), a.icon(), _listItemDrawContext, a.action(), a))
+        return apps.stream().map(a -> new ListItem<>(a.name(), a.icon(), _list.getDrawContext(), a.action(), a))
                 .collect(Collectors.toList());
     }
 
     public List<ListItem<App>> getItems() {
         return _items;
-    }
-
-    /**
-     * Creates a new context menu instance for the applist. It position is always absolute screen position
-     * @param position Absolute screen position
-     * @param pin The action to run when pinning an application
-     * @param uninstall The action to run when tapping uninstall
-     * @return The context menu on applist with Pin and uninstall options
-     */
-    private ContextMenu createAppListContextMenu(Position position, Runnable pin, Runnable uninstall) {
-        var menu = new ContextMenu(position, _contextMenuDrawContext);
-        var options = List.of(
-                new MenuOption("Pin", pin, menu),
-                new MenuOption("Uninstall", uninstall, menu));
-        menu.addOptions(options);
-        return menu;
     }
 
     private void uninstallApp(String packageName) {
@@ -227,29 +140,21 @@ public class AppList implements Page, IItemListContainer<App> {
 
     private void pinApp(App app) {
         _tileService.queuePinTile(app);
+        _list.resetScroll();
         _navigator.previousPage();
     }
 
     @Override
     public boolean isCatchingGestures() {
-        return _contextMenu != null;
-    }
-
-    private void executeCommands() {
-        Runnable command;
-        while ((command = _commandQueue.poll()) != null) {
-            command.run();
-        }
+        return _list.isCatchingGestures();
     }
 
     @Override
     public void dispose() {
+        _list.dispose();
         _items.forEach(ListItem::dispose);
         _items.clear();
         _shader.delete();
         _renderer.dispose();
-        if (_contextMenu != null) {
-            _contextMenu.dispose();
-        }
     }
 }

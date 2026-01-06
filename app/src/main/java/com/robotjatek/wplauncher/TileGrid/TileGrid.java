@@ -6,7 +6,7 @@ import android.opengl.Matrix;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.ITileListChangedListener;
+import com.robotjatek.wplauncher.Services.ITileListChangedListener;
 
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -18,7 +18,7 @@ import com.robotjatek.wplauncher.TileGrid.States.IdleState;
 import com.robotjatek.wplauncher.TileGrid.States.ScrollState;
 import com.robotjatek.wplauncher.TileGrid.States.TappedState;
 import com.robotjatek.wplauncher.TileGrid.States.TouchingState;
-import com.robotjatek.wplauncher.TileService;
+import com.robotjatek.wplauncher.Services.TileService;
 
 import java.util.List;
 import java.util.Queue;
@@ -55,7 +55,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private Tile _selectedTile;
     private List<Tile> _tiles;
     public static final int COLUMNS = 4;
-    public static final float TOP_MARGIN_PX = 128;
+    public static final float TOP_MARGIN_PX = 0;
     public static final float BOTTOM_MARGIN_PX = 192;
     private static final float PAGE_PADDING_PX = 48;
     public static final float TILE_GAP_PX = 32;

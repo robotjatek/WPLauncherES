@@ -1,5 +1,6 @@
-package com.robotjatek.wplauncher.AppList;
+package com.robotjatek.wplauncher.InternalApps.Components.List;
 
+import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 

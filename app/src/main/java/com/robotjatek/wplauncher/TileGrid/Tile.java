@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
@@ -22,15 +23,17 @@ public class Tile {
     private int _iconTextureId = -1;
     private final float[] _modelMatrix = new float[16];
     private final App _app;
+    private int _bgColor;
     private boolean _dirty = true;
     private final DragInfo _dragInfo = new DragInfo();
 
-    public Tile(int x, int y, int colSpan, int rowSpan, String title, App app) {
+    public Tile(int x, int y, int colSpan, int rowSpan, String title, App app, int bgColor) {
         this.x = x;
         this.y = y;
         this.colSpan = colSpan;
         this.rowSpan = rowSpan;
         this.title = title;
+        _bgColor = bgColor;
         _app = app;
     }
 
@@ -49,9 +52,8 @@ public class Tile {
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);
             TileUtil.deleteTexture(_iconTextureId);
-            var bgColor = 0xff1a1a2e; // TODO: bg color from config service
             _textureId = TileUtil.createTextTexture(title, TEXTURE_UNIT_PX * colSpan,
-                    TEXTURE_UNIT_PX * rowSpan, 48, Typeface.BOLD, 0xffffffff, bgColor, VerticalAlign.BOTTOM);
+                    TEXTURE_UNIT_PX * rowSpan, 48, Typeface.BOLD, Colors.WHITE, _bgColor, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(_app.icon(), ICON_SIZE_PX, ICON_SIZE_PX);
             _dirty = false;
         }
@@ -95,6 +97,11 @@ public class Tile {
         return _app.packageName();
     }
 
+    public void setBgColor(int color) {
+        _bgColor = color;
+        _dirty = true;
+    }
+
     public DragInfo getDragInfo() {
         return _dragInfo;
     }
@@ -103,5 +110,6 @@ public class Tile {
         TileUtil.deleteTexture(_textureId);
         TileUtil.deleteTexture(_iconTextureId);
         _textureId = -1;
+        _iconTextureId = -1;
     }
 }

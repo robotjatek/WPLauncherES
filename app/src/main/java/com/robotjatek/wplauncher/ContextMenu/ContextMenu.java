@@ -10,19 +10,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ContextMenu implements IDrawContext<MenuOption> {
+public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
 
     private static final float ITEM_HEIGHT_PX = 150;
-    private final IDrawContext<ContextMenu> _context;
-    private final List<MenuOption> _options = new ArrayList<>();
-    public Position position;
+    private final IDrawContext<ContextMenu<T>> _context;
+    private final List<MenuOption<T>> _options = new ArrayList<>();
+    public Position _position;
     private final float[] _modelMatrix = new float[16];
+    private T _payload;
+    private boolean _isOpened = false;
 
-    public ContextMenu(Position position, IDrawContext<ContextMenu> context) {
+    public ContextMenu(Position position, IDrawContext<ContextMenu<T>> context) {
         _context = context;
-        this.position = position;
-        this.position = new Position(_context.xOf(this), _context.yOf(this)); // recalculate position after confining the menu into the viewport
+        _position = position;
+        _position = new Position(_context.xOf(this), _context.yOf(this)); // recalculate position after confining the menu into the viewport
         Matrix.setIdentityM(_modelMatrix, 0);
+    }
+
+    public void open(Position position, T payload) {
+        _payload = payload;
+        _position = position;
+        _position = new Position(_context.xOf(this), _context.yOf(this));
+        _isOpened = true;
+    }
+
+    public void close() {
+        _isOpened = false;
+        _payload = null;
+    }
+
+    public boolean isOpened() {
+        return _isOpened;
     }
 
     public void draw(float[] proj, float[] view) {
@@ -37,7 +55,7 @@ public class ContextMenu implements IDrawContext<MenuOption> {
     }
 
 
-    public void addOptions(List<MenuOption> options) {
+    public void addOptions(List<MenuOption<T>> options) {
         _options.addAll(options);
     }
 
@@ -52,24 +70,24 @@ public class ContextMenu implements IDrawContext<MenuOption> {
     }
 
     @Override
-    public float xOf(MenuOption item) {
+    public float xOf(MenuOption<T> item) {
         return _context.xOf(this);
     }
 
     @Override
-    public float yOf(MenuOption item) {
+    public float yOf(MenuOption<T> item) {
         // Y is based on the index of the option
         var itemId = _options.indexOf(item);
         return _context.yOf(this) + itemId * ITEM_HEIGHT_PX;
     }
 
     @Override
-    public float widthOf(MenuOption item) {
+    public float widthOf(MenuOption<T> item) {
         return _context.widthOf(this);
     }
 
     @Override
-    public float heightOf(MenuOption item) {
+    public float heightOf(MenuOption<T> item) {
         // fixed height
         return ITEM_HEIGHT_PX;
     }
@@ -80,7 +98,7 @@ public class ContextMenu implements IDrawContext<MenuOption> {
 
     public void onTap(float x, float y) {
         var tappedItem = getOptionAt(x, y);
-        tappedItem.ifPresent(MenuOption::onTap);
+        tappedItem.ifPresent(t -> t.onTap(_payload));
     }
 
     public boolean isTappedOn(float x, float y) {
@@ -88,7 +106,7 @@ public class ContextMenu implements IDrawContext<MenuOption> {
                 y >= _context.yOf(this) && y <= _context.yOf(this) + _context.heightOf(this);
     }
 
-    private Optional<MenuOption> getOptionAt(float x, float y) {
+    private Optional<MenuOption<T>> getOptionAt(float x, float y) {
         return _options.stream().filter(o -> {
             var left = xOf(o);
             var top = yOf(o);

@@ -3,9 +3,10 @@ package com.robotjatek.wplauncher.InternalApps.Components.List;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
-import com.robotjatek.wplauncher.AppList.ListItem;
-import com.robotjatek.wplauncher.AppList.ListItemDrawContext;
+import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
+import com.robotjatek.wplauncher.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.IState;
+import com.robotjatek.wplauncher.InternalApps.Components.List.States.ContextMenuState;
 import com.robotjatek.wplauncher.InternalApps.Components.List.States.IdleState;
 import com.robotjatek.wplauncher.InternalApps.Components.List.States.ScrollState;
 import com.robotjatek.wplauncher.InternalApps.Components.List.States.TappedState;
@@ -13,14 +14,11 @@ import com.robotjatek.wplauncher.InternalApps.Components.List.States.TouchingSta
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO: ezt az applistben is használni
-// TODO: handle tap
-// TODO: longpress, hogy az applistben is működjön
-// TODO: ListItemDrawContext és ListItem ezzel kerüljön egy mappába
 public class ListView<T> implements IItemListContainer<T>, Page {
     public IState IDLE_STATE() {
         return new IdleState<>(this);
@@ -38,6 +36,10 @@ public class ListView<T> implements IItemListContainer<T>, Page {
         return new TappedState<>(this, y);
     }
 
+    public IState CONTEXT_MENU_STATE(float x, float y) {
+        return new ContextMenuState<>(this, x, y);
+    }
+
     private IState _state = IDLE_STATE();
     public static final int TOP_MARGIN_PX = 0;
     public static final int ITEM_HEIGHT_PX = 128;
@@ -47,11 +49,14 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     private final float[] scrollMatrix = new float[16];
     private final ScrollController _scroll = new ScrollController();
     private final ListItemDrawContext<T, ListView<T>> _drawContext;
+    private final ContextMenuDrawContext<T> _contextMenuDrawContext;
     private final List<ListItem<T>> _items = new ArrayList<>();
     private int _viewPortHeight;
+    private ContextMenu<T> _contextMenu;
 
     public ListView(QuadRenderer renderer) {
         _drawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this, renderer);
+        _contextMenuDrawContext = new ContextMenuDrawContext<>(0, _viewPortHeight, renderer);
     }
 
     @Override
@@ -69,6 +74,11 @@ public class ListView<T> implements IItemListContainer<T>, Page {
         for (var i : _items) {
             i.update(_drawContext);
             i.draw(projMatrix, scrollMatrix, _drawContext);
+        }
+
+        // Draw the context menu last so it shows up above everything else
+        if (_contextMenu != null && _contextMenu.isOpened()) {
+            _contextMenu.draw(projMatrix, viewMatrix);
         }
     }
 
@@ -91,6 +101,8 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     public void onSizeChanged(int width, int height) {
         _viewPortHeight = height;
         _drawContext.onResize(width);
+        var _listWidth = width - 2 * PAGE_PADDING_PX;
+        _contextMenuDrawContext.onResize(_listWidth, height);
         _items.forEach(ListItem::setDirty);
         setScrollBounds();
     }
@@ -114,14 +126,50 @@ public class ListView<T> implements IItemListContainer<T>, Page {
         return _scroll;
     }
 
+    public ContextMenu<T> openContextMenu(float x, float y, T item) {
+        if (_contextMenu != null) {
+            _contextMenu.open(new Position(x, y), item);
+        }
+        return _contextMenu;
+    }
+
+    public void closeContextMenu() {
+        if (_contextMenu != null) {
+            _contextMenu.close();
+        }
+    }
+
+    public void setContextMenu(ContextMenu<T> menu) {
+        if (_contextMenu != null) {
+            _contextMenu.dispose();
+        }
+        _contextMenu = menu;
+    }
+
+    public boolean hasContextMenu() {
+        return _contextMenu != null;
+    }
+
     private void setScrollBounds() {
         var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + TOP_MARGIN_PX;
         var min = Math.min(0, _viewPortHeight - (contentHeight + PAGE_PADDING_PX + BOTTOM_MARGIN_PX));
         _scroll.setBounds(min, 0);
     }
 
+    public void resetScroll() {
+        _scroll.setScrollOffset(0);
+    }
+
+    @Override
+    public boolean isCatchingGestures() {
+        return _contextMenu.isOpened();
+    }
+
     @Override
     public void dispose() {
         _items.forEach(ListItem::dispose);
+        if (_contextMenu != null) {
+            _contextMenu.dispose();
+        }
     }
 }

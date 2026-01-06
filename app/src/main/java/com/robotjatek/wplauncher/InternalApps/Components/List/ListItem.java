@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.AppList;
+package com.robotjatek.wplauncher.InternalApps.Components.List;
 
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;

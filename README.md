@@ -68,13 +68,14 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
     - [ ] Messages
     - [ ] Photos
     - [ ] Contacts
-- [ ] Change accent color
-- [ ] Global settings service with fixed options
-- [ ] Persist settings
+- [x] Change accent color
+- [x] Global settings service
+- [x] Persist settings
 - [ ] Resize tiles / Multi size app tiles
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Generic carousel view
-- [ ] Stack view
+- [x] Generic list view
+- [x] Stack view
 - [ ] UI elements
   - [ ] Button
   - [ ] Dropdown
@@ -101,7 +102,7 @@ M3 is the preparation for a first public beta release.
 
 ### Current progress
 
-M1 is in progress
+M2 is in progress
 
 ## Planned live custom tiles / "widgets"
 

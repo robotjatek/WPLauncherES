@@ -33,9 +33,8 @@ public class TouchingState<T> extends BaseState<T> {
     public void update(float delta) {
         // measure hold time, if it exceeds the LongPressTimeout move into ContextMenu state
         var deltaTime = System.currentTimeMillis() - _touchStartTime;
-        if (deltaTime > ViewConfiguration.getLongPressTimeout()) {
-            // TODO: contextMenu state
-        //    _context.changeState(_context.CONTEXT_MENU_STATE(_touchStartX, _touchStartY));
+        if (deltaTime > ViewConfiguration.getLongPressTimeout() && _context.hasContextMenu()) {
+            _context.changeState(_context.CONTEXT_MENU_STATE(_touchStartX, _touchStartY));
         }
     }
 

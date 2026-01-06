@@ -5,7 +5,7 @@ import static com.robotjatek.wplauncher.InternalApps.Components.List.ListView.IT
 import static com.robotjatek.wplauncher.InternalApps.Components.List.ListView.ITEM_HEIGHT_PX;
 import static com.robotjatek.wplauncher.InternalApps.Components.List.ListView.TOP_MARGIN_PX;
 
-import com.robotjatek.wplauncher.AppList.ListItem;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListItem;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
 

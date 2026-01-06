@@ -1,6 +1,6 @@
 package com.robotjatek.wplauncher.InternalApps.Components.List.States;
 
-import com.robotjatek.wplauncher.AppList.ListItem;
+import com.robotjatek.wplauncher.InternalApps.Components.List.ListItem;
 import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
 
 /**

@@ -3,12 +3,12 @@ package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 import android.graphics.drawable.ColorDrawable;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.InternalApps.Components.List.ListItem;
-import com.robotjatek.wplauncher.InternalApps.Components.List.ListItemDrawContext;
+import com.robotjatek.wplauncher.Components.List.ListItem;
+import com.robotjatek.wplauncher.Components.List.ListItemDrawContext;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
-import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListView;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;

@@ -69,7 +69,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
     - [ ] Photos
     - [ ] Contacts
 - [x] Change accent color
-- [x] Global settings service
+- [x] Settings service
 - [x] Persist settings
 - [ ] Resize tiles / Multi size app tiles
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)

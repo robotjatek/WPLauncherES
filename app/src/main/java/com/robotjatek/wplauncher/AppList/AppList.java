@@ -4,12 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
-import com.robotjatek.wplauncher.ContextMenu.ContextMenu;
-import com.robotjatek.wplauncher.ContextMenu.ContextMenuDrawContext;
-import com.robotjatek.wplauncher.ContextMenu.MenuOption;
-import com.robotjatek.wplauncher.InternalApps.Components.List.ListItem;
-import com.robotjatek.wplauncher.InternalApps.Components.List.ListItemDrawContext;
-import com.robotjatek.wplauncher.InternalApps.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
+import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
+import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
+import com.robotjatek.wplauncher.Components.List.ListItem;
+import com.robotjatek.wplauncher.Components.List.ListItemDrawContext;
+import com.robotjatek.wplauncher.Components.List.ListView;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;

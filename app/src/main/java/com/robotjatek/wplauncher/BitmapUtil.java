@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.drawable.AdaptiveIconDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
@@ -11,6 +12,11 @@ import android.opengl.GLUtils;
 import java.util.Objects;
 
 public class BitmapUtil {
+
+    // https://developer.android.com/guide/practices/ui_guidelines/icon_design_adaptive
+    private static final float ADAPTIVE_ICON_SIZE_DP = 108f;
+    private static final float ADAPTIVE_ICON_SAFE_ZONE_DP = 66f;
+    private static final float ADAPTIVE_ICON_SCALE = ADAPTIVE_ICON_SIZE_DP / ADAPTIVE_ICON_SAFE_ZONE_DP;
 
     /**
      * Converts a drawable (possibly an application icon) to an OpenGL texture.
@@ -42,6 +48,22 @@ public class BitmapUtil {
             }
         }
 
+        if (drawable instanceof AdaptiveIconDrawable adaptive) {
+            var monochrome = adaptive.getMonochrome();
+            if (monochrome != null) {
+                monochrome = monochrome.mutate();
+                var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                var canvas = new Canvas(bitmap);
+                canvas.drawColor(0);
+                canvas.scale(ADAPTIVE_ICON_SCALE, ADAPTIVE_ICON_SCALE,
+                        width / 2f, height / 2f);
+                monochrome.setBounds(0, 0, width, height);
+                monochrome.setTint(Colors.WHITE);
+                monochrome.draw(canvas);
+                return bitmap;
+            }
+        }
+
         var bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         var canvas = new Canvas(bitmap);
         canvas.drawColor(0x00000000);
@@ -51,7 +73,7 @@ public class BitmapUtil {
         return bitmap;
     }
 
-    private static int createTextureFromBitmap(Bitmap bitmap) {
+    public static int createTextureFromBitmap(Bitmap bitmap) {
         if (bitmap == null) {
             return -1;
         }

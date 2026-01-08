@@ -104,14 +104,14 @@ public class TileService implements OnChangeListener<AccentColor> {
                 if (obj.has("packageName")) {
                     var packageName = obj.getString("packageName");
                     if (packageName.startsWith("launcher:")) {
-                        app = _internalAppsService.getApp(packageName);
+                        app = _internalAppsService.getInternalApp(packageName);
                     } else {
                         var intent = _context.getPackageManager().getLaunchIntentForPackage(packageName);
                         if (intent == null) { // the package was uninstalled
                             Log.w("loadPersistedTiles", "Could not find package: " + packageName);
                             continue;
                         }
-                        var icon = _context.getPackageManager().getApplicationIcon(packageName);
+                        var icon = _context.getPackageManager().getActivityIcon(intent);
                         app = new App(title, packageName, icon, () -> _context.startActivity(intent));
                     }
                 }
@@ -147,6 +147,7 @@ public class TileService implements OnChangeListener<AccentColor> {
     }
 
     private Tile createTile(String title, Position position, App app) {
+        // TODO: determine here if its a live tile?
         return new Tile((int)position.x(), (int)position.y(), 2, 2, title, app, _settingsService.getAccentColor().color());
     }
 

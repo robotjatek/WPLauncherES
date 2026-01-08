@@ -34,8 +34,7 @@ public class ColorPickerScreen implements IScreen {
         return Colors.ACCENT_COLORS.stream().map(i ->
                 new ListItem<>(i.name(),
                         new ColorDrawable(i.color()),
-                        drawContext,
-                        () -> selectColor(i), i)).toList();
+                        () -> selectColor(i), i, 0)).toList();
     }
 
     public void subscribe(OnChangeListener<AccentColor> listener) {

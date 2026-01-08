@@ -10,9 +10,12 @@ import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Components.List.ListItem;
 import com.robotjatek.wplauncher.Components.List.ListItemDrawContext;
 import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
+import com.robotjatek.wplauncher.Services.AccentColor;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.StartPage.IPageNavigator;
 import com.robotjatek.wplauncher.TileGrid.Position;
@@ -24,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AppList implements Page, IItemListContainer<App> {
+public class AppList implements Page, IItemListContainer<App>, OnChangeListener<AccentColor> {
 
     private final Shader _shader = new Shader("", "");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
@@ -40,18 +43,21 @@ public class AppList implements Page, IItemListContainer<App> {
     private final ContextMenuDrawContext<App> _contextMenuDrawContext;
     private final IPageNavigator _navigator;
     private final InternalAppsService _internalAppsService;
+    private final SettingsService _settingsService;
     private final ListView<App> _list;
 
-    public AppList(Context context, IPageNavigator navigator, TileService tileService, InternalAppsService internalAppsService) {
+    public AppList(Context context, IPageNavigator navigator, TileService tileService,
+                   InternalAppsService internalAppsService, SettingsService settingsService) {
         // TODO: reload results after app install/uninstall
         _context = context;
         _navigator = navigator;
         _tileService = tileService;
+        _settingsService = settingsService;
+        _settingsService.subscribe(this);
         _listItemDrawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this, _renderer);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_listWidth, _viewPortHeight, _renderer);
         _internalAppsService = internalAppsService;
         _list = new ListView<>(_renderer);
-        _list.addItems(createItems(loadAppList()));
     }
 
     @Override
@@ -90,6 +96,7 @@ public class AppList implements Page, IItemListContainer<App> {
         _items = createItems(apps);
 
         _list.onSizeChanged(width, height);
+        _list.addItems(_items);
         _list.setContextMenu(createContextMenu());
     }
 
@@ -123,7 +130,8 @@ public class AppList implements Page, IItemListContainer<App> {
     }
 
     private List<ListItem<App>> createItems(List<App> apps) {
-        return apps.stream().map(a -> new ListItem<>(a.name(), a.icon(), _list.getDrawContext(), a.action(), a))
+        var bgColor = _settingsService.getAccentColor().color();
+        return apps.stream().map(a -> new ListItem<>(a.name(), a.icon(), a.action(), a, bgColor))
                 .collect(Collectors.toList());
     }
 
@@ -156,5 +164,10 @@ public class AppList implements Page, IItemListContainer<App> {
         _items.clear();
         _shader.delete();
         _renderer.dispose();
+    }
+
+    @Override
+    public void changed(AccentColor changed) {
+        _items.forEach(i -> i.setBgColor(changed.color()));
     }
 }

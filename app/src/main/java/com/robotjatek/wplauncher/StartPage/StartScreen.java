@@ -81,7 +81,7 @@ public class StartScreen implements IPageNavigator, IScreen {
         _internalAppsService = new InternalAppsService(context, _settingsService, navigator);
         _tileService = new TileService(context, _internalAppsService, _settingsService);
         _tileGrid = new TileGrid(_tileService, context);
-        _appList = new AppList(context, this, _tileService, _internalAppsService);
+        _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
     }
 

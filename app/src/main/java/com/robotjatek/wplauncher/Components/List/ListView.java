@@ -114,6 +114,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     public void addItems(List<ListItem<T>> items) {
         _items.addAll(items);
         _items.forEach(ListItem::setDirty);
+        setScrollBounds();
     }
 
     public void changeState(IState state) {

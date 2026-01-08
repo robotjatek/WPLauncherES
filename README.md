@@ -17,8 +17,7 @@ The goal remains the same: a WP7/8 style launcher, now with no external UI frame
 - OpenGL ES2.0
 - API Level 34
 
-<img src="img/s1.png" alt="Description" width="250">
-<img src="img/s2.png" alt="Description" width="250">
+<img src="img/s1.png" alt="Description" width="500">
 
 ## Milestones
 

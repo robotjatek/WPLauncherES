@@ -60,7 +60,7 @@ public class ListItem<T> {
         // BG
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y, 0f);
-        Matrix.scaleM(_modelMatrix, 0, h, h, 1);
+        Matrix.scaleM(_modelMatrix, 0, h, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         context.getRenderer().draw(projMatrix, _modelMatrix, _bgTextureId);
 

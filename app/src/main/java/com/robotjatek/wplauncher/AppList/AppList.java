@@ -8,7 +8,6 @@ import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Components.List.ListItem;
-import com.robotjatek.wplauncher.Components.List.ListItemDrawContext;
 import com.robotjatek.wplauncher.Components.List.ListView;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.Services.AccentColor;
@@ -21,25 +20,20 @@ import com.robotjatek.wplauncher.StartPage.IPageNavigator;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.Services.TileService;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AppList implements Page, IItemListContainer<App>, OnChangeListener<AccentColor> {
+public class AppList implements Page, OnChangeListener<AccentColor> {
 
     private final Shader _shader = new Shader("", "");
     private final QuadRenderer _renderer = new QuadRenderer(_shader);
-    private List<ListItem<App>> _items = new ArrayList<>();
-    public static final int ITEM_HEIGHT_PX = 128;
-    public static final int ITEM_GAP_PX = 5;
     private static final int PAGE_PADDING_PX = 60;
     private int _listWidth;
     private int _viewPortHeight;
     private final Context _context;
     private final TileService _tileService;
-    private final ListItemDrawContext<App, AppList> _listItemDrawContext;
     private final ContextMenuDrawContext<App> _contextMenuDrawContext;
     private final IPageNavigator _navigator;
     private final InternalAppsService _internalAppsService;
@@ -54,10 +48,12 @@ public class AppList implements Page, IItemListContainer<App>, OnChangeListener<
         _tileService = tileService;
         _settingsService = settingsService;
         _settingsService.subscribe(this);
-        _listItemDrawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this, _renderer);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_listWidth, _viewPortHeight, _renderer);
         _internalAppsService = internalAppsService;
         _list = new ListView<>(_renderer);
+        var apps = loadAppList();
+        var newItems = createItems(apps);
+        _list.addItems(newItems);
     }
 
     @Override
@@ -88,16 +84,9 @@ public class AppList implements Page, IItemListContainer<App>, OnChangeListener<
     public void onSizeChanged(int width, int height) {
         _viewPortHeight = height;
         _listWidth = width - 2 * PAGE_PADDING_PX;
-        _listItemDrawContext.onResize(_listWidth);
         _contextMenuDrawContext.onResize(_listWidth, height);
-
-        var apps = loadAppList();
-        _items.forEach(ListItem::dispose);
-        _items = createItems(apps);
-
         _list.onSizeChanged(width, height);
-        _list.addItems(_items);
-        _list.setContextMenu(createContextMenu());
+        _list.setContextMenu(createContextMenu()); // Context menu must be created when the size information is available
     }
 
     private ContextMenu<App> createContextMenu() {
@@ -135,10 +124,6 @@ public class AppList implements Page, IItemListContainer<App>, OnChangeListener<
                 .collect(Collectors.toList());
     }
 
-    public List<ListItem<App>> getItems() {
-        return _items;
-    }
-
     private void uninstallApp(String packageName) {
         var intent = new Intent(Intent.ACTION_DELETE);
         intent.setData(Uri.parse("package:" + packageName));
@@ -160,14 +145,12 @@ public class AppList implements Page, IItemListContainer<App>, OnChangeListener<
     @Override
     public void dispose() {
         _list.dispose();
-        _items.forEach(ListItem::dispose);
-        _items.clear();
         _shader.delete();
         _renderer.dispose();
     }
 
     @Override
     public void changed(AccentColor changed) {
-        _items.forEach(i -> i.setBgColor(changed.color()));
+        _list.getItems().forEach(i -> i.setBgColor(changed.color()));
     }
 }

@@ -163,7 +163,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
 
     @Override
     public boolean isCatchingGestures() {
-        return _contextMenu.isOpened();
+        return _contextMenu != null && _contextMenu.isOpened();
     }
 
     @Override

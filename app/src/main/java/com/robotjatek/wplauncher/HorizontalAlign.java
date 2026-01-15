@@ -1,8 +1,7 @@
 package com.robotjatek.wplauncher;
 
-public enum VerticalAlign {
-    BOTTOM,
+public enum HorizontalAlign {
+    LEFT,
     CENTER,
-    TOP
+    RIGHT
 }
-

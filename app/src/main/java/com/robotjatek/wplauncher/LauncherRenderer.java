@@ -28,6 +28,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     public void onSurfaceCreated(javax.microedition.khronos.opengles.GL10 glUnused,
                                  javax.microedition.khronos.egl.EGLConfig config) {
         GLES20.glClearColor(0f, 0f, 0f, 1f);
+        GLES20.glEnable(GLES20.GL_CULL_FACE);
+        GLES20.glFrontFace(GLES20.GL_CW);
         // Init screens in surfaceCreated so no accidental gl calls before the surface is ready
         _navigationStack.push(new StartScreen(_context, this));
     }

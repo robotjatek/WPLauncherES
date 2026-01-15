@@ -58,10 +58,10 @@ Consolidation
 M2 is the beginning to make the launcher usable in everyday use-cases.
 
 - [ ] Start working on "launcher apps/widgets/live tiles"
-    - [ ] Clock
+    - [x] Clock
     - [ ] Weather
     - [ ] Me/Timeline
-    - [ ] Launcher settings
+    - [x] Launcher settings
     - [ ] Calendar
     - [ ] Mail
     - [ ] Messages
@@ -78,7 +78,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] UI elements
   - [x] Button
   - [ ] Dropdown
-  - [ ] Switch / checkbox
+  - [x] Checkbox
 
 ### M3
 

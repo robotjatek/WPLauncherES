@@ -156,7 +156,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                     title,
                     app,
                     _settingsService.getAccentColor().color(),
-                    new ClockTileContent());
+                    new ClockTileContent(_context));
         }
 
         return new Tile((int)position.x(),

@@ -24,6 +24,8 @@ public class StackLayout implements ILayout {
     private int _width;
     private int _height;
 
+    private UIElement _tapStartedOn;
+
     public StackLayout(QuadRenderer renderer) {
         _renderer = renderer;
         _drawContext = new StackLayoutDrawContext(this);
@@ -46,13 +48,18 @@ public class StackLayout implements ILayout {
     @Override
     public void onTouchStart(float x, float y) {
         var tappedChild = getTappedChild(x, y);
-        // tappedChild.ifPresent(x -> x.); // TODO: onTouch start
+        tappedChild.ifPresentOrElse(c -> _tapStartedOn = c, () -> _tapStartedOn = null);
     }
 
     @Override
     public void onTouchEnd(float x, float y) {
         var tappedChild = getTappedChild(x, y);
-        tappedChild.ifPresent(UIElement::onTap);
+        tappedChild.ifPresent(t -> {
+            if (t == _tapStartedOn) {
+                t.onTap();
+            }
+        });
+        _tapStartedOn = null;
     }
 
     // TODO: this is mostly the same as getTappedTile()

@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.InternalApps.Clock;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
 
@@ -12,6 +13,9 @@ import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -26,6 +30,11 @@ public class ClockTileContent implements ITileContent {
     private int _lastMinute = -1;
     private String _location = "";
     private boolean _dirty = true;
+    private final Context _context;
+
+    public ClockTileContent(Context context) {
+        _context = context;
+    }
 
     @Override
     public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<Tile> drawContext,
@@ -40,7 +49,7 @@ public class ClockTileContent implements ITileContent {
         drawTexture(projMatrix, viewMatrix, drawContext, x, y, width, height, _bgTexture);
 
         var elapsedTime = System.currentTimeMillis() - _lastUpdate;
-        if (elapsedTime > 1000 | _dirty) {
+        if (elapsedTime > 1000 || _dirty) {
             var currentTime = LocalTime.now();
             var h = currentTime.getHour();
             var m = currentTime.getMinute();
@@ -56,12 +65,16 @@ public class ClockTileContent implements ITileContent {
                         Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
             }
 
-            var currentLocation = LocationService.get().getCity();
-            if (!_location.equals(currentLocation)) {
-                setLocation(currentLocation);
-                TileUtil.deleteTexture(_locationTexture);
-                _locationTexture = TileUtil.createTextTexture(_location, 512, 512, 72, Typeface.NORMAL,
-                        Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.RIGHT, VerticalAlign.TOP);
+            if (isLocationEnabled()) {
+                var currentLocation = LocationService.get().getCity();
+                if (!_location.equals(currentLocation)) {
+                    setLocation(currentLocation);
+                    TileUtil.deleteTexture(_locationTexture);
+                    _locationTexture = TileUtil.createTextTexture(_location, 512, 512, 72, Typeface.NORMAL,
+                            Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.RIGHT, VerticalAlign.TOP);
+                }
+            } else {
+                setLocation("");
             }
 
             _lastUpdate = System.currentTimeMillis();
@@ -71,7 +84,7 @@ public class ClockTileContent implements ITileContent {
             drawTexture(projMatrix, viewMatrix, drawContext, x, y + 30, width, height, _clockTexture);
         }
 
-        if (_locationTexture > 0) {
+        if (_locationTexture > 0 && isLocationEnabled()) {
             drawTexture(projMatrix, viewMatrix, drawContext, x, y, width, height, _locationTexture);
         }
     }
@@ -88,6 +101,20 @@ public class ClockTileContent implements ITileContent {
         Matrix.scaleM(_modelMatrix, 0, width, height, 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         drawContext.getRenderer().draw(projMatrix, _modelMatrix, textureId);
+    }
+
+    private boolean isLocationEnabled() {
+        var prefs = _context.getSharedPreferences(Clock.PREF_NAME, Context.MODE_PRIVATE);
+        var settingsJson = prefs.getString(Clock.SETTINGS, null);
+        if (settingsJson == null) {
+            return false;
+        }
+        try {
+            var settings = new JSONObject(settingsJson);
+            return settings.getBoolean("locationEnabled");
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

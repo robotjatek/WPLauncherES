@@ -32,7 +32,7 @@ public class InternalAppsService {
         _settingsScreen = new Settings(navigator, settings, context);
         var setting = new App("Launcher Settings", SETTINGS_NAME, getAppIcon(SETTINGS_NAME),
                 () -> navigator.push(_settingsScreen));
-        _clockScreen = new Clock(navigator);
+        _clockScreen = new Clock(navigator, context);
         var clock = new App("Clock", CLOCK_NAME, getAppIcon(CLOCK_NAME),
                 () -> navigator.push(_clockScreen));
 
@@ -55,6 +55,7 @@ public class InternalAppsService {
 
     private void initAppIcons() {
         _appIcons.put(SETTINGS_NAME, ContextCompat.getDrawable(_context, R.drawable.settings));
+        _appIcons.put(CLOCK_NAME, ContextCompat.getDrawable(_context, R.drawable.clock));
     }
 
     public void dispose() {

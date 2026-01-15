@@ -31,7 +31,6 @@ public class MainActivity extends ComponentActivity {
         );
         ensureLocationPermission();
 
-
         _surface = new LauncherSurfaceView(this);
         _surface.setPreserveEGLContextOnPause(true);
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);

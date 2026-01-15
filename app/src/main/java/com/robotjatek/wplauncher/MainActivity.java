@@ -20,14 +20,14 @@ public class MainActivity extends ComponentActivity {
 
     private LauncherSurfaceView _surface;
     private ActivityResultLauncher<String> _locationPermission;
-    private final LocationService _locationService = LocationService.create();
+    private final LocationService _locationService = LocationService.create(this);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         _locationPermission = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
-                (b) -> _locationService.setHasPermission(b, this)
+                _locationService::setHasPermission
         );
         ensureLocationPermission();
 

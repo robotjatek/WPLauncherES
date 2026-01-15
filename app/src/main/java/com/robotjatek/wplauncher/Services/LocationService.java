@@ -4,15 +4,25 @@ import android.content.Context;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.CancellationSignal;
+
+import java.util.concurrent.Executors;
 
 public class LocationService {
+    private static final long REFRESH_INTERVAL_MS = 10 * 60 * 1000;
     private boolean _hasPermission = false;
     private static LocationService _instance;
     private String _city = "";
+    private long _lastRequest = 0;
+    private final Context _context;
 
-    public static LocationService create() {
+    private LocationService(Context context) {
+        _context = context;
+    }
+
+    public static LocationService create(Context context) {
         if (_instance == null) {
-            _instance = new LocationService();
+            _instance = new LocationService(context);
         }
         return _instance;
     }
@@ -26,6 +36,11 @@ public class LocationService {
             return "";
         }
 
+        final var now = System.currentTimeMillis();
+        if (now - _lastRequest > REFRESH_INTERVAL_MS) {
+            getLocation();
+        }
+
         return _city;
     }
 
@@ -33,24 +48,33 @@ public class LocationService {
         return _hasPermission;
     }
 
-    public void setHasPermission(boolean value, Context context) {
+    public void setHasPermission(boolean value) {
         _hasPermission = value;
         if (_hasPermission) {
-            startGetLocation(context);
+            getLocation();
         }
     }
 
-    private void startGetLocation(Context context) {
-        if (!_hasPermission) {
+    private void getLocation() {
+        final var now = System.currentTimeMillis();
+        if (!_hasPermission || now - _lastRequest < REFRESH_INTERVAL_MS) {
             return;
         }
-        final var lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60000, 100f,
-                (Location loc) -> extractCityName(loc, context));
+
+        final var lm = (LocationManager) _context.getSystemService(Context.LOCATION_SERVICE);
+        lm.getCurrentLocation(LocationManager.NETWORK_PROVIDER, new CancellationSignal(),
+                Executors.newSingleThreadExecutor(),
+                (location -> extractCityName(location, _context)));
+
+        _lastRequest = System.currentTimeMillis();
     }
 
     private void extractCityName(Location location, Context context) {
-        var gc = new Geocoder(context);
+        if (location == null) {
+            return;
+        }
+
+        final var gc = new Geocoder(context);
         gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1,
                 addresses -> {
                     if (!addresses.isEmpty()) {

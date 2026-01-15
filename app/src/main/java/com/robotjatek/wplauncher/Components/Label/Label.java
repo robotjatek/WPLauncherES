@@ -7,6 +7,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
+import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
@@ -47,6 +48,7 @@ public class Label implements UIElement {
                     _typeFace,
                     _textColor,
                     _bgColor,
+                    HorizontalAlign.LEFT,
                     VerticalAlign.CENTER);
             _dirty = false;
         }

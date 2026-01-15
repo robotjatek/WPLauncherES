@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
@@ -87,7 +88,7 @@ public class ListItem<T> {
             var labelW = (int)(w - h);
             TileUtil.deleteTexture(_textureId);
             _textureId = TileUtil.createTextTexture(_label, labelW, (int)context.heightOf(this), 60,
-                    Typeface.NORMAL, Colors.LIGHT_GRAY, 0, VerticalAlign.CENTER);
+                    Typeface.NORMAL, Colors.LIGHT_GRAY, 0, HorizontalAlign.LEFT, VerticalAlign.CENTER);
             TileUtil.deleteTexture(_iconTextureId);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(_icon, (int)context.heightOf(this), (int)context.heightOf(this));
             TileUtil.deleteTexture(_bgTextureId);

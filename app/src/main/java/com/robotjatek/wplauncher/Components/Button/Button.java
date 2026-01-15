@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
+import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
@@ -40,8 +41,8 @@ public class Button implements UIElement {
             // 1 px white border
             TileUtil.deleteTexture(_foreground);
             TileUtil.deleteTexture(_iconTexture);
-            _bgTexture = TileUtil.createTextTexture("", w, h, 0, Typeface.NORMAL, Colors.TRANSPARENT, Colors.WHITE, VerticalAlign.CENTER);
-            _foreground = TileUtil.createTextTexture(_text, w - 1, h - 1, 48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, VerticalAlign.CENTER);
+            _bgTexture = TileUtil.createTextTexture("", w, h, 0, Typeface.NORMAL, Colors.TRANSPARENT, Colors.WHITE, HorizontalAlign.LEFT, VerticalAlign.CENTER);
+            _foreground = TileUtil.createTextTexture(_text, w - 1, h - 1, 48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, HorizontalAlign.LEFT, VerticalAlign.CENTER);
             if (_icon != null) {
                 _iconTexture = BitmapUtil.createTextureFromDrawable(_icon, h, h);
             }

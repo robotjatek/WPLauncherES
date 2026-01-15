@@ -4,6 +4,7 @@ import android.graphics.Typeface;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
@@ -27,6 +28,7 @@ public class MenuOption<T> {
                 Typeface.BOLD,
                 Colors.WHITE,
                 Colors.CONTEXT_MENU_GRAY,
+                HorizontalAlign.LEFT,
                 VerticalAlign.CENTER);
     }
 

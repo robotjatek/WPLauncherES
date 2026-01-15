@@ -1,23 +1,36 @@
 package com.robotjatek.wplauncher;
 
+import android.Manifest;
 import android.os.Bundle;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.robotjatek.wplauncher.Services.LocationService;
+
 
 public class MainActivity extends ComponentActivity {
 
     private LauncherSurfaceView _surface;
+    private ActivityResultLauncher<String> _locationPermission;
+    private final LocationService _locationService = LocationService.create();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        _locationPermission = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                (b) -> _locationService.setHasPermission(b, this)
+        );
+        ensureLocationPermission();
+
 
         _surface = new LauncherSurfaceView(this);
         _surface.setPreserveEGLContextOnPause(true);
@@ -35,6 +48,12 @@ public class MainActivity extends ComponentActivity {
                 _surface.onBackPressed();
             }
         });
+    }
+
+    private void ensureLocationPermission() {
+        if (!_locationService.hasPermission()) {
+            _locationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
     }
 
     @Override

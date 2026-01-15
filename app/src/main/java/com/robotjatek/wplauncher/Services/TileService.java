@@ -5,8 +5,10 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.AppList.App;
+import com.robotjatek.wplauncher.InternalApps.Clock.ClockTileContent;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.TileGrid.Position;
+import com.robotjatek.wplauncher.TileGrid.StaticTileContent;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 
 import org.json.JSONArray;
@@ -51,7 +53,7 @@ public class TileService implements OnChangeListener<AccentColor> {
     public void queuePinTile(App app) {
         var lowestPoint = _tiles.stream().mapToInt(t -> t.y + t.rowSpan).max().orElse(0);
         _tileCommands.add(() -> {
-            var tile = createTile(app.name(), new Position(0, lowestPoint), app);
+            var tile = createTile(app.name(), new Position(0, lowestPoint), 2, 2, app);
             _tiles.add(tile);
             persistTiles();
         });
@@ -100,7 +102,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                 var colSpan = obj.getInt("colSpan");
                 var rowSpan = obj.getInt("rowSpan");
                 var title = obj.getString("title");
-                App app = null;
+                App app;
                 if (obj.has("packageName")) {
                     var packageName = obj.getString("packageName");
                     if (packageName.startsWith("launcher:")) {
@@ -114,9 +116,8 @@ public class TileService implements OnChangeListener<AccentColor> {
                         var icon = _context.getPackageManager().getActivityIcon(intent);
                         app = new App(title, packageName, icon, () -> _context.startActivity(intent));
                     }
+                    tiles.add(createTile(title, new Position(x, y), colSpan, rowSpan, app));
                 }
-
-                tiles.add(new Tile(x, y, colSpan, rowSpan, title, app, _settingsService.getAccentColor().color()));
             }
 
             return tiles;
@@ -146,9 +147,26 @@ public class TileService implements OnChangeListener<AccentColor> {
         _subscribers.forEach(ITileListChangedListener::tileListChanged);
     }
 
-    private Tile createTile(String title, Position position, App app) {
-        // TODO: determine here if its a live tile?
-        return new Tile((int)position.x(), (int)position.y(), 2, 2, title, app, _settingsService.getAccentColor().color());
+    private Tile createTile(String title, Position position, int colSpan, int rowSpan, App app) {
+        if (app.packageName().equalsIgnoreCase("launcher:clock")) {
+            return new Tile((int)position.x(),
+                    (int)position.y(),
+                    colSpan,
+                    rowSpan,
+                    title,
+                    app,
+                    _settingsService.getAccentColor().color(),
+                    new ClockTileContent());
+        }
+
+        return new Tile((int)position.x(),
+                (int)position.y(),
+                colSpan,
+                rowSpan,
+                title,
+                app,
+                _settingsService.getAccentColor().color(),
+                new StaticTileContent());
     }
 
     public void persistTiles() {

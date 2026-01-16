@@ -31,6 +31,12 @@ public class EditReadyState extends EditBaseState {
             return;
         }
 
+        // TODO: tap resize
+        if (_tilegrid.getResizeButton().isTapped(x, y - _tilegrid.getScroll().getScrollOffset() - TileGrid.TOP_MARGIN_PX)) {
+            _tilegrid.getResizeButton().onTap();
+            return;
+        }
+
         // Check if we tapped the same tile again or an empty space
         // (If we reached that point, there is already a selected tile)
         var tappedTile = _context.getTileAt(x, y);

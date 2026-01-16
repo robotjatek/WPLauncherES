@@ -65,6 +65,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private float _pageHeight;
     private final TileService _tileService;
     private final Adorner _unpinButton;
+    private final Adorner _resizeButton;
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
 
     public TileGrid(TileService tileService, Context context) {
@@ -79,7 +80,10 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                 _tileService.queueUnpinTile(_selectedTile.getPackageName());
                 _selectedTile = null;
             }
-        }), icon, adornerDrawContext);
+        }), icon, new Position(1, 0), adornerDrawContext);
+
+        var resizeIcon = ContextCompat.getDrawable(context, R.drawable.icon_tick); // TODO: resize icon
+        _resizeButton = new Adorner(() -> {}, resizeIcon, new Position(1, 1), adornerDrawContext);
     }
 
     @Override
@@ -108,6 +112,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                     new Position(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
                     _tileDrawContext);
             _unpinButton.draw(projMatrix, scrollMatrix);
+            _resizeButton.draw(projMatrix, scrollMatrix);
         }
 
     }
@@ -124,6 +129,10 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     public Adorner getUnpinButton() {
         return _unpinButton;
+    }
+
+    public Adorner getResizeButton() {
+        return _resizeButton;
     }
 
     public TileService getTileService() {
@@ -232,5 +241,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         _renderer.dispose();
         _shader.delete();
         _unpinButton.dispose();
+        _resizeButton.dispose();
     }
 }

@@ -59,20 +59,14 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 
 - [ ] Start working on "launcher apps/widgets/live tiles"
     - [x] Clock
-    - [ ] Weather
-    - [ ] Me/Timeline
+    - [ ] Notification Center
     - [x] Launcher settings
-    - [ ] Calendar
-    - [ ] Mail
-    - [ ] Messages
-    - [ ] Photos
-    - [ ] Contacts
+    - [ ] Show notifications on corresponding tiles
 - [x] Change accent color
 - [x] Settings service
 - [x] Persist settings
 - [ ] Resize tiles / Multi size app tiles
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
-- [ ] Generic carousel view
 - [x] Generic list view
 - [x] Stack view
 - [ ] UI elements
@@ -84,8 +78,12 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 
 M3 is the preparation for a first public beta release.
 
-- [ ] Further development TBD
+- [ ] GLES 3.0
 - [ ] More tiles
+  - [ ] Tasks
+  - [ ] Photos
+  - [ ] Weather
+- [ ] Generic carousel view
 - [ ] Optimizations
 - [ ] Bug fixes
 - [ ] Multi lang support

@@ -12,6 +12,7 @@ import com.robotjatek.wplauncher.InternalApps.Clock.Clock;
 import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
 import com.robotjatek.wplauncher.R;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,9 @@ public class InternalAppsService {
     }
 
     public List<App> getInternalApps() {
-        return _internalApps.values().stream().toList();
+        return _internalApps.values().stream()
+                .sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER))
+                .toList();
     }
 
     public App getInternalApp(String packageName) {

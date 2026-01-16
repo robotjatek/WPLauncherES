@@ -45,7 +45,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     public static final int ITEM_HEIGHT_PX = 128;
     public static final int ITEM_GAP_PX = 5;
     private static final int PAGE_PADDING_PX = 60;
-    public static final float BOTTOM_MARGIN_PX = 192;
+    public static final float BOTTOM_MARGIN_PX = 240;
     private final float[] scrollMatrix = new float[16];
     private final ScrollController _scroll = new ScrollController();
     private final ListItemDrawContext<T, ListView<T>> _drawContext;

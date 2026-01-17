@@ -80,10 +80,14 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                 _tileService.queueUnpinTile(_selectedTile.getPackageName());
                 _selectedTile = null;
             }
-        }), icon, new Position(1, 0), adornerDrawContext);
+        }), icon, new Position<>(1f, 0f), adornerDrawContext);
 
-        var resizeIcon = ContextCompat.getDrawable(context, R.drawable.icon_tick); // TODO: resize icon
-        _resizeButton = new Adorner(() -> {}, resizeIcon, new Position(1, 1), adornerDrawContext);
+        var resizeIcon = ContextCompat.getDrawable(context, R.drawable.resize);
+        _resizeButton = new Adorner(() -> {
+            if (_selectedTile != null) {
+                _tileService.resizeTile(_selectedTile);
+            }
+        }, resizeIcon, new Position<>(1f, 1f), adornerDrawContext);
     }
 
     @Override
@@ -109,7 +113,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         if (_selectedTile != null) {
             _selectedTile.drawWithOffsetScaled(projMatrix, scrollMatrix,
                     1.00f,
-                    new Position(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
+                    new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
                     _tileDrawContext);
             _unpinButton.draw(projMatrix, scrollMatrix);
             _resizeButton.draw(projMatrix, scrollMatrix);

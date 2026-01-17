@@ -83,8 +83,8 @@ public class Button implements UIElement {
     }
 
     @Override
-    public Size measure() {
-        return new Size(0, 100); // TODO: configure height
+    public Size<Float> measure() {
+        return new Size<>(0f, 100f); // TODO: configure height
     }
 
     public void setText(String text) {

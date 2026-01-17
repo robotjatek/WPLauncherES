@@ -15,22 +15,22 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
     private static final float ITEM_HEIGHT_PX = 150;
     private final IDrawContext<ContextMenu<T>> _context;
     private final List<MenuOption<T>> _options = new ArrayList<>();
-    public Position _position;
+    public Position<Float> _position;
     private final float[] _modelMatrix = new float[16];
     private T _payload;
     private boolean _isOpened = false;
 
-    public ContextMenu(Position position, IDrawContext<ContextMenu<T>> context) {
+    public ContextMenu(Position<Float> position, IDrawContext<ContextMenu<T>> context) {
         _context = context;
         _position = position;
-        _position = new Position(_context.xOf(this), _context.yOf(this)); // recalculate position after confining the menu into the viewport
+        _position = new Position<>(_context.xOf(this), _context.yOf(this)); // recalculate position after confining the menu into the viewport
         Matrix.setIdentityM(_modelMatrix, 0);
     }
 
-    public void open(Position position, T payload) {
+    public void open(Position<Float> position, T payload) {
         _payload = payload;
         _position = position;
-        _position = new Position(_context.xOf(this), _context.yOf(this));
+        _position = new Position<>(_context.xOf(this), _context.yOf(this));
         _isOpened = true;
     }
 

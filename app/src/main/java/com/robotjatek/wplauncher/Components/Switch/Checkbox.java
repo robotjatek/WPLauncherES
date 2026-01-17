@@ -19,7 +19,7 @@ import com.robotjatek.wplauncher.VerticalAlign;
 import java.util.function.Consumer;
 
 public class Checkbox implements UIElement {
-    private static final int TOGGLE_SIZE = 100;
+    private static final float TOGGLE_SIZE = 100;
     private final String _label;
     private boolean _state;
     private final Consumer<Boolean> _onChange;
@@ -72,8 +72,8 @@ public class Checkbox implements UIElement {
     }
 
     @Override
-    public Size measure() {
-        return new Size(0, TOGGLE_SIZE);
+    public Size<Float> measure() {
+        return new Size<>(0f, TOGGLE_SIZE);
     }
 
     @Override

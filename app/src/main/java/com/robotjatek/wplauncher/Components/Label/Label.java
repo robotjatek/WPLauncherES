@@ -61,7 +61,7 @@ public class Label implements UIElement {
     }
 
     @Override
-    public Size measure() {
+    public Size<Float> measure() {
         var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
@@ -69,7 +69,7 @@ public class Label implements UIElement {
         var textWidth = paint.measureText(_text);
         var fm = paint.getFontMetrics();
         var textHeight = fm.descent - fm.ascent;
-        return new Size(textWidth, textHeight);
+        return new Size<>(textWidth, textHeight);
     }
 
     public String getText() {

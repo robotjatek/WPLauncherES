@@ -90,7 +90,7 @@ public class AppList implements Page, OnChangeListener<AccentColor> {
     }
 
     private ContextMenu<App> createContextMenu() {
-        var menu = new ContextMenu<>(new Position(0, 0), _contextMenuDrawContext);
+        var menu = new ContextMenu<>(new Position<>(0f, 0f), _contextMenuDrawContext);
         var options = List.of(
                 new MenuOption<>("Pin", this::pinApp, menu),
                 new MenuOption<>("Uninstall", (a) -> {

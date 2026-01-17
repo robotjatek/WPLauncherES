@@ -1,3 +1,3 @@
 package com.robotjatek.wplauncher.Components;
 
-public record Size(float width, float height) {}
+public record Size<T>(T width, T height) {}

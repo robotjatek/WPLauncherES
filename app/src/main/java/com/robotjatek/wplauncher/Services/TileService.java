@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.AppList.App;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.InternalApps.Clock.ClockTileContent;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.TileGrid.Position;
@@ -27,6 +28,10 @@ public class TileService implements OnChangeListener<AccentColor> {
 
     private static final String PREF_NAME = "WPLAUNCHER";
     private static final String TILES = "TILES";
+    private static final List<Size<Integer>> tileSizes = List.of(
+            new Size<>(4, 2),
+            new Size<>(2, 2),
+            new Size<>(1, 1));
     private final List<ITileListChangedListener> _subscribers = new ArrayList<>();
     private final Queue<Runnable> _tileCommands = new ConcurrentLinkedQueue<>();
     private final List<Tile> _tiles = new ArrayList<>();
@@ -51,9 +56,9 @@ public class TileService implements OnChangeListener<AccentColor> {
      * @param app The app to pin on the TileScreen
      */
     public void queuePinTile(App app) {
-        var lowestPoint = _tiles.stream().mapToInt(t -> t.y + t.rowSpan).max().orElse(0);
+        var lowestPoint = _tiles.stream().mapToInt(t -> t.getPosition().y() + t.getSize().height()).max().orElse(0);
         _tileCommands.add(() -> {
-            var tile = createTile(app.name(), new Position(0, lowestPoint), 2, 2, app);
+            var tile = createTile(app.name(), new Position<>(0, lowestPoint), new Size<>(2, 2), app);
             _tiles.add(tile);
             persistTiles();
         });
@@ -65,6 +70,8 @@ public class TileService implements OnChangeListener<AccentColor> {
      * Calls to this method can be off main-thread.
      * To avoid crashes this method puts its calls into a queue.
      * Execution of these commands must be fired on the main thread using {@link #executeCommands()}
+     *
+     * NOTE: this has to be put in the command queue because it disposes the unpinned tile
      * @param packageName The name of the package the tile corresponds to
      */
     public void queueUnpinTile(String packageName) {
@@ -78,6 +85,15 @@ public class TileService implements OnChangeListener<AccentColor> {
             compactGrid();
             persistTiles();
         }));
+    }
+
+    public void resizeTile(Tile tile) {
+        // 4x2 => 2x2 => 1x1 => 4x2
+        var sizeIndex = tileSizes.indexOf(new Size<>(tile.getSize().width(), tile.getSize().height()));
+        var nextIndex = (sizeIndex + 1) % tileSizes.size();
+        var nextSize = tileSizes.get(nextIndex);
+        tile.setSize(nextSize);
+        persistTiles();
     }
 
     public List<Tile> getTiles() {
@@ -116,7 +132,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                         var icon = _context.getPackageManager().getActivityIcon(intent);
                         app = new App(title, packageName, icon, () -> _context.startActivity(intent));
                     }
-                    tiles.add(createTile(title, new Position(x, y), colSpan, rowSpan, app));
+                    tiles.add(createTile(title, new Position<>(x, y), new Size<>(colSpan, rowSpan), app));
                 }
             }
 
@@ -147,22 +163,18 @@ public class TileService implements OnChangeListener<AccentColor> {
         _subscribers.forEach(ITileListChangedListener::tileListChanged);
     }
 
-    private Tile createTile(String title, Position position, int colSpan, int rowSpan, App app) {
+    private Tile createTile(String title, Position<Integer> position, Size<Integer> size, App app) {
         if (app.packageName().equalsIgnoreCase("launcher:clock")) {
-            return new Tile((int)position.x(),
-                    (int)position.y(),
-                    colSpan,
-                    rowSpan,
+            return new Tile(position,
+                    size,
                     title,
                     app,
                     _settingsService.getAccentColor().color(),
                     new ClockTileContent(_context));
         }
 
-        return new Tile((int)position.x(),
-                (int)position.y(),
-                colSpan,
-                rowSpan,
+        return new Tile(position,
+                size,
                 title,
                 app,
                 _settingsService.getAccentColor().color(),
@@ -174,10 +186,10 @@ public class TileService implements OnChangeListener<AccentColor> {
             var tileArray = new JSONArray();
             for (var tile : _tiles) {
                 var tileJson = new JSONObject();
-                tileJson.put("x", tile.x);
-                tileJson.put("y", tile.y);
-                tileJson.put("colSpan", tile.colSpan);
-                tileJson.put("rowSpan", tile.rowSpan);
+                tileJson.put("x", tile.getPosition().x());
+                tileJson.put("y", tile.getPosition().y());
+                tileJson.put("colSpan", tile.getSize().width());
+                tileJson.put("rowSpan", tile.getSize().height());
                 tileJson.put("title", tile.title);
                 tileJson.put("packageName", tile.getPackageName());
                 tileArray.put(tileJson);
@@ -200,7 +212,8 @@ public class TileService implements OnChangeListener<AccentColor> {
      */
     public void pushDownTiles(List<Tile> tiles, int offset) {
         for (var tile: tiles) {
-            tile.y += offset;
+            var oldPos = tile.getPosition();
+            tile.setPosition(new Position<>(oldPos.x(), oldPos.y() + offset));
         }
     }
 
@@ -217,7 +230,7 @@ public class TileService implements OnChangeListener<AccentColor> {
 
             final int currentRow = i;
             var group = _tiles.stream()
-                    .filter(t -> t.y > currentRow)
+                    .filter(t -> t.getPosition().y() > currentRow)
                     .collect(Collectors.toList());
 
             if (group.isEmpty()) {
@@ -236,15 +249,15 @@ public class TileService implements OnChangeListener<AccentColor> {
     }
 
     private int calculateGroupLowestPoint(List<Tile> group) {
-        return group.stream().mapToInt(t -> t.y + t.rowSpan).max().orElse(0);
+        return group.stream().mapToInt(t -> t.getPosition().y() + t.getSize().height()).max().orElse(0);
     }
 
     private boolean isRowEmpty(int row) {
-        return _tiles.stream().noneMatch(t -> row >= t.y && row < t.y + t.rowSpan);
+        return _tiles.stream().noneMatch(t -> row >= t.getPosition().y() && row < t.getPosition().y() + t.getSize().height());
     }
 
     private int getTopOfTheGroup(List<Tile> group) {
-        return group.stream().mapToInt(t -> t.y).min().orElse(0);
+        return group.stream().mapToInt(t -> t.getPosition().y()).min().orElse(0);
     }
 
     public void dispose() {

@@ -40,45 +40,11 @@ public class ClockTileContent implements ITileContent {
     public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<Tile> drawContext,
                      Tile tile, float x, float y, float width, float height) {
         if (_dirty) {
-            TileUtil.deleteTexture(_bgTexture);
-            _bgTexture = BitmapUtil.createTextureFromBitmap(
-                    BitmapUtil.createRect(1, 1, 0, tile.bgColor));
-            _dirty = false;
+            redraw(tile, width, height);
         }
 
         drawTexture(projMatrix, viewMatrix, drawContext, x, y, width, height, _bgTexture);
-
-        var elapsedTime = System.currentTimeMillis() - _lastUpdate;
-        if (elapsedTime > 1000 || _dirty) {
-            var currentTime = LocalTime.now();
-            var h = currentTime.getHour();
-            var m = currentTime.getMinute();
-
-            if (_lastHour != h || _lastMinute != m) {
-                _lastHour = h;
-                _lastMinute = m;
-                var time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH mm"));
-                TileUtil.deleteTexture(_clockTexture);
-                // TODO: 1024x512 when wide
-                // TODO: adjust text size when small tile
-                _clockTexture = TileUtil.createTextTexture(time, 512, 512, 160, Typeface.NORMAL,
-                        Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
-            }
-
-            if (isLocationEnabled()) {
-                var currentLocation = LocationService.get().getCity();
-                if (!_location.equals(currentLocation)) {
-                    setLocation(currentLocation);
-                    TileUtil.deleteTexture(_locationTexture);
-                    _locationTexture = TileUtil.createTextTexture(_location, 512, 512, 72, Typeface.NORMAL,
-                            Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.RIGHT, VerticalAlign.TOP);
-                }
-            } else {
-                setLocation("");
-            }
-
-            _lastUpdate = System.currentTimeMillis();
-        }
+        updateContent();
 
         if (_clockTexture > 0) {
             drawTexture(projMatrix, viewMatrix, drawContext, x, y + 30, width, height, _clockTexture);
@@ -87,6 +53,54 @@ public class ClockTileContent implements ITileContent {
         if (_locationTexture > 0 && isLocationEnabled()) {
             drawTexture(projMatrix, viewMatrix, drawContext, x, y, width, height, _locationTexture);
         }
+    }
+
+    private void updateContent() {
+        var elapsedTime = System.currentTimeMillis() - _lastUpdate;
+        if (elapsedTime > 1000 || _dirty) {
+            var currentTime = LocalTime.now();
+            var h = currentTime.getHour();
+            var m = currentTime.getMinute();
+
+            if (_lastHour != h || _lastMinute != m || _dirty) {
+                _lastHour = h;
+                _lastMinute = m;
+                _dirty = true;
+            }
+
+            if (isLocationEnabled()) {
+                var currentLocation = LocationService.get().getCity();
+                if (!_location.equals(currentLocation)) {
+                    setLocation(currentLocation);
+                }
+            } else {
+                setLocation("");
+            }
+
+            _lastUpdate = System.currentTimeMillis();
+        }
+    }
+
+    private void redraw(Tile tile, float w, float h) {
+        // TODO: 1x1 different layout and text size
+        TileUtil.deleteTexture(_bgTexture);
+        _bgTexture = BitmapUtil.createTextureFromBitmap(
+                BitmapUtil.createRect(1, 1, 0, tile.bgColor));
+
+        var time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH mm"));
+        TileUtil.deleteTexture(_clockTexture);
+        _clockTexture = TileUtil.createTextTexture(time,
+                (int) w,
+                (int) h,
+                160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
+
+        TileUtil.deleteTexture(_locationTexture);
+        _locationTexture = TileUtil.createTextTexture(_location,
+                (int) w,
+                (int) h,
+                72, Typeface.NORMAL,
+                Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.RIGHT, VerticalAlign.TOP);
+        _dirty = false;
     }
 
     private void setLocation(String location) {

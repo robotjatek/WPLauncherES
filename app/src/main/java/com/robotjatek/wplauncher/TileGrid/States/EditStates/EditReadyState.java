@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.TileGrid.States.EditStates;
 
+import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
@@ -31,9 +32,17 @@ public class EditReadyState extends EditBaseState {
             return;
         }
 
-        // TODO: tap resize
         if (_tilegrid.getResizeButton().isTapped(x, y - _tilegrid.getScroll().getScrollOffset() - TileGrid.TOP_MARGIN_PX)) {
             _tilegrid.getResizeButton().onTap();
+            var selectedTile = _tilegrid.getSelectedTile();
+            var position = new Position<>(selectedTile.getPosition().x(), selectedTile.getPosition().y());
+            if (!isInbounds(position)) {
+                // remove everything from the column => move to the first column
+                var correctedPosition = new Position<>(0, selectedTile.getPosition().y());
+                reflowTiles(correctedPosition);
+            } else {
+                reflowTiles(position);
+            }
             return;
         }
 

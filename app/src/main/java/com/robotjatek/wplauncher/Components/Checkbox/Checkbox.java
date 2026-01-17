@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.Components.Switch;
+package com.robotjatek.wplauncher.Components.Checkbox;
 
 import android.content.Context;
 import android.graphics.Typeface;

@@ -6,7 +6,7 @@ import android.graphics.Typeface;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
-import com.robotjatek.wplauncher.Components.Switch.Checkbox;
+import com.robotjatek.wplauncher.Components.Checkbox.Checkbox;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;

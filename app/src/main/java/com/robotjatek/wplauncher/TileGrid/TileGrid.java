@@ -65,6 +65,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private float _pageHeight;
     private final TileService _tileService;
     private final Adorner _unpinButton;
+    private final Adorner _resizeButton;
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
 
     public TileGrid(TileService tileService, Context context) {
@@ -79,7 +80,14 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                 _tileService.queueUnpinTile(_selectedTile.getPackageName());
                 _selectedTile = null;
             }
-        }), icon, adornerDrawContext);
+        }), icon, new Position<>(1f, 0f), adornerDrawContext);
+
+        var resizeIcon = ContextCompat.getDrawable(context, R.drawable.resize);
+        _resizeButton = new Adorner(() -> {
+            if (_selectedTile != null) {
+                _tileService.resizeTile(_selectedTile);
+            }
+        }, resizeIcon, new Position<>(1f, 1f), adornerDrawContext);
     }
 
     @Override
@@ -105,9 +113,10 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         if (_selectedTile != null) {
             _selectedTile.drawWithOffsetScaled(projMatrix, scrollMatrix,
                     1.00f,
-                    new Position(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
+                    new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
                     _tileDrawContext);
             _unpinButton.draw(projMatrix, scrollMatrix);
+            _resizeButton.draw(projMatrix, scrollMatrix);
         }
 
     }
@@ -124,6 +133,10 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     public Adorner getUnpinButton() {
         return _unpinButton;
+    }
+
+    public Adorner getResizeButton() {
+        return _resizeButton;
     }
 
     public TileService getTileService() {
@@ -232,5 +245,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         _renderer.dispose();
         _shader.delete();
         _unpinButton.dispose();
+        _resizeButton.dispose();
     }
 }

@@ -21,7 +21,9 @@ public class AdornerDrawContext<T extends IAdornedTileContainer> implements IDra
         if (adorner == null || selectedTile == null) {
             throw new RuntimeException();
         }
-        return _tileDrawContext.widthOf(selectedTile)
+
+        return
+                adorner.getRelativePosition().x() * _tileDrawContext.widthOf(selectedTile)
                 + _tileDrawContext.xOf(selectedTile)
                 - widthOf(adorner) / 2 + selectedTile.getDragInfo().totalX;
     }
@@ -32,7 +34,9 @@ public class AdornerDrawContext<T extends IAdornedTileContainer> implements IDra
         if (adorner == null || selectedTile == null) {
             throw new RuntimeException();
         }
-        return _tileDrawContext.yOf(selectedTile) - heightOf(adorner) / 2
+        return _tileDrawContext.yOf(selectedTile) +
+                (_tileDrawContext.heightOf(selectedTile) * adorner.getRelativePosition().y())
+                - heightOf(adorner) / 2
                 + selectedTile.getDragInfo().totalY;
     }
 

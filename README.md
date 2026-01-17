@@ -17,6 +17,7 @@ The goal remains the same: a WP7/8 style launcher, now with no external UI frame
 - OpenGL ES2.0
 - API Level 34
 
+<img src="img/s2.png" alt="Description" width="250">
 <img src="img/s1.png" alt="Description" width="500">
 
 ## Milestones
@@ -59,33 +60,37 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 
 - [ ] Start working on "launcher apps/widgets/live tiles"
     - [x] Clock
-    - [ ] Weather
-    - [ ] Me/Timeline
+    - [ ] Notification Center
     - [x] Launcher settings
-    - [ ] Calendar
-    - [ ] Mail
-    - [ ] Messages
-    - [ ] Photos
-    - [ ] Contacts
+    - [ ] Show notifications on corresponding tiles
 - [x] Change accent color
 - [x] Settings service
 - [x] Persist settings
-- [ ] Resize tiles / Multi size app tiles
-- [ ] Feedback to the user when clicked (Rotation/animations/etc)
-- [ ] Generic carousel view
+- [x] Resize tiles
 - [x] Generic list view
 - [x] Stack view
-- [ ] UI elements
+- [ ] Basic UI elements
   - [x] Button
   - [ ] Dropdown
   - [x] Checkbox
+
+### M2.5
+    
+- [ ] Checkbox border
+- [ ] Fix: pin the same tile multiple times
+- [ ] TBD
 
 ### M3
 
 M3 is the preparation for a first public beta release.
 
-- [ ] Further development TBD
+- [ ] GLES 3.0
 - [ ] More tiles
+  - [ ] Tasks
+  - [ ] Photos
+  - [ ] Weather
+- [ ] Feedback to the user when clicked (Rotation/animations/etc)
+- [ ] Generic carousel view
 - [ ] Optimizations
 - [ ] Bug fixes
 - [ ] Multi lang support

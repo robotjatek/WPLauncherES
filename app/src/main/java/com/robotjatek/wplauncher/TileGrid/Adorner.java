@@ -12,11 +12,13 @@ public class Adorner {
     private final Runnable _onTap;
     private final int _textureId;
     private final float[] _modelMatrix = new float[16];
+    private final Position<Float> _relativePosition;
 
-    public Adorner(Runnable onTap, Drawable icon, IDrawContext<Adorner> context) {
+    public Adorner(Runnable onTap, Drawable icon, Position<Float> relativePosition, IDrawContext<Adorner> context) {
         _context = context;
         _onTap = onTap;
         _textureId = BitmapUtil.createTextureFromDrawable(icon, 96, 96);
+        _relativePosition = relativePosition;
     }
 
     public void draw(float[] proj, float[] view) {
@@ -43,6 +45,10 @@ public class Adorner {
         var bottom = top + _context.heightOf(this);
 
         return x >= left && x <= right && y >= top && y <= bottom;
+    }
+
+    public Position<Float> getRelativePosition() {
+        return _relativePosition;
     }
 
     public void dispose() {

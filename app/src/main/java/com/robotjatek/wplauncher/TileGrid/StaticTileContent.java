@@ -11,7 +11,6 @@ import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
 public class StaticTileContent implements ITileContent {
-    private static final int TEXTURE_UNIT_PX = 256;
     private static final int ICON_SIZE_PX = 512;
     private final float[] _modelMatrix = new float[16];
     private int _textureId = -1;
@@ -24,8 +23,9 @@ public class StaticTileContent implements ITileContent {
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);
             TileUtil.deleteTexture(_iconTextureId);
-            _textureId = TileUtil.createTextTexture(tile.title, TEXTURE_UNIT_PX * tile.colSpan,
-                    TEXTURE_UNIT_PX * tile.rowSpan, 48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
+            var title = tile.getSize().equals(Tile.SMALL) ? "" : tile.title;
+            _textureId = TileUtil.createTextTexture(title, (int) width, (int) height,
+                    48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);
             _dirty = false;
         }

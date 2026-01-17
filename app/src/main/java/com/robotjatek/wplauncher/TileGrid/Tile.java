@@ -1,25 +1,24 @@
 package com.robotjatek.wplauncher.TileGrid;
 
 import com.robotjatek.wplauncher.AppList.App;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 
 public class Tile {
-
-    public int x;
-    public int y;
-    public int colSpan;
-    public int rowSpan;
+    public static final Size<Integer> SMALL = new Size<>(1, 1);
+    public static final Size<Integer> MEDIUM = new Size<>(2, 2);
+    public static final Size<Integer> WIDE = new Size<>(4, 2);
+    private Position<Integer> _position;
+    private Size<Integer> _size;
     public String title;
     private final App _app;
     public int bgColor;
     private final DragInfo _dragInfo = new DragInfo();
     private final ITileContent _content;
 
-    public Tile(int x, int y, int colSpan, int rowSpan, String title, App app, int bgColor, ITileContent content) {
-        this.x = x;
-        this.y = y;
-        this.colSpan = colSpan;
-        this.rowSpan = rowSpan;
+    public Tile(Position<Integer> position, Size<Integer> size, String title, App app, int bgColor, ITileContent content) {
+        _position = position;
+        _size = size;
         this.title = title;
         this.bgColor = bgColor;
         _app = app;
@@ -29,7 +28,7 @@ public class Tile {
     /**
      * Draw matrix with an offset of its original position. Scaling can be applied
      */
-    public void drawWithOffsetScaled(float[] projMatrix, float[] viewMatrix, float scale, Position offset, IDrawContext<Tile> drawContext) {
+    public void drawWithOffsetScaled(float[] projMatrix, float[] viewMatrix, float scale, Position<Float> offset, IDrawContext<Tile> drawContext) {
         var width = drawContext.widthOf(this) * scale;
         var height = drawContext.heightOf(this) * scale;
         var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
@@ -65,6 +64,23 @@ public class Tile {
 
     public DragInfo getDragInfo() {
         return _dragInfo;
+    }
+
+    public Size<Integer> getSize() {
+        return _size;
+    }
+
+    public void setSize(Size<Integer> size) {
+        _size = size;
+        _content.forceRedraw();
+    }
+
+    public Position<Integer> getPosition() {
+        return _position;
+    }
+
+    public void setPosition(Position<Integer> position) {
+        _position = position;
     }
 
     public void dispose() {

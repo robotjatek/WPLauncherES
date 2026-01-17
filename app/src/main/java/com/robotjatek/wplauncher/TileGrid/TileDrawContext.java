@@ -23,22 +23,22 @@ public class TileDrawContext implements IDrawContext<Tile> {
 
     @Override
     public float xOf(Tile t) {
-        return PAGE_PADDING_PX + t.x * (_tileSizePx + TILE_GAP_PX);
+        return PAGE_PADDING_PX + t.getPosition().x() * (_tileSizePx + TILE_GAP_PX);
     }
 
     @Override
     public float yOf(Tile t) {
-        return PAGE_PADDING_PX + t.y * (_tileSizePx + TILE_GAP_PX);
+        return PAGE_PADDING_PX + t.getPosition().y() * (_tileSizePx + TILE_GAP_PX);
     }
 
     @Override
     public float widthOf(Tile t) {
-        return t.colSpan * _tileSizePx + (t.colSpan - 1) * TILE_GAP_PX;
+        return t.getSize().width() * _tileSizePx + (t.getSize().width() - 1) * TILE_GAP_PX;
     }
 
     @Override
     public float heightOf(Tile t) {
-        return t.rowSpan * _tileSizePx + (t.rowSpan - 1) * TILE_GAP_PX;
+        return t.getSize().height() * _tileSizePx + (t.getSize().height() - 1) * TILE_GAP_PX;
     }
 
     @Override

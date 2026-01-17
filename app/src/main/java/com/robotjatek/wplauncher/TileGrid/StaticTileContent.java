@@ -23,7 +23,8 @@ public class StaticTileContent implements ITileContent {
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);
             TileUtil.deleteTexture(_iconTextureId);
-            _textureId = TileUtil.createTextTexture(tile.title, (int) width, (int) height,
+            var title = tile.getSize().equals(Tile.SMALL) ? "" : tile.title;
+            _textureId = TileUtil.createTextTexture(title, (int) width, (int) height,
                     48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);
             _dirty = false;

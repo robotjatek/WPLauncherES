@@ -50,7 +50,7 @@ public class ClockTileContent implements ITileContent {
             drawTexture(projMatrix, viewMatrix, drawContext, x, y + 30, width, height, _clockTexture);
         }
 
-        if (_locationTexture > 0 && isLocationEnabled()) {
+        if (_locationTexture > 0 && isLocationEnabled() && !tile.getSize().equals(Tile.SMALL)) {
             drawTexture(projMatrix, viewMatrix, drawContext, x, y, width, height, _locationTexture);
         }
     }
@@ -82,17 +82,17 @@ public class ClockTileContent implements ITileContent {
     }
 
     private void redraw(Tile tile, float w, float h) {
-        // TODO: 1x1 different layout and text size
         TileUtil.deleteTexture(_bgTexture);
         _bgTexture = BitmapUtil.createTextureFromBitmap(
                 BitmapUtil.createRect(1, 1, 0, tile.bgColor));
 
         var time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH mm"));
         TileUtil.deleteTexture(_clockTexture);
+        var fontSize = tile.getSize().equals(Tile.SMALL) ? 80 : 160;
         _clockTexture = TileUtil.createTextTexture(time,
                 (int) w,
                 (int) h,
-                160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
+                fontSize, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
 
         TileUtil.deleteTexture(_locationTexture);
         _locationTexture = TileUtil.createTextTexture(_location,

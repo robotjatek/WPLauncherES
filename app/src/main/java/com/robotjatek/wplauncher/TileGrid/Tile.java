@@ -5,6 +5,9 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 
 public class Tile {
+    public static final Size<Integer> SMALL = new Size<>(1, 1);
+    public static final Size<Integer> MEDIUM = new Size<>(2, 2);
+    public static final Size<Integer> WIDE = new Size<>(4, 2);
     private Position<Integer> _position;
     private Size<Integer> _size;
     public String title;

@@ -62,22 +62,23 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
     - [x] Clock
     - [ ] Notification Center
     - [x] Launcher settings
-    - [ ] Show notifications on corresponding tiles
+    - [x] Show notification count on tiles
+    - [ ] Show notification content on corresponding tiles
 - [x] Change accent color
 - [x] Settings service
 - [x] Persist settings
 - [x] Resize tiles
 - [x] Generic list view
 - [x] Stack view
-- [ ] Basic UI elements
+- [x] Basic UI elements
   - [x] Button
-  - [ ] Dropdown
   - [x] Checkbox
 
 ### M2.5
     
 - [ ] Checkbox border
 - [ ] Fix: pin the same tile multiple times
+- [ ] Fix: tile overlap after resize
 - [ ] TBD
 
 ### M3
@@ -95,6 +96,8 @@ M3 is the preparation for a first public beta release.
 - [ ] Bug fixes
 - [ ] Multi lang support
 - [ ] Light mode/Dark mode support
+  - [ ] Dropdown 
+- [ ] Radiobutton
 - [ ] First public beta version (?)
 
 ### M4

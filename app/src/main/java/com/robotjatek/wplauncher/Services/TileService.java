@@ -35,12 +35,17 @@ public class TileService implements OnChangeListener<AccentColor> {
     private final Context _context;
     private final InternalAppsService _internalAppsService;
     private final SettingsService _settingsService;
+    private final LocationService _locationService;
 
-    public TileService(Context context, InternalAppsService internalAppsService, SettingsService settingsService) {
+    public TileService(Context context,
+                       InternalAppsService internalAppsService,
+                       SettingsService settingsService,
+                       LocationService locationService) {
         _context = context;
         _internalAppsService = internalAppsService;
         _settingsService = settingsService;
         _settingsService.subscribe(this);
+        _locationService = locationService;
         _tiles.addAll(loadPersistedTiles());
     }
 
@@ -167,7 +172,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                     title,
                     app,
                     _settingsService.getAccentColor().color(),
-                    new ClockTileContent(_context));
+                    new ClockTileContent(_context, _locationService));
         }
 
         return new Tile(position,
@@ -175,7 +180,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                 title,
                 app,
                 _settingsService.getAccentColor().color(),
-                new StaticTileContent());
+                new StaticTileContent(app));
     }
 
     public void persistTiles() {

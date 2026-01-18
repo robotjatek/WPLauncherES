@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.Clock.Clock;
+import com.robotjatek.wplauncher.InternalApps.Notifications.Notifications;
 import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
 import com.robotjatek.wplauncher.R;
 
@@ -20,11 +21,13 @@ import java.util.Map;
 public class InternalAppsService {
     private static final String SETTINGS_NAME = "launcher:settings";
     private static final String CLOCK_NAME = "launcher:clock";
+    private static final String NOTIFICATIONS_NAME = "launcher:notifications";
     private final Context _context;
     private final Map<String, Drawable> _appIcons = new HashMap<>();
     private final Map<String, App> _internalApps = new HashMap<>();
     private final IScreen _settingsScreen;
     private final IScreen _clockScreen;
+    private final IScreen _notificationScreen;
 
     public InternalAppsService(Context context, SettingsService settings, IScreenNavigator navigator) {
         _context = context;
@@ -37,8 +40,13 @@ public class InternalAppsService {
         var clock = new App("Clock", CLOCK_NAME, getAppIcon(CLOCK_NAME),
                 () -> navigator.push(_clockScreen));
 
+        _notificationScreen = new Notifications(navigator);
+        var notifications = new App("Notifications", NOTIFICATIONS_NAME, getAppIcon(NOTIFICATIONS_NAME),
+                () -> navigator.push(_notificationScreen));
+
         _internalApps.put(SETTINGS_NAME, setting);
         _internalApps.put(CLOCK_NAME, clock);
+        _internalApps.put(NOTIFICATIONS_NAME, notifications);
     }
 
     public List<App> getInternalApps() {
@@ -59,6 +67,7 @@ public class InternalAppsService {
     private void initAppIcons() {
         _appIcons.put(SETTINGS_NAME, ContextCompat.getDrawable(_context, R.drawable.settings));
         _appIcons.put(CLOCK_NAME, ContextCompat.getDrawable(_context, R.drawable.clock));
+        // TODO: notifications tile icon
     }
 
     public void dispose() {

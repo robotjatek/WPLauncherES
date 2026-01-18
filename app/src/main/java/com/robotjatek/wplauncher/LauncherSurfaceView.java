@@ -4,13 +4,15 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
+import com.robotjatek.wplauncher.Services.LocationService;
+
 public class LauncherSurfaceView extends GLSurfaceView {
 
     private final LauncherRenderer _renderer;
 
-    public LauncherSurfaceView(Context context) {
+    public LauncherSurfaceView(Context context, LocationService locationService) {
         super(context);
-        _renderer = new LauncherRenderer(context);
+        _renderer = new LauncherRenderer(context, locationService);
 
         setEGLContextClientVersion(2);
         setRenderer(_renderer);

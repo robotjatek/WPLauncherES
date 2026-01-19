@@ -44,8 +44,9 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                     48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);
 
+            TileUtil.deleteTexture(_notificationCountTextureId);
             _notificationCountTextureId = TileUtil.createTextTexture(_notifications.size() + "", ICON_SIZE_PX, ICON_SIZE_PX,
-                    300, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
+                    300, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
 
             _dirty = false;
         }
@@ -84,7 +85,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
     private void drawNotificationCount(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, float width, float height, float correctedX, float correctedY, Tile tile) {
         var size = Math.min(width, height) / 2; // keep aspect ratio on wide tile
-        var offset = tile.getSize().equals(Tile.WIDE) ? 0 : width / 12;
+        var offset = tile.getSize().equals(Tile.WIDE) ? 0 : width / 10;
         var x = correctedX + (width - size) / 2 + offset;
         var y = correctedY + (height - size) / 2 + height / 7;
 

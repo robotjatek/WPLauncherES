@@ -1,8 +1,8 @@
 package com.robotjatek.wplauncher.Services;
 
+import android.app.Notification;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
-import android.util.Log;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -10,6 +10,7 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class NotificationListener extends NotificationListenerService {
@@ -32,7 +33,8 @@ public class NotificationListener extends NotificationListenerService {
         _connected = true;
         _listeners.addAll(_pendingListeners);
         _pendingListeners.clear();
-        loadActiveNotifications();
+        _notifications.clear();
+    //    loadActiveNotifications();
     }
 
     private void loadActiveNotifications() {
@@ -46,19 +48,33 @@ public class NotificationListener extends NotificationListenerService {
     @Override
     public void onNotificationPosted(StatusBarNotification sbn) {
         super.onNotificationPosted(sbn);
-        var packageName = sbn.getPackageName();
-        // TODO: wrap SBN into a custom notification
-        _notifications.computeIfAbsent(packageName, key -> new ArrayList<>()).add(sbn);
-        notifyListeners();
+        var isGroupNotification = (sbn.getNotification().flags & Notification.FLAG_GROUP_SUMMARY) != 0;
+        if (!isGroupNotification) {
+            var packageName = sbn.getPackageName();
+            // TODO: wrap SBN into a custom notification
+            _notifications.computeIfAbsent(packageName, key -> new ArrayList<>()).add(sbn);
+            notifyListeners();
+        }
     }
 
     @Override
     public void onNotificationRemoved(StatusBarNotification sbn) {
+        super.onNotificationRemoved(sbn);
         var packageName = sbn.getPackageName();
         var appNotifications = _notifications.get(packageName);
-        if (appNotifications != null) {
-            appNotifications.remove(sbn);
+
+        // If its a group notification remove the whole group from the list
+        var isGroupNotification = (sbn.getNotification().flags & Notification.FLAG_GROUP_SUMMARY) != 0;
+        if (isGroupNotification) {
+            if (appNotifications != null) {
+                appNotifications.removeIf(n -> Objects.equals(n.getGroupKey(), sbn.getGroupKey()));
+            }
+        } else { // Remove only that notification that was dismissed
+            if (appNotifications != null) {
+                appNotifications.removeIf(n -> Objects.equals(n.getKey(), sbn.getKey()));
+            }
         }
+
         notifyListeners();
     }
 

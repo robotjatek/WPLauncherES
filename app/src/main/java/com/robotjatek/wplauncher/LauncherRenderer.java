@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 import java.util.ArrayDeque;
@@ -19,9 +20,11 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     private final Context _context;
     private final float[] _projMatrix = new float[16];
     private int _topInset = 0;
+    private final LocationService _locationService;
 
-    public LauncherRenderer(Context context) {
+    public LauncherRenderer(Context context, LocationService locationService) {
         _context = context;
+        _locationService = locationService;
     }
 
     @Override
@@ -31,7 +34,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         GLES20.glFrontFace(GLES20.GL_CW);
         // Init screens in surfaceCreated so no accidental gl calls before the surface is ready
-        _navigationStack.push(new StartScreen(_context, this));
+        _navigationStack.push(new StartScreen(_context, this, _locationService));
     }
 
     @Override

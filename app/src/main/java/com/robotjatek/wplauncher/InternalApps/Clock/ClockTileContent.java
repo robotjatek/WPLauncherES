@@ -7,7 +7,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.HorizontalAlign;
-import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.Tile;
@@ -31,27 +31,28 @@ public class ClockTileContent implements ITileContent {
     private String _location = "";
     private boolean _dirty = true;
     private final Context _context;
+    private final LocationService _locationService;
 
-    public ClockTileContent(Context context) {
+    public ClockTileContent(Context context, LocationService locationService) {
         _context = context;
+        _locationService = locationService;
     }
 
     @Override
-    public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<Tile> drawContext,
-                     Tile tile, float x, float y, float width, float height) {
+    public void draw(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, float x, float y, float width, float height) {
         if (_dirty) {
             redraw(tile, width, height);
         }
 
-        drawTexture(projMatrix, viewMatrix, drawContext, x, y, width, height, _bgTexture);
+        drawTexture(projMatrix, viewMatrix, renderer, x, y, width, height, _bgTexture);
         updateContent();
 
         if (_clockTexture > 0) {
-            drawTexture(projMatrix, viewMatrix, drawContext, x, y + 30, width, height, _clockTexture);
+            drawTexture(projMatrix, viewMatrix, renderer, x, y + 30, width, height, _clockTexture);
         }
 
         if (_locationTexture > 0 && isLocationEnabled() && !tile.getSize().equals(Tile.SMALL)) {
-            drawTexture(projMatrix, viewMatrix, drawContext, x, y, width, height, _locationTexture);
+            drawTexture(projMatrix, viewMatrix, renderer, x, y, width, height, _locationTexture);
         }
     }
 
@@ -69,7 +70,7 @@ public class ClockTileContent implements ITileContent {
             }
 
             if (isLocationEnabled()) {
-                var currentLocation = LocationService.get().getCity();
+                var currentLocation = _locationService.getCity();
                 if (!_location.equals(currentLocation)) {
                     setLocation(currentLocation);
                 }
@@ -108,13 +109,13 @@ public class ClockTileContent implements ITileContent {
         _dirty = true;
     }
 
-    private void drawTexture(float[] projMatrix, float[] viewMatrix, IDrawContext<Tile> drawContext,
+    private void drawTexture(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
                              float correctedX, float correctedY, float width, float height, int textureId) {
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, correctedX, correctedY, 0f);
         Matrix.scaleM(_modelMatrix, 0, width, height, 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        drawContext.getRenderer().draw(projMatrix, _modelMatrix, textureId);
+        renderer.draw(projMatrix, _modelMatrix, textureId);
     }
 
     private boolean isLocationEnabled() {

@@ -11,24 +11,12 @@ import java.util.concurrent.Executors;
 public class LocationService {
     private static final long REFRESH_INTERVAL_MS = 10 * 60 * 1000;
     private boolean _hasPermission = false;
-    private static LocationService _instance;
     private String _city = "";
     private long _lastRequest = 0;
     private final Context _context;
 
-    private LocationService(Context context) {
+    public LocationService(Context context) {
         _context = context;
-    }
-
-    public static LocationService create(Context context) {
-        if (_instance == null) {
-            _instance = new LocationService(context);
-        }
-        return _instance;
-    }
-
-    public static LocationService get() {
-        return _instance;
     }
 
     public String getCity() {

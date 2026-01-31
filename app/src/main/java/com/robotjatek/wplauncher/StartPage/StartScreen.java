@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
+import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.StartPage.States.ChildControlState;
 import com.robotjatek.wplauncher.IState;
@@ -75,11 +76,11 @@ public class StartScreen implements IPageNavigator, IScreen {
     private final SettingsService _settingsService;
     private final float[] pageMatrix = new float[16]; // stores the page translation relative to each other
 
-    public StartScreen(Context context, IScreenNavigator navigator) {
+    public StartScreen(Context context, IScreenNavigator navigator, LocationService locationService) {
         _state = IDLE_STATE();
         _settingsService = new SettingsService(context);
         _internalAppsService = new InternalAppsService(context, _settingsService, navigator);
-        _tileService = new TileService(context, _internalAppsService, _settingsService);
+        _tileService = new TileService(context, _internalAppsService, _settingsService, locationService);
         _tileGrid = new TileGrid(_tileService, context);
         _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));

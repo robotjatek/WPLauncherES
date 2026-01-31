@@ -37,7 +37,7 @@ public class Tile {
         var correctedX = drawContext.xOf(this) + offset.x() - xDiff; // x corrected by the scaling and the offset
         var correctedY = drawContext.yOf(this) + offset.y() - yDiff; // y corrected by the scaling and the offset
 
-        _content.draw(projMatrix, viewMatrix, drawContext, this, correctedX, correctedY, width, height);
+        _content.draw(projMatrix, viewMatrix, drawContext.getRenderer(), this, correctedX, correctedY, width, height);
     }
 
     public void onTap() {

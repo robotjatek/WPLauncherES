@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.Components.Layouts.StackLayout;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
@@ -16,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 
 public class StackLayout implements ILayout {
-    private final float[] _viewMatrix = new float[16];
     public static final int TOP_MARGIN_PX = 0;
     private final List<UIElement> _children = new ArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
@@ -37,7 +37,6 @@ public class StackLayout implements ILayout {
 
     @Override
     public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position) {
-        //Matrix.setIdentityM(_viewMatrix, 0);
         Matrix.translateM(view, 0, position.x(), position.y() + TOP_MARGIN_PX, 0);
         for (var child : _children) {
             child.draw(proj, view, this, renderer);

@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Components.Layouts;
 
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.QuadRenderer;

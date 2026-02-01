@@ -48,7 +48,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         _titleLayout = new FlexLayout(
                 new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.END, false),
                 FlexLayout.AlignItems.START,
-                FlexLayout.Direction.COLUMN); // TODO: row
+                FlexLayout.Direction.COLUMN);
          _titleLabel = new Label("", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
         _titleLayout.addChild(_titleLabel);
        // _titleLayout.addChild(new Label("Másik", 48, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT));
@@ -64,7 +64,6 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);
             TileUtil.deleteTexture(_iconTextureId);
-            var title = tile.getSize().equals(Tile.SMALL) ? "" : tile.title; // Don't show the title when the when the tile is small
             _textureId = TileUtil.createTextTexture("", (int) width, (int) height,
                     48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);

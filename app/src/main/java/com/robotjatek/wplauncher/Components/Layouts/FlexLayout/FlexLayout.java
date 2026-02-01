@@ -4,6 +4,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -14,40 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class FlexLayoutItemDrawContext implements IDrawContext<UIElement> {
-
-    private final ILayout _layout;
-
-    public FlexLayoutItemDrawContext(FlexLayout layout) {
-        _layout = layout;
-    }
-
-    @Override
-    public float xOf(UIElement element) {
-        return _layout.getLayoutInfo(element).x();
-    }
-
-    @Override
-    public float yOf(UIElement element) {
-        return _layout.getLayoutInfo(element).y();
-    }
-
-    @Override
-    public float widthOf(UIElement element) {
-        return _layout.getWidth();
-    }
-
-    @Override
-    public float heightOf(UIElement element) {
-        return element.measure().height();
-    }
-}
-
-// TODO: direction row/column
-// TODO: justify content: vertical align if column, horizontal if row
-// TODO: align items: vertical if row, horizontal if column
-// TODO: column direction only for POC
-// TODO: row direction implementation after column
+// TODO: layout padding
 // TODO: allow to put other layouts as children
 // TODO: bg color for a layout
 /**
@@ -85,8 +53,8 @@ public class FlexLayout implements ILayout {
 
     private final List<UIElement> _children = new ArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
-    private int _width;
-    private int _height;
+    private float _width;
+    private float _height;
     private final float[] _modelMatrix = new float[16];
     private final JustifyContent _justify;
     private final AlignItems _align;
@@ -101,7 +69,6 @@ public class FlexLayout implements ILayout {
         _justify = justify;
         _align = align;
         _direction = direction;
-        // TODO: create proper drawcontext
         _itemDrawContext = new FlexLayoutItemDrawContext(this);
     }
 
@@ -111,56 +78,90 @@ public class FlexLayout implements ILayout {
     }
 
     private void layout() {
-        // TODO: separate layout col and row methods
         switch (_direction) {
-            case ROW -> throw new UnsupportedOperationException("Implement me :(");
+            case ROW -> layoutRow();
             case COLUMN -> layoutColumn();
         }
     }
 
+    private void layoutRow() {
+        _layoutInfo.clear();
+        var totalWidth = 0f;
+        for (var child : _children) {
+            var size = child.measure();
+            totalWidth += size.width();
+        }
+
+        // horizontal alignment based on justify
+        var childX = switch (_justify.justify()) {
+            case START -> 0;
+            case END -> _width - totalWidth;
+            case CENTER -> {
+                var offset = (_width - totalWidth) / 2;
+                yield _justify.safe ? Math.max(0, offset) : offset;
+            }
+        };
+
+        // vertical alignment based on align + store layout info
+        for (var child : _children) {
+            var size = child.measure();
+            var childY = switch (_align) {
+                case START, STRETCH -> 0f;
+                case END -> _height - size.height();
+                case CENTER -> (_height - size.height()) / 2;
+            };
+
+            _layoutInfo.put(child, new LayoutInfo(childX, childY));
+
+            if (_align == AlignItems.STRETCH) {
+                throw new UnsupportedOperationException("Implement UI element resize");
+            }
+
+            childX += size.width();
+        }
+    }
     private void layoutColumn() {
         _layoutInfo.clear();
 
         // measure total height of items
-        var totalHeight = 0;
+        var totalHeight = 0f;
         for (var child : _children) {
-            // TODO: handle vertical alignment
-            // TODO: handle horizontal alignment
             // TODO: handle if the child is a layout itself
             var size = child.measure();
             totalHeight += size.height();
         }
 
         // vertical alignment based on justify
-        var startY = switch (_justify.justify()) {
-            case START -> 0;
+        var childY = switch (_justify.justify()) {
+            case START -> 0f;
             case END -> _height - totalHeight;
             case CENTER -> {
                 var offset = (_height - totalHeight) / 2;
                 yield _justify.safe() ? Math.max(0, offset) : offset;
             }
         };
-
-        var currentY = startY;
         // horizontal alignment + store layout info
         for (var child : _children) {
-            // TODO: implement horizontal alignment based on align
             var size = child.measure();
+            var childX = switch (_align) {
+                case START -> 0;
+                case END -> _width - size.width();
+                case CENTER -> (_width - size.width()) / 2;
+                case STRETCH -> throw new UnsupportedOperationException("Implement UI element resize first");
+            };
 
-            _layoutInfo.put(child, new LayoutInfo(0, currentY));
-            currentY += size.height();
+            _layoutInfo.put(child, new LayoutInfo(childX, childY));
+            childY += size.height();
         }
-        _height = totalHeight; // TODO: i dont know if this works with dynamically added elements
     }
 
     @Override
     public IDrawContext<UIElement> getContext() {
-        return _itemDrawContext; // TODO: drawcontext for children
+        return _itemDrawContext;
     }
 
     @Override
     public void onResize(int width, int height) {
-        // TODO: available w/h?
         _width = width;
         _height = height;
         _dirty = true;
@@ -168,12 +169,12 @@ public class FlexLayout implements ILayout {
 
     @Override
     public int getWidth() {
-        return _width;
+        return (int)_width;
     }
 
     @Override
     public int getHeight() {
-        return _height;
+        return (int)_height;
     }
 
     @Override

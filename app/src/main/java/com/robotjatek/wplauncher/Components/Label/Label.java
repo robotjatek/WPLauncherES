@@ -35,16 +35,19 @@ public class Label implements UIElement {
         var context = layout.getContext();
         var x = context.xOf(this);
         var y = context.yOf(this);
-        var w = context.widthOf(this);
-        var h = context.heightOf(this);
+        var w = (int)context.widthOf(this);
+        var h = (int)context.heightOf(this);
 
         if (_dirty) {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
             }
+            if (w == 0 || h == 0) {
+                return; // Do not draw invisible element
+            }
             _textureId = TileUtil.createTextTexture(_text,
-                    (int) w,
-                    (int) h,
+                    w,
+                    h,
                     _textSize,
                     _typeFace,
                     _textColor,
@@ -52,6 +55,10 @@ public class Label implements UIElement {
                     HorizontalAlign.LEFT,
                     VerticalAlign.CENTER);
             _dirty = false;
+        }
+
+        if (w == 0 || h == 0) {
+            return; // Do not draw invisible element
         }
 
         Matrix.setIdentityM(_modelMatrix, 0);

@@ -71,7 +71,12 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [x] Generic list view
 - [x] Stack view
 - [ ] Basic flex layout
-  - [ ] Static tiles using the flex layout 
+    - [ ] Support row and column layout modes
+    - [ ] Support alignment
+    - [ ] Static tiles using the flex layout
+    - [ ] Clock tile with flex layout
+    - [ ] Flex layout as a child of flex layout 
+- [ ] Use an Image UI element instead of basic textures for icons to be able to use them in layouts 
 - [x] Basic UI elements
   - [x] Button
   - [x] Checkbox

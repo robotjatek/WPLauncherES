@@ -6,10 +6,12 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
+import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
@@ -39,20 +41,21 @@ public class ClockTileContent implements ITileContent {
     }
 
     @Override
-    public void draw(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, float x, float y, float width, float height) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, Position<Float> position, Size<Integer> size) {
         if (_dirty) {
-            redraw(tile, width, height);
+            redraw(tile, size);
         }
 
-        drawTexture(projMatrix, viewMatrix, renderer, x, y, width, height, _bgTexture);
+        drawTexture(projMatrix, viewMatrix, renderer, position, size, _bgTexture);
         updateContent();
 
         if (_clockTexture > 0) {
-            drawTexture(projMatrix, viewMatrix, renderer, x, y + 30, width, height, _clockTexture);
+            drawTexture(projMatrix, viewMatrix, renderer,
+                    new Position<>(position.x(), position.y() + 30), size, _clockTexture);
         }
 
         if (_locationTexture > 0 && isLocationEnabled() && !tile.getSize().equals(Tile.SMALL)) {
-            drawTexture(projMatrix, viewMatrix, renderer, x, y, width, height, _locationTexture);
+            drawTexture(projMatrix, viewMatrix, renderer, position, size, _locationTexture);
         }
     }
 
@@ -82,7 +85,7 @@ public class ClockTileContent implements ITileContent {
         }
     }
 
-    private void redraw(Tile tile, float w, float h) {
+    private void redraw(Tile tile, Size<Integer> size) {
         TileUtil.deleteTexture(_bgTexture);
         _bgTexture = BitmapUtil.createTextureFromBitmap(
                 BitmapUtil.createRect(1, 1, 0, tile.bgColor));
@@ -91,14 +94,14 @@ public class ClockTileContent implements ITileContent {
         TileUtil.deleteTexture(_clockTexture);
         var fontSize = tile.getSize().equals(Tile.SMALL) ? 80 : 160;
         _clockTexture = TileUtil.createTextTexture(time,
-                (int) w,
-                (int) h,
+                size.width(),
+                size.height(),
                 fontSize, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
 
         TileUtil.deleteTexture(_locationTexture);
         _locationTexture = TileUtil.createTextTexture(_location,
-                (int) w,
-                (int) h,
+                size.width(),
+                size.height(),
                 72, Typeface.NORMAL,
                 Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.RIGHT, VerticalAlign.TOP);
         _dirty = false;
@@ -110,10 +113,10 @@ public class ClockTileContent implements ITileContent {
     }
 
     private void drawTexture(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
-                             float correctedX, float correctedY, float width, float height, int textureId) {
+                             Position<Float> position, Size<Integer> size, int textureId) {
         Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, correctedX, correctedY, 0f);
-        Matrix.scaleM(_modelMatrix, 0, width, height, 1);
+        Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
+        Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         renderer.draw(projMatrix, _modelMatrix, textureId);
     }

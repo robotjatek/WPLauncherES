@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
@@ -30,20 +31,23 @@ public class Label implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout) {
+    public void draw(float[] proj, float[] view, ILayout layout, QuadRenderer renderer) {
         var context = layout.getContext();
         var x = context.xOf(this);
         var y = context.yOf(this);
-        var w = context.widthOf(this);
-        var h = context.heightOf(this);
+        var w = (int)context.widthOf(this);
+        var h = (int)context.heightOf(this);
 
         if (_dirty) {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
             }
+            if (w == 0 || h == 0) {
+                return; // Do not draw invisible element
+            }
             _textureId = TileUtil.createTextTexture(_text,
-                    (int) w,
-                    (int) h,
+                    w,
+                    h,
                     _textSize,
                     _typeFace,
                     _textColor,
@@ -53,11 +57,15 @@ public class Label implements UIElement {
             _dirty = false;
         }
 
+        if (w == 0 || h == 0) {
+            return; // Do not draw invisible element
+        }
+
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        layout.getContext().getRenderer().draw(proj, _modelMatrix, _textureId);
+        renderer.draw(proj, _modelMatrix, _textureId);
     }
 
     @Override
@@ -74,6 +82,11 @@ public class Label implements UIElement {
 
     public String getText() {
         return _text;
+    }
+
+    public void setText(String text) {
+        _text = text;
+        _dirty = true;
     }
 
     public int getBgColor() {

@@ -23,10 +23,10 @@ public class ColorPickerScreen implements IScreen {
     private final ListView<AccentColor> _view;
     private final List<OnChangeListener<AccentColor>> _changeListeners = new ArrayList<>();
 
-    public ColorPickerScreen(QuadRenderer renderer, IScreenNavigator navigator) {
+    public ColorPickerScreen(IScreenNavigator navigator) {
         _navigator = navigator;
         Matrix.setIdentityM(viewMatrix, 0);
-        _view = new ListView<>(renderer);
+        _view = new ListView<>();
         _view.addItems(createItems(_view.getDrawContext()));
     }
 
@@ -47,8 +47,8 @@ public class ColorPickerScreen implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix) {
-        _view.draw(delta, projMatrix, viewMatrix);
+    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
+        _view.draw(delta, projMatrix, viewMatrix, renderer);
     }
 
     @Override

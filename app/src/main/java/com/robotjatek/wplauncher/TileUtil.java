@@ -9,7 +9,7 @@ import android.opengl.GLUtils;
 
 public class TileUtil {
 
-    private static final int CONTENT_PADDING_PX = 20;
+    private static final int CONTENT_PADDING_PX = 0;
 
     public static int createTextTexture(
             String text,

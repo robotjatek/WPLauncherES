@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.InternalApps.Notifications;
 
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
+import com.robotjatek.wplauncher.QuadRenderer;
 
 public class Notifications implements IScreen {
 
@@ -12,7 +13,7 @@ public class Notifications implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix) {
+    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
 
     }
 

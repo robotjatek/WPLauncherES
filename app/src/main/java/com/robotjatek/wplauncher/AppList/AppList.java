@@ -27,8 +27,6 @@ import java.util.stream.Stream;
 
 public class AppList implements Page, OnChangeListener<AccentColor> {
 
-    private final Shader _shader = new Shader("", "");
-    private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private static final int PAGE_PADDING_PX = 60;
     private int _listWidth;
     private int _viewPortHeight;
@@ -48,17 +46,17 @@ public class AppList implements Page, OnChangeListener<AccentColor> {
         _tileService = tileService;
         _settingsService = settingsService;
         _settingsService.subscribe(this);
-        _contextMenuDrawContext = new ContextMenuDrawContext<>(_listWidth, _viewPortHeight, _renderer);
+        _contextMenuDrawContext = new ContextMenuDrawContext<>(_listWidth, _viewPortHeight);
         _internalAppsService = internalAppsService;
-        _list = new ListView<>(_renderer);
+        _list = new ListView<>();
         var apps = loadAppList();
         var newItems = createItems(apps);
         _list.addItems(newItems);
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
-        _list.draw(delta, projMatrix, viewMatrix);
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {
+        _list.draw(delta, projMatrix, viewMatrix, renderer);
     }
 
     @Override
@@ -145,8 +143,6 @@ public class AppList implements Page, OnChangeListener<AccentColor> {
     @Override
     public void dispose() {
         _list.dispose();
-        _shader.delete();
-        _renderer.dispose();
     }
 
     @Override

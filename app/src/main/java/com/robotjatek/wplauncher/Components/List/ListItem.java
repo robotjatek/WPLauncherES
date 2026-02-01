@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.VerticalAlign;
 import com.robotjatek.wplauncher.TileUtil;
 
@@ -49,7 +50,7 @@ public class ListItem<T> {
         return _payload;
     }
 
-    public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<ListItem<T>> context) {
+    public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<ListItem<T>> context, QuadRenderer renderer) {
         var x = context.xOf(this);
         var y = context.yOf(this);
         var w = context.widthOf(this);
@@ -63,21 +64,21 @@ public class ListItem<T> {
         Matrix.translateM(_modelMatrix, 0, x, y, 0f);
         Matrix.scaleM(_modelMatrix, 0, h, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        context.getRenderer().draw(projMatrix, _modelMatrix, _bgTextureId);
+        renderer.draw(projMatrix, _modelMatrix, _bgTextureId);
 
         // icon
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
         Matrix.scaleM(_modelMatrix, 0, h, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        context.getRenderer().draw(projMatrix, _modelMatrix, _iconTextureId);
+        renderer.draw(projMatrix, _modelMatrix, _iconTextureId);
 
         // label
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, labelX, y, 0);
         Matrix.scaleM(_modelMatrix, 0, labelW, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        context.getRenderer().draw(projMatrix, _modelMatrix, _textureId);
+        renderer.draw(projMatrix, _modelMatrix, _textureId);
     }
 
     public void update(IDrawContext<ListItem<T>> context) {

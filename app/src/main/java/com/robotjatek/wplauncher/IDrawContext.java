@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher;
 
 public interface IDrawContext<T> {
-    QuadRenderer getRenderer();
 
     /**
      * Calculates screen space X position of a child

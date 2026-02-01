@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.Components.List;
 
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.IDrawContext;
-import com.robotjatek.wplauncher.QuadRenderer;
 
 public class ListItemDrawContext<T, U extends IItemListContainer<T>> implements IDrawContext<ListItem<T>> {
 
@@ -11,14 +10,12 @@ public class ListItemDrawContext<T, U extends IItemListContainer<T>> implements 
     private final int ITEM_GAP_PX;
     private int _listWidth;
     private final U _itemContainer;
-    private final QuadRenderer _renderer;
 
-    public ListItemDrawContext(int padding, int itemHeight, int itemGap, U itemContainer, QuadRenderer renderer) {
+    public ListItemDrawContext(int padding, int itemHeight, int itemGap, U itemContainer) {
         PAGE_PADDING_PX = padding;
         ITEM_HEIGHT_PX = itemHeight;
         ITEM_GAP_PX = itemGap;
         _itemContainer = itemContainer;
-        _renderer = renderer;
     }
 
     public void onResize(int listWidth) {
@@ -47,10 +44,5 @@ public class ListItemDrawContext<T, U extends IItemListContainer<T>> implements 
     @Override
     public float heightOf(ListItem<T> item) {
         return ITEM_HEIGHT_PX;
-    }
-
-    @Override
-    public QuadRenderer getRenderer() {
-        return _renderer;
     }
 }

@@ -1,7 +1,7 @@
 package com.robotjatek.wplauncher;
 
 public interface Page {
-    void draw(float delta, float[] projMatrix, float[] viewMatrix);
+    void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer);
 
     void touchMove(float x, float y);
 

@@ -4,9 +4,11 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.Components.Button.Button;
@@ -16,7 +18,7 @@ import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.ColorPickerScree
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
 import com.robotjatek.wplauncher.Services.SettingsService;
-import com.robotjatek.wplauncher.Shader;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 /**
  * Note Settings page should be completely STATELESS as its a singleton!
@@ -26,23 +28,22 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
     private final IScreenNavigator _navigator;
     private final Context _context;
     private final StackLayout _layout;
-    private final Shader _shader = new Shader("","");
-    private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private final SettingsService _settings;
     private final ColorPickerScreen _colorPickerScreen;
     private final Button _colorPickerBtn;
     private Bitmap _icon;
+    private Size<Integer> _size = new Size<>(-1, -1);
 
     public Settings(IScreenNavigator navigator, SettingsService settings, Context context) {
         _navigator = navigator;
         _settings = settings;
         _context = context;
-        _layout = new StackLayout(_renderer);
+        _layout = new StackLayout();
         _layout.addChild(new Label("LAUNCHER SETTINGS", 52, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("theme", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
 
-        _colorPickerScreen = new ColorPickerScreen(_renderer, navigator);
+        _colorPickerScreen = new ColorPickerScreen(navigator);
         _colorPickerScreen.subscribe(this);
 
         var color = settings.getAccentColor();
@@ -54,9 +55,12 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
         // TODO: Light/Dark mode selector
     }
 
+    private final float[] _view = new float[16];
+
     @Override
-    public void draw(float delta, float[] projMatrix) {
-        _layout.draw(delta, projMatrix);
+    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
+        Matrix.setIdentityM(_view, 0);
+        _layout.draw(delta, projMatrix, _view, renderer, new Position<>(0f, 0f), _size);
     }
 
     @Override
@@ -66,6 +70,7 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
 
     @Override
     public void onResize(int width, int height) {
+        _size = new Size<>(width, height);
         _layout.onResize(width, height);
         _colorPickerScreen.onResize(width, height);
     }
@@ -87,8 +92,6 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
 
     @Override
     public void dispose() {
-        _renderer.dispose();
-        _shader.delete();
         _layout.dispose();
         _colorPickerScreen.dispose();
         _icon.recycle();

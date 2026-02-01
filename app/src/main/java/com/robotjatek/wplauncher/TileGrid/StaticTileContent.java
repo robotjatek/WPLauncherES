@@ -46,12 +46,12 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                 FlexLayout.Direction.COLUMN);
 
         _titleLayout = new FlexLayout(
-                new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.START, false),
+                new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.END, false),
                 FlexLayout.AlignItems.START,
                 FlexLayout.Direction.COLUMN); // TODO: row
          _titleLabel = new Label("", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
         _titleLayout.addChild(_titleLabel);
-        _titleLayout.addChild(new Label("Másik", 48, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT));
+       // _titleLayout.addChild(new Label("Másik", 48, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT));
 
         //_rootLayout.addChild(_titleLayout); // TODO: make it happen
         // rootLayout.addChild(iconLayout);
@@ -65,15 +65,15 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
             TileUtil.deleteTexture(_textureId);
             TileUtil.deleteTexture(_iconTextureId);
             var title = tile.getSize().equals(Tile.SMALL) ? "" : tile.title; // Don't show the title when the when the tile is small
-            _textureId = TileUtil.createTextTexture(title, (int) width, (int) height,
+            _textureId = TileUtil.createTextTexture("", (int) width, (int) height,
                     48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);
 
-            TileUtil.deleteTexture(_notificationCountTextureId);
+            TileUtil.deleteTexture(_notificationCountTextureId); // Don't show the title when the when the tile is small
             _notificationCountTextureId = TileUtil.createTextTexture(_notifications.size() + "", ICON_SIZE_PX, ICON_SIZE_PX,
                     300, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
 
-            _titleLabel.setText(tile.title);
+            _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.title);
             _titleLayout.onResize((int) width, (int) height); // TODO: ez elég hacky itt
             _dirty = false;
         }

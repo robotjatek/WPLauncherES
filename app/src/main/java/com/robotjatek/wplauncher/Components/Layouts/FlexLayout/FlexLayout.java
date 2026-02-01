@@ -119,18 +119,38 @@ public class FlexLayout implements ILayout {
     }
 
     private void layoutColumn() {
-        // TODO: implement
         _layoutInfo.clear();
+
+        // measure total height of items
         var totalHeight = 0;
         for (var child : _children) {
-            var size = child.measure();
             // TODO: handle vertical alignment
             // TODO: handle horizontal alignment
             // TODO: handle if the child is a layout itself
-            _layoutInfo.put(child, new LayoutInfo(0, totalHeight));
+            var size = child.measure();
             totalHeight += size.height();
         }
-        _height = totalHeight;
+
+        // vertical alignment based on justify
+        var startY = switch (_justify.justify()) {
+            case START -> 0;
+            case END -> _height - totalHeight;
+            case CENTER -> {
+                var offset = (_height - totalHeight) / 2;
+                yield _justify.safe() ? Math.max(0, offset) : offset;
+            }
+        };
+
+        var currentY = startY;
+        // horizontal alignment + store layout info
+        for (var child : _children) {
+            // TODO: implement horizontal alignment based on align
+            var size = child.measure();
+
+            _layoutInfo.put(child, new LayoutInfo(0, currentY));
+            currentY += size.height();
+        }
+        _height = totalHeight; // TODO: i dont know if this works with dynamically added elements
     }
 
     @Override

@@ -10,6 +10,7 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
@@ -31,7 +32,7 @@ public class Button implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout) {
+    public void draw(float[] proj, float[] view, ILayout layout, QuadRenderer renderer) {
         var x = layout.getContext().xOf(this);
         var y = layout.getContext().yOf(this);
         var w = (int) layout.getContext().widthOf(this);
@@ -54,7 +55,7 @@ public class Button implements UIElement {
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        layout.getContext().getRenderer().draw(proj, _modelMatrix, _bgTexture);
+        renderer.draw(proj, _modelMatrix, _bgTexture);
         var textOffset = 0;
         if (_icon != null) {
             textOffset = h;
@@ -65,14 +66,14 @@ public class Button implements UIElement {
         Matrix.translateM(_modelMatrix, 0, x+4+textOffset, y+4, 0);
         Matrix.scaleM(_modelMatrix, 0, w-8-textOffset, h-8, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        layout.getContext().getRenderer().draw(proj, _modelMatrix, _foreground);
+        renderer.draw(proj, _modelMatrix, _foreground);
 
         // draw icon
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x+4, y+4, 0);
         Matrix.scaleM(_modelMatrix, 0, h, h-8, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        layout.getContext().getRenderer().draw(proj, _modelMatrix, _iconTexture);
+        renderer.draw(proj, _modelMatrix, _iconTexture);
     }
 
     @Override

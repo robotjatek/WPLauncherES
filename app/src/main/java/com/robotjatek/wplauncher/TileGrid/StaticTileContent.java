@@ -8,6 +8,8 @@ import android.service.notification.StatusBarNotification;
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Label.Label;
+import com.robotjatek.wplauncher.Components.Layouts.FlexLayout.FlexLayout;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.INotificationChangedListener;
@@ -18,6 +20,7 @@ import com.robotjatek.wplauncher.VerticalAlign;
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
+// TODO: use layouts and components instead of hardcoded TileUtil textures
 public class StaticTileContent implements ITileContent, INotificationChangedListener {
     private static final int ICON_SIZE_PX = 512;
     private final float[] _modelMatrix = new float[16];
@@ -28,13 +31,35 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     private final String _packageName;
     private final Deque<StatusBarNotification> _notifications = new ConcurrentLinkedDeque<>();
 
+    private final FlexLayout _rootLayout;
+    private final FlexLayout _titleLayout;
+    private final Label _titleLabel;
+
+    // TODO: first impl: bg is still a texture and draw the layout on top of it
+    // TODO: bgColor for layout
     public StaticTileContent(App app) {
         _packageName = app.packageName();
         NotificationListener.subscribe(this);
+        _rootLayout = new FlexLayout(
+                new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.START, true),
+                FlexLayout.AlignItems.START,
+                FlexLayout.Direction.COLUMN);
+
+        _titleLayout = new FlexLayout(
+                new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.START, false),
+                FlexLayout.AlignItems.START,
+                FlexLayout.Direction.COLUMN); // TODO: row
+         _titleLabel = new Label("", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+        _titleLayout.addChild(_titleLabel);
+        _titleLayout.addChild(new Label("Másik", 48, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT));
+
+        //_rootLayout.addChild(_titleLayout); // TODO: make it happen
+        // rootLayout.addChild(iconLayout);
+        // TODO: when calling draw on a root layout call draw for all child layouts
     }
 
     @Override
-    public void draw(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, float x, float y, float width, float height) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, float x, float y, float width, float height) {
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);
@@ -48,13 +73,24 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
             _notificationCountTextureId = TileUtil.createTextTexture(_notifications.size() + "", ICON_SIZE_PX, ICON_SIZE_PX,
                     300, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
 
+            _titleLabel.setText(tile.title);
+            _titleLayout.onResize((int) width, (int) height); // TODO: ez elég hacky itt
             _dirty = false;
         }
 
+        // TODO: stretch behavior for size
+//        var iconLayout = new FlexLayout(
+//                new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.CENTER, false),
+//                FlexLayout.AlignItems.CENTER,
+//                FlexLayout.Direction.COLUMN);
+        // TODO: add icon
+
+
         drawBackground(projMatrix, viewMatrix, renderer, x, y, width, height, _textureId);
-        drawIcon(projMatrix, viewMatrix, renderer, width, height, x, y);
+        _titleLayout.draw(delta, projMatrix, viewMatrix, renderer, new Position<>(x, y));
+     //   drawIcon(projMatrix, viewMatrix, renderer, width, height, x, y);
         if (!_notifications.isEmpty()) {
-            drawNotificationCount(projMatrix, viewMatrix, renderer, width, height, x, y, tile);
+        //    drawNotificationCount(projMatrix, viewMatrix, renderer, width, height, x, y, tile);
         }
     }
 

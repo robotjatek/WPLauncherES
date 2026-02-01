@@ -39,7 +39,7 @@ public class ClockTileContent implements ITileContent {
     }
 
     @Override
-    public void draw(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, float x, float y, float width, float height) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, float x, float y, float width, float height) {
         if (_dirty) {
             redraw(tile, width, height);
         }

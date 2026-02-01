@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher.TileGrid;
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.QuadRenderer;
 
 public class Tile {
     public static final Size<Integer> SMALL = new Size<>(1, 1);
@@ -28,7 +29,8 @@ public class Tile {
     /**
      * Draw matrix with an offset of its original position. Scaling can be applied
      */
-    public void drawWithOffsetScaled(float[] projMatrix, float[] viewMatrix, float scale, Position<Float> offset, IDrawContext<Tile> drawContext) {
+    public void drawWithOffsetScaled(float delta, float[] projMatrix, float[] viewMatrix, float scale,
+                                     Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
         var width = drawContext.widthOf(this) * scale;
         var height = drawContext.heightOf(this) * scale;
         var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
@@ -37,7 +39,7 @@ public class Tile {
         var correctedX = drawContext.xOf(this) + offset.x() - xDiff; // x corrected by the scaling and the offset
         var correctedY = drawContext.yOf(this) + offset.y() - yDiff; // y corrected by the scaling and the offset
 
-        _content.draw(projMatrix, viewMatrix, drawContext.getRenderer(), this, correctedX, correctedY, width, height);
+        _content.draw(delta, projMatrix, viewMatrix, renderer, this, correctedX, correctedY, width, height);
     }
 
     public void onTap() {

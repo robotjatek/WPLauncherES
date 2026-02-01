@@ -1,17 +1,14 @@
 package com.robotjatek.wplauncher.TileGrid;
 
 import com.robotjatek.wplauncher.IDrawContext;
-import com.robotjatek.wplauncher.QuadRenderer;
 
 public class AdornerDrawContext<T extends IAdornedTileContainer> implements IDrawContext<Adorner> {
 
     private final TileDrawContext _tileDrawContext;
-    private final QuadRenderer _renderer;
     private final T _tileContainer;
 
-    public AdornerDrawContext(TileDrawContext tileDrawContext, QuadRenderer renderer, T tileContainer) {
+    public AdornerDrawContext(TileDrawContext tileDrawContext, T tileContainer) {
         _tileDrawContext = tileDrawContext;
-        _renderer = renderer;
         _tileContainer = tileContainer;
     }
 
@@ -48,10 +45,5 @@ public class AdornerDrawContext<T extends IAdornedTileContainer> implements IDra
     @Override
     public float heightOf(Adorner adorner) {
         return 96;
-    }
-
-    @Override
-    public QuadRenderer getRenderer() {
-        return _renderer;
     }
 }

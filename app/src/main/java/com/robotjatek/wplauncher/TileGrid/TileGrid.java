@@ -12,7 +12,6 @@ import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.ScrollController;
-import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.States.IdleState;
 import com.robotjatek.wplauncher.TileGrid.States.ScrollState;
@@ -59,8 +58,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     public static final float BOTTOM_MARGIN_PX = 192;
     private static final float PAGE_PADDING_PX = 48;
     public static final float TILE_GAP_PX = 32;
-    private final Shader _shader = new Shader("", "");
-    private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private float tileSizePx;
     private float _pageHeight;
     private final TileService _tileService;
@@ -72,8 +69,8 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         _tileService = tileService;
         _tiles = tileService.getTiles();
         _tileService.subscribe(this);
-        _tileDrawContext = new TileDrawContext(PAGE_PADDING_PX, TILE_GAP_PX, tileSizePx, _renderer);
-        var adornerDrawContext = new AdornerDrawContext<>(_tileDrawContext, _renderer, this);
+        _tileDrawContext = new TileDrawContext(PAGE_PADDING_PX, TILE_GAP_PX, tileSizePx);
+        var adornerDrawContext = new AdornerDrawContext<>(_tileDrawContext, this);
         var icon = ContextCompat.getDrawable(context, R.drawable.close_circle);
         _unpinButton = new Adorner(() -> _commands.add(() -> {
             if (_selectedTile != null) {
@@ -91,7 +88,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {
         _state.update(delta);
         _scroll.update(delta);
         executeCommands();
@@ -106,17 +103,18 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                 continue;
             }
             var scale = _selectedTile == null ? 1.0f : 0.95f;
-            tile.drawWithOffsetScaled(projMatrix, scrollMatrix, scale, Position.ZERO, _tileDrawContext);
+            tile.drawWithOffsetScaled(delta, projMatrix, scrollMatrix, scale, Position.ZERO, _tileDrawContext, renderer);
         }
 
         // render the selected tile with different scaling, and on its current drag position
         if (_selectedTile != null) {
-            _selectedTile.drawWithOffsetScaled(projMatrix, scrollMatrix,
+            _selectedTile.drawWithOffsetScaled(delta, projMatrix, scrollMatrix,
                     1.00f,
                     new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
-                    _tileDrawContext);
-            _unpinButton.draw(projMatrix, scrollMatrix);
-            _resizeButton.draw(projMatrix, scrollMatrix);
+                    _tileDrawContext,
+                    renderer);
+            _unpinButton.draw(projMatrix, scrollMatrix, renderer);
+            _resizeButton.draw(projMatrix, scrollMatrix, renderer);
         }
 
     }
@@ -242,8 +240,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     public void dispose() {
-        _renderer.dispose();
-        _shader.delete();
         _unpinButton.dispose();
         _resizeButton.dispose();
     }

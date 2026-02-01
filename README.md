@@ -70,6 +70,8 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [x] Resize tiles
 - [x] Generic list view
 - [x] Stack view
+- [ ] Basic flex layout
+  - [ ] Static tiles using the flex layout 
 - [x] Basic UI elements
   - [x] Button
   - [x] Checkbox

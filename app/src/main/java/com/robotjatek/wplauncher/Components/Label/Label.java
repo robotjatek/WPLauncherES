@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
@@ -30,7 +31,7 @@ public class Label implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout) {
+    public void draw(float[] proj, float[] view, ILayout layout, QuadRenderer renderer) {
         var context = layout.getContext();
         var x = context.xOf(this);
         var y = context.yOf(this);
@@ -57,7 +58,7 @@ public class Label implements UIElement {
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        layout.getContext().getRenderer().draw(proj, _modelMatrix, _textureId);
+        renderer.draw(proj, _modelMatrix, _textureId);
     }
 
     @Override
@@ -74,6 +75,11 @@ public class Label implements UIElement {
 
     public String getText() {
         return _text;
+    }
+
+    public void setText(String text) {
+        _text = text;
+        _dirty = true;
     }
 
     public int getBgColor() {

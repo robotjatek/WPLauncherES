@@ -12,6 +12,7 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
@@ -37,7 +38,7 @@ public class Checkbox implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout) {
+    public void draw(float[] proj, float[] view, ILayout layout, QuadRenderer renderer) {
         // Available draw space
         var x = layout.getContext().xOf(this);
         var y = layout.getContext().yOf(this);
@@ -61,14 +62,14 @@ public class Checkbox implements UIElement {
             Matrix.translateM(_modelMatrix, 0, x, y, 0);
             Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE, TOGGLE_SIZE, 0);
             Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-            layout.getContext().getRenderer().draw(proj, _modelMatrix, _stateTexture);
+            renderer.draw(proj, _modelMatrix, _stateTexture);
         }
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x + TOGGLE_SIZE, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w - TOGGLE_SIZE, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        layout.getContext().getRenderer().draw(proj, _modelMatrix, _labelTexture);
+        renderer.draw(proj, _modelMatrix, _labelTexture);
     }
 
     @Override

@@ -2,6 +2,8 @@ package com.robotjatek.wplauncher.Components.Layouts.FlexLayout;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
 import com.robotjatek.wplauncher.Components.Size;
@@ -9,6 +11,7 @@ import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
+import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +20,6 @@ import java.util.Map;
 
 // TODO: layout padding
 // TODO: allow to put other layouts as children
-// TODO: bg color for a layout
 /**
  * A minimal flex layout implementation
  */
@@ -60,6 +62,8 @@ public class FlexLayout implements ILayout {
     private final Direction _direction;
     private final IDrawContext<UIElement> _itemDrawContext;
     private boolean _dirty = true;
+    private int _bgColor = Colors.TRANSPARENT;
+    private int _bgTexture = -1;
 
     public FlexLayout(
             JustifyContent justify,
@@ -73,6 +77,11 @@ public class FlexLayout implements ILayout {
 
     public void addChild(UIElement element) {
         _children.add(element);
+        _dirty = true;
+    }
+
+    public void setBgColor(int bgColor) {
+        _bgColor = bgColor;
         _dirty = true;
     }
 
@@ -189,8 +198,24 @@ public class FlexLayout implements ILayout {
         }
         if (_dirty) {
             layout();
+            TileUtil.deleteTexture(_bgTexture);
+            _bgTexture = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, _bgColor));
             _dirty = false;
         }
+
+        drawBg(position, size, proj, viewMatrix, renderer);
+        drawChildren(proj, viewMatrix, renderer, position);
+    }
+
+    private void drawBg(Position<Float> position, Size<Integer> size, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {
+        Matrix.setIdentityM(_modelMatrix, 0);
+        Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
+        Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
+        Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
+        renderer.draw(projMatrix, _modelMatrix, _bgTexture);
+    }
+
+    private void drawChildren(float[] proj, float[] viewMatrix, QuadRenderer renderer, Position<Float> position) {
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
@@ -218,5 +243,6 @@ public class FlexLayout implements ILayout {
     public void dispose() {
         _children.forEach(UIElement::dispose);
         _children.clear();
+        TileUtil.deleteTexture(_bgTexture);
     }
 }

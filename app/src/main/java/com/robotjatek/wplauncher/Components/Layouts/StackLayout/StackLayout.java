@@ -40,7 +40,7 @@ public class StackLayout implements ILayout {
                      Size<Integer> size) {
         Matrix.translateM(view, 0, position.x(), position.y() + TOP_MARGIN_PX, 0);
         for (var child : _children) {
-            child.draw(proj, view, this, renderer);
+            child.draw(proj, view, _drawContext, renderer);
         }
     }
 

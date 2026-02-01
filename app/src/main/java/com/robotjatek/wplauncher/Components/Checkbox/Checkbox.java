@@ -12,6 +12,7 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.TileUtil;
@@ -38,12 +39,12 @@ public class Checkbox implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout, QuadRenderer renderer) {
+    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         // Available draw space
-        var x = layout.getContext().xOf(this);
-        var y = layout.getContext().yOf(this);
-        var w = (int) layout.getContext().widthOf(this);
-        var h = (int) layout.getContext().heightOf(this);
+        var x = drawContext.xOf(this);
+        var y = drawContext.yOf(this);
+        var w = (int) drawContext.widthOf(this);
+        var h = (int) drawContext.heightOf(this);
 
         if (_dirty) {
             TileUtil.deleteTexture(_stateTexture);

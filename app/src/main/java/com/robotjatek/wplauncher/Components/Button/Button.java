@@ -10,6 +10,7 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
@@ -32,11 +33,11 @@ public class Button implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout, QuadRenderer renderer) {
-        var x = layout.getContext().xOf(this);
-        var y = layout.getContext().yOf(this);
-        var w = (int) layout.getContext().widthOf(this);
-        var h = (int) layout.getContext().heightOf(this);
+    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+        var x = drawContext.xOf(this);
+        var y = drawContext.yOf(this);
+        var w = (int) drawContext.widthOf(this);
+        var h = (int) drawContext.heightOf(this);
 
         if (_isDirty) {
             // 1 px white border

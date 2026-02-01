@@ -189,9 +189,35 @@ public class FlexLayout implements ILayout {
         return _layoutInfo.get(item);
     }
 
+    class FlexLayoutDrawContext implements IDrawContext<FlexLayout> {
+
+        @Override
+        public float xOf(FlexLayout element) {
+            return 0;
+        }
+
+        @Override
+        public float yOf(FlexLayout element) {
+            return 0;
+        }
+
+        @Override
+        public float widthOf(FlexLayout element) {
+            return 0;
+        }
+
+        @Override
+        public float heightOf(FlexLayout element) {
+            return 0;
+        }
+    }
+
     @Override
     public void draw(float delta, float[] proj, float[] viewMatrix, QuadRenderer renderer,
                      Position<Float> position, Size<Integer> size) {
+        // TODO: dont pass the pos and size directly query it from the parent
+        //  - statictilecontent or an other layout (flexlayoutDrawcontext)
+
         if (!_size.equals(size)) {
             _size = size;
             _dirty = true;
@@ -220,7 +246,7 @@ public class FlexLayout implements ILayout {
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         for (var child : _children) {
-            child.draw(proj, _modelMatrix, this, renderer);
+            child.draw(proj, _modelMatrix, _itemDrawContext, renderer);
         }
     }
 

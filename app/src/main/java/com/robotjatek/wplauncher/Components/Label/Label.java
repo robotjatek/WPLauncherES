@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
@@ -31,12 +32,11 @@ public class Label implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout, QuadRenderer renderer) {
-        var context = layout.getContext();
-        var x = context.xOf(this);
-        var y = context.yOf(this);
-        var w = (int)context.widthOf(this);
-        var h = (int)context.heightOf(this);
+    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+        var x = drawContext.xOf(this);
+        var y = drawContext.yOf(this);
+        var w = (int)drawContext.widthOf(this);
+        var h = (int)drawContext.heightOf(this);
 
         if (_dirty) {
             if (_textureId > 0) {

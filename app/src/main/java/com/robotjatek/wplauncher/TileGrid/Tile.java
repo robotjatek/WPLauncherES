@@ -32,8 +32,8 @@ public class Tile {
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
                                Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
-        var width = drawContext.widthOf(this) * _scale;
-        var height = drawContext.heightOf(this) * _scale;
+        var width = (int) (drawContext.widthOf(this) * _scale);
+        var height = (int) (drawContext.heightOf(this) * _scale);
         var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
         var yDiff = (height - drawContext.heightOf(this)) / 2; // correction for the scaling
 

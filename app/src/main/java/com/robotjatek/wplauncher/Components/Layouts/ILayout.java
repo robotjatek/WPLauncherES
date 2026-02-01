@@ -12,7 +12,7 @@ public interface ILayout {
     int getWidth();
     int getHeight();
     LayoutInfo getLayoutInfo(UIElement item);
-    void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position);
+    void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position, Size<Integer> size);
     void onTouchStart(float x, float y);
     void onTouchEnd(float x, float y);
     void onTouchMove(float x, float y);

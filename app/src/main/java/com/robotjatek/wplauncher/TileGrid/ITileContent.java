@@ -5,7 +5,7 @@ import com.robotjatek.wplauncher.QuadRenderer;
 
 public interface ITileContent {
     void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
-              Tile tile, Position<Float> position, Size<Float> size);
+              Tile tile, Position<Float> position, Size<Integer> size);
 
     void dispose();
     void forceRedraw();

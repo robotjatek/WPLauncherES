@@ -8,6 +8,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.Components.Button.Button;
@@ -31,6 +32,7 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
     private final ColorPickerScreen _colorPickerScreen;
     private final Button _colorPickerBtn;
     private Bitmap _icon;
+    private Size<Integer> _size = new Size<>(-1, -1);
 
     public Settings(IScreenNavigator navigator, SettingsService settings, Context context) {
         _navigator = navigator;
@@ -58,7 +60,7 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
     @Override
     public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
         Matrix.setIdentityM(_view, 0);
-        _layout.draw(delta, projMatrix, _view, renderer, new Position<>(0f, 0f));
+        _layout.draw(delta, projMatrix, _view, renderer, new Position<>(0f, 0f), _size);
     }
 
     @Override
@@ -68,6 +70,7 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
 
     @Override
     public void onResize(int width, int height) {
+        _size = new Size<>(width, height);
         _layout.onResize(width, height);
         _colorPickerScreen.onResize(width, height);
     }

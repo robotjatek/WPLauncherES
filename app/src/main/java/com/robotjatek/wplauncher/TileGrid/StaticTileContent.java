@@ -61,12 +61,12 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
-                     Tile tile, Position<Float> position, Size<Float> size) {
+                     Tile tile, Position<Float> position, Size<Integer> size) {
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);
             TileUtil.deleteTexture(_iconTextureId);
-            _textureId = TileUtil.createTextTexture("", size.width().intValue(), size.height().intValue(),
+            _textureId = TileUtil.createTextTexture("", size.width(), size.height(),
                     48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);
 
@@ -75,7 +75,6 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                     300, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
 
             _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.title);
-            _titleLayout.onResize(size.width().intValue(), size.height().intValue()); // TODO: ez elég hacky itt
             _dirty = false;
         }
 
@@ -88,7 +87,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
 
         drawBackground(projMatrix, viewMatrix, renderer, position, size, _textureId);
-        _titleLayout.draw(delta, projMatrix, viewMatrix, renderer, position);
+        _titleLayout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
      //   drawIcon(projMatrix, viewMatrix, renderer, width, height, x, y);
         if (!_notifications.isEmpty()) {
         //    drawNotificationCount(projMatrix, viewMatrix, renderer, width, height, x, y, tile);
@@ -112,7 +111,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         renderer.draw(projMatrix, _modelMatrix, _iconTextureId);
     }
 
-    private void drawBackground(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Position<Float> position, Size<Float> size, int texId) {
+    private void drawBackground(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Position<Float> position, Size<Integer> size, int texId) {
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);

@@ -53,8 +53,7 @@ public class FlexLayout implements ILayout {
 
     private final List<UIElement> _children = new ArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
-    private float _width;
-    private float _height;
+    private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _modelMatrix = new float[16];
     private final JustifyContent _justify;
     private final AlignItems _align;
@@ -95,9 +94,9 @@ public class FlexLayout implements ILayout {
         // horizontal alignment based on justify
         var childX = switch (_justify.justify()) {
             case START -> 0;
-            case END -> _width - totalWidth;
+            case END -> _size.width() - totalWidth;
             case CENTER -> {
-                var offset = (_width - totalWidth) / 2;
+                var offset = (_size.width() - totalWidth) / 2;
                 yield _justify.safe ? Math.max(0, offset) : offset;
             }
         };
@@ -107,8 +106,8 @@ public class FlexLayout implements ILayout {
             var size = child.measure();
             var childY = switch (_align) {
                 case START, STRETCH -> 0f;
-                case END -> _height - size.height();
-                case CENTER -> (_height - size.height()) / 2;
+                case END -> _size.height() - size.height();
+                case CENTER -> (_size.height() - size.height()) / 2;
             };
 
             _layoutInfo.put(child, new LayoutInfo(childX, childY));
@@ -134,9 +133,9 @@ public class FlexLayout implements ILayout {
         // vertical alignment based on justify
         var childY = switch (_justify.justify()) {
             case START -> 0f;
-            case END -> _height - totalHeight;
+            case END -> _size.height() - totalHeight;
             case CENTER -> {
-                var offset = (_height - totalHeight) / 2;
+                var offset = (_size.height() - totalHeight) / 2;
                 yield _justify.safe() ? Math.max(0, offset) : offset;
             }
         };
@@ -145,8 +144,8 @@ public class FlexLayout implements ILayout {
             var size = child.measure();
             var childX = switch (_align) {
                 case START -> 0;
-                case END -> _width - size.width();
-                case CENTER -> (_width - size.width()) / 2;
+                case END -> _size.width() - size.width();
+                case CENTER -> (_size.width() - size.width()) / 2;
                 case STRETCH -> throw new UnsupportedOperationException("Implement UI element resize first");
             };
 
@@ -162,19 +161,18 @@ public class FlexLayout implements ILayout {
 
     @Override
     public void onResize(int width, int height) {
-        _width = width;
-        _height = height;
+        _size = new Size<>(width, height);
         _dirty = true;
     }
 
     @Override
     public int getWidth() {
-        return (int)_width;
+        return _size.width();
     }
 
     @Override
     public int getHeight() {
-        return (int)_height;
+        return _size.height();
     }
 
     @Override
@@ -183,7 +181,12 @@ public class FlexLayout implements ILayout {
     }
 
     @Override
-    public void draw(float delta, float[] proj, float[] viewMatrix, QuadRenderer renderer, Position<Float> position) {
+    public void draw(float delta, float[] proj, float[] viewMatrix, QuadRenderer renderer,
+                     Position<Float> position, Size<Integer> size) {
+        if (!_size.equals(size)) {
+            _size = size;
+            _dirty = true;
+        }
         if (_dirty) {
             layout();
             _dirty = false;

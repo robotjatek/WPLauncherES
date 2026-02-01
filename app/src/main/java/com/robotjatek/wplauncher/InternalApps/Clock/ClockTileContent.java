@@ -41,7 +41,7 @@ public class ClockTileContent implements ITileContent {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, Position<Float> position, Size<Float> size) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, Position<Float> position, Size<Integer> size) {
         if (_dirty) {
             redraw(tile, size);
         }
@@ -85,7 +85,7 @@ public class ClockTileContent implements ITileContent {
         }
     }
 
-    private void redraw(Tile tile, Size<Float> size) {
+    private void redraw(Tile tile, Size<Integer> size) {
         TileUtil.deleteTexture(_bgTexture);
         _bgTexture = BitmapUtil.createTextureFromBitmap(
                 BitmapUtil.createRect(1, 1, 0, tile.bgColor));
@@ -94,14 +94,14 @@ public class ClockTileContent implements ITileContent {
         TileUtil.deleteTexture(_clockTexture);
         var fontSize = tile.getSize().equals(Tile.SMALL) ? 80 : 160;
         _clockTexture = TileUtil.createTextTexture(time,
-                size.width().intValue(),
-                size.height().intValue(),
+                size.width(),
+                size.height(),
                 fontSize, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
 
         TileUtil.deleteTexture(_locationTexture);
         _locationTexture = TileUtil.createTextTexture(_location,
-                size.width().intValue(),
-                size.height().intValue(),
+                size.width(),
+                size.height(),
                 72, Typeface.NORMAL,
                 Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.RIGHT, VerticalAlign.TOP);
         _dirty = false;
@@ -113,7 +113,7 @@ public class ClockTileContent implements ITileContent {
     }
 
     private void drawTexture(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
-                             Position<Float> position, Size<Float> size, int textureId) {
+                             Position<Float> position, Size<Integer> size, int textureId) {
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);

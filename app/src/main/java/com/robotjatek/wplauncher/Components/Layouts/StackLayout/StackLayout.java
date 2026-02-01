@@ -36,7 +36,8 @@ public class StackLayout implements ILayout {
     }
 
     @Override
-    public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position) {
+    public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position,
+                     Size<Integer> size) {
         Matrix.translateM(view, 0, position.x(), position.y() + TOP_MARGIN_PX, 0);
         for (var child : _children) {
             child.draw(proj, view, this, renderer);

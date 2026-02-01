@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Checkbox.Checkbox;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -26,6 +27,7 @@ public class Clock implements IScreen {
     private final Context _context;
     private boolean _locationEnabled;
     private final float[] _pageMatrix = new float[16];
+    private Size<Integer> _size = new Size<>(-1, -1);
 
     public Clock(IScreenNavigator navigator, Context context) {
         _navigator = navigator;
@@ -74,7 +76,7 @@ public class Clock implements IScreen {
     @Override
     public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
         Matrix.setIdentityM(_pageMatrix, 0);
-        _layout.draw(delta, projMatrix, _pageMatrix, renderer, new Position<>(0f, 0f));
+        _layout.draw(delta, projMatrix, _pageMatrix, renderer, new Position<>(0f, 0f), _size);
     }
 
     @Override
@@ -84,6 +86,7 @@ public class Clock implements IScreen {
 
     @Override
     public void onResize(int width, int height) {
+        _size = new Size<>(width, height);
         _layout.onResize(width, height);
     }
 

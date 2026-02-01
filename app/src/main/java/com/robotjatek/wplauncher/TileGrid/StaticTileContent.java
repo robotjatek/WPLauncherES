@@ -10,6 +10,7 @@ import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.FlexLayout.FlexLayout;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.INotificationChangedListener;
@@ -59,12 +60,12 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, float x, float y, float width, float height) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, Position<Float> position, Size<Float> size) {
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);
             TileUtil.deleteTexture(_iconTextureId);
-            _textureId = TileUtil.createTextTexture("", (int) width, (int) height,
+            _textureId = TileUtil.createTextTexture("", size.width().intValue(), size.height().intValue(),
                     48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);
 
@@ -73,7 +74,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                     300, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
 
             _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.title);
-            _titleLayout.onResize((int) width, (int) height); // TODO: ez elég hacky itt
+            _titleLayout.onResize(size.width().intValue(), size.height().intValue()); // TODO: ez elég hacky itt
             _dirty = false;
         }
 
@@ -85,8 +86,8 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         // TODO: add icon
 
 
-        drawBackground(projMatrix, viewMatrix, renderer, x, y, width, height, _textureId);
-        _titleLayout.draw(delta, projMatrix, viewMatrix, renderer, new Position<>(x, y));
+        drawBackground(projMatrix, viewMatrix, renderer, position, size, _textureId);
+        _titleLayout.draw(delta, projMatrix, viewMatrix, renderer, position);
      //   drawIcon(projMatrix, viewMatrix, renderer, width, height, x, y);
         if (!_notifications.isEmpty()) {
         //    drawNotificationCount(projMatrix, viewMatrix, renderer, width, height, x, y, tile);
@@ -110,10 +111,10 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         renderer.draw(projMatrix, _modelMatrix, _iconTextureId);
     }
 
-    private void drawBackground(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, float correctedX, float correctedY, float width, float height, int texId) {
+    private void drawBackground(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Position<Float> position, Size<Float> size, int texId) {
         Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, correctedX, correctedY, 0f);
-        Matrix.scaleM(_modelMatrix, 0, width, height, 1);
+        Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
+        Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         renderer.draw(projMatrix, _modelMatrix, texId);
     }
@@ -138,6 +139,8 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         _textureId = -1;
         _iconTextureId = -1;
         _notificationCountTextureId = -1;
+
+        _titleLayout.dispose();
     }
 
     @Override

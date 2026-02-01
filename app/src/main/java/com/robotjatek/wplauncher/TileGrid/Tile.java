@@ -16,6 +16,7 @@ public class Tile {
     public int bgColor;
     private final DragInfo _dragInfo = new DragInfo();
     private final ITileContent _content;
+    private float _scale = 1.0f;
 
     public Tile(Position<Integer> position, Size<Integer> size, String title, App app, int bgColor, ITileContent content) {
         _position = position;
@@ -29,10 +30,10 @@ public class Tile {
     /**
      * Draw matrix with an offset of its original position. Scaling can be applied
      */
-    public void drawWithOffsetScaled(float delta, float[] projMatrix, float[] viewMatrix, float scale,
-                                     Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
-        var width = drawContext.widthOf(this) * scale;
-        var height = drawContext.heightOf(this) * scale;
+    public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
+                               Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
+        var width = drawContext.widthOf(this) * _scale;
+        var height = drawContext.heightOf(this) * _scale;
         var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
         var yDiff = (height - drawContext.heightOf(this)) / 2; // correction for the scaling
 
@@ -84,6 +85,10 @@ public class Tile {
 
     public void setPosition(Position<Integer> position) {
         _position = position;
+    }
+
+    public void setScale(float scale) {
+        _scale = scale;
     }
 
     public void dispose() {

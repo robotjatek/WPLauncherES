@@ -102,14 +102,12 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
             if (tile == _selectedTile) {
                 continue;
             }
-            var scale = _selectedTile == null ? 1.0f : 0.95f;
-            tile.drawWithOffsetScaled(delta, projMatrix, scrollMatrix, scale, Position.ZERO, _tileDrawContext, renderer);
+            tile.drawWithOffset(delta, projMatrix, scrollMatrix, Position.ZERO, _tileDrawContext, renderer);
         }
 
         // render the selected tile with different scaling, and on its current drag position
         if (_selectedTile != null) {
-            _selectedTile.drawWithOffsetScaled(delta, projMatrix, scrollMatrix,
-                    1.00f,
+            _selectedTile.drawWithOffset(delta, projMatrix, scrollMatrix,
                     new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
                     _tileDrawContext,
                     renderer);
@@ -199,15 +197,23 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     public void selectTile(Tile tile) {
         _commands.add(() -> {
+            for (var t : _tiles) {
+                t.setScale(0.95f);
+            }
+
             _selectedTile = tile;
+            _selectedTile.setScale(1f);
             _selectedTile.getDragInfo().reset();
         });
     }
 
     public void cancelSelection() {
-        if (_selectedTile != null) {
-            _commands.add(() -> _selectedTile = null);
-        }
+        _commands.add(() -> {
+            for (var tile : _tiles) {
+                tile.setScale(1f);
+            }
+            _selectedTile = null;
+        });
     }
 
     @Override

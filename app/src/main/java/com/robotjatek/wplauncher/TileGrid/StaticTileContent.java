@@ -60,7 +60,8 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, Position<Float> position, Size<Float> size) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
+                     Tile tile, Position<Float> position, Size<Float> size) {
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
             TileUtil.deleteTexture(_textureId);

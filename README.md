@@ -1,6 +1,6 @@
 # WPLauncher ES
 
-A reimplementation of my old WPLauncher project using OpenGL ES. 
+A reimplementation of my original WPLauncher project using OpenGL ES. 
 The goal remains the same: a WP7/8 style launcher, now with no external UI frameworks.
 
 ## Planned features
@@ -22,7 +22,7 @@ The goal remains the same: a WP7/8 style launcher, now with no external UI frame
 
 ## Milestones
 
-### M1
+### M1 - POC / pre-alpha
 
 M1 is all about laying the groundwork. Don't expect anything fancy here. At this phase the application is barely usable.
 
@@ -49,12 +49,12 @@ M1 is all about laying the groundwork. Don't expect anything fancy here. At this
 
 Consolidation
 
-- [x] Extracting draw contexts
+- [x] Extract draw contexts
 - [x] Applist state machine (also fixed fling to keep momentum)
 - [x] Tilegrid state machine
 - [x] Fix de-select bug when rearranging tiles
 
-### M2
+### M2 - MVP / alpha
 
 M2 is the beginning to make the launcher usable in everyday use-cases.
 
@@ -63,7 +63,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
     - [ ] Notification Center
     - [x] Launcher settings
     - [x] Show notification count on tiles
-    - [ ] Show notification content on corresponding tiles
+    - [x] Show notification content on corresponding tiles
 - [x] Change accent color
 - [x] Settings service
 - [x] Persist settings
@@ -86,17 +86,20 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Checkbox border
 - [ ] Fix: pin the same tile multiple times
 - [ ] Fix: tile overlap after resize
+- [ ] Remove uninstalled app from the applist/tilegrid
 - [ ] TBD
 
-### M3
+### M3 - beta
 
 M3 is the preparation for a first public beta release.
 
 - [ ] GLES 3.0
-- [ ] More tiles
+- [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
   - [ ] Photos
   - [ ] Weather
+  - [ ] Messenger
+  - [ ] Messages
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Generic carousel view
 - [ ] Optimizations
@@ -107,7 +110,7 @@ M3 is the preparation for a first public beta release.
 - [ ] Radiobutton
 - [ ] First public beta version (?)
 
-### M4
+### M4 - RC
 
 - [ ] Landscape mode support
 - [ ] Background image with transparent tiles

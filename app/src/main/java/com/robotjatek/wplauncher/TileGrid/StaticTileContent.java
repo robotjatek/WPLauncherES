@@ -58,13 +58,17 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
             _layout.clear();
             _layout.addChild(_icon, new Position<>(iconX, iconY));
-            // Fixed padding for title - always 10px from left, 60px from bottom
             _layout.addChild(_titleLabel, new Position<>(10f, size.height().floatValue() - 60));
-            // Notification badge - scales with tile
-            var offset = tile.getSize().equals(Tile.WIDE) ? 0 : size.width() / 10f + 10;
-            var x = (size.width() - iconSize) / 2f + offset;
-            var y = (size.height() - iconSize) / 2f + size.height() / 7f;
-            _layout.addChild(_notificationLabel, new Position<>(x, y));
+
+            if (!_notifications.isEmpty()) {
+                // Notification badge
+                var offset = tile.getSize().equals(Tile.WIDE) ? 0 : size.width() / 10f + 30;
+                var x = (size.width() - iconSize) / 2f + offset;
+                var y = (size.height() - iconSize) / 2f + size.height() / 7f;
+                _layout.addChild(_notificationLabel, new Position<>(x, y));
+            } else {
+                _layout.removeChild(_notificationLabel);
+            }
 
             _dirty = false;
         }
@@ -74,11 +78,17 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
     public void dispose() {
         _layout.dispose(); // Root should dispose all of its children including the nested layouts
+        NotificationListener.unsubscribe(this);
     }
 
     @Override
     public void forceRedraw() {
         _dirty = true;
+    }
+
+    @Override
+    public boolean hasContent() {
+        return true;
     }
 
     @Override
@@ -92,11 +102,6 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
             if (!isGroup) {
                 _notifications.add(n);
             }
-
-//            var title = n.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE);
-//            var text = n.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT);
-//            var messages = n.getNotification().extras.getCharSequence(Notification.EXTRA_MESSAGES);
-//            var summary = n.getNotification().extras.getCharSequence(Notification.EXTRA_SUMMARY_TEXT);
         }
         _dirty = true;
     }

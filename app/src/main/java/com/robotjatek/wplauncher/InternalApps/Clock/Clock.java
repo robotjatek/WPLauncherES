@@ -2,15 +2,17 @@ package com.robotjatek.wplauncher.InternalApps.Clock;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Checkbox.Checkbox;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.Shader;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,20 +24,19 @@ public class Clock implements IScreen {
 
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
-
-    private final Shader _shader = new Shader("","");
-    private final QuadRenderer _renderer = new QuadRenderer(_shader);
     private final Context _context;
     private boolean _locationEnabled;
+    private final float[] _pageMatrix = new float[16];
+    private Size<Integer> _size = new Size<>(-1, -1);
 
     public Clock(IScreenNavigator navigator, Context context) {
         _navigator = navigator;
         _context = context;
         loadSettings();
 
-        _layout = new StackLayout(_renderer);
+        _layout = new StackLayout();
         _layout.addChild(new Label("CLOCK", 52, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("Settings", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout.addChild(new Label("settings", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Checkbox("Show location on tile when available", _locationEnabled, (b) -> {
             _locationEnabled = b;
             persistSettings();
@@ -73,8 +74,9 @@ public class Clock implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix) {
-        _layout.draw(delta, projMatrix);
+    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
+        Matrix.setIdentityM(_pageMatrix, 0);
+        _layout.draw(delta, projMatrix, _pageMatrix, renderer, new Position<>(0f, 0f), _size);
     }
 
     @Override
@@ -84,6 +86,7 @@ public class Clock implements IScreen {
 
     @Override
     public void onResize(int width, int height) {
+        _size = new Size<>(width, height);
         _layout.onResize(width, height);
     }
 
@@ -106,7 +109,5 @@ public class Clock implements IScreen {
     public void dispose() {
         persistSettings();
         _layout.dispose();
-        _shader.delete();
-        _renderer.dispose();
     }
 }

@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 
 public class Adorner {
@@ -21,7 +22,7 @@ public class Adorner {
         _relativePosition = relativePosition;
     }
 
-    public void draw(float[] proj, float[] view) {
+    public void draw(float[] proj, float[] view, QuadRenderer renderer) {
         var x = _context.xOf(this);
         var y = _context.yOf(this);
         var w = _context.widthOf(this);
@@ -31,7 +32,7 @@ public class Adorner {
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w, h, 1);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        _context.getRenderer().draw(proj, _modelMatrix, _textureId);
+        renderer.draw(proj, _modelMatrix, _textureId);
     }
 
     public void onTap() {

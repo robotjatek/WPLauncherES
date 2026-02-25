@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher.TileGrid;
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.QuadRenderer;
 
 public class Tile {
     public static final Size<Integer> SMALL = new Size<>(1, 1);
@@ -15,6 +16,7 @@ public class Tile {
     public int bgColor;
     private final DragInfo _dragInfo = new DragInfo();
     private final ITileContent _content;
+    private float _scale = 1.0f;
 
     public Tile(Position<Integer> position, Size<Integer> size, String title, App app, int bgColor, ITileContent content) {
         _position = position;
@@ -28,16 +30,18 @@ public class Tile {
     /**
      * Draw matrix with an offset of its original position. Scaling can be applied
      */
-    public void drawWithOffsetScaled(float[] projMatrix, float[] viewMatrix, float scale, Position<Float> offset, IDrawContext<Tile> drawContext) {
-        var width = drawContext.widthOf(this) * scale;
-        var height = drawContext.heightOf(this) * scale;
+    public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
+                               Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
+        var width = (int) (drawContext.widthOf(this) * _scale);
+        var height = (int) (drawContext.heightOf(this) * _scale);
         var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
         var yDiff = (height - drawContext.heightOf(this)) / 2; // correction for the scaling
 
         var correctedX = drawContext.xOf(this) + offset.x() - xDiff; // x corrected by the scaling and the offset
         var correctedY = drawContext.yOf(this) + offset.y() - yDiff; // y corrected by the scaling and the offset
 
-        _content.draw(projMatrix, viewMatrix, drawContext.getRenderer(), this, correctedX, correctedY, width, height);
+        _content.draw(delta, projMatrix, viewMatrix, renderer, this,
+                new Position<>(correctedX, correctedY), new Size<>(width, height));
     }
 
     public void onTap() {
@@ -81,6 +85,11 @@ public class Tile {
 
     public void setPosition(Position<Integer> position) {
         _position = position;
+    }
+
+    public void setScale(float scale) {
+        _scale = scale;
+        _content.forceRedraw();
     }
 
     public void dispose() {

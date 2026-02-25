@@ -2,107 +2,78 @@ package com.robotjatek.wplauncher.TileGrid;
 
 import android.app.Notification;
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 import android.service.notification.StatusBarNotification;
 
 import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
-import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.Components.Icon.Icon;
+import com.robotjatek.wplauncher.Components.Label.Label;
+import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.INotificationChangedListener;
 import com.robotjatek.wplauncher.Services.NotificationListener;
-import com.robotjatek.wplauncher.TileUtil;
-import com.robotjatek.wplauncher.VerticalAlign;
 
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class StaticTileContent implements ITileContent, INotificationChangedListener {
-    private static final int ICON_SIZE_PX = 512;
-    private final float[] _modelMatrix = new float[16];
-    private int _textureId = -1;
-    private int _iconTextureId = -1;
-    private int _notificationCountTextureId = -1;
+
     private boolean _dirty = true;
     private final String _packageName;
     private final Deque<StatusBarNotification> _notifications = new ConcurrentLinkedDeque<>();
+    private final Label _titleLabel;
+    private final Icon _icon;
+    private final AbsoluteLayout _layout;
+    private final Label _notificationLabel;
 
     public StaticTileContent(App app) {
         _packageName = app.packageName();
         NotificationListener.subscribe(this);
+        _titleLabel = new Label("My App", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+        _icon = new Icon(app.icon());
+        _layout = new AbsoluteLayout();
+        _notificationLabel = new Label("", 64, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
     }
 
     @Override
-    public void draw(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, float x, float y, float width, float height) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
+                     Tile tile, Position<Float> position, Size<Integer> size) {
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
-            TileUtil.deleteTexture(_textureId);
-            TileUtil.deleteTexture(_iconTextureId);
-            var title = tile.getSize().equals(Tile.SMALL) ? "" : tile.title; // Don't show the title when the when the tile is small
-            _textureId = TileUtil.createTextTexture(title, (int) width, (int) height,
-                    48, Typeface.BOLD, Colors.WHITE, tile.bgColor, HorizontalAlign.LEFT, VerticalAlign.BOTTOM);
-            _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);
+            var iconSize = Math.min(size.width(), size.height()) / 2;
+            _icon.setSize(new Size<>(iconSize, iconSize));
+            _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.title);
+            _layout.setBgColor(tile.bgColor);
 
-            TileUtil.deleteTexture(_notificationCountTextureId);
-            _notificationCountTextureId = TileUtil.createTextTexture(_notifications.size() + "", ICON_SIZE_PX, ICON_SIZE_PX,
-                    300, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
+            // Icon centered
+            var iconX = (size.width() - iconSize) / 2f;
+            var iconY = (size.height() - iconSize) / 2f;
+
+            // Move icon slightly to left when there are notifications
+            if (!_notifications.isEmpty()) {
+                iconX -= size.width() / 4f;
+                _notificationLabel.setText(_notifications.size()+"");
+            }
+
+            _layout.clear();
+            _layout.addChild(_icon, new Position<>(iconX, iconY));
+            // Fixed padding for title - always 10px from left, 60px from bottom
+            _layout.addChild(_titleLabel, new Position<>(10f, size.height().floatValue() - 60));
+            // Notification badge - scales with tile
+            var offset = tile.getSize().equals(Tile.WIDE) ? 0 : size.width() / 10f + 10;
+            var x = (size.width() - iconSize) / 2f + offset;
+            var y = (size.height() - iconSize) / 2f + size.height() / 7f;
+            _layout.addChild(_notificationLabel, new Position<>(x, y));
 
             _dirty = false;
         }
 
-        drawBackground(projMatrix, viewMatrix, renderer, x, y, width, height, _textureId);
-        drawIcon(projMatrix, viewMatrix, renderer, width, height, x, y);
-        if (!_notifications.isEmpty()) {
-            drawNotificationCount(projMatrix, viewMatrix, renderer, width, height, x, y, tile);
-        }
-    }
-
-    private void drawIcon(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, float width, float height, float correctedX, float correctedY) {
-        // Center icon, keep aspect ratio on wide tiles
-        var iconSize = Math.min(width, height) / 2;
-        var iconX = correctedX + (width - iconSize) / 2;
-        var iconY = correctedY + (height - iconSize) / 2;
-        // Move icon slightly to left when there are notifications
-        if (!_notifications.isEmpty()) {
-            iconX -= width / 4;
-        }
-
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, iconX, iconY, 0f);
-        Matrix.scaleM(_modelMatrix, 0, iconSize, iconSize, 1);
-        Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(projMatrix, _modelMatrix, _iconTextureId);
-    }
-
-    private void drawBackground(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, float correctedX, float correctedY, float width, float height, int texId) {
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, correctedX, correctedY, 0f);
-        Matrix.scaleM(_modelMatrix, 0, width, height, 1);
-        Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(projMatrix, _modelMatrix, texId);
-    }
-
-    private void drawNotificationCount(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, float width, float height, float correctedX, float correctedY, Tile tile) {
-        var size = Math.min(width, height) / 2; // keep aspect ratio on wide tile
-        var offset = tile.getSize().equals(Tile.WIDE) ? 0 : width / 10;
-        var x = correctedX + (width - size) / 2 + offset;
-        var y = correctedY + (height - size) / 2 + height / 7;
-
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0f);
-        Matrix.scaleM(_modelMatrix, 0, size, size, 1);
-        Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(projMatrix, _modelMatrix, _notificationCountTextureId);
+        _layout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
     }
 
     public void dispose() {
-        TileUtil.deleteTexture(_textureId);
-        TileUtil.deleteTexture(_iconTextureId);
-        TileUtil.deleteTexture(_notificationCountTextureId);
-        _textureId = -1;
-        _iconTextureId = -1;
-        _notificationCountTextureId = -1;
+        _layout.dispose(); // Root should dispose all of its children including the nested layouts
     }
 
     @Override

@@ -21,6 +21,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     private final float[] _projMatrix = new float[16];
     private int _topInset = 0;
     private final LocationService _locationService;
+    private Shader _shader;
+    private QuadRenderer _renderer;
 
     public LauncherRenderer(Context context, LocationService locationService) {
         _context = context;
@@ -30,10 +32,12 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     @Override
     public void onSurfaceCreated(javax.microedition.khronos.opengles.GL10 glUnused,
                                  javax.microedition.khronos.egl.EGLConfig config) {
+        // Init screens and every GL related objects in surfaceCreated so no accidental gl calls before the surface is ready
         GLES20.glClearColor(0f, 0f, 0f, 1f);
         GLES20.glEnable(GLES20.GL_CULL_FACE);
         GLES20.glFrontFace(GLES20.GL_CW);
-        // Init screens in surfaceCreated so no accidental gl calls before the surface is ready
+        _shader = new Shader("","");
+        _renderer = new QuadRenderer(_shader);
         _navigationStack.push(new StartScreen(_context, this, _locationService));
     }
 
@@ -49,7 +53,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
             fpsTime = System.currentTimeMillis();
         }
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-        _navigationStack.getFirst().draw(delta, _projMatrix); // TODO: animation
+        _navigationStack.getFirst().draw(delta, _projMatrix, _renderer); // TODO: animation
     }
 
     @Override
@@ -88,6 +92,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
     public void dispose() {
         _navigationStack.forEach(IScreen::dispose);
+        _renderer.dispose();
+        _shader.delete();
     }
 
     public void setInsets(int left, int top, int right, int bottom) {

@@ -2,11 +2,13 @@ package com.robotjatek.wplauncher.Components.Layouts.StackLayout;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,9 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class StackLayout implements ILayout {
-    private final float[] _viewMatrix = new float[16];
     public static final int TOP_MARGIN_PX = 0;
-    private final QuadRenderer _renderer;
     private final List<UIElement> _children = new ArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
     private final StackLayoutDrawContext _drawContext;
@@ -26,8 +26,7 @@ public class StackLayout implements ILayout {
 
     private UIElement _tapStartedOn;
 
-    public StackLayout(QuadRenderer renderer) {
-        _renderer = renderer;
+    public StackLayout() {
         _drawContext = new StackLayoutDrawContext(this);
     }
 
@@ -37,11 +36,11 @@ public class StackLayout implements ILayout {
     }
 
     @Override
-    public void draw(float delta, float[] proj) {
-        Matrix.setIdentityM(_viewMatrix, 0);
-        Matrix.translateM(_viewMatrix, 0, 0, TOP_MARGIN_PX, 0);
+    public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position,
+                     Size<Integer> size) {
+        Matrix.translateM(view, 0, position.x(), position.y() + TOP_MARGIN_PX, 0);
         for (var child : _children) {
-            child.draw(proj, _viewMatrix, this);
+            child.draw(proj, view, _drawContext, renderer);
         }
     }
 
@@ -87,11 +86,6 @@ public class StackLayout implements ILayout {
     @Override
     public IDrawContext<UIElement> getContext() {
         return _drawContext;
-    }
-
-    @Override
-    public QuadRenderer getRenderer() {
-        return _renderer;
     }
 
     @Override

@@ -4,10 +4,11 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
@@ -30,20 +31,22 @@ public class Label implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout) {
-        var context = layout.getContext();
-        var x = context.xOf(this);
-        var y = context.yOf(this);
-        var w = context.widthOf(this);
-        var h = context.heightOf(this);
+    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+        var x = drawContext.xOf(this);
+        var y = drawContext.yOf(this);
+        var w = (int)drawContext.widthOf(this);
+        var h = (int)drawContext.heightOf(this);
 
         if (_dirty) {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
             }
+            if (w == 0 || h == 0) {
+                return; // Do not draw invisible element
+            }
             _textureId = TileUtil.createTextTexture(_text,
-                    (int) w,
-                    (int) h,
+                    w,
+                    h,
                     _textSize,
                     _typeFace,
                     _textColor,
@@ -53,15 +56,19 @@ public class Label implements UIElement {
             _dirty = false;
         }
 
+        if (w == 0 || h == 0) {
+            return; // Do not draw invisible element
+        }
+
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        layout.getContext().getRenderer().draw(proj, _modelMatrix, _textureId);
+        renderer.draw(proj, _modelMatrix, _textureId);
     }
 
     @Override
-    public Size<Float> measure() {
+    public Size<Integer> measure() {
         var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
@@ -69,11 +76,16 @@ public class Label implements UIElement {
         var textWidth = paint.measureText(_text);
         var fm = paint.getFontMetrics();
         var textHeight = fm.descent - fm.ascent;
-        return new Size<>(textWidth, textHeight);
+        return new Size<>((int)textWidth, (int)textHeight);
     }
 
     public String getText() {
         return _text;
+    }
+
+    public void setText(String text) {
+        _text = text;
+        _dirty = true;
     }
 
     public int getBgColor() {

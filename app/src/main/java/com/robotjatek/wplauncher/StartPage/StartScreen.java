@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.Services.LocationService;
@@ -86,14 +87,14 @@ public class StartScreen implements IPageNavigator, IScreen {
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
     }
 
-    public void draw(float delta, float[] projMatrix) {
+    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
         _tileService.executeCommands();
         for (var i = 0; i < _pages.size(); i++) {
             var xOffset = (i - _currentPage) * _screenWidth + _pageOffset;
             Matrix.setIdentityM(pageMatrix, 0);
             Matrix.translateM(pageMatrix, 0, xOffset, 0, 0);
 
-            _pages.get(i).draw(delta, projMatrix, pageMatrix);
+            _pages.get(i).draw(delta, projMatrix, pageMatrix, renderer);
         }
         _state.update(delta);
     }

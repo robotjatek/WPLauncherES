@@ -1,7 +1,7 @@
 package com.robotjatek.wplauncher;
 
 public interface IScreen {
-    void draw(float delta, float[] projMatrix);
+    void draw(float delta, float[] projMatrix, QuadRenderer renderer);
     void onBackPressed();
     void onResize(int width, int height);
     void onTouchStart(float x, float y);

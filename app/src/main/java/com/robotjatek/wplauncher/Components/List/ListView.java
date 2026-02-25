@@ -54,9 +54,9 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     private int _viewPortHeight;
     private ContextMenu<T> _contextMenu;
 
-    public ListView(QuadRenderer renderer) {
-        _drawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this, renderer);
-        _contextMenuDrawContext = new ContextMenuDrawContext<>(0, _viewPortHeight, renderer);
+    public ListView() {
+        _drawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
+        _contextMenuDrawContext = new ContextMenuDrawContext<>(0, _viewPortHeight);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, float[] viewMatrix) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {
         _state.update(delta);
         Matrix.setIdentityM(scrollMatrix, 0);
         Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
@@ -73,12 +73,12 @@ public class ListView<T> implements IItemListContainer<T>, Page {
 
         for (var i : _items) {
             i.update(_drawContext);
-            i.draw(projMatrix, scrollMatrix, _drawContext);
+            i.draw(projMatrix, scrollMatrix, _drawContext, renderer);
         }
 
         // Draw the context menu last so it shows up above everything else
         if (_contextMenu != null && _contextMenu.isOpened()) {
-            _contextMenu.draw(projMatrix, viewMatrix);
+            _contextMenu.draw(projMatrix, viewMatrix, renderer);
         }
     }
 
@@ -129,7 +129,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
 
     public ContextMenu<T> openContextMenu(float x, float y, T item) {
         if (_contextMenu != null) {
-            _contextMenu.open(new Position(x, y), item);
+            _contextMenu.open(new Position<>(x, y), item);
         }
         return _contextMenu;
     }

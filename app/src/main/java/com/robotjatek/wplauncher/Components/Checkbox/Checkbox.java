@@ -12,6 +12,8 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
@@ -19,7 +21,7 @@ import com.robotjatek.wplauncher.VerticalAlign;
 import java.util.function.Consumer;
 
 public class Checkbox implements UIElement {
-    private static final float TOGGLE_SIZE = 100;
+    private static final int TOGGLE_SIZE = 100;
     private final String _label;
     private boolean _state;
     private final Consumer<Boolean> _onChange;
@@ -37,12 +39,12 @@ public class Checkbox implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, ILayout layout) {
+    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         // Available draw space
-        var x = layout.getContext().xOf(this);
-        var y = layout.getContext().yOf(this);
-        var w = (int) layout.getContext().widthOf(this);
-        var h = (int) layout.getContext().heightOf(this);
+        var x = drawContext.xOf(this);
+        var y = drawContext.yOf(this);
+        var w = (int) drawContext.widthOf(this);
+        var h = (int) drawContext.heightOf(this);
 
         if (_dirty) {
             TileUtil.deleteTexture(_stateTexture);
@@ -61,19 +63,19 @@ public class Checkbox implements UIElement {
             Matrix.translateM(_modelMatrix, 0, x, y, 0);
             Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE, TOGGLE_SIZE, 0);
             Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-            layout.getContext().getRenderer().draw(proj, _modelMatrix, _stateTexture);
+            renderer.draw(proj, _modelMatrix, _stateTexture);
         }
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x + TOGGLE_SIZE, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w - TOGGLE_SIZE, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        layout.getContext().getRenderer().draw(proj, _modelMatrix, _labelTexture);
+        renderer.draw(proj, _modelMatrix, _labelTexture);
     }
 
     @Override
-    public Size<Float> measure() {
-        return new Size<>(0f, TOGGLE_SIZE);
+    public Size<Integer> measure() {
+        return new Size<>(0, TOGGLE_SIZE);
     }
 
     @Override

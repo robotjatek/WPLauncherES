@@ -43,14 +43,14 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
         return _isOpened;
     }
 
-    public void draw(float[] proj, float[] view) {
+    public void draw(float[] proj, float[] view, QuadRenderer renderer) {
         var menuHeight = calculateHeight();
         // Currently I only draw the child elements
         Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
         Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0); // Menu height is based on the number of items
         for (var i = 0; i < _options.size(); i++) {
             // draw each option
-            _options.get(i).draw(proj, view);
+            _options.get(i).draw(proj, view, renderer);
         }
     }
 
@@ -62,11 +62,6 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
     public void dispose() {
         _options.forEach(MenuOption::dispose);
         _options.clear();
-    }
-
-    @Override
-    public QuadRenderer getRenderer() {
-        return _context.getRenderer();
     }
 
     @Override

@@ -103,6 +103,14 @@ public class NotificationListener extends NotificationListenerService {
         }
     }
 
+    public static void unsubscribe(INotificationChangedListener listener) {
+        if (_instance != null && _instance.isConnected()) {
+            _instance._listeners.remove(listener);
+        } else {
+            _pendingListeners.remove(listener);
+        }
+    }
+
     private void notifyListeners() {
         for (var l : _listeners) {
             l.onChange();

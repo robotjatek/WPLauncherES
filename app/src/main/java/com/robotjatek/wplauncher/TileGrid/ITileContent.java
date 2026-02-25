@@ -9,4 +9,5 @@ public interface ITileContent {
 
     void dispose();
     void forceRedraw();
+    boolean hasContent();
 }

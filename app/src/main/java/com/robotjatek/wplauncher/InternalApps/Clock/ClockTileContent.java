@@ -146,4 +146,9 @@ public class ClockTileContent implements ITileContent {
     public void forceRedraw() {
         _dirty = true;
     }
+
+    @Override
+    public boolean hasContent() {
+        return true;
+    }
 }

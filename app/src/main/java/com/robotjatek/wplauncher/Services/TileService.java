@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.InternalApps.Clock.ClockTileContent;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
+import com.robotjatek.wplauncher.TileGrid.NotificationSurface;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.StaticTileContent;
 import com.robotjatek.wplauncher.TileGrid.Tile;
@@ -172,7 +173,8 @@ public class TileService implements OnChangeListener<AccentColor> {
                     title,
                     app,
                     _settingsService.getAccentColor().color(),
-                    new ClockTileContent(_context, _locationService));
+                    new ClockTileContent(_context, _locationService),
+                    null);
         }
 
         return new Tile(position,
@@ -180,7 +182,8 @@ public class TileService implements OnChangeListener<AccentColor> {
                 title,
                 app,
                 _settingsService.getAccentColor().color(),
-                new StaticTileContent(app));
+                new StaticTileContent(app),
+                new NotificationSurface(app));
     }
 
     public void persistTiles() {

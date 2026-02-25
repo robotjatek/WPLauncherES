@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.TextBox.TextBox;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.INotificationChangedListener;
 import com.robotjatek.wplauncher.Services.NotificationListener;
@@ -31,13 +32,13 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     private final List<InternalNotification> _notifications = Collections.synchronizedList(new ArrayList<>());
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _titleLabel = new Label("Should not be seen", 48, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
-    private final Label _textLabel = new Label("", 32, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT); // TODO: make it a textbox with textwrap
+    private final TextBox _textBox = new TextBox("", 32, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400);
 
     public NotificationSurface(App app) {
         _packageName = app.packageName();
         NotificationListener.subscribe(this);
         _layout.addChild(_titleLabel, new Position<>(0f, 0f));
-        _layout.addChild(_textLabel, new Position<>(0f, 0f));
+        _layout.addChild(_textBox, new Position<>(0f, 0f));
     }
 
     @Override
@@ -48,12 +49,17 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
             if (!_notifications.isEmpty()) {
                 var currentNotification = _notifications.get(_currentNotificationId);
                 _titleLabel.setText(currentNotification.title());
-                _textLabel.setText(currentNotification.message());
+                _textBox.setText(currentNotification.message());
                 var titleX = position.x() + 50;
                 var titleY = position.y() + 100;
-                var a = _titleLabel.measure().height();
+                var titleHeight = _titleLabel.measure().height();
                 _layout.setChildPosition(_titleLabel, new Position<>(titleX, titleY));
-                _layout.setChildPosition(_textLabel, new Position<>(titleX, titleY + a));
+                _layout.setChildPosition(_textBox, new Position<>(titleX, titleY + titleHeight));
+                var messageMaxWidth = (int)(size.width() - titleX);
+                var messageMaxHeight = (int)(size.height() - titleY - titleHeight);
+                _textBox.setMaxWidth(messageMaxWidth);
+                _textBox.setMaxHeight(messageMaxHeight);
+
             }
             _dirty = false;
         }
@@ -101,6 +107,6 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     public void dispose() {
         NotificationListener.unsubscribe(this);
         _titleLabel.dispose();
-        _textLabel.dispose();
+        _textBox.dispose();
     }
 }

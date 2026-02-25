@@ -59,11 +59,16 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
             _layout.clear();
             _layout.addChild(_icon, new Position<>(iconX, iconY));
             _layout.addChild(_titleLabel, new Position<>(10f, size.height().floatValue() - 60));
-            // Notification badge
-            var offset = tile.getSize().equals(Tile.WIDE) ? 0 : size.width() / 10f + 30;
-            var x = (size.width() - iconSize) / 2f + offset;
-            var y = (size.height() - iconSize) / 2f + size.height() / 7f;
-            _layout.addChild(_notificationLabel, new Position<>(x, y));
+
+            if (!_notifications.isEmpty()) {
+                // Notification badge
+                var offset = tile.getSize().equals(Tile.WIDE) ? 0 : size.width() / 10f + 30;
+                var x = (size.width() - iconSize) / 2f + offset;
+                var y = (size.height() - iconSize) / 2f + size.height() / 7f;
+                _layout.addChild(_notificationLabel, new Position<>(x, y));
+            } else {
+                _layout.removeChild(_notificationLabel);
+            }
 
             _dirty = false;
         }

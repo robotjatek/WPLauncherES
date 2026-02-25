@@ -41,6 +41,10 @@ public class AbsoluteLayout implements ILayout {
         _dirty = true;
     }
 
+    public void removeChild(UIElement element) {
+        _positionedElements.removeIf(layout -> layout._element.equals(element));
+    }
+
     public void setChildPosition(UIElement element, Position<Float> position) {
         for (var child : _positionedElements) {
             if (child._element == element) {

@@ -113,8 +113,8 @@ public class FlexLayout implements ILayout, UIElement {
         _layoutInfo.clear();
 
         // First pass: measure fixed-size children and calculate total flex-grow
-        float totalWidth = 0f;
-        float totalFlexGrow = 0f;
+        var totalWidth = 0f;
+        var totalFlexGrow = 0f;
 
         for (var child : _children) {
             if (child instanceof FlexLayout childLayout && childLayout.getFlexGrow() > 0) {
@@ -126,7 +126,7 @@ public class FlexLayout implements ILayout, UIElement {
         }
 
         // Calculate remaining space for flex items
-        float remainingSpace = Math.max(0, _size.width() - totalWidth);
+        var remainingSpace = Math.max(0, _size.width() - totalWidth);
 
         // horizontal alignment based on justify (only applies if no flex-grow)
         var childX = 0f;
@@ -176,8 +176,8 @@ public class FlexLayout implements ILayout, UIElement {
         _layoutInfo.clear();
 
         // First pass: measure fixed-size children and calculate total flex-grow
-        float totalHeight = 0f;
-        float totalFlexGrow = 0f;
+        var totalHeight = 0f;
+        var totalFlexGrow = 0f;
 
         for (var child : _children) {
             if (child instanceof FlexLayout childLayout && childLayout.getFlexGrow() > 0) {
@@ -189,7 +189,7 @@ public class FlexLayout implements ILayout, UIElement {
         }
 
         // Calculate remaining space for flex items
-        float remainingSpace = Math.max(0, _size.height() - totalHeight);
+        var remainingSpace = Math.max(0, _size.height() - totalHeight);
 
         // vertical alignment based on justify (only applies if no flex-grow)
         var childY = 0f;

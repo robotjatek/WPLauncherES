@@ -89,6 +89,7 @@ public class Tile {
 
     public void setScale(float scale) {
         _scale = scale;
+        _content.forceRedraw();
     }
 
     public void dispose() {

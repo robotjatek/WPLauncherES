@@ -8,6 +8,7 @@ import android.service.notification.StatusBarNotification;
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.FlexLayout.FlexLayout;
 import com.robotjatek.wplauncher.Components.Size;
@@ -35,12 +36,12 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     private final FlexLayout _titleLayout;
     private final FlexLayout _iconLayout;
     private final Label _titleLabel;
+    private final Icon _icon;
 
     public StaticTileContent(App app) {
         _packageName = app.packageName();
         NotificationListener.subscribe(this);
 
-        // TODO: add icon layout (stretch mode)?
         // TODO: add icon
         _rootLayout = new FlexLayout(
                 new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.START, true),
@@ -60,8 +61,10 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                 new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.CENTER, false), // Center vertically
                 FlexLayout.AlignItems.CENTER, // Center horizontally
                 FlexLayout.Direction.COLUMN);
-        _iconLayout.setFlexGrow(1f); // <-- THIS IS THE MAGIC
-        _iconLayout.addChild(_titleLabel); // TODO: label is just a placeholder before the icon UIElement is implemented
+        _iconLayout.setFlexGrow(1f);
+        _icon = new Icon(app.icon());
+        _iconLayout.addChild(_icon);
+
 
         _rootLayout.addChild(_iconLayout);  // Icon first (takes remaining space)
         _rootLayout.addChild(_titleLayout); // Title last (fixed at bottom)
@@ -75,9 +78,11 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
             TileUtil.deleteTexture(_iconTextureId);
             _iconTextureId = BitmapUtil.createTextureFromDrawable(tile.getApp().icon(), ICON_SIZE_PX, ICON_SIZE_PX);
 
-            TileUtil.deleteTexture(_notificationCountTextureId); // Don't show the title when the when the tile is small
+            TileUtil.deleteTexture(_notificationCountTextureId); // Don't show the title when the tile is small
             _notificationCountTextureId = TileUtil.createTextTexture(_notifications.size() + "", ICON_SIZE_PX, ICON_SIZE_PX,
                     300, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
+            var iconSize = Math.min(size.width(), size.height()) / 2;
+            _icon.setSize(new Size<>(iconSize, iconSize));
 
             _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.title);
             _rootLayout.setBgColor(tile.bgColor);

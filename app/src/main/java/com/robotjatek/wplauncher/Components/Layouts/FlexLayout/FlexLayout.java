@@ -19,11 +19,10 @@ import java.util.List;
 import java.util.Map;
 
 // TODO: layout padding
-// TODO: allow to put other layouts as children
 /**
  * A minimal flex layout implementation
  */
-public class FlexLayout implements ILayout {
+public class FlexLayout implements ILayout, UIElement {
     public enum Direction {
         ROW,
         COLUMN
@@ -38,7 +37,7 @@ public class FlexLayout implements ILayout {
     /**
      * Controls the alignment of all items on the main axis (vertical align if column, horizontal if row)
      * @param justify
-     * @param safe Only overflow to right if centered, keeping the left side inside the container)
+     * @param safe Only overflow to right if centered, keeping the left side inside the container
      */
     public record JustifyContent(JustifyContentEnum justify, boolean safe) {}
 
@@ -60,6 +59,7 @@ public class FlexLayout implements ILayout {
     private final JustifyContent _justify;
     private final AlignItems _align;
     private final Direction _direction;
+    private float _flexGrow = 0f;
     private final IDrawContext<UIElement> _itemDrawContext;
     private boolean _dirty = true;
     private int _bgColor = Colors.TRANSPARENT;
@@ -73,6 +73,23 @@ public class FlexLayout implements ILayout {
         _align = align;
         _direction = direction;
         _itemDrawContext = new FlexLayoutItemDrawContext(this);
+    }
+
+    public AlignItems getAlign() {
+        return _align;
+    }
+
+    public Direction getDirection() {
+        return _direction;
+    }
+
+    public void setFlexGrow(float grow) {
+        _flexGrow = grow;
+        _dirty = true;
+    }
+
+    public float getFlexGrow() {
+        return _flexGrow;
     }
 
     public void addChild(UIElement element) {
@@ -94,72 +111,127 @@ public class FlexLayout implements ILayout {
 
     private void layoutRow() {
         _layoutInfo.clear();
-        var totalWidth = 0f;
+
+        // First pass: measure fixed-size children and calculate total flex-grow
+        float totalWidth = 0f;
+        float totalFlexGrow = 0f;
+
         for (var child : _children) {
-            var size = child.measure();
-            totalWidth += size.width();
+            if (child instanceof FlexLayout childLayout && childLayout.getFlexGrow() > 0) {
+                totalFlexGrow += childLayout.getFlexGrow();
+            } else {
+                var size = child.measure();
+                totalWidth += size.width();
+            }
         }
 
-        // horizontal alignment based on justify
-        var childX = switch (_justify.justify()) {
-            case START -> 0;
-            case END -> _size.width() - totalWidth;
-            case CENTER -> {
-                var offset = (_size.width() - totalWidth) / 2;
-                yield _justify.safe ? Math.max(0, offset) : offset;
-            }
-        };
+        // Calculate remaining space for flex items
+        float remainingSpace = Math.max(0, _size.width() - totalWidth);
 
-        // vertical alignment based on align + store layout info
+        // horizontal alignment based on justify (only applies if no flex-grow)
+        var childX = 0f;
+        if (totalFlexGrow == 0) {
+            childX = switch (_justify.justify()) {
+                case START -> 0f;
+                case END -> _size.width() - totalWidth;
+                case CENTER -> {
+                    var offset = (_size.width() - totalWidth) / 2f;
+                    yield _justify.safe ? Math.max(0, offset) : offset;
+                }
+            };
+        }
+
+        // Second pass: layout children
         for (var child : _children) {
-            var size = child.measure();
+            float childWidth;
+
+            // Check if this child should grow
+            if (child instanceof FlexLayout childLayout && childLayout.getFlexGrow() > 0) {
+                // This child gets a portion of remaining space
+                childWidth = (remainingSpace / totalFlexGrow) * childLayout.getFlexGrow();
+                // Resize the child layout
+                var naturalSize = childLayout.measure();
+                childLayout.onResize(
+                        (int) childWidth,
+                        _align == AlignItems.STRETCH ? _size.height() : naturalSize.height().intValue()
+                );
+            } else {
+                var size = child.measure();
+                childWidth = size.width();
+            }
+
+            var childHeight = child.measure().height();
             var childY = switch (_align) {
                 case START, STRETCH -> 0f;
-                case END -> _size.height() - size.height();
-                case CENTER -> (_size.height() - size.height()) / 2;
+                case END -> _size.height() - childHeight;
+                case CENTER -> (_size.height() - childHeight) / 2f;
             };
 
             _layoutInfo.put(child, new LayoutInfo(childX, childY));
-
-            if (_align == AlignItems.STRETCH) {
-                throw new UnsupportedOperationException("Implement UI element resize");
-            }
-
-            childX += size.width();
+            childX += childWidth;
         }
     }
+
     private void layoutColumn() {
         _layoutInfo.clear();
 
-        // measure total height of items
-        var totalHeight = 0f;
+        // First pass: measure fixed-size children and calculate total flex-grow
+        float totalHeight = 0f;
+        float totalFlexGrow = 0f;
+
         for (var child : _children) {
-            // TODO: handle if the child is a layout itself
-            var size = child.measure();
-            totalHeight += size.height();
+            if (child instanceof FlexLayout childLayout && childLayout.getFlexGrow() > 0) {
+                totalFlexGrow += childLayout.getFlexGrow();
+            } else {
+                var size = child.measure();
+                totalHeight += size.height();
+            }
         }
 
-        // vertical alignment based on justify
-        var childY = switch (_justify.justify()) {
-            case START -> 0f;
-            case END -> _size.height() - totalHeight;
-            case CENTER -> {
-                var offset = (_size.height() - totalHeight) / 2;
-                yield _justify.safe() ? Math.max(0, offset) : offset;
-            }
-        };
-        // horizontal alignment + store layout info
+        // Calculate remaining space for flex items
+        float remainingSpace = Math.max(0, _size.height() - totalHeight);
+
+        // vertical alignment based on justify (only applies if no flex-grow)
+        var childY = 0f;
+        if (totalFlexGrow == 0) {
+            childY = switch (_justify.justify()) {
+                case START -> 0f;
+                case END -> _size.height() - totalHeight;
+                case CENTER -> {
+                    var offset = (_size.height() - totalHeight) / 2f;
+                    yield _justify.safe() ? Math.max(0, offset) : offset;
+                }
+            };
+        }
+
+        // Second pass: layout children
         for (var child : _children) {
-            var size = child.measure();
+            float childHeight;
+
+            // Check if this child should grow
+            if (child instanceof FlexLayout childLayout && childLayout.getFlexGrow() > 0) {
+                // This child gets a portion of remaining space
+                childHeight = (remainingSpace / totalFlexGrow) * childLayout.getFlexGrow();
+                // Resize the child layout
+                var naturalSize = childLayout.measure();
+                childLayout.onResize(
+                        _align == AlignItems.STRETCH ? _size.width() : naturalSize.width().intValue(),
+                        (int) childHeight
+                );
+            } else {
+                var size = child.measure();
+                childHeight = size.height();
+            }
+
+            var childWidth = child.measure().width();
             var childX = switch (_align) {
-                case START -> 0;
-                case END -> _size.width() - size.width();
-                case CENTER -> (_size.width() - size.width()) / 2;
-                case STRETCH -> throw new UnsupportedOperationException("Implement UI element resize first");
+                case START, STRETCH -> 0;
+                case END -> _size.width() - childWidth;
+                case CENTER -> (_size.width() - childWidth) / 2;
             };
 
             _layoutInfo.put(child, new LayoutInfo(childX, childY));
-            childY += size.height();
+            childY += childHeight;
         }
     }
 
@@ -187,29 +259,6 @@ public class FlexLayout implements ILayout {
     @Override
     public LayoutInfo getLayoutInfo(UIElement item) {
         return _layoutInfo.get(item);
-    }
-
-    class FlexLayoutDrawContext implements IDrawContext<FlexLayout> {
-
-        @Override
-        public float xOf(FlexLayout element) {
-            return 0;
-        }
-
-        @Override
-        public float yOf(FlexLayout element) {
-            return 0;
-        }
-
-        @Override
-        public float widthOf(FlexLayout element) {
-            return 0;
-        }
-
-        @Override
-        public float heightOf(FlexLayout element) {
-            return 0;
-        }
     }
 
     @Override
@@ -266,9 +315,64 @@ public class FlexLayout implements ILayout {
     }
 
     @Override
+    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+        // when drawn as a child
+        var x = drawContext.xOf(this);
+        var y = drawContext.yOf(this);
+        var width = (int) drawContext.widthOf(this);
+        var height = (int) drawContext.heightOf(this);
+
+        // call the ILayout draw method
+        draw(0, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
+    }
+
+    @Override
+    public Size<Integer> measure() {
+        // If we've been explicitly sized, return that
+        if (_size.width() != -1 && _size.height() != -1) {
+            var s = new Size<>(_size.width(), _size.height());
+            _size = s;
+            return s;
+        }
+
+        // Otherwise, calculate intrinsic size based on children and direction
+        if (_children.isEmpty()) {
+            _size = new Size<>(0, 0);
+            return _size;
+        }
+
+        if (_direction == Direction.COLUMN) {
+            var totalHeight = 0;
+            var maxWidth = 0;
+            for (var child : _children) {
+                var childSize = child.measure();
+                totalHeight += childSize.height();
+                maxWidth = Math.max(maxWidth, childSize.width());
+            }
+            _size = new Size<>(maxWidth, totalHeight);
+            return _size;
+        } else { // ROW
+            var totalWidth = 0;
+            var maxHeight = 0;
+            for (var child : _children) {
+                var childSize = child.measure();
+                totalWidth += childSize.width();
+                maxHeight = Math.max(maxHeight, childSize.height());
+            }
+            _size = new Size<>(totalWidth, maxHeight);
+            return _size;
+        }
+    }
+
+    @Override
     public void dispose() {
         _children.forEach(UIElement::dispose);
         _children.clear();
         TileUtil.deleteTexture(_bgTexture);
+    }
+
+    @Override
+    public void onTap() {
+        // Ignore for now
     }
 }

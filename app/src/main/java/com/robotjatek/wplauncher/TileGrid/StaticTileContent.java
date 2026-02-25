@@ -33,27 +33,38 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
     private final FlexLayout _rootLayout;
     private final FlexLayout _titleLayout;
+    private final FlexLayout _iconLayout;
     private final Label _titleLabel;
 
     public StaticTileContent(App app) {
         _packageName = app.packageName();
         NotificationListener.subscribe(this);
+
+        // TODO: add icon layout (stretch mode)?
+        // TODO: add icon
         _rootLayout = new FlexLayout(
                 new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.START, true),
-                FlexLayout.AlignItems.START,
+                FlexLayout.AlignItems.STRETCH, // Stretch horizontally
                 FlexLayout.Direction.COLUMN);
 
+        // Title layout - fixed height (whatever the label needs)
         _titleLayout = new FlexLayout(
                 new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.END, false),
                 FlexLayout.AlignItems.START,
                 FlexLayout.Direction.COLUMN);
-         _titleLabel = new Label("", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+        _titleLabel = new Label("My App", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
         _titleLayout.addChild(_titleLabel);
-       // _titleLayout.addChild(new Label("Másik", 48, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT));
 
-        //_rootLayout.addChild(_titleLayout); // TODO: make it happen
-        // rootLayout.addChild(iconLayout);
-        // TODO: when calling draw on a root layout call draw for all child layouts
+        // Icon layout - grows to fill remaining space
+        _iconLayout = new FlexLayout(
+                new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.CENTER, false), // Center vertically
+                FlexLayout.AlignItems.CENTER, // Center horizontally
+                FlexLayout.Direction.COLUMN);
+        _iconLayout.setFlexGrow(1f); // <-- THIS IS THE MAGIC
+        _iconLayout.addChild(_titleLabel); // TODO: label is just a placeholder before the icon UIElement is implemented
+
+        _rootLayout.addChild(_iconLayout);  // Icon first (takes remaining space)
+        _rootLayout.addChild(_titleLayout); // Title last (fixed at bottom)
     }
 
     @Override
@@ -69,18 +80,13 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                     300, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.CENTER, VerticalAlign.CENTER);
 
             _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.title);
-            _titleLayout.setBgColor(tile.bgColor); // TODO: ez majd a rootLayoutba kell
+            _rootLayout.setBgColor(tile.bgColor);
+            _titleLayout.setBgColor(tile.bgColor);
+            _iconLayout.setBgColor(tile.bgColor);
             _dirty = false;
         }
 
-        // TODO: stretch behavior for size
-//        var iconLayout = new FlexLayout(
-//                new FlexLayout.JustifyContent(FlexLayout.JustifyContentEnum.CENTER, false),
-//                FlexLayout.AlignItems.CENTER,
-//                FlexLayout.Direction.COLUMN);
-        // TODO: add icon
-
-        _titleLayout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
+        _rootLayout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
      //   drawIcon(projMatrix, viewMatrix, renderer, width, height, x, y);
         if (!_notifications.isEmpty()) {
         //    drawNotificationCount(projMatrix, viewMatrix, renderer, width, height, x, y, tile);
@@ -122,8 +128,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         TileUtil.deleteTexture(_notificationCountTextureId);
         _iconTextureId = -1;
         _notificationCountTextureId = -1;
-
-        _titleLayout.dispose();
+        _rootLayout.dispose(); // Root should dispose all of its children including the nested layouts
     }
 
     @Override

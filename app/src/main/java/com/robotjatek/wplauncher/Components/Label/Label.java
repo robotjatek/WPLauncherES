@@ -19,15 +19,21 @@ public class Label implements UIElement {
     private int _typeFace;
     private int _textColor;
     private int _bgColor;
+    private int _maxWidth; // -1 means no limit
     private boolean _dirty = true;
     private int _textureId = -1;
 
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
+        this(text, textSize, typeFace, textColor, bgColor, -1);
+    }
+
+    public Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
         _text = text;
         _textSize = textSize;
         _typeFace = typeFace;
         _textColor = textColor;
         _bgColor = bgColor;
+        _maxWidth = maxWidth;
     }
 
     @Override
@@ -44,7 +50,11 @@ public class Label implements UIElement {
             if (w == 0 || h == 0) {
                 return; // Do not draw invisible element
             }
-            _textureId = TileUtil.createTextTexture(_text,
+
+            // Truncate text if it exceeds max width
+            var displayText = _maxWidth > 0 ? truncateText(_text, _maxWidth) : _text;
+
+            _textureId = TileUtil.createTextTexture(displayText,
                     w,
                     h,
                     _textSize,
@@ -67,13 +77,64 @@ public class Label implements UIElement {
         renderer.draw(proj, _modelMatrix, _textureId);
     }
 
+    private String truncateText(String text, int maxWidth) {
+        var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
+        paint.setTextSize(_textSize);
+
+        var textWidth = paint.measureText(text);
+
+        // Text fits - no truncation needed
+        if (textWidth <= maxWidth) {
+            return text;
+        }
+
+        // Need to truncate - binary search for the right length
+        var ellipsis = "...";
+        var ellipsisWidth = paint.measureText(ellipsis);
+        var availableWidth = maxWidth - ellipsisWidth;
+
+        if (availableWidth <= 0) {
+            return ellipsis;
+        }
+
+        // Binary search for optimal length
+        var left = 0;
+        var right = text.length();
+        var bestLength = 0;
+
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            var substring = text.substring(0, mid);
+            var substringWidth = paint.measureText(substring);
+
+            if (substringWidth <= availableWidth) {
+                bestLength = mid;
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+
+        return text.substring(0, bestLength) + ellipsis;
+    }
+
     @Override
     public Size<Integer> measure() {
         var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
         paint.setTextSize(_textSize);
-        var textWidth = paint.measureText(_text);
+
+        var displayText = _maxWidth > 0 ? truncateText(_text, _maxWidth) : _text;
+        var textWidth = paint.measureText(displayText);
+
+        // If max width is set, don't exceed it
+        if (_maxWidth > 0 && textWidth > _maxWidth) {
+            textWidth = _maxWidth;
+        }
+
         var fm = paint.getFontMetrics();
         var textHeight = fm.descent - fm.ascent;
         return new Size<>((int)textWidth, (int)textHeight);
@@ -85,6 +146,11 @@ public class Label implements UIElement {
 
     public void setText(String text) {
         _text = text;
+        _dirty = true;
+    }
+
+    public void setMaxWidth(int maxWidth) {
+        _maxWidth = maxWidth;
         _dirty = true;
     }
 
@@ -113,5 +179,4 @@ public class Label implements UIElement {
     public void dispose() {
         TileUtil.deleteTexture(_textureId);
     }
-
 }

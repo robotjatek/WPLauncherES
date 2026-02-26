@@ -31,8 +31,8 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     private final String _packageName;
     private final List<InternalNotification> _notifications = Collections.synchronizedList(new ArrayList<>());
     private final AbsoluteLayout _layout = new AbsoluteLayout();
-    private final Label _titleLabel = new Label("Should not be seen", 48, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
-    private final TextBox _textBox = new TextBox("", 32, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400);
+    private final Label _titleLabel = new Label("Should not be seen", 56, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+    private final TextBox _textBox = new TextBox("", 52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400);
 
     public NotificationSurface(App app) {
         _packageName = app.packageName();
@@ -57,6 +57,7 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
                 _layout.setChildPosition(_textBox, new Position<>(titleX, titleY + titleHeight));
                 var messageMaxWidth = (int)(size.width() - titleX);
                 var messageMaxHeight = (int)(size.height() - titleY - titleHeight);
+                _titleLabel.setMaxWidth(messageMaxWidth);
                 _textBox.setMaxWidth(messageMaxWidth);
                 _textBox.setMaxHeight(messageMaxHeight);
 

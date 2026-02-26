@@ -87,6 +87,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Fix: pin the same tile multiple times
 - [ ] Fix: tile overlap after resize
 - [ ] Remove uninstalled app from the applist/tilegrid
+- [ ] Fix: Tile bg after resize 
 - [ ] TBD
 
 ### M3 - beta

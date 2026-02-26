@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
+// TODO: use absoluteLayout
 public class ClockTileContent implements ITileContent {
     private final float[] _modelMatrix = new float[16];
     private int _clockTexture;

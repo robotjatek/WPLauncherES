@@ -31,6 +31,9 @@ public class Icon implements UIElement {
         var h = (int)drawContext.heightOf(this);
 
         if (_dirty) {
+            if (_textureId > 0) {
+                TileUtil.deleteTexture(_textureId);
+            }
             _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, ICON_TEX_SIZE_PX, ICON_TEX_SIZE_PX);
             _dirty = false;
         }

@@ -40,7 +40,7 @@ public class Tile {
     }
 
     /**
-     * Draw matrix with an offset of its original position. Scaling can be applied
+     * Draw matrix with an offset of its original position
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
                                Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {

@@ -63,7 +63,7 @@ public class NotificationListener extends NotificationListenerService {
         var packageName = sbn.getPackageName();
         var appNotifications = _notifications.get(packageName);
 
-        // If its a group notification remove the whole group from the list
+        // If it is a group notification remove the whole group from the list
         var isGroupNotification = (sbn.getNotification().flags & Notification.FLAG_GROUP_SUMMARY) != 0;
         if (isGroupNotification) {
             if (appNotifications != null) {

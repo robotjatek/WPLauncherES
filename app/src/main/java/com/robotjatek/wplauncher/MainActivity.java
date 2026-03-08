@@ -8,6 +8,7 @@ import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.Settings;
 
@@ -20,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.NotificationListener;
 
@@ -29,6 +31,7 @@ public class MainActivity extends ComponentActivity {
     private LauncherSurfaceView _surface;
     private ActivityResultLauncher<String> _locationPermission;
     private final LocationService _locationService = new LocationService(this);
+    private final AppChangeReceiver _appChangeReceiver = new AppChangeReceiver();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,7 +41,7 @@ public class MainActivity extends ComponentActivity {
                 new ActivityResultContracts.RequestPermission(),
                 _locationService::setHasPermission);
 
-        _surface = new LauncherSurfaceView(this, _locationService);
+        _surface = new LauncherSurfaceView(this, _locationService, _appChangeReceiver);
         _surface.setPreserveEGLContextOnPause(true);
         ViewCompat.setOnApplyWindowInsetsListener(_surface, (view, insets) -> {
             var sys = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -61,6 +64,16 @@ public class MainActivity extends ComponentActivity {
 
         ensureLocationPermission();
         ensureNotificationPermission();
+        setupAppChangeListener();
+    }
+
+    private void setupAppChangeListener() {
+        var filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
+        filter.addDataScheme("package");
+        registerReceiver(_appChangeReceiver, filter);
     }
 
     private void ensureNotificationPermission() {
@@ -102,5 +115,8 @@ public class MainActivity extends ComponentActivity {
     protected void onDestroy() {
         super.onDestroy();
         _surface.dispose();
+        if (_appChangeReceiver != null) {
+            unregisterReceiver(_appChangeReceiver);
+        }
     }
 }

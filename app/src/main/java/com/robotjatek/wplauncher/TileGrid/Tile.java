@@ -15,22 +15,20 @@ public class Tile {
     private static final float TIME_BEFORE_FLIP_MAX = 8000f;
     private Position<Integer> _position;
     private Size<Integer> _size;
-    public String title;
-    private final App _app;
+    private App _app;
     public int bgColor;
     private final DragInfo _dragInfo = new DragInfo();
     private final ITileContent _content;
     private final ITileContent _backContent;
     private float _scale = 1.0f;
-    private float _rot = 180f;
+    private float _rot = 0;
     private float _targetRot = 180f;
     private float _timeOnSide = 0f;
     private float _flipInterval;
 
-    public Tile(Position<Integer> position, Size<Integer> size, String title, App app, int bgColor, ITileContent content, ITileContent backContent) {
+    public Tile(Position<Integer> position, Size<Integer> size, App app, int bgColor, ITileContent content, ITileContent backContent) {
         _position = position;
         _size = size;
-        this.title = title;
         this.bgColor = bgColor;
         _app = app;
         _content = content;
@@ -40,7 +38,7 @@ public class Tile {
     }
 
     /**
-     * Draw matrix with an offset of its original position. Scaling can be applied
+     * Draw matrix with an offset of its original position
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
                                Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
@@ -122,6 +120,14 @@ public class Tile {
 
     public App getApp() {
         return _app;
+    }
+
+    public void setApp(App app) {
+        _app = app;
+        _content.forceRedraw();
+        if (_backContent != null) {
+            _backContent.forceRedraw();
+        }
     }
 
     public void setBgColor(int color) {

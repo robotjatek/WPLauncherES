@@ -58,9 +58,8 @@ Consolidation
 
 M2 is the beginning to make the launcher usable in everyday use-cases.
 
-- [ ] Start working on "launcher apps/widgets/live tiles"
+- [x] Start working on "launcher apps/widgets/live tiles"
     - [x] Clock
-    - [ ] Notification Center
     - [x] Launcher settings
     - [x] Show notification count on tiles
     - [x] Show notification content on corresponding tiles
@@ -86,8 +85,14 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Checkbox border
 - [ ] Fix: pin the same tile multiple times
 - [ ] Fix: tile overlap after resize
-- [ ] Remove uninstalled app from the applist/tilegrid
-- [ ] Fix: Tile bg after resize 
+- [x] Remove uninstalled app from the applist/tilegrid
+- [ ] Don't show uninstall in the context menu for internal apps
+- [ ] Fix: Tile bg after resize is dark
+- [ ] Adjust notification count on tiles - don't allow overlap with the icon
+- [ ] Fix: Scrolling while swiping on the main screen
+- [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware)
+- [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware)
+- [ ] Fix all TODOs introduced in M2
 - [ ] TBD
 
 ### M3 - beta
@@ -101,6 +106,7 @@ M3 is the preparation for a first public beta release.
   - [ ] Weather
   - [ ] Messenger
   - [ ] Messages
+  - [ ] Contacts
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Generic carousel view
 - [ ] Optimizations

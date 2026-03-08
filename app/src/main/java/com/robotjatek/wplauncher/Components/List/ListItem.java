@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -14,15 +15,15 @@ import com.robotjatek.wplauncher.TileUtil;
 
 public class ListItem<T> {
     private String _label;
-    private final Drawable _icon;
+    private Drawable _icon;
     private int _bgColor;
     private int _iconTextureId;
     private int _bgTextureId;
     private int _textureId;
     private final float[] _modelMatrix = new float[16];
-    private final Runnable _onTap;
+    private Runnable _onTap;
     private boolean _dirty = true;
-    private final T _payload;
+    private T _payload;
 
     public ListItem(String label, Drawable icon, Runnable onTap, T payload, int bgColor) {
         _label = label;
@@ -48,6 +49,19 @@ public class ListItem<T> {
 
     public T getPayload() {
         return _payload;
+    }
+
+    public void setPayload(T payload) {
+        _payload = payload;
+    }
+
+    public void setIcon(Drawable icon) {
+        _icon = icon;
+        _dirty = true;
+    }
+
+    public void setOnTap(Runnable onTap) {
+        _onTap = onTap;
     }
 
     public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<ListItem<T>> context, QuadRenderer renderer) {

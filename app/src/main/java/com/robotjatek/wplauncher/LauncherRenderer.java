@@ -5,6 +5,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
@@ -21,12 +22,14 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     private final float[] _projMatrix = new float[16];
     private int _topInset = 0;
     private final LocationService _locationService;
+    private final AppChangeReceiver _appChangeReceiver;
     private Shader _shader;
     private QuadRenderer _renderer;
 
-    public LauncherRenderer(Context context, LocationService locationService) {
+    public LauncherRenderer(Context context, LocationService locationService, AppChangeReceiver appChangeReceiver) {
         _context = context;
         _locationService = locationService;
+        _appChangeReceiver = appChangeReceiver;
     }
 
     @Override
@@ -38,7 +41,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
         GLES20.glFrontFace(GLES20.GL_CW);
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
-        _navigationStack.push(new StartScreen(_context, this, _locationService));
+        _navigationStack.push(new StartScreen(_context, this, _locationService, _appChangeReceiver));
     }
 
     @Override

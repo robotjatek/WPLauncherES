@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.TileGrid;
 
+import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.QuadRenderer;
 

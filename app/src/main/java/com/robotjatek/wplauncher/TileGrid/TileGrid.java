@@ -5,7 +5,9 @@ import android.opengl.Matrix;
 
 import androidx.core.content.ContextCompat;
 
+import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.IState;
+import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.ITileListChangedListener;
 
 import com.robotjatek.wplauncher.Page;
@@ -24,7 +26,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 // TODO: resize tile
-public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedListener {
+public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedListener, AppChangeReceiver.IAppChangeListener {
 
     public IState IDLE_STATE() {
         return new IdleState(this);
@@ -65,7 +67,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private final Adorner _resizeButton;
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
 
-    public TileGrid(TileService tileService, Context context) {
+    public TileGrid(TileService tileService, Context context, AppChangeReceiver appChangeReceiver) {
         _tileService = tileService;
         _tiles = tileService.getTiles();
         _tileService.subscribe(this);
@@ -85,6 +87,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                 _tileService.resizeTile(_selectedTile);
             }
         }, resizeIcon, new Position<>(1f, 1f), adornerDrawContext);
+        appChangeReceiver.subscribe(this);
     }
 
     @Override
@@ -248,5 +251,11 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     public void dispose() {
         _unpinButton.dispose();
         _resizeButton.dispose();
+    }
+
+    @Override
+    public void onAppReplace(App app) {
+        var tile = _tiles.stream().filter(t -> t.getPackageName().equals(app.packageName())).findFirst();
+        tile.ifPresent(t -> t.setApp(app));
     }
 }

@@ -17,6 +17,7 @@ import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ListView<T> implements IItemListContainer<T>, Page {
@@ -50,7 +51,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     private final ScrollController _scroll = new ScrollController();
     private final ListItemDrawContext<T, ListView<T>> _drawContext;
     private final ContextMenuDrawContext<T> _contextMenuDrawContext;
-    private final List<ListItem<T>> _items = new ArrayList<>();
+    private final List<ListItem<T>> _items = Collections.synchronizedList(new ArrayList<>());
     private int _viewPortHeight;
     private ContextMenu<T> _contextMenu;
 
@@ -111,9 +112,20 @@ public class ListView<T> implements IItemListContainer<T>, Page {
         return _drawContext;
     }
 
+    public void addItem(int index, ListItem<T> item) {
+        _items.add(index, item);
+        setScrollBounds();
+    }
+
     public void addItems(List<ListItem<T>> items) {
         _items.addAll(items);
         _items.forEach(ListItem::setDirty);
+        setScrollBounds();
+    }
+
+    public void removeItem(ListItem<T> item) {
+        _items.remove(item);
+        item.dispose();
         setScrollBounds();
     }
 

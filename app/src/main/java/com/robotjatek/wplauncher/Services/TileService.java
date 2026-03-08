@@ -61,7 +61,7 @@ public class TileService implements OnChangeListener<AccentColor> {
     public void queuePinTile(App app) {
         var lowestPoint = _tiles.stream().mapToInt(t -> t.getPosition().y() + t.getSize().height()).max().orElse(0);
         _tileCommands.add(() -> {
-            var tile = createTile(app.name(), new Position<>(0, lowestPoint), new Size<>(2, 2), app);
+            var tile = createTile(new Position<>(0, lowestPoint), new Size<>(2, 2), app);
             _tiles.add(tile);
             persistTiles();
         });
@@ -135,7 +135,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                         var icon = _context.getPackageManager().getActivityIcon(intent);
                         app = new App(title, packageName, icon, () -> _context.startActivity(intent));
                     }
-                    tiles.add(createTile(title, new Position<>(x, y), new Size<>(colSpan, rowSpan), app));
+                    tiles.add(createTile(new Position<>(x, y), new Size<>(colSpan, rowSpan), app));
                 }
             }
 
@@ -166,11 +166,10 @@ public class TileService implements OnChangeListener<AccentColor> {
         _subscribers.forEach(ITileListChangedListener::tileListChanged);
     }
 
-    private Tile createTile(String title, Position<Integer> position, Size<Integer> size, App app) {
+    private Tile createTile(Position<Integer> position, Size<Integer> size, App app) {
         if (app.packageName().equalsIgnoreCase("launcher:clock")) {
             return new Tile(position,
                     size,
-                    title,
                     app,
                     _settingsService.getAccentColor().color(),
                     new ClockTileContent(_context, _locationService),
@@ -179,7 +178,6 @@ public class TileService implements OnChangeListener<AccentColor> {
 
         return new Tile(position,
                 size,
-                title,
                 app,
                 _settingsService.getAccentColor().color(),
                 new StaticTileContent(app),
@@ -195,7 +193,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                 tileJson.put("y", tile.getPosition().y());
                 tileJson.put("colSpan", tile.getSize().width());
                 tileJson.put("rowSpan", tile.getSize().height());
-                tileJson.put("title", tile.title);
+                tileJson.put("title", tile.getApp().name());
                 tileJson.put("packageName", tile.getPackageName());
                 tileArray.put(tileJson);
             }

@@ -22,18 +22,29 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     private boolean _dirty = true;
     private final String _packageName;
     private final Deque<StatusBarNotification> _notifications = new ConcurrentLinkedDeque<>();
-    private final Label _titleLabel;
-    private final Icon _icon;
+    private Label _titleLabel;
+    private Icon _icon;
     private final AbsoluteLayout _layout;
     private final Label _notificationLabel;
 
     public StaticTileContent(App app) {
         _packageName = app.packageName();
         NotificationListener.subscribe(this);
-        _titleLabel = new Label("My App", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-        _icon = new Icon(app.icon());
+        setApp(app);
         _layout = new AbsoluteLayout();
         _notificationLabel = new Label("", 64, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+    }
+
+    private void setApp(App app) {
+        if (_icon != null) {
+            _icon.dispose();
+        }
+        if (_titleLabel != null) {
+            _titleLabel.dispose();
+        }
+        _icon = new Icon(app.icon());
+        _titleLabel = new Label("", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+        _dirty = true;
     }
 
     @Override
@@ -41,9 +52,10 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                      Tile tile, Position<Float> position, Size<Integer> size) {
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
+            setApp(tile.getApp());
             var iconSize = Math.min(size.width(), size.height()) / 2;
             _icon.setSize(new Size<>(iconSize, iconSize));
-            _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.title);
+            _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.getApp().name());
             _layout.setBgColor(tile.bgColor);
 
             // Icon centered
@@ -67,7 +79,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                 var y = (size.height() - iconSize) / 2f + size.height() / 7f;
                 _layout.addChild(_notificationLabel, new Position<>(x, y));
             } else {
-                _layout.removeChild(_notificationLabel);
+                _layout.removeChild(_notificationLabel); // TODO: leak: removed element is not disposed
             }
 
             _dirty = false;

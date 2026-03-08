@@ -11,11 +11,11 @@ import com.robotjatek.wplauncher.Components.List.ListItem;
 import com.robotjatek.wplauncher.Components.List.ListView;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.Services.AccentColor;
+import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.SettingsService;
-import com.robotjatek.wplauncher.Shader;
 import com.robotjatek.wplauncher.StartPage.IPageNavigator;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.Services.TileService;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AppList implements Page, OnChangeListener<AccentColor> {
+public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeReceiver.IAppChangeListener {
 
     private static final int PAGE_PADDING_PX = 60;
     private int _listWidth;
@@ -34,24 +34,24 @@ public class AppList implements Page, OnChangeListener<AccentColor> {
     private final TileService _tileService;
     private final ContextMenuDrawContext<App> _contextMenuDrawContext;
     private final IPageNavigator _navigator;
-    private final InternalAppsService _internalAppsService;
     private final SettingsService _settingsService;
     private final ListView<App> _list;
 
     public AppList(Context context, IPageNavigator navigator, TileService tileService,
-                   InternalAppsService internalAppsService, SettingsService settingsService) {
-        // TODO: reload results after app install/uninstall
+                   InternalAppsService internalAppsService, SettingsService settingsService,
+                   AppChangeReceiver appChangeReceiver) {
         _context = context;
         _navigator = navigator;
         _tileService = tileService;
         _settingsService = settingsService;
         _settingsService.subscribe(this);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_listWidth, _viewPortHeight);
-        _internalAppsService = internalAppsService;
         _list = new ListView<>();
-        var apps = loadAppList();
-        var newItems = createItems(apps);
-        _list.addItems(newItems);
+        var internalApps = internalAppsService.getInternalApps().stream();
+        var apps = Stream.concat(loadAppList(), internalApps)
+                .sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER)).toList();
+        _list.addItems(createItems(apps));
+        appChangeReceiver.subscribe(this);
     }
 
     @Override
@@ -99,27 +99,29 @@ public class AppList implements Page, OnChangeListener<AccentColor> {
         return menu;
     }
 
-    private List<App> loadAppList() {
-        var internalApps = _internalAppsService.getInternalApps().stream();
+    private Stream<App> loadAppList() {
         var pm = _context.getPackageManager();
         var intent = new Intent(Intent.ACTION_MAIN, null);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         var activities = pm.queryIntentActivities(intent, 0);
-        var installedApps = activities.stream().map(resolveInfo -> {
+
+        return activities.stream().map(resolveInfo -> {
             var label = resolveInfo.loadLabel(pm).toString();
             var packageName = resolveInfo.activityInfo.packageName;
             var icon = resolveInfo.loadIcon(pm);
             var launchIntent = pm.getLaunchIntentForPackage(packageName);
             return new App(label, packageName, icon, () -> _context.startActivity(launchIntent));
-        }).sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER));
-
-        return Stream.concat(internalApps, installedApps).toList();
+        });
     }
 
     private List<ListItem<App>> createItems(List<App> apps) {
-        var bgColor = _settingsService.getAccentColor().color();
-        return apps.stream().map(a -> new ListItem<>(a.name(), a.icon(), a.action(), a, bgColor))
+        return apps.stream().map(this::createItem)
                 .collect(Collectors.toList());
+    }
+
+    private ListItem<App> createItem(App app) {
+        var bgColor = _settingsService.getAccentColor().color();
+        return new ListItem<>(app.name(), app.icon(), app.action(), app, bgColor);
     }
 
     private void uninstallApp(String packageName) {
@@ -148,5 +150,38 @@ public class AppList implements Page, OnChangeListener<AccentColor> {
     @Override
     public void changed(AccentColor changed) {
         _list.getItems().forEach(i -> i.setBgColor(changed.color()));
+    }
+
+    @Override
+    public void onAppRemove(String packageName) {
+        var item = _list.getItems().stream().filter(i -> i.getPayload().packageName().equals(packageName)).findFirst();
+        item.ifPresent(_list::removeItem);
+    }
+
+    @Override
+    public void onAppInstall(App app) {
+        var item = createItem(app);
+        var items = _list.getItems();
+        var insertIndex = 0;
+        for (var i = 0; i < items.size(); i++) {
+            if (app.name().compareToIgnoreCase(items.get(i).getPayload().name()) < 0) {
+                insertIndex = i;
+                break;
+            }
+            insertIndex = i + 1;
+        }
+
+        _list.addItem(insertIndex, item);
+    }
+
+    @Override
+    public void onAppReplace(App app) {
+        var item = _list.getItems().stream().filter(i -> i.getPayload().packageName().equals(app.packageName())).findFirst();
+        item.ifPresent(i -> {
+            i.setLabel(app.name());
+            i.setIcon(app.icon());
+            i.setOnTap(app.action());
+            i.setPayload(app);
+        });
     }
 }

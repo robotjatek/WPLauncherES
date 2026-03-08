@@ -85,13 +85,14 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Checkbox border
 - [ ] Fix: pin the same tile multiple times
 - [ ] Fix: tile overlap after resize
-- [ ] Remove uninstalled app from the applist/tilegrid
+- [x] Remove uninstalled app from the applist/tilegrid
 - [ ] Don't show uninstall in the context menu for internal apps
-- [ ] Fix: Tile bg after resize 
+- [ ] Fix: Tile bg after resize is dark
 - [ ] Adjust notification count on tiles - don't allow overlap with the icon
 - [ ] Fix: Scrolling while swiping on the main screen
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware)
 - [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware)
+- [ ] Fix all TODOs introduced in M2
 - [ ] TBD
 
 ### M3 - beta

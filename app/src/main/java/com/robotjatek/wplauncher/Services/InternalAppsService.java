@@ -34,7 +34,7 @@ public class InternalAppsService {
         var setting = new App("Launcher Settings", SETTINGS_NAME, getAppIcon(SETTINGS_NAME),
                 () -> navigator.push(_settingsScreen));
         _clockScreen = new Clock(navigator, context);
-        var clock = new App("Clock", CLOCK_NAME, getAppIcon(CLOCK_NAME),
+        var clock = new App("Clock HUB", CLOCK_NAME, getAppIcon(CLOCK_NAME),
                 () -> navigator.push(_clockScreen));
 
         _internalApps.put(SETTINGS_NAME, setting);

@@ -92,6 +92,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Fix: Scrolling while swiping on the main screen
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware)
 - [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware)
+- [ ] Fix: some notifications are counted multiple times
 - [ ] Fix all TODOs introduced in M2
 - [ ] TBD
 

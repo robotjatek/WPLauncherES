@@ -29,7 +29,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
     public StaticTileContent(App app) {
         _packageName = app.packageName();
-        NotificationListener.subscribe(this);
+        NotificationListener.subscribe(_packageName, this);
         setApp(app);
         _layout = new AbsoluteLayout();
         _notificationLabel = new Label("", 64, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
@@ -90,7 +90,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
     public void dispose() {
         _layout.dispose(); // Root should dispose all of its children including the nested layouts
-        NotificationListener.unsubscribe(this);
+        NotificationListener.unsubscribe(_packageName, this);
     }
 
     @Override
@@ -104,8 +104,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     }
 
     @Override
-    public void onChange() {
-        // TODO: this now runs on every notification for ALL listeners
+    public void onNotificationsChanged() {
         var notifications = NotificationListener.getInstance().getNotifications(_packageName);
         _notifications.clear();
         for (var n : notifications) {

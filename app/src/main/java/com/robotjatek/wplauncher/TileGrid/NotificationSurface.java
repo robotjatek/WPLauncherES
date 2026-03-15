@@ -36,7 +36,7 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
 
     public NotificationSurface(App app) {
         _packageName = app.packageName();
-        NotificationListener.subscribe(this);
+        NotificationListener.subscribe(_packageName, this);
         _layout.addChild(_titleLabel, new Position<>(0f, 0f));
         _layout.addChild(_textBox, new Position<>(0f, 0f));
     }
@@ -86,7 +86,7 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     }
 
     @Override
-    public void onChange() {
+    public void onNotificationsChanged() {
         var notifications = NotificationListener.getInstance().getNotifications(_packageName);
         _notifications.clear();
         _currentNotificationId = 0;
@@ -106,7 +106,7 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
 
     @Override
     public void dispose() {
-        NotificationListener.unsubscribe(this);
+        NotificationListener.unsubscribe(_packageName, this);
         _titleLabel.dispose();
         _textBox.dispose();
     }

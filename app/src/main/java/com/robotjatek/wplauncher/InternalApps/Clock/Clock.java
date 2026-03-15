@@ -35,7 +35,7 @@ public class Clock implements IScreen {
         loadSettings();
 
         _layout = new StackLayout();
-        _layout.addChild(new Label("CLOCK", 52, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout.addChild(new Label("CLOCK HUB", 52, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("settings", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Checkbox("Show location on tile when available", _locationEnabled, (b) -> {
             _locationEnabled = b;

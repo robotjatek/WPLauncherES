@@ -4,20 +4,19 @@ import android.app.Notification;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class NotificationListener extends NotificationListenerService {
 
-    private final Map<String, List<StatusBarNotification>> _notifications = new HashMap<>();
-    private final Deque<INotificationChangedListener> _listeners = new ArrayDeque<>();
-    private static final Deque<INotificationChangedListener> _pendingListeners = new ConcurrentLinkedDeque<>();
+    private static final Object _lock = new Object();
+    private final Map<String, List<StatusBarNotification>> _notifications = new ConcurrentHashMap<>();
+    private final Map<String, List<INotificationChangedListener>> _listeners = new ConcurrentHashMap<>();
+    private static final Map<String, List<INotificationChangedListener>> _pendingListeners = new ConcurrentHashMap<>();
     private boolean _connected = false;
     private static NotificationListener _instance;
 
@@ -30,19 +29,17 @@ public class NotificationListener extends NotificationListenerService {
     @Override
     public void onListenerConnected() {
         super.onListenerConnected();
-        _connected = true;
-        _listeners.addAll(_pendingListeners);
-        _pendingListeners.clear();
-        _notifications.clear();
-    //    loadActiveNotifications();
-    }
 
-    private void loadActiveNotifications() {
-        var notifications = super.getActiveNotifications();
-        for (var n : notifications) {
-            _notifications.computeIfAbsent(n.getPackageName(), key -> new ArrayList<>()).add(n);
+        synchronized (_lock) {
+            _connected = true;
+
+            // The notification listener is instantiated asynchronously by the system, but subscriptions can be initiated before the service is ready
+            // On connect we move all pending listeners to the real listener list
+            for (var entry : _pendingListeners.entrySet()) {
+                _listeners.computeIfAbsent(entry.getKey(), k -> new CopyOnWriteArrayList<>()).addAll(entry.getValue());
+            }
+            _pendingListeners.clear();
         }
-        notifyListeners();
     }
 
     @Override
@@ -51,9 +48,13 @@ public class NotificationListener extends NotificationListenerService {
         var isGroupNotification = (sbn.getNotification().flags & Notification.FLAG_GROUP_SUMMARY) != 0;
         if (!isGroupNotification) {
             var packageName = sbn.getPackageName();
-            // TODO: wrap SBN into a custom notification
-            _notifications.computeIfAbsent(packageName, key -> new ArrayList<>()).add(sbn);
-            notifyListeners();
+            var appNotifications = _notifications.computeIfAbsent(packageName, key -> new ArrayList<>());
+
+            // An already existing notification was updated:
+            appNotifications.removeIf(n -> Objects.equals(n.getKey(), sbn.getKey()));
+
+            appNotifications.add(sbn);
+            notifyListeners(packageName);
         }
     }
 
@@ -64,6 +65,7 @@ public class NotificationListener extends NotificationListenerService {
         var appNotifications = _notifications.get(packageName);
 
         // If it is a group notification remove the whole group from the list
+        // NOTE: as of now this is kind of a dead code, because I don't store group notifications
         var isGroupNotification = (sbn.getNotification().flags & Notification.FLAG_GROUP_SUMMARY) != 0;
         if (isGroupNotification) {
             if (appNotifications != null) {
@@ -75,45 +77,50 @@ public class NotificationListener extends NotificationListenerService {
             }
         }
 
-        notifyListeners();
+        notifyListeners(packageName);
     }
 
     public List<StatusBarNotification> getNotifications(String packageName){
         return _notifications.getOrDefault(packageName, List.of());
     }
 
-    public void removeNotification(String notificationKey) {
-        cancelNotification(notificationKey);
-    }
-
     /**
-     * Subscribe to notification changes.
+     * Subscribe to notification changes for a specific package.
      * Subscriptions can be made before the system instantiates the service.
-     * Subscribers receive every current notification upon subscription
+     * Subscribers receive the current notification state upon subscription.
      * The notification listener is instantiated asynchronously by the system.
      */
-    public static void subscribe(INotificationChangedListener listener) {
-        if (_instance != null && _instance.isConnected()) {
-            // add directly & make it query all current notifications
-            _instance._listeners.add(listener);
-            listener.onChange();
-        } else {
-            // Service is not instantiated or connected yet, add listener to pending listeners
-            _pendingListeners.add(listener);
+    public static void subscribe(String packageName, INotificationChangedListener listener) {
+        synchronized (_lock) {
+            if (_instance != null && _instance.isConnected()) {
+                _instance._listeners.computeIfAbsent(packageName, k -> new CopyOnWriteArrayList<>()).add(listener);
+                listener.onNotificationsChanged(); // Notify immediately with current state
+            } else {
+                _pendingListeners.computeIfAbsent(packageName, k -> new CopyOnWriteArrayList<>()).add(listener);
+            }
         }
     }
 
-    public static void unsubscribe(INotificationChangedListener listener) {
-        if (_instance != null && _instance.isConnected()) {
-            _instance._listeners.remove(listener);
-        } else {
-            _pendingListeners.remove(listener);
+    public static void unsubscribe(String packageName, INotificationChangedListener listener) {
+        synchronized (_lock) {
+            List<INotificationChangedListener> listeners;
+            if (_instance != null && _instance.isConnected()) {
+                listeners = _instance._listeners.get(packageName);
+            } else {
+                listeners = _pendingListeners.get(packageName);
+            }
+            if (listeners != null) {
+                listeners.remove(listener);
+            }
         }
     }
 
-    private void notifyListeners() {
-        for (var l : _listeners) {
-            l.onChange();
+    private void notifyListeners(String packageName) {
+        var listeners = _listeners.get(packageName);
+        if (listeners != null) {
+            for (var l : listeners) {
+                l.onNotificationsChanged();
+            }
         }
     }
 

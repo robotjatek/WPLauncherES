@@ -258,4 +258,9 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         var tile = _tiles.stream().filter(t -> t.getPackageName().equals(app.packageName())).findFirst();
         tile.ifPresent(t -> t.setApp(app));
     }
+
+    @Override
+    public void onAppRemove(String packageName) {
+        _tileService.queueUnpinTile(packageName);
+    }
 }

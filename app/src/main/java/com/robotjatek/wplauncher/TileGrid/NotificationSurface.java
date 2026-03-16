@@ -25,6 +25,7 @@ record InternalNotification(String title, String message) { }
  */
 public class NotificationSurface implements ITileContent, INotificationChangedListener {
 
+    private boolean _disposed = false;
     private boolean _dirty = true;
     private long _timeOnNotification = 0;
     private int _currentNotificationId = 0;
@@ -106,8 +107,11 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
 
     @Override
     public void dispose() {
-        NotificationListener.unsubscribe(_packageName, this);
-        _titleLabel.dispose();
-        _textBox.dispose();
+        if (!_disposed) {
+            NotificationListener.unsubscribe(_packageName, this);
+            _titleLabel.dispose();
+            _textBox.dispose();
+            _disposed = true;
+        }
     }
 }

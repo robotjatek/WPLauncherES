@@ -41,6 +41,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
         return new ContextMenuState<>(this, x, y);
     }
 
+    private boolean _disposed = false;
     private IState _state = IDLE_STATE();
     public static final int TOP_MARGIN_PX = 0;
     public static final int ITEM_HEIGHT_PX = 128;
@@ -180,9 +181,12 @@ public class ListView<T> implements IItemListContainer<T>, Page {
 
     @Override
     public void dispose() {
-        _items.forEach(ListItem::dispose);
-        if (_contextMenu != null) {
-            _contextMenu.dispose();
+        if (!_disposed) {
+            _items.forEach(ListItem::dispose);
+            if (_contextMenu != null) {
+                _contextMenu.dispose();
+            }
+            _disposed = true;
         }
     }
 }

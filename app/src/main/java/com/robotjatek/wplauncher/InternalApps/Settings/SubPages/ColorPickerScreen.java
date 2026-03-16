@@ -18,6 +18,7 @@ import java.util.List;
 
 public class ColorPickerScreen implements IScreen {
 
+    private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final float[] viewMatrix = new float[16];
     private final ListView<AccentColor> _view;
@@ -78,6 +79,9 @@ public class ColorPickerScreen implements IScreen {
 
     @Override
     public void dispose() {
-        _view.dispose();
+        if (!_disposed) {
+            _view.dispose();
+            _disposed = true;
+        }
     }
 }

@@ -94,6 +94,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Fix all TODOs introduced in M2
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
 - [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware, needs repro)
+- [x] Use AbsoluteLayout in the ClockHUB tile
 - [ ] TBD
 
 ### M3 - beta

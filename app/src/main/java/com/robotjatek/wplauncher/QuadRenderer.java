@@ -11,6 +11,7 @@ import java.nio.ByteOrder;
  */
 public class QuadRenderer {
 
+    private boolean _disposed = false;
     private final int _vboId;
     private final int _iboId;
     private final int _texCoordVBOId;
@@ -126,6 +127,9 @@ public class QuadRenderer {
     }
 
     public void dispose() {
-        GLES20.glDeleteBuffers(3, new int[] { _vboId, _iboId, _texCoordVBOId }, 0);
+        if (!_disposed) {
+            GLES20.glDeleteBuffers(3, new int[] { _vboId, _iboId, _texCoordVBOId }, 0);
+            _disposed = true;
+        }
     }
 }

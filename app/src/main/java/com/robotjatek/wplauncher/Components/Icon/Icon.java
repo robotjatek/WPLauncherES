@@ -13,6 +13,7 @@ import com.robotjatek.wplauncher.TileUtil;
 public class Icon implements UIElement {
 
     private static final int ICON_TEX_SIZE_PX = 512;
+    private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private final Drawable _iconDrawable;
     private int _textureId = -1;
@@ -57,8 +58,12 @@ public class Icon implements UIElement {
 
     @Override
     public void dispose() {
-        if (_textureId > 0) {
-            TileUtil.deleteTexture(_textureId);
+        if (!_disposed) {
+            if (_textureId > 0) {
+                TileUtil.deleteTexture(_textureId);
+                _textureId = -1;
+            }
+            _disposed = true;
         }
     }
 

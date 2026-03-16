@@ -13,6 +13,7 @@ public class Tile {
     public static final Size<Integer> WIDE = new Size<>(4, 2);
     private static final float TIME_BEFORE_FLIP_MIN = 4000f;
     private static final float TIME_BEFORE_FLIP_MAX = 8000f;
+    private boolean _disposed = false;
     private Position<Integer> _position;
     private Size<Integer> _size;
     private App _app;
@@ -175,9 +176,12 @@ public class Tile {
     }
 
     public void dispose() {
-        _content.dispose();
-        if (_backContent != null) {
-            _backContent.dispose();
+        if (!_disposed) {
+            _content.dispose();
+            if (_backContent != null) {
+                _backContent.dispose();
+            }
+            _disposed = true;
         }
     }
 }

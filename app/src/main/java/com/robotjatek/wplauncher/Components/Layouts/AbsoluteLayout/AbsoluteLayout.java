@@ -18,6 +18,7 @@ import java.util.List;
 
 
 public class AbsoluteLayout implements ILayout {
+    private boolean _disposed = false;
     private final List<PositionedElement> _positionedElements = new ArrayList<>();
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _modelMatrix = new float[16];
@@ -143,8 +144,11 @@ public class AbsoluteLayout implements ILayout {
 
     @Override
     public void dispose() {
-        _positionedElements.forEach(c -> c._element.dispose());
-        _positionedElements.clear();
-        TileUtil.deleteTexture(_bgTexture);
+        if (!_disposed) {
+            _positionedElements.forEach(c -> c._element.dispose());
+            _positionedElements.clear();
+            TileUtil.deleteTexture(_bgTexture);
+            _disposed = true;
+        }
     }
 }

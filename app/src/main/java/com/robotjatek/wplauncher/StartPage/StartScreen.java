@@ -35,6 +35,7 @@ import java.util.List;
  */
 public class StartScreen implements IPageNavigator, IScreen {
 
+    private boolean _disposed = false;
     private IState _state;
 
     public IState IDLE_STATE() {
@@ -168,10 +169,13 @@ public class StartScreen implements IPageNavigator, IScreen {
     }
 
     public void dispose() {
-        _tileService.persistTiles();
-        _pages.forEach(Page::dispose);
-        _tileService.dispose();
-        _internalAppsService.dispose();
-        _settingsService.dispose();
+        if (!_disposed) {
+            _tileService.persistTiles();
+            _pages.forEach(Page::dispose);
+            _tileService.dispose();
+            _internalAppsService.dispose();
+            _settingsService.dispose();
+            _disposed = true;
+        }
     }
 }

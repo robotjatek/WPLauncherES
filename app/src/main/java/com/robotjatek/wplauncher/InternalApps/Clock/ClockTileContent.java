@@ -2,19 +2,16 @@ package com.robotjatek.wplauncher.InternalApps.Clock;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Label.Label;
+import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
-import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.Tile;
-import com.robotjatek.wplauncher.TileUtil;
-import com.robotjatek.wplauncher.VerticalAlign;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,12 +19,8 @@ import org.json.JSONObject;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 
-// TODO: use absoluteLayout
 public class ClockTileContent implements ITileContent {
-    private final float[] _modelMatrix = new float[16];
-    private int _clockTexture;
-    private int _locationTexture;
-    private int _bgTexture;
+    private boolean _disposed = false;
     private long _lastUpdate = System.currentTimeMillis();
     private int _lastHour = -1;
     private int _lastMinute = -1;
@@ -35,29 +28,45 @@ public class ClockTileContent implements ITileContent {
     private boolean _dirty = true;
     private final Context _context;
     private final LocationService _locationService;
+    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final Label _clockLabel;
+    private final Label _locationLabel;
 
     public ClockTileContent(Context context, LocationService locationService) {
         _context = context;
         _locationService = locationService;
+        _clockLabel = new Label("", 160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+        _locationLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, Position<Float> position, Size<Integer> size) {
         if (_dirty) {
-            redraw(tile, size);
+            _layout.setBgColor(tile.bgColor);
+
+            _layout.removeChild(_clockLabel);
+            var time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH mm"));
+            var fontSize = tile.getSize().equals(Tile.SMALL) ? 80 : 160;
+            _clockLabel.setText(time);
+            _clockLabel.setTextSize(fontSize);
+            _clockLabel.setMaxWidth(size.width());
+            var clockPosition = new Position<>(position.x(), position.y() + size.height() / 3);
+            _layout.addChild(_clockLabel, clockPosition);
+
+            _layout.removeChild(_locationLabel);
+            if (isLocationEnabled() && !tile.getSize().equals(Tile.SMALL)) {
+                _locationLabel.setText(_location);
+                _locationLabel.setMaxWidth(size.width());
+                var locationSize = _locationLabel.measure();
+                var locationPosition = new Position<>((position.x() + size.width()) - locationSize.width(), position.y()); // Right aligned
+                _layout.addChild(_locationLabel, locationPosition);
+            }
+
+            _dirty = false;
         }
 
-        drawTexture(projMatrix, viewMatrix, renderer, position, size, _bgTexture);
         updateContent();
-
-        if (_clockTexture > 0) {
-            drawTexture(projMatrix, viewMatrix, renderer,
-                    new Position<>(position.x(), position.y() + 30), size, _clockTexture);
-        }
-
-        if (_locationTexture > 0 && isLocationEnabled() && !tile.getSize().equals(Tile.SMALL)) {
-            drawTexture(projMatrix, viewMatrix, renderer, position, size, _locationTexture);
-        }
+        _layout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
     }
 
     private void updateContent() {
@@ -79,47 +88,16 @@ public class ClockTileContent implements ITileContent {
                     setLocation(currentLocation);
                 }
             } else {
-                setLocation("");
+                setLocation("Budapest");
             }
 
             _lastUpdate = System.currentTimeMillis();
         }
     }
 
-    private void redraw(Tile tile, Size<Integer> size) {
-        TileUtil.deleteTexture(_bgTexture);
-        _bgTexture = BitmapUtil.createTextureFromBitmap(
-                BitmapUtil.createRect(1, 1, 0, tile.bgColor));
-
-        var time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH mm"));
-        TileUtil.deleteTexture(_clockTexture);
-        var fontSize = tile.getSize().equals(Tile.SMALL) ? 80 : 160;
-        _clockTexture = TileUtil.createTextTexture(time,
-                size.width(),
-                size.height(),
-                fontSize, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
-
-        TileUtil.deleteTexture(_locationTexture);
-        _locationTexture = TileUtil.createTextTexture(_location,
-                size.width(),
-                size.height(),
-                72, Typeface.NORMAL,
-                Colors.WHITE, Colors.TRANSPARENT, HorizontalAlign.RIGHT, VerticalAlign.TOP);
-        _dirty = false;
-    }
-
     private void setLocation(String location) {
         _location = location;
         _dirty = true;
-    }
-
-    private void drawTexture(float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
-                             Position<Float> position, Size<Integer> size, int textureId) {
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
-        Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
-        Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(projMatrix, _modelMatrix, textureId);
     }
 
     private boolean isLocationEnabled() {
@@ -138,9 +116,13 @@ public class ClockTileContent implements ITileContent {
 
     @Override
     public void dispose() {
-        TileUtil.deleteTexture(_bgTexture);
-        TileUtil.deleteTexture(_clockTexture);
-        TileUtil.deleteTexture(_locationTexture);
+        if (!_disposed) {
+            _layout.dispose();
+            // Make sure that the labels are disposed. The layout only disposes children that are on it in the time of the disposal
+            _clockLabel.dispose();
+            _locationLabel.dispose();
+            _disposed = true;
+        }
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.Services.LocationService;
 
 public class LauncherSurfaceView extends GLSurfaceView {
 
+    private boolean _disposed = false;
     private final LauncherRenderer _renderer;
 
     public LauncherSurfaceView(Context context, LocationService locationService, AppChangeReceiver appChangeReceiver) {
@@ -43,6 +44,9 @@ public class LauncherSurfaceView extends GLSurfaceView {
     }
 
     public void dispose() {
-        _renderer.dispose();
+        if (_disposed) {
+            _renderer.dispose();
+            _disposed = true;
+        }
     }
 }

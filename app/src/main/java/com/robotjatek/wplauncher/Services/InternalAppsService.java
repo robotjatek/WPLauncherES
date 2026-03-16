@@ -20,6 +20,7 @@ import java.util.Map;
 public class InternalAppsService {
     private static final String SETTINGS_NAME = "launcher:settings";
     private static final String CLOCK_NAME = "launcher:clock";
+    private boolean _disposed = false;
     private final Context _context;
     private final Map<String, Drawable> _appIcons = new HashMap<>();
     private final Map<String, App> _internalApps = new HashMap<>();
@@ -62,7 +63,10 @@ public class InternalAppsService {
     }
 
     public void dispose() {
-        _settingsScreen.dispose();
+        if (!_disposed) {
+            _settingsScreen.dispose();
+            _disposed = true;
+        }
     }
 
     public void onSizeChanged(int width, int height) {

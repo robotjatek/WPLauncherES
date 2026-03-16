@@ -50,6 +50,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     private IState _state = IDLE_STATE();
 
+    private boolean _disposed = false;
     private final ScrollController _scroll = new ScrollController();
     private final TileDrawContext _tileDrawContext;
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
@@ -249,8 +250,11 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     public void dispose() {
-        _unpinButton.dispose();
-        _resizeButton.dispose();
+        if (!_disposed) {
+            _unpinButton.dispose();
+            _resizeButton.dispose();
+            _disposed = true;
+        }
     }
 
     @Override

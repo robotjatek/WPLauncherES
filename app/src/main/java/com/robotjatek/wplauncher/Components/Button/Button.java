@@ -6,7 +6,6 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
-import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.HorizontalAlign;
@@ -17,6 +16,7 @@ import com.robotjatek.wplauncher.VerticalAlign;
 
 public class Button implements UIElement {
 
+    private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private String _text;
     private Drawable _icon;
@@ -101,8 +101,14 @@ public class Button implements UIElement {
 
     @Override
     public void dispose() {
-        TileUtil.deleteTexture(_bgTexture);
-        TileUtil.deleteTexture(_foreground);
-        TileUtil.deleteTexture(_iconTexture);
+        if (!_disposed) {
+            TileUtil.deleteTexture(_bgTexture);
+            _bgTexture = -1;
+            TileUtil.deleteTexture(_foreground);
+            _foreground = -1;
+            TileUtil.deleteTexture(_iconTexture);
+            _iconTexture = -1;
+            _disposed = true;
+        }
     }
 }

@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class StaticTileContent implements ITileContent, INotificationChangedListener {
 
+    private boolean _disposed = false;
     private boolean _dirty = true;
     private final String _packageName;
     private final Deque<StatusBarNotification> _notifications = new ConcurrentLinkedDeque<>();
@@ -79,7 +80,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
                 var y = (size.height() - iconSize) / 2f + size.height() / 7f;
                 _layout.addChild(_notificationLabel, new Position<>(x, y));
             } else {
-                _layout.removeChild(_notificationLabel); // TODO: leak: removed element is not disposed
+                _layout.removeChild(_notificationLabel);
             }
 
             _dirty = false;
@@ -89,8 +90,12 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     }
 
     public void dispose() {
-        _layout.dispose(); // Root should dispose all of its children including the nested layouts
-        NotificationListener.unsubscribe(_packageName, this);
+        if (!_disposed) {
+            _layout.dispose(); // Root should dispose all of its children including the nested layouts,
+            _notificationLabel.dispose(); // dynamically removed items are not disposed automatically, making sure its disposed (double dispose is safe)
+            NotificationListener.unsubscribe(_packageName, this);
+            _disposed = true;
+        }
     }
 
     @Override

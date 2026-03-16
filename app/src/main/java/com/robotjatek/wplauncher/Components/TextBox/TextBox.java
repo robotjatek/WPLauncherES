@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TextBox implements UIElement {
+    private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private String _text;
     private int _textSize;
@@ -232,6 +233,9 @@ public class TextBox implements UIElement {
 
     @Override
     public void dispose() {
-        TileUtil.deleteTexture(_textureId);
+        if (!_disposed) {
+            TileUtil.deleteTexture(_textureId);
+            _disposed = true;
+        }
     }
 }

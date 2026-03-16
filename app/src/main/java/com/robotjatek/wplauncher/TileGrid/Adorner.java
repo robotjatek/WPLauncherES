@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 
 public class Adorner {
+    private boolean _disposed = false;
     private final IDrawContext<Adorner> _context;
     private final Runnable _onTap;
     private final int _textureId;
@@ -53,6 +54,9 @@ public class Adorner {
     }
 
     public void dispose() {
-        TileUtil.deleteTexture(_textureId);
+        if (!_disposed) {
+            TileUtil.deleteTexture(_textureId);
+            _disposed = true;
+        }
     }
 }

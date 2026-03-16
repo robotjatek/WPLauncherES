@@ -13,6 +13,7 @@ import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
 public class Label implements UIElement {
+    private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private String _text;
     private int _textSize;
@@ -166,6 +167,11 @@ public class Label implements UIElement {
         return _textSize;
     }
 
+    public void setTextSize(int size) {
+        _textSize = size;
+        _dirty = true;
+    }
+
     public int getTypeFace() {
         return _typeFace;
     }
@@ -177,6 +183,9 @@ public class Label implements UIElement {
 
     @Override
     public void dispose() {
-        TileUtil.deleteTexture(_textureId);
+        if (!_disposed) {
+            TileUtil.deleteTexture(_textureId);
+            _disposed = true;
+        }
     }
 }

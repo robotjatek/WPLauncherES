@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 public class MenuOption<T> {
 
+    private boolean _disposed = false;
     private final Consumer<T> _action;
     private final IDrawContext<MenuOption<T>> _context;
     private final float[] _modelMatrix = new float[16];
@@ -48,7 +49,10 @@ public class MenuOption<T> {
     }
 
     public void dispose() {
-        TileUtil.deleteTexture(_textureId);
-        _textureId = -1;
+        if (!_disposed) {
+            TileUtil.deleteTexture(_textureId);
+            _textureId = -1;
+            _disposed = true;
+        }
     }
 }

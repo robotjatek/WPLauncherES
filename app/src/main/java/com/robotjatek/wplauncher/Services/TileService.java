@@ -30,6 +30,7 @@ public class TileService implements OnChangeListener<AccentColor> {
     private static final String PREF_NAME = "WPLAUNCHER";
     private static final String TILES = "TILES";
     private static final List<Size<Integer>> tileSizes = List.of(Tile.WIDE, Tile.MEDIUM, Tile.SMALL);
+    private boolean _disposed = false;
     private final List<ITileListChangedListener> _subscribers = new ArrayList<>();
     private final Queue<Runnable> _tileCommands = new ConcurrentLinkedQueue<>();
     private final List<Tile> _tiles = new ArrayList<>();
@@ -264,8 +265,11 @@ public class TileService implements OnChangeListener<AccentColor> {
     }
 
     public void dispose() {
-        _tiles.forEach(Tile::dispose);
-        _tiles.clear();
+        if (!_disposed) {
+            _tiles.forEach(Tile::dispose);
+            _tiles.clear();
+            _disposed = true;
+        }
     }
 
     @Override

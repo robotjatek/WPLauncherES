@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeReceiver.IAppChangeListener {
 
     private static final int PAGE_PADDING_PX = 60;
+    private boolean _disposed = false;
     private int _listWidth;
     private int _viewPortHeight;
     private final Context _context;
@@ -144,7 +145,10 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     @Override
     public void dispose() {
-        _list.dispose();
+        if (!_disposed) {
+            _list.dispose();
+            _disposed = true;
+        }
     }
 
     @Override

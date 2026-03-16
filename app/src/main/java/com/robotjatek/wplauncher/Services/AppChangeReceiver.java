@@ -65,7 +65,6 @@ public class AppChangeReceiver extends BroadcastReceiver {
                 } catch (PackageManager.NameNotFoundException e) {
                     Log.e("AppChangeReceiver", "Installed app not found: " + packageName);
                 }
-                // TODO: signal replace (icon change/name change etc) grid (unpin/repin)
             }
         }
     }

@@ -22,6 +22,7 @@ import java.util.function.Consumer;
 
 public class Checkbox implements UIElement {
     private static final int TOGGLE_SIZE = 100;
+    private boolean _disposed = false;
     private final String _label;
     private boolean _state;
     private final Consumer<Boolean> _onChange;
@@ -93,7 +94,12 @@ public class Checkbox implements UIElement {
 
     @Override
     public void dispose() {
-        TileUtil.deleteTexture(_stateTexture);
-        TileUtil.deleteTexture(_labelTexture);
+        if (!_disposed) {
+            TileUtil.deleteTexture(_stateTexture);
+            TileUtil.deleteTexture(_labelTexture);
+            _stateTexture = -1;
+            _labelTexture = -1;
+            _disposed = true;
+        }
     }
 }

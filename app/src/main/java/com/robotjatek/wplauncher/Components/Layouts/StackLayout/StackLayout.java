@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Optional;
 
 public class StackLayout implements ILayout {
+    private boolean _disposed = false;
     public static final int TOP_MARGIN_PX = 0;
     private final List<UIElement> _children = new ArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
@@ -115,8 +116,11 @@ public class StackLayout implements ILayout {
     }
 
     public void dispose() {
-        _children.forEach(UIElement::dispose);
-        _children.clear();
-        _layoutInfo.clear();
+        if (!_disposed) {
+            _children.forEach(UIElement::dispose);
+            _children.clear();
+            _layoutInfo.clear();
+            _disposed = true;
+        }
     }
 }

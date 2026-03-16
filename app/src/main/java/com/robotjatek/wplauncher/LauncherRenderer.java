@@ -13,6 +13,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigator {
+    private boolean _disposed = false;
     private float lastTime = System.nanoTime();
     private int frameCount = 0;
     private long fpsTime = System.currentTimeMillis();
@@ -94,9 +95,12 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     }
 
     public void dispose() {
-        _navigationStack.forEach(IScreen::dispose);
-        _renderer.dispose();
-        _shader.delete();
+        if (!_disposed) {
+            _navigationStack.forEach(IScreen::dispose);
+            _renderer.dispose();
+            _shader.delete();
+            _disposed = true;
+        }
     }
 
     public void setInsets(int left, int top, int right, int bottom) {

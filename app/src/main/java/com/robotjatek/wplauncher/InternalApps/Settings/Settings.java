@@ -25,6 +25,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
  */
 public class Settings implements IScreen, OnChangeListener<AccentColor> {
 
+    private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final Context _context;
     private final StackLayout _layout;
@@ -92,9 +93,12 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
 
     @Override
     public void dispose() {
-        _layout.dispose();
-        _colorPickerScreen.dispose();
-        _icon.recycle();
+        if (!_disposed) {
+            _layout.dispose();
+            _colorPickerScreen.dispose();
+            _icon.recycle();
+            _disposed = true;
+        }
     }
 
     @Override

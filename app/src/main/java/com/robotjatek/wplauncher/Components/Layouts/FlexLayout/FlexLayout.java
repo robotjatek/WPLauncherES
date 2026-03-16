@@ -52,6 +52,7 @@ public class FlexLayout implements ILayout, UIElement {
         STRETCH
     }
 
+    private boolean _disposed = false;
     private final List<UIElement> _children = new ArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
     private Size<Integer> _size = new Size<>(-1, -1);
@@ -366,9 +367,12 @@ public class FlexLayout implements ILayout, UIElement {
 
     @Override
     public void dispose() {
-        _children.forEach(UIElement::dispose);
-        _children.clear();
-        TileUtil.deleteTexture(_bgTexture);
+        if (!_disposed) {
+            _children.forEach(UIElement::dispose);
+            _children.clear();
+            TileUtil.deleteTexture(_bgTexture);
+            _disposed = true;
+        }
     }
 
     @Override

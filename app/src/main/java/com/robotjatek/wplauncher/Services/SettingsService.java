@@ -14,6 +14,7 @@ import java.util.List;
 public class SettingsService {
     public static final String PREF_NAME = "WPLAUNCHER";
     public static final String SETTINGS = "SETTINGS";
+    private boolean _disposed = false;
     private final List<OnChangeListener<AccentColor>> _listeners = new ArrayList<>();
     private AccentColor _accentColor = Colors.ACCENT_COLORS.get(0);
     private final Context _context;
@@ -71,6 +72,9 @@ public class SettingsService {
     }
 
     public void dispose() {
-        persistSettings();
+        if (!_disposed) {
+            persistSettings();
+            _disposed = true;
+        }
     }
 }

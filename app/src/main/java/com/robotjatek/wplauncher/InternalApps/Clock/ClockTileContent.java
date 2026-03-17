@@ -45,20 +45,24 @@ public class ClockTileContent implements ITileContent {
             _layout.setBgColor(tile.bgColor);
 
             _layout.removeChild(_clockLabel);
+            var padding = size.height() * 0.035f;
             var time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH mm"));
             var fontSize = tile.getSize().equals(Tile.SMALL) ? 80 : 160;
             _clockLabel.setText(time);
             _clockLabel.setTextSize(fontSize);
-            _clockLabel.setMaxWidth(size.width());
-            var clockPosition = new Position<>(position.x(), position.y() + size.height() / 3);
+            _clockLabel.setMaxWidth(size.width() - padding * 2);
+            var clockPosition = new Position<>(position.x() + padding, position.y() + size.height() / 3);
             _layout.addChild(_clockLabel, clockPosition);
 
             _layout.removeChild(_locationLabel);
-            if (isLocationEnabled() && !tile.getSize().equals(Tile.SMALL)) {
+            if (isLocationEnabled() &&
+                    !tile.getSize().equals(Tile.SMALL)) {
                 _locationLabel.setText(_location);
-                _locationLabel.setMaxWidth(size.width());
+                _locationLabel.setMaxWidth(size.width() - padding * 2);
                 var locationSize = _locationLabel.measure();
-                var locationPosition = new Position<>((position.x() + size.width()) - locationSize.width(), position.y()); // Right aligned
+                var x = locationSize.width() + padding < size.width() - padding ?
+                        (position.x() + size.width()) - locationSize.width() - padding : padding;
+                var locationPosition = new Position<>(x, position.y() + padding); // Right aligned
                 _layout.addChild(_locationLabel, locationPosition);
             }
 
@@ -88,7 +92,7 @@ public class ClockTileContent implements ITileContent {
                     setLocation(currentLocation);
                 }
             } else {
-                setLocation("Budapest");
+                setLocation("");
             }
 
             _lastUpdate = System.currentTimeMillis();

@@ -87,7 +87,7 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Fix: tile overlap after resize
 - [x] Remove uninstalled app from the applist/tilegrid
 - [ ] Don't show uninstall in the context menu for internal apps
-- [ ] Adjust notification count on tiles - don't allow overlap with the icon
+- [x] Adjust notification count on tiles - don't allow overlap with the icon
 - [ ] Fix: Scrolling while swiping on the main screen
 - [x] Fix: some notifications are counted multiple times
 - [ ] Fix all TODOs introduced in M2

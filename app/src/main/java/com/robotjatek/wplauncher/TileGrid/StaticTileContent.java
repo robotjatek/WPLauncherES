@@ -54,9 +54,11 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
             setApp(tile.getApp());
+            var padding = size.height() * 0.035f;
             var iconSize = Math.min(size.width(), size.height()) / 2;
             _icon.setSize(new Size<>(iconSize, iconSize));
             _titleLabel.setText(tile.getSize().equals(Tile.SMALL) ? "" : tile.getApp().name());
+            _titleLabel.setMaxWidth(size.width() - padding * 2);
             _layout.setBgColor(tile.bgColor);
 
             // Icon centered
@@ -66,18 +68,20 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
             // Move icon slightly to left when there are notifications
             if (!_notifications.isEmpty()) {
                 iconX -= size.width() / 4f;
-                _notificationLabel.setText(_notifications.size()+"");
             }
 
             _layout.clear();
             _layout.addChild(_icon, new Position<>(iconX, iconY));
-            _layout.addChild(_titleLabel, new Position<>(10f, size.height().floatValue() - 60));
+            var labelHeight = _titleLabel.measure().height();
+            _layout.addChild(_titleLabel, new Position<>(padding, size.height() - labelHeight - padding / 2));
 
             if (!_notifications.isEmpty()) {
                 // Notification badge
-                var offset = tile.getSize().equals(Tile.WIDE) ? 0 : size.width() / 10f + 30;
-                var x = (size.width() - iconSize) / 2f + offset;
-                var y = (size.height() - iconSize) / 2f + size.height() / 7f;
+                var offset = size.width() * 0.025f;
+                _notificationLabel.setTextSize(tile.getSize().equals(Tile.SMALL) ? 48 : 144);
+                _notificationLabel.setText(String.valueOf(_notifications.size()));
+                var x = iconX + iconSize + offset;
+                var y = position.y() + iconSize - _notificationLabel.measure().height() / 2f;
                 _layout.addChild(_notificationLabel, new Position<>(x, y));
             } else {
                 _layout.removeChild(_notificationLabel);

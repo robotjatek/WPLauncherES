@@ -20,7 +20,7 @@ public class Label implements UIElement {
     private int _typeFace;
     private int _textColor;
     private int _bgColor;
-    private int _maxWidth; // -1 means no limit
+    private float _maxWidth; // -1 means no limit
     private boolean _dirty = true;
     private int _textureId = -1;
 
@@ -78,7 +78,7 @@ public class Label implements UIElement {
         renderer.draw(proj, _modelMatrix, _textureId);
     }
 
-    private String truncateText(String text, int maxWidth) {
+    private String truncateText(String text, float maxWidth) {
         var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
@@ -150,7 +150,7 @@ public class Label implements UIElement {
         _dirty = true;
     }
 
-    public void setMaxWidth(int maxWidth) {
+    public void setMaxWidth(float maxWidth) {
         _maxWidth = maxWidth;
         _dirty = true;
     }

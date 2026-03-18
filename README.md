@@ -50,8 +50,8 @@ M1 is all about laying the groundwork. Don't expect anything fancy here. At this
 Consolidation
 
 - [x] Extract draw contexts
-- [x] Applist state machine (also fixed fling to keep momentum)
-- [x] Tilegrid state machine
+- [x] App-list state machine (also fixed fling to keep momentum)
+- [x] Tile-grid state machine
 - [x] Fix de-select bug when rearranging tiles
 
 ### M2 - MVP / alpha
@@ -86,19 +86,18 @@ I'm already daily-driving, you shouldn't be.
     
 - [ ] Checkbox border
 - [ ] Fix: pin the same tile multiple times
+- [ ] Don't show uninstall in the context menu for internal apps
 - [ ] Fix: tile overlap after resize
 - [x] Remove uninstalled app from the applist/tilegrid
-- [x] Fix: Updated app is removed from the grid and applist instead of updating
-- [ ] Don't show uninstall in the context menu for internal apps
+- [x] Fix: Updated app is removed from the grid and app-list instead of updating
 - [x] Adjust notification count on tiles - don't allow overlap with the icon
-- [ ] Fix: Scrolling while swiping on the main screen
+- [ ] Fix: Scrolling while swiping on the main screen (scrolling on tile-grid keeps working, WHILE in SWIPING state)
 - [x] Fix: Some notifications are counted multiple times
-- [ ] Fix all TODOs introduced in M2
 - [x] Use AbsoluteLayout in the ClockHUB tile
+- [x] Press "Home" button to jump back to the top of the tile-grid  
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
 - [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware, needs repro)
 - [ ] Fix: Tile bg after resize is dark (needs repro)
-- [ ] TBD
 
 ### M3 - beta
 
@@ -121,7 +120,9 @@ M3 is the preparation for a first public beta release.
   - [ ] Dropdown 
 - [ ] Radiobutton
 - [ ] Disable landscape mode
-- [ ] Re-ask for permissions from the launcher settings 
+- [ ] Re-ask for permissions from the launcher settings
+- [ ] Search bar in the app-list
+- [ ] Scissor test on tiles to prevent drawing out of the tile
 - [ ] First public beta version (?)
 
 ### M4 - RC

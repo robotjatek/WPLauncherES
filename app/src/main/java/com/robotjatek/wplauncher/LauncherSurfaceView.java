@@ -39,6 +39,10 @@ public class LauncherSurfaceView extends GLSurfaceView {
         _renderer.onBackPressed();
     }
 
+    public void onHomePressed() {
+        _renderer.onHomePressed();
+    }
+
     public LauncherRenderer getRenderer() {
         return _renderer;
     }

@@ -86,13 +86,13 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
 - [ ] Fix: pin the same tile multiple times
 - [ ] Fix: tile overlap after resize
 - [x] Remove uninstalled app from the applist/tilegrid
+- [x] Fix: Updated app is removed from the grid and applist instead of updating
 - [ ] Don't show uninstall in the context menu for internal apps
 - [x] Adjust notification count on tiles - don't allow overlap with the icon
 - [ ] Fix: Scrolling while swiping on the main screen
-- [x] Fix: some notifications are counted multiple times
+- [x] Fix: Some notifications are counted multiple times
 - [ ] Fix all TODOs introduced in M2
 - [x] Use AbsoluteLayout in the ClockHUB tile
-- [ ] Fix: updated app is removed from the grid and applist instead of updating
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
 - [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware, needs repro)
 - [ ] Fix: Tile bg after resize is dark (needs repro)
@@ -118,6 +118,8 @@ M3 is the preparation for a first public beta release.
 - [ ] Light mode/Dark mode support
   - [ ] Dropdown 
 - [ ] Radiobutton
+- [ ] Disable landscape mode
+- [ ] Re-ask for permissions from the launcher settings 
 - [ ] First public beta version (?)
 
 ### M4 - RC

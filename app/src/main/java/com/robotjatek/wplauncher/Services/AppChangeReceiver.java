@@ -56,7 +56,10 @@ public class AppChangeReceiver extends BroadcastReceiver {
 
             }
             case Intent.ACTION_PACKAGE_REMOVED -> {
-                _listeners.forEach(l -> l.onAppRemove(packageName));
+                var replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false);
+                if (!replacing) {
+                    _listeners.forEach(l -> l.onAppRemove(packageName));
+                }
             }
             case Intent.ACTION_PACKAGE_REPLACED -> {
                 try {

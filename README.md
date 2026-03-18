@@ -56,7 +56,7 @@ Consolidation
 
 ### M2 - MVP / alpha
 
-M2 is the beginning to make the launcher usable in everyday use-cases.
+M2 is the beginning of making the launcher usable in everyday use-cases.
 
 - [x] Start working on "launcher apps/widgets/live tiles"
     - [x] Clock
@@ -81,6 +81,8 @@ M2 is the beginning to make the launcher usable in everyday use-cases.
   - [x] Checkbox
 
 ### M2.5
+
+I'm already daily-driving, you shouldn't be.
     
 - [ ] Checkbox border
 - [ ] Fix: pin the same tile multiple times
@@ -131,7 +133,7 @@ M3 is the preparation for a first public beta release.
 
 ### Current progress
 
-M2 is in progress
+M2.5 is in progress
 
 ## Planned live custom tiles / "widgets"
 

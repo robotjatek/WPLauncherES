@@ -18,6 +18,7 @@
         android:theme="@style/Theme.WPLauncher">
         <activity
             android:name=".MainActivity"
+            android:launchMode="singleInstance"
             android:exported="true"
             android:theme="@style/Theme.WPLauncher">
             <intent-filter>

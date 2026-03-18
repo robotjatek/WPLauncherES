@@ -109,6 +109,7 @@ public class MainActivity extends ComponentActivity {
     protected void onResume() {
         super.onResume();
         _surface.onResume();
+        _surface.onHomePressed();
     }
 
     @Override

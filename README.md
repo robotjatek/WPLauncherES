@@ -84,7 +84,7 @@ M2 is the beginning of making the launcher usable in everyday use-cases.
 
 I'm already daily-driving, you shouldn't be.
     
-- [ ] Checkbox border
+- [x] Checkbox border
 - [ ] Fix: pin the same tile multiple times
 - [ ] Don't show uninstall in the context menu for internal apps
 - [ ] Fix: tile overlap after resize
@@ -131,6 +131,7 @@ M3 is the preparation for a first public beta release.
 - [ ] Background image with transparent tiles
 - [ ] 6 column mode setting
 - [ ] WP7/7.8 start screen setting
+- [ ] Custom tile color
 
 ### Current progress
 

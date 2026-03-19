@@ -29,6 +29,9 @@ public class Checkbox implements UIElement {
     private boolean _dirty = true;
     private int _stateTexture = -1;
     private int _labelTexture = -1;
+    private int _borderTexture;
+    private int _bgTexture;
+
     private final Context _context;
 
     public Checkbox(String label, boolean initialState, Consumer<Boolean> onChange, Context context) {
@@ -36,6 +39,8 @@ public class Checkbox implements UIElement {
         _onChange = onChange;
         _context = context;
         _state = initialState;
+        _borderTexture = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, Colors.WHITE));
+        _bgTexture = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, Colors.BLACK));
     }
 
     @Override
@@ -58,16 +63,28 @@ public class Checkbox implements UIElement {
             _dirty = false;
         }
 
+        Matrix.setIdentityM(_modelMatrix, 0);
+        Matrix.translateM(_modelMatrix, 0, x, y, 0);
+        Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE, TOGGLE_SIZE, 0);
+        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
+        renderer.draw(proj, _modelMatrix, _borderTexture);
+
+        Matrix.setIdentityM(_modelMatrix, 0);
+        Matrix.translateM(_modelMatrix, 0, x + 4, y + 4, 0);
+        Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE - 8, TOGGLE_SIZE - 8, 0);
+        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
+        renderer.draw(proj, _modelMatrix, _bgTexture);
+
         if (_state) {
             Matrix.setIdentityM(_modelMatrix, 0);
-            Matrix.translateM(_modelMatrix, 0, x, y, 0);
-            Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE, TOGGLE_SIZE, 0);
+            Matrix.translateM(_modelMatrix, 0, x + 4, y + 4, 0);
+            Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE - 8, TOGGLE_SIZE - 8, 0);
             Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
             renderer.draw(proj, _modelMatrix, _stateTexture);
         }
 
         Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x + TOGGLE_SIZE, y, 0);
+        Matrix.translateM(_modelMatrix, 0, x + TOGGLE_SIZE + 16, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w - TOGGLE_SIZE, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         renderer.draw(proj, _modelMatrix, _labelTexture);
@@ -96,8 +113,12 @@ public class Checkbox implements UIElement {
         if (!_disposed) {
             TileUtil.deleteTexture(_stateTexture);
             TileUtil.deleteTexture(_labelTexture);
+            TileUtil.deleteTexture(_borderTexture);
+            TileUtil.deleteTexture(_bgTexture);
             _stateTexture = -1;
             _labelTexture = -1;
+            _borderTexture = -1;
+            _bgTexture = -1;
             _disposed = true;
         }
     }

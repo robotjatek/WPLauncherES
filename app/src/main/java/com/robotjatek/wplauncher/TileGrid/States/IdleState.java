@@ -10,6 +10,7 @@ public class IdleState extends BaseState {
 
     @Override
     public void enter() {
+        super.enter();
         _context.cancelSelection();
     }
 

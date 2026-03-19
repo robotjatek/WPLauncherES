@@ -156,6 +156,13 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     @Override
+    public void resetState() {
+        if (!(_state instanceof IdleState)) {
+            changeState(IDLE_STATE());
+        }
+    }
+
+    @Override
     public void touchStart(float x, float y) {
         _state.handleTouchStart(x, y);
     }

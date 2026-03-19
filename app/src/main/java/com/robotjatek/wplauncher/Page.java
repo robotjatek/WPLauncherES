@@ -14,6 +14,8 @@ public interface Page {
     }
 
     void onSizeChanged(int width, int height);
+    
+	void resetState();
 
     void dispose();
 }

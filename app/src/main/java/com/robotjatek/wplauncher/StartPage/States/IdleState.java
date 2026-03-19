@@ -18,4 +18,10 @@ public class IdleState extends BaseState {
 
     @Override
     public void handleMove(float x, float y) {}
+
+    @Override
+    public void enter() {
+        super.enter();
+        _context.getCurrentPage().resetState();
+    }
 }

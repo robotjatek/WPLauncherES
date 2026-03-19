@@ -91,7 +91,7 @@ I'm already daily-driving, you shouldn't be.
 - [x] Remove uninstalled app from the applist/tilegrid
 - [x] Fix: Updated app is removed from the grid and app-list instead of updating
 - [x] Adjust notification count on tiles - don't allow overlap with the icon
-- [ ] Fix: Scrolling while swiping on the main screen (scrolling on tile-grid keeps working, WHILE in SWIPING state)
+- [x] Fix: Scrolling while swiping on the main screen (scrolling on tile-grid keeps working, WHILE in SWIPING state) -- keeping an eye out, this was a sneaky one
 - [x] Fix: Some notifications are counted multiple times
 - [x] Use AbsoluteLayout in the ClockHUB tile
 - [x] Press "Home" button to jump back to the top of the tile-grid  
@@ -113,6 +113,7 @@ M3 is the preparation for a first public beta release.
   - [ ] Contacts
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Generic carousel view
+- [ ] Gesture system refactor
 - [ ] Optimizations
 - [ ] Bug fixes
 - [ ] Multi lang support
@@ -124,6 +125,12 @@ M3 is the preparation for a first public beta release.
 - [ ] Search bar in the app-list
 - [ ] Scissor test on tiles to prevent drawing out of the tile
 - [ ] First public beta version (?)
+
+### M3.5
+
+Try it at your own risk
+
+- [] TBD
 
 ### M4 - RC
 

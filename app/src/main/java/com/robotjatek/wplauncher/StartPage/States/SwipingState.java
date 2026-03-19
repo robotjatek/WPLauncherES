@@ -15,6 +15,12 @@ public class SwipingState extends BaseState {
     }
 
     @Override
+    public void enter() {
+        super.enter();
+        _context.getCurrentPage().resetState();
+    }
+
+    @Override
     public void handleTouchStart(float x, float y) {
     }
 

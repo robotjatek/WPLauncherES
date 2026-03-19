@@ -109,6 +109,13 @@ public class ListView<T> implements IItemListContainer<T>, Page {
         setScrollBounds();
     }
 
+    @Override
+    public void resetState() {
+        if (!(_state instanceof IdleState<?>)) {
+            changeState(IDLE_STATE());
+        }
+    }
+
     public ListItemDrawContext<T, ListView<T>> getDrawContext() {
         return _drawContext;
     }

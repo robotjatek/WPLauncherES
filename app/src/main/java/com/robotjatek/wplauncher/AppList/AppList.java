@@ -88,6 +88,11 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _list.setContextMenu(createContextMenu()); // Context menu must be created when the size information is available
     }
 
+    @Override
+    public void resetState() {
+        _list.resetState();
+    }
+
     private ContextMenu<App> createContextMenu() {
         var menu = new ContextMenu<>(new Position<>(0f, 0f), _contextMenuDrawContext);
         var options = List.of(

@@ -85,8 +85,8 @@ M2 is the beginning of making the launcher usable in everyday use-cases.
 I'm already daily-driving, you shouldn't be.
     
 - [x] Checkbox border
-- [ ] Fix: pin the same tile multiple times
-- [ ] Don't show uninstall in the context menu for internal apps
+- [x] Fix: pin the same tile multiple times
+- [x] Don't show uninstall in the context menu for internal and system apps
 - [ ] Fix: tile overlap after resize
 - [x] Remove uninstalled app from the applist/tilegrid
 - [x] Fix: Updated app is removed from the grid and app-list instead of updating
@@ -104,6 +104,7 @@ I'm already daily-driving, you shouldn't be.
 M3 is the preparation for a first public beta release.
 
 - [ ] GLES 3.0
+- [ ] Make ContextMenu and MenuOption to use layouts and labels
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
   - [ ] Photos
@@ -130,7 +131,7 @@ M3 is the preparation for a first public beta release.
 
 Try it at your own risk
 
-- [] TBD
+- [ ] TBD
 
 ### M4 - RC
 

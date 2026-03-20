@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher.Services;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
@@ -77,7 +78,8 @@ public class AppChangeReceiver extends BroadcastReceiver {
         var info = pm.getApplicationInfo(packageName, 0);
         var name = pm.getApplicationLabel(info).toString();
         var icon = pm.getApplicationIcon(info);
+        var isSystemApp = (info.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
         var launchIntent = pm.getLaunchIntentForPackage(packageName);
-        return new App(name, packageName, icon, () -> context.startActivity(launchIntent));
+        return new App(name, packageName, icon, () -> context.startActivity(launchIntent), isSystemApp);
     }
 }

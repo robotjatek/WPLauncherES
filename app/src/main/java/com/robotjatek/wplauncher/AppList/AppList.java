@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.AppList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
@@ -96,11 +97,11 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private ContextMenu<App> createContextMenu() {
         var menu = new ContextMenu<>(new Position<>(0f, 0f), _contextMenuDrawContext);
         var options = List.of(
-                new MenuOption<>("Pin", this::pinApp, menu),
+                new MenuOption<>("Pin", this::pinApp, menu, (a) -> !_tileService.isPinned(a)),
                 new MenuOption<>("Uninstall", (a) -> {
                     uninstallApp(a.packageName());
                     _tileService.queueUnpinTile(a.packageName());
-                }, menu));
+                }, menu, (a) -> !a.isSystemApp()));
         menu.addOptions(options);
         return menu;
     }
@@ -116,7 +117,9 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
             var packageName = resolveInfo.activityInfo.packageName;
             var icon = resolveInfo.loadIcon(pm);
             var launchIntent = pm.getLaunchIntentForPackage(packageName);
-            return new App(label, packageName, icon, () -> _context.startActivity(launchIntent));
+            var isSystemApp = (resolveInfo.activityInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+
+            return new App(label, packageName, icon, () -> _context.startActivity(launchIntent), isSystemApp);
         });
     }
 
@@ -138,9 +141,11 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     }
 
     private void pinApp(App app) {
-        _tileService.queuePinTile(app);
-        _list.resetScroll();
-        _navigator.previousPage();
+        if (!_tileService.isPinned(app)) {
+            _tileService.queuePinTile(app);
+            _list.resetScroll();
+            _navigator.previousPage();
+        }
     }
 
     @Override

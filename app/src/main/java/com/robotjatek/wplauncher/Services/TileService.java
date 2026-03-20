@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher.Services;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
@@ -91,6 +92,11 @@ public class TileService implements OnChangeListener<AccentColor> {
         }));
     }
 
+    public boolean isPinned(App app) {
+        return _tiles.stream()
+                .anyMatch(t -> t.getPackageName().equals(app.packageName()));
+    }
+
     public void resizeTile(Tile tile) {
         // 4x2 => 2x2 => 1x1 => 4x2
         var sizeIndex = tileSizes.indexOf(new Size<>(tile.getSize().width(), tile.getSize().height()));
@@ -134,7 +140,9 @@ public class TileService implements OnChangeListener<AccentColor> {
                             continue;
                         }
                         var icon = _context.getPackageManager().getActivityIcon(intent);
-                        app = new App(title, packageName, icon, () -> _context.startActivity(intent));
+                        var info = _context.getPackageManager().getApplicationInfo(packageName, 0);
+                        var isSystemApp = (info.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+                        app = new App(title, packageName, icon, () -> _context.startActivity(intent), isSystemApp);
                     }
                     tiles.add(createTile(new Position<>(x, y), new Size<>(colSpan, rowSpan), app));
                 }

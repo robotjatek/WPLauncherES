@@ -48,7 +48,7 @@ public class LauncherSurfaceView extends GLSurfaceView {
     }
 
     public void dispose() {
-        if (_disposed) {
+        if (!_disposed) {
             _renderer.dispose();
             _disposed = true;
         }

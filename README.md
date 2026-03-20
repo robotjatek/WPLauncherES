@@ -22,6 +22,8 @@ The goal remains the same: a WP7/8 style launcher, now with no external UI frame
 
 ## Milestones
 
+This is a living roadmap, all future milestones are refined as I go, and subject to change.
+
 ### M1 - POC / pre-alpha
 
 M1 is all about laying the groundwork. Don't expect anything fancy here. At this phase the application is barely usable.
@@ -87,7 +89,7 @@ I'm already daily-driving, you shouldn't be.
 - [x] Checkbox border
 - [x] Fix: pin the same tile multiple times
 - [x] Don't show uninstall in the context menu for internal and system apps
-- [ ] Fix: tile overlap after resize
+- [x] Fix: tile overlap after resize
 - [x] Remove uninstalled app from the applist/tilegrid
 - [x] Fix: Updated app is removed from the grid and app-list instead of updating
 - [x] Adjust notification count on tiles - don't allow overlap with the icon
@@ -95,13 +97,10 @@ I'm already daily-driving, you shouldn't be.
 - [x] Fix: Some notifications are counted multiple times
 - [x] Use AbsoluteLayout in the ClockHUB tile
 - [x] Press "Home" button to jump back to the top of the tile-grid  
-- [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
-- [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware, needs repro)
-- [ ] Fix: Tile bg after resize is dark (needs repro)
 
 ### M3 - beta
 
-M3 is the preparation for a first public beta release.
+Try to make it usable for the less crazy people
 
 - [ ] GLES 3.0
 - [ ] Make ContextMenu and MenuOption to use layouts and labels
@@ -115,6 +114,7 @@ M3 is the preparation for a first public beta release.
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Generic carousel view
 - [ ] Gesture system refactor
+- [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Optimizations
 - [ ] Bug fixes
 - [ ] Multi lang support
@@ -125,12 +125,12 @@ M3 is the preparation for a first public beta release.
 - [ ] Re-ask for permissions from the launcher settings
 - [ ] Search bar in the app-list
 - [ ] Scissor test on tiles to prevent drawing out of the tile
-- [ ] First public beta version (?)
 
 ### M3.5
 
 Try it at your own risk
 
+- [ ] Maybe a closed beta (?)
 - [ ] TBD
 
 ### M4 - RC
@@ -141,9 +141,15 @@ Try it at your own risk
 - [ ] WP7/7.8 start screen setting
 - [ ] Custom tile color
 
+### Bugs that need repro:
+
+- [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
+- [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware, needs repro)
+- [ ] Fix: Tile bg after resize is dark (needs repro)
+
 ### Current progress
 
-M2.5 is in progress
+M3 is in progress
 
 ## Planned live custom tiles / "widgets"
 

@@ -49,14 +49,26 @@ public abstract class EditBaseState implements IState {
     }
 
     protected void reflowTiles(Position<Integer> newPosition) {
-        var collidingTiles = getCollidingTiles(newPosition); // TODO: could be better if they swapped positions if it collides with 1 tile only
-        var lowestPoint = calculateGroupLowestPoint(collidingTiles);
-        var nonCollidingBelow = getTilesBelowGroup(collidingTiles, lowestPoint);
-        var offset = calculateReflowOffset(collidingTiles, newPosition);
+        // TODO: could be better if they swapped positions if it collides with 1 tile only
+        //  but what to do in other cases: maybe tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?
+        var selectedTile = _tilegrid.getSelectedTile();
+        var collidingTiles = getCollidingTiles(newPosition);
+        if (collidingTiles.isEmpty()) {
+            _tilegrid.getSelectedTile().setPosition(newPosition);
+            _tileService.compactGrid();
+            return;
+        }
 
-        _tileService.pushDownTiles(collidingTiles, offset);
-        _tileService.pushDownTiles(nonCollidingBelow, offset);
-        _tilegrid.getSelectedTile().setPosition(newPosition);
+        var offset = calculateReflowOffset(collidingTiles, newPosition);
+        var minY = collidingTiles.stream().mapToInt(t -> t.getPosition().y()).min().orElse(0);
+
+        var tilesToPush = _tilegrid.getTiles().stream()
+                .filter(t -> t != selectedTile)
+                .filter(t -> t.getPosition().y() >= minY)
+                .collect(Collectors.toList());
+
+        _tileService.pushDownTiles(tilesToPush, offset);
+        selectedTile.setPosition(newPosition);
         _tileService.compactGrid();
     }
 
@@ -90,18 +102,6 @@ public abstract class EditBaseState implements IState {
         }
 
         return colliding;
-    }
-
-    protected int calculateGroupLowestPoint(List<Tile> group) {
-        return group.stream().mapToInt(t -> t.getPosition().y() + t.getSize().height()).max().orElse(0);
-    }
-
-    protected List<Tile> getTilesBelowGroup(List<Tile> collidedGroup, int groupHeight) {
-        var selectedTile = _tilegrid.getSelectedTile();
-        // filter out the collided and the selected tiles
-        var nonCollided = _tilegrid.getTiles().stream().filter(t -> !collidedGroup.contains(t) && t != selectedTile);
-        var below = nonCollided.filter(t -> t.getPosition().y() >= groupHeight);
-        return below.collect(Collectors.toList());
     }
 
     /**

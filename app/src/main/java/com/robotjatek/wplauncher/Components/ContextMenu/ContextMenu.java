@@ -51,7 +51,7 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
         Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0); // Menu height is based on the number of items
         for (var i = 0; i < _options.size(); i++) {
             // draw each option
-            _options.get(i).draw(proj, view, renderer);
+            _options.get(i).draw(proj, view, renderer, _payload);
         }
     }
 

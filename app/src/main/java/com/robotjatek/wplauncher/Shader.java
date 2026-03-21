@@ -1,6 +1,6 @@
 package com.robotjatek.wplauncher;
 
-import android.opengl.GLES20;
+import android.opengl.GLES32;
 import android.util.Log;
 
 public class Shader {
@@ -11,9 +11,10 @@ public class Shader {
     // TODO: load file via path
     public Shader(String vertexPath, String fragmentPath) {
         var vertexShaderCode =
-                        "attribute vec4 vPosition;" +
-                        "attribute vec2 aTexCoord;" +
-                        "varying vec2 vTexCoord;" +
+                "#version 300 es\n" +
+                        "layout(location = 0) in vec4 vPosition;" +
+                        "layout(location = 1) in vec2 aTexCoord;" +
+                        "out vec2 vTexCoord;" +
                         "uniform mat4 uMVP;" +
                         "void main() {" +
                         "  gl_Position = uMVP * vPosition;" +
@@ -21,31 +22,33 @@ public class Shader {
                         "}";
 
         String fragmentShaderCode =
+                "#version 300 es\n" +
                         "precision mediump float;" +
                         "uniform sampler2D uTexture;" +
-                        "varying vec2 vTexCoord;" +
+                        "in vec2 vTexCoord;" +
+                        "out vec4 color;" +
                         "void main() {" +
-                        "  vec4 texColor = texture2D(uTexture, vTexCoord);" +
-                        "  gl_FragColor = texColor;" +
+                        "  vec4 texColor = texture(uTexture, vTexCoord);" +
+                        "  color = texColor;" +
                         "}";
 
-        var vertexShader = loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        var fragmentShader = loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        var vertexShader = loadShader(GLES32.GL_VERTEX_SHADER, vertexShaderCode);
+        var fragmentShader = loadShader(GLES32.GL_FRAGMENT_SHADER, fragmentShaderCode);
 
-        _shaderProgram = GLES20.glCreateProgram();
-        GLES20.glAttachShader(_shaderProgram, vertexShader);
-        GLES20.glAttachShader(_shaderProgram, fragmentShader);
-        GLES20.glLinkProgram(_shaderProgram);
-        GLES20.glDetachShader(_shaderProgram, vertexShader);
-        GLES20.glDetachShader(_shaderProgram, fragmentShader);
+        _shaderProgram = GLES32.glCreateProgram();
+        GLES32.glAttachShader(_shaderProgram, vertexShader);
+        GLES32.glAttachShader(_shaderProgram, fragmentShader);
+        GLES32.glLinkProgram(_shaderProgram);
+        GLES32.glDetachShader(_shaderProgram, vertexShader);
+        GLES32.glDetachShader(_shaderProgram, fragmentShader);
     }
 
     public void use() {
-        GLES20.glUseProgram(_shaderProgram);
+        GLES32.glUseProgram(_shaderProgram);
     }
 
     public void delete() {
-        GLES20.glDeleteShader(_shaderProgram);
+        GLES32.glDeleteShader(_shaderProgram);
     }
 
     public int getId() {
@@ -55,32 +58,32 @@ public class Shader {
     // TODO: cache location
     public void setVec4Uniform(String name, float x, float y, float z, float w) {
         this.use();
-        var location = GLES20.glGetUniformLocation(_shaderProgram, name);
-        GLES20.glUniform4f(location, x, y, z, w);
+        var location = GLES32.glGetUniformLocation(_shaderProgram, name);
+        GLES32.glUniform4f(location, x, y, z, w);
     }
 
     public void setMat4Uniform(String name, float[] matrix) {
         this.use();
-        var location = GLES20.glGetUniformLocation(_shaderProgram, name);
-        GLES20.glUniformMatrix4fv(location, 1, false, matrix, 0);
+        var location = GLES32.glGetUniformLocation(_shaderProgram, name);
+        GLES32.glUniformMatrix4fv(location, 1, false, matrix, 0);
     }
 
     public void setIntUniform(String name, int value) {
         this.use();
-        var location = GLES20.glGetUniformLocation(_shaderProgram, name);
-        GLES20.glUniform1i(location, value);
+        var location = GLES32.glGetUniformLocation(_shaderProgram, name);
+        GLES32.glUniform1i(location, value);
     }
 
     private static int loadShader(int type, String shaderCode){
-        var shader = GLES20.glCreateShader(type);
-        GLES20.glShaderSource(shader, shaderCode);
-        GLES20.glCompileShader(shader);
+        var shader = GLES32.glCreateShader(type);
+        GLES32.glShaderSource(shader, shaderCode);
+        GLES32.glCompileShader(shader);
 
         int[] compiled = new int[1];
-        GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0);
+        GLES32.glGetShaderiv(shader, GLES32.GL_COMPILE_STATUS, compiled, 0);
         if (compiled[0] == 0) {
-            Log.e("GL", "Could not compile shader " + type + ": " + GLES20.glGetShaderInfoLog(shader));
-            GLES20.glDeleteShader(shader);
+            Log.e("GL", "Could not compile shader " + type + ": " + GLES32.glGetShaderInfoLog(shader));
+            GLES32.glDeleteShader(shader);
             shader = 0;
         }
 

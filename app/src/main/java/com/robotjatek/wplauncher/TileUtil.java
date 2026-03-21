@@ -4,7 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.opengl.GLES20;
+import android.opengl.GLES32;
 import android.opengl.GLUtils;
 
 public class TileUtil {
@@ -61,13 +61,13 @@ public class TileUtil {
         canvas.drawText(text, x, y, paint);
 
         var ids = new int[1];
-        GLES20.glGenTextures(1, ids, 0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, ids[0]);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+        GLES32.glGenTextures(1, ids, 0);
+        GLES32.glBindTexture(GLES32.GL_TEXTURE_2D, ids[0]);
+        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MIN_FILTER, GLES32.GL_LINEAR);
+        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_MAG_FILTER, GLES32.GL_LINEAR);
+        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_WRAP_S, GLES32.GL_CLAMP_TO_EDGE);
+        GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_WRAP_T, GLES32.GL_CLAMP_TO_EDGE);
+        GLUtils.texImage2D(GLES32.GL_TEXTURE_2D, 0, bitmap, 0);
 
         bitmap.recycle();
 
@@ -80,7 +80,7 @@ public class TileUtil {
 
     public static void deleteTexture(int handle) {
         if (handle != -1) {
-            GLES20.glDeleteTextures(1, new int[] {handle}, 0);
+            GLES32.glDeleteTextures(1, new int[] {handle}, 0);
         }
     }
 }

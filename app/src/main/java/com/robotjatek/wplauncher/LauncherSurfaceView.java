@@ -16,7 +16,7 @@ public class LauncherSurfaceView extends GLSurfaceView {
         super(context);
         _renderer = new LauncherRenderer(context, locationService, appChangeReceiver);
 
-        setEGLContextClientVersion(2);
+        setEGLContextClientVersion(3);
         setRenderer(_renderer);
 
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);

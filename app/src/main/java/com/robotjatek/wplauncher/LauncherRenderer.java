@@ -1,7 +1,7 @@
 package com.robotjatek.wplauncher;
 
 import android.content.Context;
-import android.opengl.GLES20;
+import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
@@ -37,9 +37,10 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     public void onSurfaceCreated(javax.microedition.khronos.opengles.GL10 glUnused,
                                  javax.microedition.khronos.egl.EGLConfig config) {
         // Init screens and every GL related objects in surfaceCreated so no accidental gl calls before the surface is ready
-        GLES20.glClearColor(0f, 0f, 0f, 1f);
-        GLES20.glEnable(GLES20.GL_CULL_FACE);
-        GLES20.glFrontFace(GLES20.GL_CW);
+        GLES32.glClearColor(0f, 0f, 0f, 1f);
+        GLES32.glEnable(GLES32.GL_CULL_FACE);
+        GLES32.glFrontFace(GLES32.GL_CW);
+        GLES32.glCullFace(GLES32.GL_BACK);
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
         _navigationStack.push(new StartScreen(_context, this, _locationService, _appChangeReceiver));
@@ -56,13 +57,13 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
             frameCount = 0;
             fpsTime = System.currentTimeMillis();
         }
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT);
         _navigationStack.getFirst().draw(delta, _projMatrix, _renderer); // TODO: animation
     }
 
     @Override
     public void onSurfaceChanged(javax.microedition.khronos.opengles.GL10 glUnused, int width, int height) {
-        GLES20.glViewport(0, 0, width, height);
+        GLES32.glViewport(0, 0, width, height);
         Matrix.orthoM(_projMatrix, 0, 0, width, height, 0, -1, 1);
         Matrix.translateM(_projMatrix, 0, 0, _topInset, 0);
         _navigationStack.forEach(s -> s.onResize(width, height));

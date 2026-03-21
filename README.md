@@ -102,7 +102,7 @@ I'm already daily-driving, you shouldn't be.
 
 Try to make it usable for the less crazy people
 
-- [ ] GLES 3.0
+- [x] GLES 3.0
 - [ ] Make ContextMenu and MenuOption to use layouts and labels
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks

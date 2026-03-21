@@ -14,7 +14,7 @@ The goal remains the same: a WP7/8 style launcher, now with no external UI frame
 
 ## Tech stack
 - Java 
-- OpenGL ES2.0
+- OpenGL ES3.2
 - API Level 34
 
 <img src="img/s2.png" alt="Description" width="250">
@@ -102,8 +102,8 @@ I'm already daily-driving, you shouldn't be.
 
 Try to make it usable for the less crazy people
 
-- [x] GLES 3.0
-- [ ] Make ContextMenu and MenuOption to use layouts and labels
+- [x] GLES 3.2
+- [x] Make ContextMenu and MenuOption to use layouts and labels
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
   - [ ] Photos

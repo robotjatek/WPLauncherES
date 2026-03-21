@@ -1,7 +1,5 @@
 package com.robotjatek.wplauncher.Components.ContextMenu;
 
-import android.opengl.Matrix;
-
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
@@ -17,7 +15,6 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
     private final IDrawContext<ContextMenu<T>> _context;
     private final List<MenuOption<T>> _options = new ArrayList<>();
     public Position<Float> _position;
-    private final float[] _modelMatrix = new float[16];
     private T _payload;
     private boolean _isOpened = false;
 
@@ -25,7 +22,6 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
         _context = context;
         _position = position;
         _position = new Position<>(_context.xOf(this), _context.yOf(this)); // recalculate position after confining the menu into the viewport
-        Matrix.setIdentityM(_modelMatrix, 0);
     }
 
     public void open(Position<Float> position, T payload) {
@@ -44,14 +40,10 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
         return _isOpened;
     }
 
-    public void draw(float[] proj, float[] view, QuadRenderer renderer) {
-        var menuHeight = calculateHeight();
-        // Currently I only draw the child elements
-        Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
-        Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), menuHeight, 0); // Menu height is based on the number of items
+    public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer) {
         for (var i = 0; i < _options.size(); i++) {
             // draw each option
-            _options.get(i).draw(proj, view, renderer, _payload);
+            _options.get(i).draw(delta, proj, view, renderer, _payload);
         }
     }
 

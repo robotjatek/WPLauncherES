@@ -6,7 +6,6 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
-import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;

@@ -163,6 +163,11 @@ public class Label implements UIElement {
         return _textColor;
     }
 
+    public void setTextColor(int color) {
+        _textColor = color;
+        _dirty = true;
+    }
+
     public int getTextSize() {
         return _textSize;
     }

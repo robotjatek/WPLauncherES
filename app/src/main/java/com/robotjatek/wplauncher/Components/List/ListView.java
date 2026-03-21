@@ -80,7 +80,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
 
         // Draw the context menu last so it shows up above everything else
         if (_contextMenu != null && _contextMenu.isOpened()) {
-            _contextMenu.draw(projMatrix, viewMatrix, renderer);
+            _contextMenu.draw(delta, projMatrix, viewMatrix, renderer);
         }
     }
 

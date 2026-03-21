@@ -1,44 +1,36 @@
 package com.robotjatek.wplauncher.Components.ContextMenu;
 
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
-import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.Components.Label.Label;
+import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.VerticalAlign;
-import com.robotjatek.wplauncher.TileUtil;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-// TODO: make MenuOption to use labels, and layouts
 public class MenuOption<T> {
 
     private boolean _disposed = false;
     private final Consumer<T> _action;
     private final IDrawContext<MenuOption<T>> _context;
-    private final float[] _modelMatrix = new float[16];
-    private int _textureId;
     private final Function<T, Boolean> _isEnabled;
     private Boolean _prevEnabled = null;
-    private final String _label;
+    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final Label _option;
+    private boolean _dirty = true;
 
     public MenuOption(String label, Consumer<T> action, IDrawContext<MenuOption<T>> context, Function<T, Boolean> isEnabled) {
         _action = action;
         _context = context;
         _isEnabled = isEnabled;
-        _label = label;
-        _textureId = TileUtil.createTextTexture(label,
-                (int) context.widthOf(this),
-                (int) context.heightOf(this),
-                48,
-                Typeface.BOLD,
-                Colors.WHITE,
-                Colors.CONTEXT_MENU_GRAY,
-                HorizontalAlign.LEFT,
-                VerticalAlign.CENTER);
+
+        _option = new Label(label, 48, Typeface.BOLD, Colors.WHITE, Colors.CONTEXT_MENU_GRAY);
+        _layout.setBgColor(Colors.CONTEXT_MENU_GRAY);
     }
 
     public void onTap(T payload) {
@@ -52,32 +44,34 @@ public class MenuOption<T> {
         }
     }
 
-    public void draw(float[] proj, float[] view, QuadRenderer renderer, T payload) {
-        var w = _context.widthOf(this);
-        var h = _context.heightOf(this);
+    public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, T payload) {
+        var x = _context.xOf(this);
+        var y = _context.yOf(this);
+        var w = (int) _context.widthOf(this);
+        var h = (int) _context.heightOf(this);
+
+        if (_dirty) {
+            _layout.addChild(_option, new Position<>(w * 0.05f, (h / 2f) - _option.measure().height() / 2f));
+            _dirty = false;
+        }
+
+        _option.setMaxWidth(w);
 
         if (_isEnabled != null) {
             var isEnabled = _isEnabled.apply(payload);
             if (isEnabled != _prevEnabled) {
                 var color = isEnabled ? Colors.WHITE : Colors.LIGHT_GRAY;
-                TileUtil.deleteTexture(_textureId);
-                _textureId = TileUtil.createTextTexture(_label, (int) w, (int) h, 48, Typeface.BOLD,
-                        color, Colors.CONTEXT_MENU_GRAY, HorizontalAlign.LEFT, VerticalAlign.CENTER);
+                _option.setTextColor(color);
                 _prevEnabled = isEnabled;
             }
         }
 
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, _context.xOf(this), _context.yOf(this), 0);
-        Matrix.scaleM(_modelMatrix, 0, _context.widthOf(this), _context.heightOf(this), 0);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _textureId);
+        _layout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
     }
 
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_textureId);
-            _textureId = -1;
+            _layout.dispose();
             _disposed = true;
         }
     }

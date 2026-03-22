@@ -2,48 +2,41 @@ package com.robotjatek.wplauncher.Components.List;
 
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
-import com.robotjatek.wplauncher.HorizontalAlign;
+import com.robotjatek.wplauncher.Components.Icon.Icon;
+import com.robotjatek.wplauncher.Components.Label.Label;
+import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.VerticalAlign;
-import com.robotjatek.wplauncher.TileUtil;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class ListItem<T> {
-    private String _label;
-    private Drawable _icon;
-    private int _bgColor;
-    private int _iconTextureId;
-    private int _bgTextureId;
-    private int _textureId;
-    private final float[] _modelMatrix = new float[16];
     private Runnable _onTap;
     private boolean _dirty = true;
     private T _payload;
+    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final Label _textLabel;
+    private final Icon _icon;
 
-    public ListItem(String label, Drawable icon, Runnable onTap, T payload, int bgColor) {
-        _label = label;
+    public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
         _onTap = onTap;
         _payload = payload;
-        _icon = icon;
-        _bgColor = bgColor;
+        _textLabel = new Label(label, 60, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
+        _icon = new Icon(icon, iconBgColor);
     }
 
     public String getLabel() {
-        return _label;
+        return _textLabel.getText();
     }
 
     public void setLabel(String label) {
-        _label = label;
-        _dirty = true;
+        _textLabel.setText(label);
     }
 
-    public void setBgColor(int color) {
-        _bgColor = color;
-        _dirty = true;
+    public void setIconBgColor(int color) {
+        _icon.setBgColor(color);
     }
 
     public T getPayload() {
@@ -55,58 +48,36 @@ public class ListItem<T> {
     }
 
     public void setIcon(Drawable icon) {
-        _icon = icon;
-        _dirty = true;
+        _icon.setIconDrawable(icon);
     }
 
     public void setOnTap(Runnable onTap) {
         _onTap = onTap;
     }
 
-    public void draw(float[] projMatrix, float[] viewMatrix, IDrawContext<ListItem<T>> context, QuadRenderer renderer) {
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, IDrawContext<ListItem<T>> context, QuadRenderer renderer) {
         var x = context.xOf(this);
         var y = context.yOf(this);
-        var w = context.widthOf(this);
-        var h = context.heightOf(this);
-
-        var labelW = w - h;
-        var labelX = x + h;
-
-        // BG
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0f);
-        Matrix.scaleM(_modelMatrix, 0, h, h, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(projMatrix, _modelMatrix, _bgTextureId);
-
-        // icon
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, h, h, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(projMatrix, _modelMatrix, _iconTextureId);
-
-        // label
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, labelX, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, labelW, h, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(projMatrix, _modelMatrix, _textureId);
+        var w = (int) context.widthOf(this);
+        var h = (int) context.heightOf(this);
+        _layout.draw(delta, projMatrix, viewMatrix, renderer, new Position<>(x, y), new Size<>(w, h));
     }
 
     public void update(IDrawContext<ListItem<T>> context) {
-        // TODO: queue up opengl events into a command list
         if (_dirty) {
-            var w = context.widthOf(this);
-            var h = context.heightOf(this);
-            var labelW = (int)(w - h);
-            TileUtil.deleteTexture(_textureId);
-            _textureId = TileUtil.createTextTexture(_label, labelW, (int)context.heightOf(this), 60,
-                    Typeface.NORMAL, Colors.LIGHT_GRAY, 0, HorizontalAlign.LEFT, VerticalAlign.CENTER);
-            TileUtil.deleteTexture(_iconTextureId);
-            _iconTextureId = BitmapUtil.createTextureFromDrawable(_icon, (int)context.heightOf(this), (int)context.heightOf(this));
-            TileUtil.deleteTexture(_bgTextureId);
-            _bgTextureId = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect((int)w, (int)h, 0, _bgColor));
+            var w = (int) context.widthOf(this);
+            var h = (int) context.heightOf(this);
+            _icon.setSize(new Size<>(h, h));
+            _textLabel.setMaxWidth(w - h);
+
+            var labelX = _icon.measure().width() + w * 0.02f;
+            var labelY = (h - _textLabel.measure().height()) / 2f;
+
+
+            _layout.removeChild(_icon);
+            _layout.addChild(_icon, new Position<>(0f, 0f));
+            _layout.removeChild(_textLabel);
+            _layout.addChild(_textLabel, new Position<>(labelX, labelY));
             _dirty = false;
         }
     }
@@ -122,11 +93,6 @@ public class ListItem<T> {
     }
 
     public void dispose() {
-        TileUtil.deleteTexture(_textureId);
-        TileUtil.deleteTexture(_iconTextureId);
-        TileUtil.deleteTexture(_bgTextureId);
-        _textureId = -1;
-        _iconTextureId = -1;
-        _bgTextureId = -1;
+        _layout.dispose();
     }
 }

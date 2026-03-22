@@ -5,6 +5,8 @@ import static com.robotjatek.wplauncher.Components.List.ListView.ITEM_GAP_PX;
 import static com.robotjatek.wplauncher.Components.List.ListView.ITEM_HEIGHT_PX;
 import static com.robotjatek.wplauncher.Components.List.ListView.TOP_MARGIN_PX;
 
+import android.util.Log;
+
 import com.robotjatek.wplauncher.Components.List.ListItem;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.Components.List.ListView;
@@ -21,7 +23,7 @@ public class BaseState<T> implements IState {
 
     @Override
     public void enter() {
-
+        Log.d(IState.class.toString(), this.getClass().toString());
     }
 
     @Override

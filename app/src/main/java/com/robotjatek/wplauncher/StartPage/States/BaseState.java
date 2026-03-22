@@ -15,7 +15,7 @@ public abstract class BaseState implements IState {
 
     @Override
     public void enter() {
-        Log.d(IState.class.toString(), this.getClass().toString());
+    //    Log.d(IState.class.toString(), this.getClass().toString());
     }
 
     @Override

@@ -4,7 +4,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Components.List.ListItem;
-import com.robotjatek.wplauncher.Components.List.ListItemDrawContext;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
@@ -28,14 +27,15 @@ public class ColorPickerScreen implements IScreen {
         _navigator = navigator;
         Matrix.setIdentityM(viewMatrix, 0);
         _view = new ListView<>();
-        _view.addItems(createItems(_view.getDrawContext()));
+        _view.addItems(createItems());
     }
 
-    private List<ListItem<AccentColor>> createItems(ListItemDrawContext<AccentColor, ListView<AccentColor>> drawContext) {
+    private List<ListItem<AccentColor>> createItems() {
         return Colors.ACCENT_COLORS.stream().map(i ->
                 new ListItem<>(i.name(),
                         new ColorDrawable(i.color()),
-                        () -> selectColor(i), i, 0)).toList();
+                        Colors.TRANSPARENT,
+                        () -> selectColor(i), i)).toList();
     }
 
     public void subscribe(OnChangeListener<AccentColor> listener) {

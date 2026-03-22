@@ -104,6 +104,7 @@ Try to make it usable for the less crazy people
 
 - [x] GLES 3.2
 - [x] Make ContextMenu and MenuOption to use layouts and labels
+- [x] Make ListItem use high level UI components
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
   - [ ] Photos

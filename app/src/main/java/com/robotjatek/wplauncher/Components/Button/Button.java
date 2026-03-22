@@ -43,7 +43,7 @@ public class Button implements UIElement {
             // 1 px white border
             TileUtil.deleteTexture(_foreground);
             TileUtil.deleteTexture(_iconTexture);
-            _bgTexture = TileUtil.createTextTexture("", w, h, 0, Typeface.NORMAL, Colors.TRANSPARENT, Colors.WHITE, HorizontalAlign.LEFT, VerticalAlign.CENTER);
+            _bgTexture = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, Colors.WHITE));
             _foreground = TileUtil.createTextTexture(_text, w - 1, h - 1, 48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, HorizontalAlign.LEFT, VerticalAlign.CENTER);
             if (_icon != null) {
                 _iconTexture = BitmapUtil.createTextureFromDrawable(_icon, h, h);

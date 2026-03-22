@@ -75,7 +75,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
 
         for (var i : _items) {
             i.update(_drawContext);
-            i.draw(projMatrix, scrollMatrix, _drawContext, renderer);
+            i.draw(delta, projMatrix, scrollMatrix, _drawContext, renderer);
         }
 
         // Draw the context menu last so it shows up above everything else

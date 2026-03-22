@@ -129,8 +129,8 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     }
 
     private ListItem<App> createItem(App app) {
-        var bgColor = _settingsService.getAccentColor().color();
-        return new ListItem<>(app.name(), app.icon(), app.action(), app, bgColor);
+        var accentColor = _settingsService.getAccentColor().color();
+        return new ListItem<>(app.name(), app.icon(), accentColor, app.action(), app);
     }
 
     private void uninstallApp(String packageName) {
@@ -163,7 +163,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     @Override
     public void changed(AccentColor changed) {
-        _list.getItems().forEach(i -> i.setBgColor(changed.color()));
+        _list.getItems().forEach(i -> i.setIconBgColor(changed.color()));
     }
 
     @Override

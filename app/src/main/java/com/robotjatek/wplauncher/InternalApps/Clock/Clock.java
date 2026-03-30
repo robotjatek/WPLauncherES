@@ -76,7 +76,7 @@ public class Clock implements IScreen {
     @Override
     public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
         Matrix.setIdentityM(_pageMatrix, 0);
-        _layout.draw(delta, projMatrix, _pageMatrix, renderer, new Position<>(0f, 0f), _size);
+        _layout.draw(delta, projMatrix, _pageMatrix, renderer, Position.ZERO, _size);
     }
 
     @Override

@@ -105,6 +105,7 @@ Try to make it usable for the less crazy people
 - [x] GLES 3.2
 - [x] Make ContextMenu and MenuOption to use layouts and labels
 - [x] Make ListItem use high level UI components
+- [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
   - [ ] Photos
@@ -113,6 +114,7 @@ Try to make it usable for the less crazy people
   - [ ] Messages
   - [ ] Contacts
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
+- [ ] Animation after swipe
 - [ ] Generic carousel view
 - [ ] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)

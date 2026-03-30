@@ -4,6 +4,7 @@ import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class ScrollState extends BaseState {
     private final float _startY;
+    private boolean _touching = true;
 
     public ScrollState(TileGrid context, float y) {
         super(context);
@@ -17,13 +18,29 @@ public class ScrollState extends BaseState {
     }
 
     @Override
+    public void handleTouchStart(float x, float y) {
+        // handle retap on flinging
+        _touching = true;
+        _context.getScroll().onTouchStart(y);
+    }
+
+    @Override
     public void handleTouchEnd(float x, float y) {
+        _touching = false;
         _context.getScroll().onTouchEnd();
-        _context.changeState(_context.IDLE_STATE()); // TODO: low prio fix: remain in scroll state while flinging
     }
 
     @Override
     public void handleMove(float x, float y) {
         _context.getScroll().onTouchMove(y);
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+
+        if (!_touching && !_context.getScroll().isFlinging()) {
+            _context.changeState(_context.IDLE_STATE());
+        }
     }
 }

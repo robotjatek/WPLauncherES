@@ -75,7 +75,7 @@ public class ListItem<T> {
 
 
             _layout.removeChild(_icon);
-            _layout.addChild(_icon, new Position<>(0f, 0f));
+            _layout.addChild(_icon, Position.ZERO);
             _layout.removeChild(_textLabel);
             _layout.addChild(_textLabel, new Position<>(labelX, labelY));
             _dirty = false;

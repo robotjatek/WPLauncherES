@@ -21,7 +21,7 @@ public class Shader {
                         "  vTexCoord = aTexCoord;" +
                         "}";
 
-        String fragmentShaderCode =
+        var fragmentShaderCode =
                 "#version 300 es\n" +
                         "precision mediump float;" +
                         "uniform sampler2D uTexture;" +
@@ -41,6 +41,8 @@ public class Shader {
         GLES32.glLinkProgram(_shaderProgram);
         GLES32.glDetachShader(_shaderProgram, vertexShader);
         GLES32.glDetachShader(_shaderProgram, fragmentShader);
+        GLES32.glDeleteShader(vertexShader);
+        GLES32.glDeleteShader(fragmentShader);
     }
 
     public void use() {

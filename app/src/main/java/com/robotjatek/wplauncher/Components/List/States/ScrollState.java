@@ -4,6 +4,7 @@ import com.robotjatek.wplauncher.Components.List.ListView;
 
 public class ScrollState<T> extends BaseState<T> {
     private final float _startY;
+    private boolean _touching = true;
 
     public ScrollState(ListView<T> context, float y) {
         super(context);
@@ -17,13 +18,28 @@ public class ScrollState<T> extends BaseState<T> {
     }
 
     @Override
+    public void handleTouchStart(float x, float y) {
+        // handle retap on flinging
+        _touching = true;
+        _context.getScroll().onTouchStart(y);
+    }
+
+    @Override
     public void handleTouchEnd(float x, float y) {
         _context.getScroll().onTouchEnd();
-        _context.changeState(_context.IDLE_STATE()); // TODO: low prio fix: remain in scroll state while flinging
+        _touching = false;
     }
 
     @Override
     public void handleMove(float x, float y) {
         _context.getScroll().onTouchMove(y);
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        if (!_touching && !_context.getScroll().isFlinging()) {
+            _context.changeState(_context.IDLE_STATE());
+        }
     }
 }

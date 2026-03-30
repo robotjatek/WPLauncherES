@@ -61,7 +61,7 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
     @Override
     public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
         Matrix.setIdentityM(_view, 0);
-        _layout.draw(delta, projMatrix, _view, renderer, new Position<>(0f, 0f), _size);
+        _layout.draw(delta, projMatrix, _view, renderer, Position.ZERO, _size);
     }
 
     @Override

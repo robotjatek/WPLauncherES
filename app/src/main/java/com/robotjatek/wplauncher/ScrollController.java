@@ -4,7 +4,7 @@ public class ScrollController {
 
     private static final float FRICTION = 0.0025f; // Deceleration in pixels/ms2
     private static final float FLING_THRESHOLD = 1.5f;
-    private static final float MIN_VELOCITY = 0.01f;
+    private static final float MIN_VELOCITY = 0.5f;
     private static final float MAX_VELOCITY = 5f;
 
     private boolean _isFlinging = false;
@@ -40,8 +40,8 @@ public class ScrollController {
             }
         }
 
-        // Stop if velocity is below threshold
-        if (Math.abs(_velocity) < MIN_VELOCITY) {
+        // Stop if velocity is below threshold or when hit boundaries
+        if (Math.abs(_velocity) < MIN_VELOCITY || _scrollOffset <= _minOffset || _scrollOffset >= _maxOffset) {
             _velocity = 0;
             _isFlinging = false;
             return;
@@ -113,6 +113,10 @@ public class ScrollController {
     }
 
     public void setScrollOffset(float value) {
-        _scrollOffset = value;
+        _scrollOffset = clampOffset(value);
+    }
+
+    public boolean isFlinging() {
+        return _isFlinging;
     }
 }

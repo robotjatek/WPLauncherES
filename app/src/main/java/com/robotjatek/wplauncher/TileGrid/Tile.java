@@ -11,6 +11,8 @@ public class Tile {
     public static final Size<Integer> SMALL = new Size<>(1, 1);
     public static final Size<Integer> MEDIUM = new Size<>(2, 2);
     public static final Size<Integer> WIDE = new Size<>(4, 2);
+    private final float[] _frontViewMatrix = new float[16];
+    private final float[] _backViewMatrix = new float[16];
     private static final float TIME_BEFORE_FLIP_MIN = 4000f;
     private static final float TIME_BEFORE_FLIP_MAX = 8000f;
     private boolean _disposed = false;
@@ -54,21 +56,19 @@ public class Tile {
         // fake perspective
         var scaleY = (float) Math.cos(Math.toRadians(_rot));
 
-        var frontViewMatrix = new float[16];
-        Matrix.setIdentityM(frontViewMatrix, 0);
-        Matrix.translateM(frontViewMatrix, 0, correctedX + width / 2f, correctedY + height/2f, 0f);
-        Matrix.scaleM(frontViewMatrix, 0, 1, scaleY, 1);
-        Matrix.translateM(frontViewMatrix, 0, -width / 2f, -height / 2f, 0f);
-        Matrix.multiplyMM(frontViewMatrix, 0, viewMatrix, 0, frontViewMatrix, 0);
+        Matrix.setIdentityM(_frontViewMatrix, 0);
+        Matrix.translateM(_frontViewMatrix, 0, correctedX + width / 2f, correctedY + height/2f, 0f);
+        Matrix.scaleM(_frontViewMatrix, 0, 1, scaleY, 1);
+        Matrix.translateM(_frontViewMatrix, 0, -width / 2f, -height / 2f, 0f);
+        Matrix.multiplyMM(_frontViewMatrix, 0, viewMatrix, 0, _frontViewMatrix, 0);
 
-        var backViewMatrix = new float[16];
-        Matrix.setIdentityM(backViewMatrix, 0);
-        Matrix.translateM(backViewMatrix, 0, correctedX + width / 2f, correctedY + height / 2f, 0f);
+        Matrix.setIdentityM(_backViewMatrix, 0);
+        Matrix.translateM(_backViewMatrix, 0, correctedX + width / 2f, correctedY + height / 2f, 0f);
         // 2 combined scales: first mirror, then rotate
-        Matrix.scaleM(backViewMatrix, 0, 1, -1, 1); // Mirror the back side
-        Matrix.scaleM(backViewMatrix, 0, 1, scaleY, 1); // Then apply rotation scale
-        Matrix.translateM(backViewMatrix, 0, -width / 2f, -height / 2f, 0f);
-        Matrix.multiplyMM(backViewMatrix, 0, viewMatrix, 0, backViewMatrix, 0);
+        Matrix.scaleM(_backViewMatrix, 0, 1, -1, 1); // Mirror the back side
+        Matrix.scaleM(_backViewMatrix, 0, 1, scaleY, 1); // Then apply rotation scale
+        Matrix.translateM(_backViewMatrix, 0, -width / 2f, -height / 2f, 0f);
+        Matrix.multiplyMM(_backViewMatrix, 0, viewMatrix, 0, _backViewMatrix, 0);
 
         var backHasContent = _backContent != null && _backContent.hasContent() && !_size.equals(Tile.SMALL);
         if (backHasContent) {
@@ -98,10 +98,10 @@ public class Tile {
 
         // Draw only the visible side
         if (scaleY >= 0) {
-            _content.draw(delta, projMatrix, frontViewMatrix, renderer, this, new Position<>(0f, 0f), new Size<>(width, height));
+            _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
         } else {
             if (_backContent != null) {
-                _backContent.draw(delta, projMatrix, backViewMatrix, renderer, this, new Position<>(0f, 0f), new Size<>(width, height));
+                _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
             }
         }
     }

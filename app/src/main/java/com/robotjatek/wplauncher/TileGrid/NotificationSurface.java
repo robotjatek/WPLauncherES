@@ -38,8 +38,8 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     public NotificationSurface(App app) {
         _packageName = app.packageName();
         NotificationListener.subscribe(_packageName, this);
-        _layout.addChild(_titleLabel, new Position<>(0f, 0f));
-        _layout.addChild(_textBox, new Position<>(0f, 0f));
+        _layout.addChild(_titleLabel, Position.ZERO);
+        _layout.addChild(_textBox, Position.ZERO);
     }
 
     @Override

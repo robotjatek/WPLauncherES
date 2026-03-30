@@ -116,10 +116,6 @@ public class ListView<T> implements IItemListContainer<T>, Page {
         }
     }
 
-    public ListItemDrawContext<T, ListView<T>> getDrawContext() {
-        return _drawContext;
-    }
-
     public void addItem(int index, ListItem<T> item) {
         _items.add(index, item);
         setScrollBounds();

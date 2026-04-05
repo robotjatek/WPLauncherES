@@ -16,7 +16,6 @@ import com.robotjatek.wplauncher.Services.NotificationListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 record InternalNotification(String title, String message) { }
 
@@ -95,11 +94,15 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
             var flags = n.getNotification().flags;
             var isGroup = (flags & Notification.FLAG_GROUP_SUMMARY) != 0;
             if (!isGroup) {
-                var title = Objects.requireNonNull(n.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE)).toString();
-                var text = Objects.requireNonNull(n.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT)).toString();
+                var title = n.getNotification().extras.getCharSequence(Notification.EXTRA_TITLE);
+                var text = n.getNotification().extras.getCharSequence(Notification.EXTRA_TEXT);
+                if (title == null && text == null) continue; // skip notifications without content;
              //   var messages = n.getNotification().extras.getCharSequence(Notification.EXTRA_MESSAGES);
              //   var summary = n.getNotification().extras.getCharSequence(Notification.EXTRA_SUMMARY_TEXT);
-                _notifications.add(new InternalNotification(title, text));
+                _notifications.add(
+                        new InternalNotification(
+                                title != null ? title.toString() : "",
+                                text != null ? text.toString() : ""));
             }
         }
         _dirty = true;

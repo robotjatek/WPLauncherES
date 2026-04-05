@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.EdgeToEdge;
@@ -36,6 +37,7 @@ public class MainActivity extends ComponentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(this));
         EdgeToEdge.enable(this);
         _locationPermission = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
@@ -114,6 +116,7 @@ public class MainActivity extends ComponentActivity {
 
     @Override
     protected void onDestroy() {
+        Log.d(MainActivity.class.getName(), "onDestroy!!!!");
         super.onDestroy();
         _surface.dispose();
         if (_appChangeReceiver != null) {

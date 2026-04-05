@@ -9,8 +9,8 @@ import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
-import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigator {
     private boolean _disposed = false;
@@ -18,7 +18,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     private int frameCount = 0;
     private long fpsTime = System.currentTimeMillis();
 
-    private final Deque<IScreen> _navigationStack = new ArrayDeque<>();
+    private final Deque<IScreen> _navigationStack = new ConcurrentLinkedDeque<>();
     private final Context _context;
     private final float[] _projMatrix = new float[16];
     private int _topInset = 0;

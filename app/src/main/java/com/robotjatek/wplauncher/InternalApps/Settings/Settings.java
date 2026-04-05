@@ -1,62 +1,48 @@
 package com.robotjatek.wplauncher.InternalApps.Settings;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
-import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
-import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.ColorPickerScreen;
+import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.CrashLogScreen;
+import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.ThemeScreen;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.Services.AccentColor;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 /**
- * Note Settings page should be completely STATELESS as its a singleton!
+ * Note: Settings page should be completely STATELESS as it's a singleton!
  */
-public class Settings implements IScreen, OnChangeListener<AccentColor> {
+public class Settings implements IScreen {
 
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
-    private final Context _context;
     private final StackLayout _layout;
-    private final SettingsService _settings;
-    private final ColorPickerScreen _colorPickerScreen;
-    private final Button _colorPickerBtn;
-    private Bitmap _icon;
     private Size<Integer> _size = new Size<>(-1, -1);
+    private final float[] _view = new float[16];
+    private final ThemeScreen _themeScreen;
+    private final CrashLogScreen _crashScreen;
 
     public Settings(IScreenNavigator navigator, SettingsService settings, Context context) {
         _navigator = navigator;
-        _settings = settings;
-        _context = context;
+        _themeScreen = new ThemeScreen(navigator, settings, context);
+        _crashScreen = new CrashLogScreen(navigator);
         _layout = new StackLayout();
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 52, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("theme", 160, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
+        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
 
-        _colorPickerScreen = new ColorPickerScreen(navigator);
-        _colorPickerScreen.subscribe(this);
-
-        var color = settings.getAccentColor();
-        _icon = BitmapUtil.createRect(64, 64, 8, color.color());
-        _colorPickerBtn = new Button(color.name(), new BitmapDrawable(context.getResources(), _icon),
-                () -> navigator.push(_colorPickerScreen));
-        _layout.addChild(_colorPickerBtn);
-
-        // TODO: Light/Dark mode selector
+        _layout.addChild(new Label("", 160, Typeface.NORMAL, Colors.WHITE, 0, -1, null)); // TODO: proper spacer (dedicated element, or an empty layout?)
+        _layout.addChild(new Label("theme", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+                () -> navigator.push(_themeScreen)));
+        _layout.addChild(new Label("crash log", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+                () -> navigator.push(_crashScreen)));
+        _layout.addChild(new Label("about", 96, Typeface.NORMAL, Colors.WHITE, 0, -1, null));
     }
-
-    private final float[] _view = new float[16];
 
     @Override
     public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
@@ -73,7 +59,8 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
         _layout.onResize(width, height);
-        _colorPickerScreen.onResize(width, height);
+        _themeScreen.onResize(width, height); // TODO: calling onResize manually for children is very error prone
+        _crashScreen.onResize(width, height);
     }
 
     @Override
@@ -95,18 +82,9 @@ public class Settings implements IScreen, OnChangeListener<AccentColor> {
     public void dispose() {
         if (!_disposed) {
             _layout.dispose();
-            _colorPickerScreen.dispose();
-            _icon.recycle();
+            _themeScreen.dispose();
+            _crashScreen.dispose();
             _disposed = true;
         }
-    }
-
-    @Override
-    public void changed(AccentColor changed) {
-        _settings.setAccentColor(changed);
-        _icon.recycle();
-        _colorPickerBtn.setText(changed.name());
-        _icon = BitmapUtil.createRect(64, 64, 8, changed.color());
-        _colorPickerBtn.setIcon(new BitmapDrawable(_context.getResources(), _icon));
     }
 }

@@ -105,7 +105,6 @@ Try to make it usable for the less crazy people
 - [x] GLES 3.2
 - [x] Make ContextMenu and MenuOption to use layouts and labels
 - [x] Make ListItem use high level UI components
-- [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
   - [ ] Photos
@@ -118,8 +117,14 @@ Try to make it usable for the less crazy people
 - [ ] Generic carousel view
 - [ ] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
+- [ ] Device resolution independent UI
 - [ ] Optimizations
+  - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
+  - [ ] On-demand alloc of internal apps and screens
 - [ ] Bug fixes
+  - [x] Fix: crash on empty notification content
+  - [x] Fix: crash on concurrent access to navigation stack
+  - [x] Crash logs
 - [ ] Multi lang support
 - [ ] Light mode/Dark mode support
   - [ ] Dropdown 

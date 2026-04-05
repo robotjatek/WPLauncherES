@@ -23,18 +23,20 @@ public class Label implements UIElement {
     private float _maxWidth; // -1 means no limit
     private boolean _dirty = true;
     private int _textureId = -1;
+    private final Runnable _onTap;
 
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
-        this(text, textSize, typeFace, textColor, bgColor, -1);
+        this(text, textSize, typeFace, textColor, bgColor, -1, null);
     }
 
-    public Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
+    public Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, Runnable onTap) {
         _text = text;
         _textSize = textSize;
         _typeFace = typeFace;
         _textColor = textColor;
         _bgColor = bgColor;
         _maxWidth = maxWidth;
+        _onTap = onTap;
     }
 
     @Override
@@ -183,7 +185,9 @@ public class Label implements UIElement {
 
     @Override
     public void onTap() {
-        // do nothing
+        if (_onTap != null) {
+            _onTap.run();
+        }
     }
 
     @Override

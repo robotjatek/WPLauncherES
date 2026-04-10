@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ListView<T> implements IItemListContainer<T>, Page {
+public class ListPage<T> implements IItemListContainer<T>, Page {
     public IState IDLE_STATE() {
         return new IdleState<>(this);
     }
@@ -50,13 +50,13 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     public static final float BOTTOM_MARGIN_PX = 240;
     private final float[] scrollMatrix = new float[16];
     private final ScrollController _scroll = new ScrollController();
-    private final ListItemDrawContext<T, ListView<T>> _drawContext;
+    private final ListItemDrawContext<T, ListPage<T>> _drawContext;
     private final ContextMenuDrawContext<T> _contextMenuDrawContext;
     private final List<ListItem<T>> _items = Collections.synchronizedList(new ArrayList<>());
     private int _viewPortHeight;
     private ContextMenu<T> _contextMenu;
 
-    public ListView() {
+    public ListPage() {
         _drawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(0, _viewPortHeight);
     }

@@ -2,7 +2,7 @@ package com.robotjatek.wplauncher.Components.List.States;
 
 import android.view.ViewConfiguration;
 
-import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListPage;
 
 /**
  * Measures touch time
@@ -17,7 +17,7 @@ public class TouchingState<T> extends BaseState<T> {
     private final float _touchStartY;
     private long _touchStartTime = -1;
 
-    public TouchingState(ListView<T> context, float x, float y) {
+    public TouchingState(ListPage<T> context, float x, float y) {
         super(context);
         _touchStartX = x;
         _touchStartY = y;

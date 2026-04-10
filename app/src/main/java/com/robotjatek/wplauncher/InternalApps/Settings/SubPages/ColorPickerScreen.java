@@ -7,7 +7,7 @@ import com.robotjatek.wplauncher.Components.List.ListItem;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
-import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListPage;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
@@ -20,13 +20,13 @@ public class ColorPickerScreen implements IScreen {
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final float[] viewMatrix = new float[16];
-    private final ListView<AccentColor> _view;
+    private final ListPage<AccentColor> _view;
     private final List<OnChangeListener<AccentColor>> _changeListeners = new ArrayList<>();
 
     public ColorPickerScreen(IScreenNavigator navigator) {
         _navigator = navigator;
         Matrix.setIdentityM(viewMatrix, 0);
-        _view = new ListView<>();
+        _view = new ListPage<>();
         _view.addItems(createItems());
     }
 

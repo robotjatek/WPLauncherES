@@ -1,7 +1,7 @@
 package com.robotjatek.wplauncher.Components.List.States;
 
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
-import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListPage;
 
 public class ContextMenuState<T> extends BaseState<T> {
 
@@ -10,7 +10,7 @@ public class ContextMenuState<T> extends BaseState<T> {
     private ContextMenu<T> _menu;
     private boolean _acceptsInput = false;
 
-    public ContextMenuState(ListView<T> context, float x, float y) {
+    public ContextMenuState(ListPage<T> context, float x, float y) {
         super(context);
         _x = x;
         _y = y;

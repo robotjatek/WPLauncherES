@@ -1,10 +1,10 @@
 package com.robotjatek.wplauncher.Components.List.States;
 
-import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListPage;
 
 public class IdleState<T> extends BaseState<T> {
 
-    public IdleState(ListView<T> context) {
+    public IdleState(ListPage<T> context) {
         super(context);
     }
 

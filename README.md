@@ -124,6 +124,7 @@ Try to make it usable for the less crazy people
 - [ ] Bug fixes
   - [x] Fix: crash on empty notification content
   - [x] Fix: crash on concurrent access to navigation stack
+  - [x] Fix: Crash when onDestroy() fires before onSurfaceCreated()
   - [x] Crash logs
 - [ ] Multi lang support
 - [ ] Light mode/Dark mode support

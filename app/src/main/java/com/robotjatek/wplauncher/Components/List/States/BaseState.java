@@ -1,23 +1,23 @@
 package com.robotjatek.wplauncher.Components.List.States;
 
 
-import static com.robotjatek.wplauncher.Components.List.ListView.ITEM_GAP_PX;
-import static com.robotjatek.wplauncher.Components.List.ListView.ITEM_HEIGHT_PX;
-import static com.robotjatek.wplauncher.Components.List.ListView.TOP_MARGIN_PX;
+import static com.robotjatek.wplauncher.Components.List.ListPage.ITEM_GAP_PX;
+import static com.robotjatek.wplauncher.Components.List.ListPage.ITEM_HEIGHT_PX;
+import static com.robotjatek.wplauncher.Components.List.ListPage.TOP_MARGIN_PX;
 
 import android.util.Log;
 
 import com.robotjatek.wplauncher.Components.List.ListItem;
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListPage;
 
 import java.util.Optional;
 
 public class BaseState<T> implements IState {
 
-    ListView<T> _context;
+    ListPage<T> _context;
 
-    protected BaseState(ListView<T> context) {
+    protected BaseState(ListPage<T> context) {
         _context = context;
     }
 

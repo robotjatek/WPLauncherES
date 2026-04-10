@@ -1,12 +1,12 @@
 package com.robotjatek.wplauncher.Components.List.States;
 
-import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListPage;
 
 public class ScrollState<T> extends BaseState<T> {
     private final float _startY;
     private boolean _touching = true;
 
-    public ScrollState(ListView<T> context, float y) {
+    public ScrollState(ListPage<T> context, float y) {
         super(context);
         _startY = y;
     }

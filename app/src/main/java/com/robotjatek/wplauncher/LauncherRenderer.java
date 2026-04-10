@@ -107,8 +107,9 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     public void dispose() {
         if (!_disposed) {
             _navigationStack.forEach(IScreen::dispose);
-            _renderer.dispose();
-            _shader.delete();
+            _navigationStack.clear();
+            if (_renderer != null) _renderer.dispose();
+            if (_shader != null) _shader.delete();
             _disposed = true;
         }
     }

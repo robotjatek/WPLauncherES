@@ -9,7 +9,7 @@ import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Components.List.ListItem;
-import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListPage;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.Services.AccentColor;
@@ -38,7 +38,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private final ContextMenuDrawContext<App> _contextMenuDrawContext;
     private final IPageNavigator _navigator;
     private final SettingsService _settingsService;
-    private final ListView<App> _list;
+    private final ListPage<App> _list;
 
     public AppList(Context context, IPageNavigator navigator, TileService tileService,
                    InternalAppsService internalAppsService, SettingsService settingsService,
@@ -49,7 +49,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _settingsService = settingsService;
         _settingsService.subscribe(this);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_listWidth, _viewPortHeight);
-        _list = new ListView<>();
+        _list = new ListPage<>();
         var internalApps = internalAppsService.getInternalApps().stream();
         var apps = Stream.concat(loadAppList(), internalApps)
                 .sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER)).toList();

@@ -1,7 +1,7 @@
 package com.robotjatek.wplauncher.Components.List.States;
 
 import com.robotjatek.wplauncher.Components.List.ListItem;
-import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Components.List.ListPage;
 
 /**
  * Handles regular tap event then moves to {@link IdleState}
@@ -10,7 +10,7 @@ public class TappedState<T> extends BaseState<T> {
 
     private final float _y;
 
-    public TappedState(ListView<T> context, float y) {
+    public TappedState(ListPage<T> context, float y) {
         super(context);
         _y = y;
     }

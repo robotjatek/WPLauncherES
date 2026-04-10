@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class CrashHandler implements Thread.UncaughtExceptionHandler {
@@ -25,7 +26,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
     public void uncaughtException(@NonNull Thread t, @NonNull Throwable e) {
         try {
             var timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault());
-            var file = new File(_context.getFilesDir(), "crash_" + timestamp + ".txt");
+            var file = new File(_context.getFilesDir(), "crash_" + timestamp.format(new Date()) + ".txt");
             var writer = new FileWriter(file, true);
             e.printStackTrace(new PrintWriter(writer));
             writer.close();

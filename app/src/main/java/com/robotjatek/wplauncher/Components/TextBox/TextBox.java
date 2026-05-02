@@ -46,7 +46,7 @@ public class TextBox implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+    public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
 

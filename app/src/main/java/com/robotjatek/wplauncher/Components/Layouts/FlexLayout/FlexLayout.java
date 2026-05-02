@@ -280,7 +280,7 @@ public class FlexLayout implements ILayout, UIElement {
         }
 
         drawBg(position, size, proj, viewMatrix, renderer);
-        drawChildren(proj, viewMatrix, renderer, position);
+        drawChildren(delta, proj, viewMatrix, renderer, position);
     }
 
     private void drawBg(Position<Float> position, Size<Integer> size, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {
@@ -291,12 +291,12 @@ public class FlexLayout implements ILayout, UIElement {
         renderer.draw(projMatrix, _modelMatrix, _bgTexture);
     }
 
-    private void drawChildren(float[] proj, float[] viewMatrix, QuadRenderer renderer, Position<Float> position) {
+    private void drawChildren(float delta, float[] proj, float[] viewMatrix, QuadRenderer renderer, Position<Float> position) {
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         for (var child : _children) {
-            child.draw(proj, _modelMatrix, _itemDrawContext, renderer);
+            child.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer);
         }
     }
 
@@ -316,7 +316,7 @@ public class FlexLayout implements ILayout, UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+    public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         // when drawn as a child
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
@@ -324,7 +324,7 @@ public class FlexLayout implements ILayout, UIElement {
         var height = (int) drawContext.heightOf(this);
 
         // call the ILayout draw method
-        draw(0, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
+        draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
     }
 
     @Override

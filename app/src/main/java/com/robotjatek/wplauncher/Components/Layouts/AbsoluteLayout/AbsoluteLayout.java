@@ -118,7 +118,7 @@ public class AbsoluteLayout implements ILayout {
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
 
         for (var child : _positionedElements) {
-            child._element.draw(proj, _modelMatrix, _drawContext, renderer);
+            child._element.draw(delta, proj, _modelMatrix, _drawContext, renderer);
         }
     }
 

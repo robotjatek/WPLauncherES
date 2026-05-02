@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.Components.List;
+package com.robotjatek.wplauncher.Components.ListPage;
 
 import android.opengl.Matrix;
 
@@ -6,11 +6,11 @@ import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.Components.List.States.ContextMenuState;
-import com.robotjatek.wplauncher.Components.List.States.IdleState;
-import com.robotjatek.wplauncher.Components.List.States.ScrollState;
-import com.robotjatek.wplauncher.Components.List.States.TappedState;
-import com.robotjatek.wplauncher.Components.List.States.TouchingState;
+import com.robotjatek.wplauncher.Components.ListPage.States.ContextMenuState;
+import com.robotjatek.wplauncher.Components.ListPage.States.IdleState;
+import com.robotjatek.wplauncher.Components.ListPage.States.ScrollState;
+import com.robotjatek.wplauncher.Components.ListPage.States.TappedState;
+import com.robotjatek.wplauncher.Components.ListPage.States.TouchingState;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;

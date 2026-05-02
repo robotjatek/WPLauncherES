@@ -1,8 +1,8 @@
-package com.robotjatek.wplauncher.Components.List.States;
+package com.robotjatek.wplauncher.Components.ListPage.States;
 
 import android.view.ViewConfiguration;
 
-import com.robotjatek.wplauncher.Components.List.ListPage;
+import com.robotjatek.wplauncher.Components.ListPage.ListPage;
 
 /**
  * Measures touch time

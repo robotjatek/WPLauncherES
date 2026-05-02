@@ -1,7 +1,7 @@
-package com.robotjatek.wplauncher.Components.List.States;
+package com.robotjatek.wplauncher.Components.ListPage.States;
 
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
-import com.robotjatek.wplauncher.Components.List.ListPage;
+import com.robotjatek.wplauncher.Components.ListPage.ListPage;
 
 public class ContextMenuState<T> extends BaseState<T> {
 

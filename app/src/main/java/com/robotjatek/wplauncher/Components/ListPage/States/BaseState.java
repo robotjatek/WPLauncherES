@@ -1,15 +1,15 @@
-package com.robotjatek.wplauncher.Components.List.States;
+package com.robotjatek.wplauncher.Components.ListPage.States;
 
 
-import static com.robotjatek.wplauncher.Components.List.ListPage.ITEM_GAP_PX;
-import static com.robotjatek.wplauncher.Components.List.ListPage.ITEM_HEIGHT_PX;
-import static com.robotjatek.wplauncher.Components.List.ListPage.TOP_MARGIN_PX;
+import static com.robotjatek.wplauncher.Components.ListPage.ListPage.ITEM_GAP_PX;
+import static com.robotjatek.wplauncher.Components.ListPage.ListPage.ITEM_HEIGHT_PX;
+import static com.robotjatek.wplauncher.Components.ListPage.ListPage.TOP_MARGIN_PX;
 
 import android.util.Log;
 
-import com.robotjatek.wplauncher.Components.List.ListItem;
+import com.robotjatek.wplauncher.Components.ListPage.ListItem;
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.Components.List.ListPage;
+import com.robotjatek.wplauncher.Components.ListPage.ListPage;
 
 import java.util.Optional;
 

@@ -6,7 +6,7 @@ import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 public interface UIElement extends IGestureHandler {
-     void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer); // TODO: pass delta?
+     void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer);
      Size<Integer> measure();
      default boolean handleGesture(Gesture gesture) {
           return gesture.dispatch(this);

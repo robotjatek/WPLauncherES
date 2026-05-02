@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.Components.List;
+package com.robotjatek.wplauncher.Components.ListPage;
 
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -72,7 +72,6 @@ public class ListItem<T> {
 
             var labelX = _icon.measure().width() + w * 0.02f;
             var labelY = (h - _textLabel.measure().height()) / 2f;
-
 
             _layout.removeChild(_icon);
             _layout.addChild(_icon, Position.ZERO);

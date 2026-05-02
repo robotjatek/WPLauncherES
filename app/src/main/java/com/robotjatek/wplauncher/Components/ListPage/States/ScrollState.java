@@ -1,6 +1,6 @@
-package com.robotjatek.wplauncher.Components.List.States;
+package com.robotjatek.wplauncher.Components.ListPage.States;
 
-import com.robotjatek.wplauncher.Components.List.ListPage;
+import com.robotjatek.wplauncher.Components.ListPage.ListPage;
 import com.robotjatek.wplauncher.Gestures.DownGesture;
 import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;

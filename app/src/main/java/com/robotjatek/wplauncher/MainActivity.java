@@ -105,6 +105,7 @@ public class MainActivity extends ComponentActivity {
     protected void onPause() {
         super.onPause();
         _surface.onPause();
+        _locationService.pause();
     }
 
     @Override
@@ -112,6 +113,7 @@ public class MainActivity extends ComponentActivity {
         super.onResume();
         _surface.onResume();
         _surface.onHomePressed();
+        _locationService.resume();
     }
 
     @Override

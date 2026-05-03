@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.StartPage.States;
 
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 /**
@@ -12,20 +13,11 @@ public class ChildControlState extends BaseState {
         super(context);
     }
 
-//    @Override
-//    public void handleTouchStart(float x, float y) {
-//        _context.getCurrentPage().touchStart(x, y);
-//    }
-//
-//    @Override
-//    public void handleTouchEnd(float x, float y) {
-//        _context.getCurrentPage().touchEnd(x, y);
-//    }
-//
-//    @Override
-//    public void handleMove(float x, float y) {
-//        _context.getCurrentPage().touchMove(x, y);
-//    }
+
+    @Override
+    public boolean handleGesture(Gesture gesture) {
+        return _context.getCurrentPage().handleGesture(gesture);
+    }
 
     @Override
     public void update(float delta) {

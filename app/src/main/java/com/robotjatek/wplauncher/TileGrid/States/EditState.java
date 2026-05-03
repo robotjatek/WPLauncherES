@@ -15,8 +15,8 @@ import com.robotjatek.wplauncher.TileGrid.TileGrid;
  */
 public class EditState extends BaseState {
 
-    public IState EDIT_IDLE(float x, float y) {
-        return new EditIdleState(this, _context, x, y);
+    public IState EDIT_IDLE() {
+        return new EditIdleState(this, _context);
     }
 
     public IState EDIT_READY(float x, float y) {
@@ -42,7 +42,7 @@ public class EditState extends BaseState {
         super(context);
         _x = x;
         _y = y;
-        _state = EDIT_IDLE(_x, _y);
+        _state = EDIT_IDLE();
     }
 
     @Override

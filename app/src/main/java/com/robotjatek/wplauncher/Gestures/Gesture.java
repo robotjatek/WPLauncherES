@@ -8,7 +8,7 @@ public abstract class Gesture {
         _y = y;
     }
 
-    public abstract boolean dispatch(IGestureHandler element);
+    public abstract boolean dispatch(IGestureHandler handler);
     public abstract Gesture copyWithOffset(float dx, float dy);
 
     public float getX() {

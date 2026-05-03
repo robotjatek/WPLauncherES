@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.robotjatek.wplauncher.Gestures.LongPressGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
@@ -31,7 +32,7 @@ public class LauncherSurfaceView extends GLSurfaceView {
 
            @Override
            public void onLongPress(@NonNull MotionEvent e) {
-               // TODO: renderer->handleGesture(new longpressgesture(x, y))
+               _renderer.handleGesture(new LongPressGesture(e.getX(), e.getY()));
            }
 
            @Override

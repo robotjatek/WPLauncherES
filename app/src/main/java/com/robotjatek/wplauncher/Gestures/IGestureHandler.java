@@ -5,5 +5,7 @@ public interface IGestureHandler {
         return false;
     }
 
-    // TODO: handle longpress
+    default boolean handleLongPress(LongPressGesture gesture) {
+        return false;
+    }
 }

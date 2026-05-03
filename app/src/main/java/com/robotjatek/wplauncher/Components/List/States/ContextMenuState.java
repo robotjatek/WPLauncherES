@@ -2,13 +2,13 @@ package com.robotjatek.wplauncher.Components.List.States;
 
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Gestures.TapGesture;
 
 public class ContextMenuState<T> extends BaseState<T> {
 
     private final float _x;
     private final float _y;
     private ContextMenu<T> _menu;
-    private boolean _acceptsInput = false;
 
     public ContextMenuState(ListView<T> context, float x, float y) {
         super(context);
@@ -27,16 +27,13 @@ public class ContextMenuState<T> extends BaseState<T> {
     }
 
     @Override
-    public void handleTouchEnd(float x, float y) {
-        if (!_acceptsInput) {
-            // im already in this state before releasing the finger, so i have to ignore the first release
-            _acceptsInput = true;
-        } else {
-            if (_menu.isTappedOn(x, y)) {
-                _menu.onTap(x, y);
-            }
-            _context.closeContextMenu();
-            _context.changeState(_context.IDLE_STATE());
+    public boolean handleTap(TapGesture gesture) {
+        if (_menu.isTappedOn(gesture.getX(), gesture.getY())) {
+            _menu.onTap(gesture.getX(), gesture.getY());
         }
+        _context.closeContextMenu();
+        _context.changeState(_context.IDLE_STATE());
+
+        return true;
     }
 }

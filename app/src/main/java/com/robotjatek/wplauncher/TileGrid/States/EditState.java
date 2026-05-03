@@ -1,9 +1,9 @@
 package com.robotjatek.wplauncher.TileGrid.States;
 
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.TileGrid.States.EditStates.EditDragState;
 import com.robotjatek.wplauncher.TileGrid.States.EditStates.EditIdleState;
-import com.robotjatek.wplauncher.TileGrid.States.EditStates.EditReadyState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 /**
@@ -14,12 +14,8 @@ import com.robotjatek.wplauncher.TileGrid.TileGrid;
  */
 public class EditState extends BaseState {
 
-    public IState EDIT_IDLE(float x, float y) {
-        return new EditIdleState(this, _context, x, y);
-    }
-
-    public IState EDIT_READY(float x, float y) {
-        return new EditReadyState(this, _context, x, y);
+    public IState EDIT_IDLE() {
+        return new EditIdleState(this, _context);
     }
 
     public IState EDIT_DRAG(float x, float y) {
@@ -41,7 +37,7 @@ public class EditState extends BaseState {
         super(context);
         _x = x;
         _y = y;
-        _state = EDIT_IDLE(_x, _y);
+        _state = EDIT_IDLE();
     }
 
     @Override
@@ -55,21 +51,8 @@ public class EditState extends BaseState {
     }
 
     @Override
-    public void handleTouchStart(float x, float y) {
-        super.handleTouchStart(x, y);
-        _state.handleTouchStart(x, y);
-    }
-
-    @Override
-    public void handleMove(float x, float y) {
-        super.handleMove(x, y);
-        _state.handleMove(x, y);
-    }
-
-    @Override
-    public void handleTouchEnd(float x, float y) {
-        super.handleTouchEnd(x, y);
-        _state.handleTouchEnd(x, y);
+    public boolean handleGesture(Gesture gesture) {
+        return _state.handleGesture(gesture);
     }
 
     @Override

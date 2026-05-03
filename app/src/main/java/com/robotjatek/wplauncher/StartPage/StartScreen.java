@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.AppList;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -17,8 +18,6 @@ import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.States.IdleState;
 import com.robotjatek.wplauncher.StartPage.States.ScrollState;
 import com.robotjatek.wplauncher.StartPage.States.SwipingState;
-import com.robotjatek.wplauncher.StartPage.States.TappedState;
-import com.robotjatek.wplauncher.StartPage.States.TouchingState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 import com.robotjatek.wplauncher.Services.TileService;
 
@@ -40,14 +39,6 @@ public class StartScreen implements IPageNavigator, IScreen {
 
     public IState IDLE_STATE() {
         return new IdleState(this);
-    }
-
-    public IState TOUCHING_STATE(float x, float y) {
-        return new TouchingState(this, x, y);
-    }
-
-    public IState TAPPED_STATE(float x, float y) {
-        return new TappedState(this, x, y);
     }
 
     public IState CHILD_CONTROL_STATE() {
@@ -101,16 +92,9 @@ public class StartScreen implements IPageNavigator, IScreen {
         _state.update(delta);
     }
 
-    public void onTouchMove(float x, float y) {
-        _state.handleMove(x, y);
-    }
-
-    public void onTouchStart(float x, float y) {
-        _state.handleTouchStart(x, y);
-    }
-
-    public void onTouchEnd(float x, float y) {
-        _state.handleTouchEnd(x, y);
+    @Override
+    public boolean handleGesture(Gesture gesture) {
+        return _state.handleGesture(gesture);
     }
 
     public void onResize(int width, int height) {

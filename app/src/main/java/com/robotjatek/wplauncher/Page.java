@@ -1,13 +1,10 @@
 package com.robotjatek.wplauncher;
 
-public interface Page {
+import com.robotjatek.wplauncher.Gestures.Gesture;
+import com.robotjatek.wplauncher.Gestures.IGestureHandler;
+
+public interface Page extends IGestureHandler {
     void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer);
-
-    void touchMove(float x, float y);
-
-    void touchStart(float x, float y);
-
-    void touchEnd(float x, float y);
 
     default boolean isCatchingGestures() {
         return false;
@@ -16,6 +13,8 @@ public interface Page {
     void onSizeChanged(int width, int height);
     
 	void resetState();
+
+    boolean handleGesture(Gesture gesture);
 
     void dispose();
 }

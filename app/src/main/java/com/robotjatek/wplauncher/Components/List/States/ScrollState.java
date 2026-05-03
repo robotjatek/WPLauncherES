@@ -1,7 +1,11 @@
 package com.robotjatek.wplauncher.Components.List.States;
 
 import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Gestures.ScrollGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 
+// TODO: ignore small movements in edit mode
+// TODO: stop scrolling when retapped while flinging
 public class ScrollState<T> extends BaseState<T> {
     private final float _startY;
     private boolean _touching = true;
@@ -18,21 +22,16 @@ public class ScrollState<T> extends BaseState<T> {
     }
 
     @Override
-    public void handleTouchStart(float x, float y) {
-        // handle retap on flinging
-        _touching = true;
-        _context.getScroll().onTouchStart(y);
+    public boolean handleScroll(ScrollGesture gesture) {
+        _context.getScroll().onTouchMove(gesture.getY());
+        return true;
     }
 
     @Override
-    public void handleTouchEnd(float x, float y) {
+    public boolean handleUp(UpGesture gesture) {
         _context.getScroll().onTouchEnd();
         _touching = false;
-    }
-
-    @Override
-    public void handleMove(float x, float y) {
-        _context.getScroll().onTouchMove(y);
+        return true;
     }
 
     @Override

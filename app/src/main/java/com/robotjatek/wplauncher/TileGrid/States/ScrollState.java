@@ -1,5 +1,7 @@
 package com.robotjatek.wplauncher.TileGrid.States;
 
+import com.robotjatek.wplauncher.Gestures.ScrollGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class ScrollState extends BaseState {
@@ -15,24 +17,20 @@ public class ScrollState extends BaseState {
     public void enter() {
         super.enter();
         _context.getScroll().onTouchStart(_startY);
-    }
-
-    @Override
-    public void handleTouchStart(float x, float y) {
-        // handle retap on flinging
         _touching = true;
-        _context.getScroll().onTouchStart(y);
     }
 
     @Override
-    public void handleTouchEnd(float x, float y) {
-        _touching = false;
+    public boolean handleScroll(ScrollGesture gesture) {
+        _context.getScroll().onTouchMove(gesture.getY());
+        return true;
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
         _context.getScroll().onTouchEnd();
-    }
-
-    @Override
-    public void handleMove(float x, float y) {
-        _context.getScroll().onTouchMove(y);
+        _touching = false;
+        return true;
     }
 
     @Override

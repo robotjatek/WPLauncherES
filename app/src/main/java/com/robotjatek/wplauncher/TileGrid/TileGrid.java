@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.AppList.App;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.ITileListChangedListener;
@@ -17,8 +18,6 @@ import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.States.IdleState;
 import com.robotjatek.wplauncher.TileGrid.States.ScrollState;
-import com.robotjatek.wplauncher.TileGrid.States.TappedState;
-import com.robotjatek.wplauncher.TileGrid.States.TouchingState;
 import com.robotjatek.wplauncher.Services.TileService;
 
 import java.util.List;
@@ -30,14 +29,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     public IState IDLE_STATE() {
         return new IdleState(this);
-    }
-
-    public IState TOUCHING_STATE(float x, float y) {
-        return new TouchingState(this, x, y);
-    }
-
-    public IState TAPPED_STATE(float x, float y) {
-        return new TappedState(this, x, y);
     }
 
     public IState SCROLL_STATE(float y) {
@@ -163,18 +154,8 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     @Override
-    public void touchStart(float x, float y) {
-        _state.handleTouchStart(x, y);
-    }
-
-    @Override
-    public void touchMove(float x, float y) {
-        _state.handleMove(x, y);
-    }
-
-    @Override
-    public void touchEnd(float x, float y) {
-        _state.handleTouchEnd(x, y);
+    public boolean handleGesture(Gesture gesture) {
+        return _state.handleGesture(gesture);
     }
 
     private float getContentHeight() {

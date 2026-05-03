@@ -18,8 +18,6 @@ import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.States.IdleState;
 import com.robotjatek.wplauncher.StartPage.States.ScrollState;
 import com.robotjatek.wplauncher.StartPage.States.SwipingState;
-import com.robotjatek.wplauncher.StartPage.States.TappedState;
-import com.robotjatek.wplauncher.StartPage.States.TouchingState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 import com.robotjatek.wplauncher.Services.TileService;
 
@@ -41,14 +39,6 @@ public class StartScreen implements IPageNavigator, IScreen {
 
     public IState IDLE_STATE() {
         return new IdleState(this);
-    }
-
-    public IState TOUCHING_STATE(float x, float y) {
-        return new TouchingState(this, x, y);
-    }
-
-    public IState TAPPED_STATE(float x, float y) {
-        return new TappedState(this, x, y);
     }
 
     public IState CHILD_CONTROL_STATE() {

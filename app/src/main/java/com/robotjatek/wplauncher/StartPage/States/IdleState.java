@@ -35,12 +35,6 @@ public class IdleState extends BaseState {
     }
 
     @Override
-    public boolean handleMove(MoveGesture gesture) {
-        _context.getCurrentPage().handleMove(gesture);
-        return true;
-    }
-
-    @Override
     public boolean handleScroll(ScrollGesture gesture) {
         if (Math.abs(gesture.getDx()) > Math.abs(gesture.getDy())) {
             _context.changeState(_context.SWIPE_STATE(gesture.getX()));

@@ -25,7 +25,7 @@ public class IdleState extends BaseState {
 
     @Override
     public boolean handleMove(MoveGesture gesture) {
-        return true; // TODO: itt ez nem lesz jó szerintem, scroll lesz ez, és scrollstatebe change
+        return true; // TODO: itt ez nem lesz jó szerintem, scroll lesz ez, és scrollstatebe change + valószínűleg a return sem sima return true hanem pass down
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.robotjatek.wplauncher.StartPage.States;
 
-import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
@@ -15,15 +15,14 @@ public class ScrollState extends BaseState {
     }
 
     // TODO: ez itt a fel-le scroll, még tesztelni kell
-    // TODO: handle scroll lesz ez szerintem
     @Override
-    public boolean handleMove(MoveGesture gesture) {
+    public boolean handleScroll(ScrollGesture gesture) {
         return _context.getCurrentPage().handleGesture(gesture);
     }
 
     @Override
     public boolean handleUp(UpGesture gesture) {
         _context.changeState(_context.IDLE_STATE());
-        return true;
+        return _context.getCurrentPage().handleGesture(gesture);
     }
 }

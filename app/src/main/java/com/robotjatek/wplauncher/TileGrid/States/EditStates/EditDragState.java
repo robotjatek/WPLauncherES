@@ -1,9 +1,10 @@
 package com.robotjatek.wplauncher.TileGrid.States.EditStates;
 
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.TileGrid.DragInfo;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
-import com.robotjatek.wplauncher.TileGrid.Tile;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class EditDragState extends EditBaseState {
@@ -44,27 +45,25 @@ public class EditDragState extends EditBaseState {
         }
     }
 
-//    @Override
-//    public void handleMove(float x, float y) {
-//        super.handleMove(x, y);
-//        _tilegrid.getSelectedTile()
-//                .getDragInfo().update(x, y);
-//    }
-//
-//    @Override
-//    public void handleTouchEnd(float x, float y) {
-//        super.handleTouchEnd(x, y);
-//        var dragInfo = _tilegrid.getSelectedTile().getDragInfo();
-//
-//        // drop tile to its new location, recalculate new tile positions, remove empty lines from the grid
-//        var newPosition = calculateNewPosition(dragInfo);
-//        if (isInbounds(newPosition)) {
-//            reflowTiles(newPosition);
-//        }
-//
-//        _tilegrid.cancelSelection();
-//        _tilegrid.changeState(_tilegrid.IDLE_STATE());
-//    }
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        _tilegrid.getSelectedTile().getDragInfo().update(gesture.getX(), gesture.getY());
+        return true;
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
+        // drop tile to its new location, recalculate new tile positions, remove empty lines from the grid
+        var dragInfo = _tilegrid.getSelectedTile().getDragInfo();
+        var newPosition = calculateNewPosition(dragInfo);
+        if (isInbounds(newPosition)) {
+            reflowTiles(newPosition);
+        }
+
+        _tilegrid.cancelSelection();
+        _tilegrid.changeState(_tilegrid.IDLE_STATE());
+        return true;
+    }
 
     /**
      * Calculate the new tile position after a drag

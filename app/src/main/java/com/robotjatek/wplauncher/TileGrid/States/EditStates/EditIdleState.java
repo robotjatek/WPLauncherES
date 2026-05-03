@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.TileGrid.States.EditStates;
 
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
@@ -26,21 +27,10 @@ public class EditIdleState extends EditBaseState {
         return true;
     }
 
-//    @Override
-//    public void handleTouchStart(float x, float y) {
-//        super.handleTouchStart(x, y);
-//        _context.changeState(_context.EDIT_READY(x, y));
-//    }
-//
-//    @Override
-//    public void handleMove(float x, float y) {
-//        super.handleMove(x, y);
-//        float deltaX = x - _startX;
-//        float deltaY = y - _startY;
-//        float distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-//
-//        if (distance > MOVEMENT_THRESHOLD) {
-//            _context.changeState(_context.EDIT_DRAG(x, y));
-//        }
-//    }
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        _context.changeState(_context.EDIT_DRAG(gesture.getX(), gesture.getY()));
+        return true;
+        //return _context.handleGesture(gesture); // TODO: ?
+    }
 }

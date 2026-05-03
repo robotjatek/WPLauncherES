@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.StartPage.States;
 
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
@@ -30,6 +31,12 @@ public class IdleState extends BaseState {
     @Override
     public boolean handleLongPress(LongPressGesture gesture) {
         _context.getCurrentPage().handleGesture(gesture);
+        return true;
+    }
+
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        _context.getCurrentPage().handleMove(gesture);
         return true;
     }
 

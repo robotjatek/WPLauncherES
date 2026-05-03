@@ -9,7 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 
@@ -74,8 +76,8 @@ public class LauncherSurfaceView extends GLSurfaceView {
 
         switch (event.getActionMasked()) {
            // case MotionEvent.ACTION_DOWN -> _renderer.handleTouchDown(x, y);
-          //  case MotionEvent.ACTION_UP -> _renderer.handleTouchUp(x, y); // TODO: create gestures for that
-          //  case MotionEvent.ACTION_MOVE -> _renderer.handleTouchMove(x, y); // TODO: create gestures for that
+            case MotionEvent.ACTION_UP -> _renderer.handleGesture(new UpGesture(x, y));
+            case MotionEvent.ACTION_MOVE -> _renderer.handleGesture(new MoveGesture(x, y));
         }
         return true;
     }

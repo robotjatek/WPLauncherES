@@ -10,6 +10,7 @@ import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Components.List.ListItem;
 import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.Services.AccentColor;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
@@ -61,21 +62,6 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _list.draw(delta, projMatrix, viewMatrix, renderer);
     }
 
-    @Override
-    public void touchMove(float x, float y) {
-        _list.touchMove(x, y);
-    }
-
-    @Override
-    public void touchStart(float x, float y) {
-        _list.touchStart(x, y);
-    }
-
-    @Override
-    public void touchEnd(float x, float y) {
-        _list.touchEnd(x, y);
-    }
-
     public void resetScroll() {
         _list.resetScroll();
     }
@@ -92,6 +78,11 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     @Override
     public void resetState() {
         _list.resetState();
+    }
+
+    @Override
+    public boolean handleGesture(Gesture gesture) {
+        return _list.handleGesture(gesture);
     }
 
     private ContextMenu<App> createContextMenu() {

@@ -32,18 +32,6 @@ public abstract class EditBaseState implements IState {
     }
 
     @Override
-    public void handleTouchStart(float x, float y) {
-    }
-
-    @Override
-    public void handleTouchEnd(float x, float y) {
-    }
-
-    @Override
-    public void handleMove(float x, float y) {
-    }
-
-    @Override
     public void update(float delta) {
 
     }

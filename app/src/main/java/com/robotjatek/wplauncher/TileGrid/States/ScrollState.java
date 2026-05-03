@@ -17,23 +17,23 @@ public class ScrollState extends BaseState {
         _context.getScroll().onTouchStart(_startY);
     }
 
-    @Override
-    public void handleTouchStart(float x, float y) {
-        // handle retap on flinging
-        _touching = true;
-        _context.getScroll().onTouchStart(y);
-    }
-
-    @Override
-    public void handleTouchEnd(float x, float y) {
-        _touching = false;
-        _context.getScroll().onTouchEnd();
-    }
-
-    @Override
-    public void handleMove(float x, float y) {
-        _context.getScroll().onTouchMove(y);
-    }
+//    @Override
+//    public void handleTouchStart(float x, float y) {
+//        // handle retap on flinging
+//        _touching = true;
+//        _context.getScroll().onTouchStart(y);
+//    }
+//
+//    @Override
+//    public void handleTouchEnd(float x, float y) {
+//        _touching = false;
+//        _context.getScroll().onTouchEnd();
+//    }
+//
+//    @Override
+//    public void handleMove(float x, float y) {
+//        _context.getScroll().onTouchMove(y);
+//    }
 
     @Override
     public void update(float delta) {

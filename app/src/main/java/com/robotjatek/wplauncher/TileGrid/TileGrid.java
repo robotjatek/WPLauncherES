@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.AppList.App;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.ITileListChangedListener;
@@ -163,18 +164,8 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     @Override
-    public void touchStart(float x, float y) {
-        _state.handleTouchStart(x, y);
-    }
-
-    @Override
-    public void touchMove(float x, float y) {
-        _state.handleMove(x, y);
-    }
-
-    @Override
-    public void touchEnd(float x, float y) {
-        _state.handleTouchEnd(x, y);
+    public boolean handleGesture(Gesture gesture) {
+        return _state.handleGesture(gesture);
     }
 
     private float getContentHeight() {

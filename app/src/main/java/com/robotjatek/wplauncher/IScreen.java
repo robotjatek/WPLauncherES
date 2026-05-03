@@ -1,11 +1,14 @@
 package com.robotjatek.wplauncher;
 
-public interface IScreen {
+import com.robotjatek.wplauncher.Gestures.Gesture;
+import com.robotjatek.wplauncher.Gestures.IGestureHandler;
+
+public interface IScreen extends IGestureHandler {
     void draw(float delta, float[] projMatrix, QuadRenderer renderer);
     void onBackPressed();
     void onResize(int width, int height);
-    void onTouchStart(float x, float y);
-    void onTouchEnd(float x, float y);
-    void onTouchMove(float x, float y);
+    default boolean handleGesture(Gesture gesture) {
+        throw new RuntimeException("Implementáld baszod"); // TODO: remove default implementation!
+    }
     void dispose();
 }

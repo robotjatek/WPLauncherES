@@ -38,22 +38,22 @@ public class TouchingState<T> extends BaseState<T> {
         }
     }
 
-    @Override
-    public void handleTouchEnd(float x, float y) {
-        // This was a quick tap, shorter than the long-press timeout
-        _context.changeState(_context.TAPPED_STATE(_touchStartY));
-    }
-
-    @Override
-    public void handleMove(float x, float y) {
-        var deltaX = x - _touchStartX;
-        var deltaY = y - _touchStartY;
-
-        if (Math.abs(deltaY) > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
-            _context.changeState(_context.SCROLL_STATE(y));
-        } else if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
-            _touchStartTime = System.currentTimeMillis();
-            _context.changeState(_context.IDLE_STATE());
-        }
-    }
+//    @Override
+//    public void handleTouchEnd(float x, float y) {
+//        // This was a quick tap, shorter than the long-press timeout
+//        _context.changeState(_context.TAPPED_STATE(_touchStartY));
+//    }
+//
+//    @Override
+//    public void handleMove(float x, float y) {
+//        var deltaX = x - _touchStartX;
+//        var deltaY = y - _touchStartY;
+//
+//        if (Math.abs(deltaY) > 10 && Math.abs(deltaY) > Math.abs(deltaX)) {
+//            _context.changeState(_context.SCROLL_STATE(y));
+//        } else if (Math.abs(deltaX) > 0 || Math.abs(deltaY) > 0) {
+//            _touchStartTime = System.currentTimeMillis();
+//            _context.changeState(_context.IDLE_STATE());
+//        }
+//    }
 }

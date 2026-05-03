@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher.Components.List.States;
 
 import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Gestures.TapGesture;
 
 public class IdleState<T> extends BaseState<T> {
 
@@ -9,7 +10,8 @@ public class IdleState<T> extends BaseState<T> {
     }
 
     @Override
-    public void handleTouchStart(float x, float y) {
-        _context.changeState(_context.TOUCHING_STATE(x, y));
+    public boolean handleTap(TapGesture gesture) {
+        _context.changeState(_context.TAPPED_STATE(gesture.getY()));
+        return true;
     }
 }

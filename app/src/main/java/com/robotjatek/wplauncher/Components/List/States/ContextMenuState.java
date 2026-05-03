@@ -26,17 +26,17 @@ public class ContextMenuState<T> extends BaseState<T> {
         });
     }
 
-    @Override
-    public void handleTouchEnd(float x, float y) {
-        if (!_acceptsInput) {
-            // im already in this state before releasing the finger, so i have to ignore the first release
-            _acceptsInput = true;
-        } else {
-            if (_menu.isTappedOn(x, y)) {
-                _menu.onTap(x, y);
-            }
-            _context.closeContextMenu();
-            _context.changeState(_context.IDLE_STATE());
-        }
-    }
+//    @Override
+//    public void handleTouchEnd(float x, float y) {
+//        if (!_acceptsInput) {
+//            // im already in this state before releasing the finger, so i have to ignore the first release
+//            _acceptsInput = true;
+//        } else {
+//            if (_menu.isTappedOn(x, y)) {
+//                _menu.onTap(x, y);
+//            }
+//            _context.closeContextMenu();
+//            _context.changeState(_context.IDLE_STATE());
+//        }
+//    }
 }

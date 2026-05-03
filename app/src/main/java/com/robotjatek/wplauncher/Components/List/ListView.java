@@ -5,6 +5,8 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
+import com.robotjatek.wplauncher.Gestures.Gesture;
+import com.robotjatek.wplauncher.Gestures.IGestureHandler;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.Components.List.States.ContextMenuState;
 import com.robotjatek.wplauncher.Components.List.States.IdleState;
@@ -83,20 +85,10 @@ public class ListView<T> implements IItemListContainer<T>, Page {
             _contextMenu.draw(delta, projMatrix, viewMatrix, renderer);
         }
     }
-
+    
     @Override
-    public void touchMove(float x, float y) {
-        _state.handleMove(x, y);
-    }
-
-    @Override
-    public void touchStart(float x, float y) {
-        _state.handleTouchStart(x, y);
-    }
-
-    @Override
-    public void touchEnd(float x, float y) {
-        _state.handleTouchEnd(x, y);
+    public boolean handleGesture(Gesture gesture) {
+        return _state.handleGesture(gesture);
     }
 
     @Override

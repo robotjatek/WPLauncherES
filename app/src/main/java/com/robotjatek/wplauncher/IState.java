@@ -1,10 +1,13 @@
 package com.robotjatek.wplauncher;
 
-public interface IState {
+import com.robotjatek.wplauncher.Gestures.Gesture;
+import com.robotjatek.wplauncher.Gestures.IGestureHandler;
+
+public interface IState extends IGestureHandler {
     void enter();
     void exit();
-    void handleTouchStart(float x, float y);
-    void handleTouchEnd(float x, float y);
-    void handleMove(float x, float y);
+    default boolean handleGesture(Gesture gesture) {
+        return gesture.dispatch(this); // TODO: lehet itt sem kell default
+    }
     void update(float delta);
 }

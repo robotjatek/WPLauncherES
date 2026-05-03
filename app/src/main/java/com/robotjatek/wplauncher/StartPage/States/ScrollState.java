@@ -12,19 +12,19 @@ public class ScrollState extends BaseState {
         super(context);
     }
 
-    @Override
-    public void handleTouchStart(float x, float y) {
-
-    }
-
-    @Override
-    public void handleTouchEnd(float x, float y) {
-        _context.getCurrentPage().touchEnd(x, y);
-        _context.changeState(_context.IDLE_STATE());
-    }
-
-    @Override
-    public void handleMove(float x, float y) {
-        _context.getCurrentPage().touchMove(x, y);
-    }
+//    @Override
+//    public void handleTouchStart(float x, float y) {
+//
+//    }
+//
+//    @Override
+//    public void handleTouchEnd(float x, float y) {
+//        _context.getCurrentPage().touchEnd(x, y);
+//        _context.changeState(_context.IDLE_STATE());
+//    }
+//
+//    @Override
+//    public void handleMove(float x, float y) {
+//        _context.getCurrentPage().touchMove(x, y);
+//    }
 }

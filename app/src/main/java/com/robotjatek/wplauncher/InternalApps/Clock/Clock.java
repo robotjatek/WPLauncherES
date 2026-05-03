@@ -91,21 +91,6 @@ public class Clock implements IScreen {
     }
 
     @Override
-    public void onTouchStart(float x, float y) {
-        _layout.onTouchStart(x, y);
-    }
-
-    @Override
-    public void onTouchEnd(float x, float y) {
-        _layout.onTouchEnd(x, y);
-    }
-
-    @Override
-    public void onTouchMove(float x, float y) {
-        _layout.onTouchMove(x, y);
-    }
-
-    @Override
     public void dispose() {
         persistSettings();
         _layout.dispose();

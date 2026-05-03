@@ -1,5 +1,7 @@
 package com.robotjatek.wplauncher.StartPage.States;
 
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 /**
@@ -12,19 +14,16 @@ public class ScrollState extends BaseState {
         super(context);
     }
 
-//    @Override
-//    public void handleTouchStart(float x, float y) {
-//
-//    }
-//
-//    @Override
-//    public void handleTouchEnd(float x, float y) {
-//        _context.getCurrentPage().touchEnd(x, y);
-//        _context.changeState(_context.IDLE_STATE());
-//    }
-//
-//    @Override
-//    public void handleMove(float x, float y) {
-//        _context.getCurrentPage().touchMove(x, y);
-//    }
+    // TODO: ez itt a fel-le scroll, még tesztelni kell
+    // TODO: handle scroll lesz ez szerintem
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        return _context.getCurrentPage().handleGesture(gesture);
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
+        _context.changeState(_context.IDLE_STATE());
+        return true;
+    }
 }

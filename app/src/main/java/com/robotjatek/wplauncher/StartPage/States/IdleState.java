@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.StartPage.States;
 
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
-import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.StartPage.StartScreen;

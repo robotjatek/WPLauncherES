@@ -14,7 +14,6 @@ public class ScrollState extends BaseState {
         super(context);
     }
 
-    // TODO: ez itt a fel-le scroll, még tesztelni kell
     @Override
     public boolean handleScroll(ScrollGesture gesture) {
         return _context.getCurrentPage().handleGesture(gesture);

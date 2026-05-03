@@ -2,7 +2,9 @@ package com.robotjatek.wplauncher.TileGrid.States;
 
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
 import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
+import com.robotjatek.wplauncher.TileGrid.Tile;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class IdleState extends BaseState {
@@ -13,7 +15,8 @@ public class IdleState extends BaseState {
 
     @Override
     public boolean handleTap(TapGesture gesture) {
-        _context.changeState(_context.TAPPED_STATE(gesture.getX(), gesture.getY()));
+        var tappedTile = getTileAt(gesture.getX(), gesture.getY());
+        tappedTile.ifPresent(Tile::onTap);
         return true;
     }
 
@@ -23,9 +26,11 @@ public class IdleState extends BaseState {
         return true;
     }
 
+
     @Override
-    public boolean handleMove(MoveGesture gesture) {
-        return true; // TODO: itt ez nem lesz jó szerintem, scroll lesz ez, és scrollstatebe change + valószínűleg a return sem sima return true hanem pass down
+    public boolean handleScroll(ScrollGesture gesture) {
+        _context.changeState(_context.SCROLL_STATE(gesture.getY()));
+        return _context.handleGesture(gesture);
     }
 
     @Override

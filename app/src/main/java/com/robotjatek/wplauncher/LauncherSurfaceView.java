@@ -51,15 +51,6 @@ public class LauncherSurfaceView extends GLSurfaceView {
                // TODO: renderer->handleGesture(new scrollgesture(x, y))
                return true;
            }
-
-           @Override
-            public boolean onDown(@NonNull MotionEvent e) {
-               // TODO: renderer->handleGesture(new scrollgesture(x, y))
-               // TODO: ListPage, AppList scroll states
-               return true;
-           }
-
-           
         });
 
         setEGLContextClientVersion(3);
@@ -73,10 +64,9 @@ public class LauncherSurfaceView extends GLSurfaceView {
         float x = event.getX();
         float y = event.getY();
 
-        var handled = _gestureDetector.onTouchEvent(event);
+        _gestureDetector.onTouchEvent(event);
 
         switch (event.getActionMasked()) {
-           // case MotionEvent.ACTION_DOWN -> _renderer.handleTouchDown(x, y);
             case MotionEvent.ACTION_UP -> _renderer.handleGesture(new UpGesture(x, y));
             case MotionEvent.ACTION_MOVE -> _renderer.handleGesture(new MoveGesture(x, y));
         }

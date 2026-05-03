@@ -7,7 +7,7 @@ public interface IState extends IGestureHandler {
     void enter();
     void exit();
     default boolean handleGesture(Gesture gesture) {
-        return gesture.dispatch(this); // TODO: lehet itt sem kell default
+        return gesture.dispatch(this);
     }
     void update(float delta);
 }

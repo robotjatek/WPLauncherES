@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Checkbox.Checkbox;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -88,6 +89,11 @@ public class Clock implements IScreen {
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
         _layout.onResize(width, height);
+    }
+
+    @Override
+    public boolean handleGesture(Gesture gesture) {
+        return _layout.handleGesture(gesture);
     }
 
     @Override

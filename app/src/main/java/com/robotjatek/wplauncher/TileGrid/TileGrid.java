@@ -18,8 +18,6 @@ import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.States.IdleState;
 import com.robotjatek.wplauncher.TileGrid.States.ScrollState;
-import com.robotjatek.wplauncher.TileGrid.States.TappedState;
-import com.robotjatek.wplauncher.TileGrid.States.TouchingState;
 import com.robotjatek.wplauncher.Services.TileService;
 
 import java.util.List;
@@ -31,14 +29,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     public IState IDLE_STATE() {
         return new IdleState(this);
-    }
-
-    public IState TOUCHING_STATE(float x, float y) {
-        return new TouchingState(this, x, y);
-    }
-
-    public IState TAPPED_STATE(float x, float y) {
-        return new TappedState(this, x, y);
     }
 
     public IState SCROLL_STATE(float y) {

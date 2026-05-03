@@ -20,4 +20,8 @@ public interface IGestureHandler {
     default boolean handleScroll(ScrollGesture gesture) {
         return false;
     }
+
+    default boolean handleDown(DownGesture gesture) {
+        return false;
+    }
 }

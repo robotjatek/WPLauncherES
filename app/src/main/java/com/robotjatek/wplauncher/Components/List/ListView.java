@@ -6,13 +6,11 @@ import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Gestures.Gesture;
-import com.robotjatek.wplauncher.Gestures.IGestureHandler;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.Components.List.States.ContextMenuState;
 import com.robotjatek.wplauncher.Components.List.States.IdleState;
 import com.robotjatek.wplauncher.Components.List.States.ScrollState;
 import com.robotjatek.wplauncher.Components.List.States.TappedState;
-import com.robotjatek.wplauncher.Components.List.States.TouchingState;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
@@ -25,10 +23,6 @@ import java.util.List;
 public class ListView<T> implements IItemListContainer<T>, Page {
     public IState IDLE_STATE() {
         return new IdleState<>(this);
-    }
-
-    public IState TOUCHING_STATE(float x, float y) {
-        return new TouchingState<>(this, x, y);
     }
 
     public IState SCROLL_STATE(float y) {
@@ -153,10 +147,6 @@ public class ListView<T> implements IItemListContainer<T>, Page {
             _contextMenu.dispose();
         }
         _contextMenu = menu;
-    }
-
-    public boolean hasContextMenu() {
-        return _contextMenu != null;
     }
 
     private void setScrollBounds() {

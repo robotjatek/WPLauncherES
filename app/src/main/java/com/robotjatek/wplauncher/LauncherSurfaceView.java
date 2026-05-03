@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.robotjatek.wplauncher.Gestures.DownGesture;
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
 import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
@@ -44,6 +45,11 @@ public class LauncherSurfaceView extends GLSurfaceView {
                return true;
            }
 
+           @Override
+           public boolean onDown(@NonNull MotionEvent e) {
+               _renderer.handleGesture(new DownGesture(e.getX(), e.getY()));
+               return true;
+           }
 
             @Override
            public boolean onFling(@Nullable MotionEvent e1, @NonNull MotionEvent e2,

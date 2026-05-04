@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.TileGrid.States.EditStates;
 
+import com.robotjatek.wplauncher.Gestures.DownGesture;
 import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.TileGrid.Position;
@@ -7,8 +8,8 @@ import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class EditIdleState extends EditBaseState {
-    private final float _startX;
-    private final float _startY;
+    private float _startX;
+    private float _startY;
 
     public EditIdleState(EditState context, TileGrid tilegrid, float x, float y) {
         super(context, tilegrid);
@@ -17,14 +18,27 @@ public class EditIdleState extends EditBaseState {
     }
 
     @Override
+    public boolean handleDown(DownGesture gesture) {
+        // Update the start coordinates on retouch, so we don't accidentally move to EditDragState
+        _startX = gesture.getX();
+        _startY = gesture.getY();
+        return true;
+    }
+
+    @Override
     public boolean handleTap(TapGesture gesture) {
-        if (_tilegrid.getUnpinButton().isTapped(gesture.getX(), gesture.getY())) {
+        // tap adorner
+        if (_tilegrid.getUnpinButton().isTapped(
+                gesture.getX(),
+                gesture.getY() - _tilegrid.getScroll().getScrollOffset() - TileGrid.TOP_MARGIN_PX)) {
             _tilegrid.getUnpinButton().onTap();
+            _tilegrid.changeState(_tilegrid.IDLE_STATE());
             return true;
         }
 
-        var scrollOffset = _tilegrid.getScroll().getScrollOffset();
-        if (_tilegrid.getResizeButton().isTapped(gesture.getX(), gesture.getY() - scrollOffset - TileGrid.TOP_MARGIN_PX)) {
+        if (_tilegrid.getResizeButton().isTapped(
+                gesture.getX(),
+                gesture.getY() - _tilegrid.getScroll().getScrollOffset() - TileGrid.TOP_MARGIN_PX)) {
             _tilegrid.getResizeButton().onTap();
             var selectedTile = _tilegrid.getSelectedTile();
             var position = new Position<>(selectedTile.getPosition().x(), selectedTile.getPosition().y());
@@ -38,7 +52,17 @@ public class EditIdleState extends EditBaseState {
             return true;
         }
 
-        _context.changeState(_tilegrid.IDLE_STATE());
+        // Check if we tapped the same tile again or an empty space
+        // (If we reached that point, there is already a selected tile)
+        var tappedTile = _context.getTileAt(gesture.getX(), gesture.getY());
+        if (tappedTile.isEmpty() || tappedTile.get() == _tilegrid.getSelectedTile()) {
+            // empty space or same tile was clicked: unselect and go back to idle
+            _tilegrid.cancelSelection();
+            _tilegrid.changeState(_tilegrid.IDLE_STATE());
+        } else {
+            _tilegrid.selectTile(tappedTile.get());
+        }
+
         return true;
     }
 

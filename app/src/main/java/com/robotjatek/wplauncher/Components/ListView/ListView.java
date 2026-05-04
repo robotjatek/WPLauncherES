@@ -1,13 +1,13 @@
 package com.robotjatek.wplauncher.Components.ListView;
 
 import android.opengl.Matrix;
-import android.util.Log;
 
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ListPage.ListItem;
 import com.robotjatek.wplauncher.Components.ListPage.ListItemDrawContext;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -98,11 +98,8 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     }
 
     @Override
-    public void onTap() {
-        // TODO: identify the tapped item -> signal tap to the item
-        // TODO: new gesture logic?
-        // Triggerelődik az ontap most is -> viszont move endnél is... kelleni fog az a new gesture...
-        Log.d("","");
+    public boolean handleGesture(Gesture gesture) {
+        return _state.handleGesture(gesture);
     }
 
     @Override

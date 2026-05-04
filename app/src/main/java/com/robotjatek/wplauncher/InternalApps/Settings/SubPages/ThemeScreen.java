@@ -12,6 +12,7 @@ import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
@@ -73,27 +74,17 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     }
 
     @Override
-    public void onTouchStart(float x, float y) {
-        _layout.onTouchStart(x, y);
-    }
-
-    @Override
-    public void onTouchEnd(float x, float y) {
-        _layout.onTouchEnd(x, y);
-    }
-
-    @Override
-    public void onTouchMove(float x, float y) {
-        _layout.onTouchMove(x, y);
-    }
-
-    @Override
     public void changed(AccentColor changed) {
         _settings.setAccentColor(changed);
         _icon.recycle();
         _colorPickerBtn.setText(changed.name());
         _icon = BitmapUtil.createRect(64, 64, 8, changed.color()); // TODO: real icon component?
         _colorPickerBtn.setIcon(new BitmapDrawable(_context.getResources(), _icon));
+    }
+
+    @Override
+    public boolean handleGesture(Gesture gesture) {
+        return _layout.handleGesture(gesture);
     }
 
     @Override

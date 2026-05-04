@@ -11,7 +11,6 @@ import com.robotjatek.wplauncher.Components.ListPage.States.ContextMenuState;
 import com.robotjatek.wplauncher.Components.ListPage.States.IdleState;
 import com.robotjatek.wplauncher.Components.ListPage.States.ScrollState;
 import com.robotjatek.wplauncher.Components.ListPage.States.TappedState;
-import com.robotjatek.wplauncher.Components.ListPage.States.TouchingState;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;

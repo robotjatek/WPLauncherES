@@ -7,9 +7,13 @@ import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class EditIdleState extends EditBaseState {
+    private final float _startX;
+    private final float _startY;
 
-    public EditIdleState(EditState context, TileGrid tilegrid) {
+    public EditIdleState(EditState context, TileGrid tilegrid, float x, float y) {
         super(context, tilegrid);
+        _startX = x;
+        _startY = y;
     }
 
     @Override
@@ -40,7 +44,13 @@ public class EditIdleState extends EditBaseState {
 
     @Override
     public boolean handleMove(MoveGesture gesture) {
-        _context.changeState(_context.EDIT_DRAG(gesture.getX(), gesture.getY()));
+        var deltaX = gesture.getX() - _startX;
+        var deltaY = gesture.getY() - _startY;
+        var distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        if (distance > 40) {
+            _context.changeState(_context.EDIT_DRAG(gesture.getX(), gesture.getY()));
+        }
+
         return true;
     }
 }

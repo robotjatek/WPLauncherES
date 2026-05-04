@@ -6,7 +6,6 @@ import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 
-// TODO: ignore small movements in edit mode
 public class ScrollState<T> extends BaseState<T> {
     private final float _startY;
     private boolean _touching = true;

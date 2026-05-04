@@ -36,4 +36,9 @@ public class ContextMenuState<T> extends BaseState<T> {
 
         return true;
     }
+
+    @Override
+    public boolean isCatchingGestures() {
+        return true;
+    }
 }

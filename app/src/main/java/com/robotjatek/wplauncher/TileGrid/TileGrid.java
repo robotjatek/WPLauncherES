@@ -210,7 +210,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     @Override
     public boolean isCatchingGestures() {
-        return _selectedTile != null;
+        return _state.isCatchingGestures();
     }
 
     private void setScrollBounds() {

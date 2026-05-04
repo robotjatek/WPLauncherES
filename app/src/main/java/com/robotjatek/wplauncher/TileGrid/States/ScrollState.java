@@ -1,5 +1,7 @@
 package com.robotjatek.wplauncher.TileGrid.States;
 
+import com.robotjatek.wplauncher.Gestures.DownGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
@@ -21,6 +23,16 @@ public class ScrollState extends BaseState {
     }
 
     @Override
+    public boolean handleMove(MoveGesture gesture) {
+        if (_touching) {
+            _context.getScroll().onTouchMove(gesture.getY());
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean handleScroll(ScrollGesture gesture) {
         _context.getScroll().onTouchMove(gesture.getY());
         return true;
@@ -31,6 +43,18 @@ public class ScrollState extends BaseState {
         _context.getScroll().onTouchEnd();
         _touching = false;
         return true;
+    }
+
+    @Override
+    public boolean handleDown(DownGesture gesture) {
+        _context.getScroll().onTouchStart(gesture.getY());
+        _touching = true;
+        return true;
+    }
+
+    @Override
+    public boolean isCatchingGestures() {
+        return _touching || _context.getScroll().isFlinging();
     }
 
     @Override

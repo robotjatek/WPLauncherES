@@ -1,7 +1,5 @@
 package com.robotjatek.wplauncher.StartPage.States;
 
-import android.util.Log;
-
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 

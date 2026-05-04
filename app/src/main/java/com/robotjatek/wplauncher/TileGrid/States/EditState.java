@@ -56,6 +56,11 @@ public class EditState extends BaseState {
     }
 
     @Override
+    public boolean isCatchingGestures() {
+        return true;
+    }
+
+    @Override
     public void update(float delta) {
         super.update(delta);
         _state.update(delta);

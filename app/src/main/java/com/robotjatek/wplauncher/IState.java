@@ -9,5 +9,8 @@ public interface IState extends IGestureHandler {
     default boolean handleGesture(Gesture gesture) {
         return gesture.dispatch(this);
     }
+    default boolean isCatchingGestures() {
+        return false;
+    }
     void update(float delta);
 }

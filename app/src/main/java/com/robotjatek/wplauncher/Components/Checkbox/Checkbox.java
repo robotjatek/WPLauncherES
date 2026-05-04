@@ -10,6 +10,7 @@ import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
+import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -96,8 +97,9 @@ public class Checkbox implements UIElement {
     }
 
     @Override
-    public void onTap() {
+    public boolean handleTap(TapGesture gesture) {
         toggleState();
+        return true;
     }
 
     private void toggleState() {

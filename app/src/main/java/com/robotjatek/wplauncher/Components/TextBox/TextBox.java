@@ -227,11 +227,6 @@ public class TextBox implements UIElement {
     }
 
     @Override
-    public void onTap() {
-        // do nothing
-    }
-
-    @Override
     public void dispose() {
         if (!_disposed) {
             TileUtil.deleteTexture(_textureId);

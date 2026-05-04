@@ -123,18 +123,44 @@ public class AbsoluteLayout implements ILayout {
     }
 
     @Override
-    public void onTouchStart(float x, float y) {
+    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+        var x = drawContext.xOf(this);
+        var y = drawContext.yOf(this);
+        var width = (int) drawContext.widthOf(this);
+        var height = (int) drawContext.heightOf(this);
 
+        // TODO: add delta to the interface
+        draw(0, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
     }
 
     @Override
-    public void onTouchEnd(float x, float y) {
-
+    public Size<Integer> measure() {
+        if (_size.width() != -1 && _size.height() != -1) {
+            return _size;
+        }
+        // Calculation based on children positions and sizes
+        float maxX = 0;
+        float maxY = 0;
+        for (var pe : _positionedElements) {
+            var size = pe._element.measure();
+            maxX = Math.max(maxX, pe._position.x() + size.width());
+            maxY = Math.max(maxY, pe._position.y() + size.height());
+        }
+        return new Size<>((int) maxX, (int) maxY);
     }
 
     @Override
-    public void onTouchMove(float x, float y) {
-
+    public UIElement findChildAt(float x, float y) {
+        // Iterate backwards to find topmost child (if they overlap)
+        for (int i = _positionedElements.size() - 1; i >= 0; i--) {
+            var pe = _positionedElements.get(i);
+            var size = pe._element.measure();
+            if (x >= pe._position.x() && x <= pe._position.x() + size.width() &&
+                    y >= pe._position.y() && y <= pe._position.y() + size.height()) {
+                return pe._element;
+            }
+        }
+        return null;
     }
 
     public void clear() {

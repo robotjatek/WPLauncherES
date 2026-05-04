@@ -5,12 +5,12 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.Components.List.States.ContextMenuState;
 import com.robotjatek.wplauncher.Components.List.States.IdleState;
 import com.robotjatek.wplauncher.Components.List.States.ScrollState;
 import com.robotjatek.wplauncher.Components.List.States.TappedState;
-import com.robotjatek.wplauncher.Components.List.States.TouchingState;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
@@ -23,10 +23,6 @@ import java.util.List;
 public class ListView<T> implements IItemListContainer<T>, Page {
     public IState IDLE_STATE() {
         return new IdleState<>(this);
-    }
-
-    public IState TOUCHING_STATE(float x, float y) {
-        return new TouchingState<>(this, x, y);
     }
 
     public IState SCROLL_STATE(float y) {
@@ -83,20 +79,10 @@ public class ListView<T> implements IItemListContainer<T>, Page {
             _contextMenu.draw(delta, projMatrix, viewMatrix, renderer);
         }
     }
-
+    
     @Override
-    public void touchMove(float x, float y) {
-        _state.handleMove(x, y);
-    }
-
-    @Override
-    public void touchStart(float x, float y) {
-        _state.handleTouchStart(x, y);
-    }
-
-    @Override
-    public void touchEnd(float x, float y) {
-        _state.handleTouchEnd(x, y);
+    public boolean handleGesture(Gesture gesture) {
+        return _state.handleGesture(gesture);
     }
 
     @Override
@@ -163,10 +149,6 @@ public class ListView<T> implements IItemListContainer<T>, Page {
         _contextMenu = menu;
     }
 
-    public boolean hasContextMenu() {
-        return _contextMenu != null;
-    }
-
     private void setScrollBounds() {
         var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + TOP_MARGIN_PX;
         var min = Math.min(0, _viewPortHeight - (contentHeight + PAGE_PADDING_PX + BOTTOM_MARGIN_PX));
@@ -179,7 +161,7 @@ public class ListView<T> implements IItemListContainer<T>, Page {
 
     @Override
     public boolean isCatchingGestures() {
-        return _contextMenu != null && _contextMenu.isOpened();
+        return _state.isCatchingGestures();
     }
 
     @Override

@@ -99,9 +99,4 @@ public class Icon implements UIElement {
             _disposed = true;
         }
     }
-
-    @Override
-    public void onTap() {
-        // Ignore for now
-    }
 }

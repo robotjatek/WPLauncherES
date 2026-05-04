@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 public class StackLayout implements ILayout {
     private boolean _disposed = false;
@@ -24,8 +23,6 @@ public class StackLayout implements ILayout {
     private final StackLayoutDrawContext _drawContext;
     private int _width;
     private int _height;
-
-    private UIElement _tapStartedOn;
 
     public StackLayout() {
         _drawContext = new StackLayoutDrawContext(this);
@@ -43,40 +40,6 @@ public class StackLayout implements ILayout {
         for (var child : _children) {
             child.draw(proj, view, _drawContext, renderer);
         }
-    }
-
-    @Override
-    public void onTouchStart(float x, float y) {
-        var tappedChild = getTappedChild(x, y);
-        tappedChild.ifPresentOrElse(c -> _tapStartedOn = c, () -> _tapStartedOn = null);
-    }
-
-    @Override
-    public void onTouchEnd(float x, float y) {
-        var tappedChild = getTappedChild(x, y);
-        tappedChild.ifPresent(t -> {
-            if (t == _tapStartedOn) {
-                t.onTap();
-            }
-        });
-        _tapStartedOn = null;
-    }
-
-    // TODO: this is mostly the same as getTappedTile()
-    private Optional<UIElement> getTappedChild(float x, float y) {
-        return _children.stream().filter(t -> {
-            var scrollPosition = 0;
-            var left = _drawContext.xOf(t);
-            var top = _drawContext.yOf(t) + scrollPosition + TOP_MARGIN_PX;
-            var right = left + _drawContext.widthOf(t);
-            var bottom = top + _drawContext.heightOf(t);
-            return x >= left && x <= right && y >= top && y <= bottom;
-        }).findFirst();
-    }
-
-    @Override
-    public void onTouchMove(float x, float y) {
-
     }
 
     public void addChild(UIElement element) {
@@ -113,6 +76,43 @@ public class StackLayout implements ILayout {
             _layoutInfo.put(child, new LayoutInfo(0, height));
             height += size.height();
         }
+    }
+
+    @Override
+    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+        var x = drawContext.xOf(this);
+        var y = drawContext.yOf(this);
+        var width = (int) drawContext.widthOf(this);
+        var height = (int) drawContext.heightOf(this);
+
+        // TODO: add delta
+        draw(0, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
+    }
+
+    @Override
+    public Size<Integer> measure() {
+        var totalHeight = 0;
+        var maxWidth = 0;
+        for (var child : _children) {
+            var size = child.measure();
+            totalHeight += size.height();
+            maxWidth = Math.max(maxWidth, size.width());
+        }
+        return new Size<>(maxWidth, totalHeight);
+    }
+
+    @Override
+    public UIElement findChildAt(float x, float y) {
+        for (var child : _children) {
+            var left = _drawContext.xOf(child);
+            var top = _drawContext.yOf(child) + TOP_MARGIN_PX;
+            var right = left + _drawContext.widthOf(child);
+            var bottom = top + _drawContext.heightOf(child);
+            if (x >= left && x <= right && y >= top && y <= bottom) {
+                return child;
+            }
+        }
+        return null;
     }
 
     public void dispose() {

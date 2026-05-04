@@ -5,6 +5,7 @@ import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
@@ -69,16 +70,10 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
         _navigationStack.forEach(s -> s.onResize(width, height));
     }
 
-    public void handleTouchDown(float x, float y) {
-        _navigationStack.getFirst().onTouchStart(x, y - _topInset);
-    }
-
-    public void handleTouchUp(float x, float y) {
-        _navigationStack.getFirst().onTouchEnd(x, y - _topInset);
-    }
-
-    public void handleTouchMove(float x, float y) {
-        _navigationStack.getFirst().onTouchMove(x, y - _topInset);
+    public void handleGesture(Gesture gesture) {
+        if (!_navigationStack.isEmpty()) {
+            _navigationStack.getFirst().handleGesture(gesture.copyWithOffset(0, -_topInset));
+        }
     }
 
     public void onBackPressed() {

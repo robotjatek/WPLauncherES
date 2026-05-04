@@ -8,6 +8,7 @@ import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
+import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -78,10 +79,12 @@ public class Button implements UIElement {
     }
 
     @Override
-    public void onTap() {
+    public boolean handleTap(TapGesture gesture) {
         if (_onTap != null) {
             _onTap.run();
+            return true;
         }
+        return false;
     }
 
     @Override

@@ -116,7 +116,7 @@ Try to make it usable for the less crazy people
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Animation after swipe
 - [ ] Generic carousel view
-- [ ] Gesture system refactor
+- [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Optimizations
 - [ ] Bug fixes

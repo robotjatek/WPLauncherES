@@ -1,6 +1,10 @@
 package com.robotjatek.wplauncher.Components.List.States;
 
 import com.robotjatek.wplauncher.Components.List.ListView;
+import com.robotjatek.wplauncher.Gestures.DownGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.ScrollGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 
 public class ScrollState<T> extends BaseState<T> {
     private final float _startY;
@@ -18,21 +22,34 @@ public class ScrollState<T> extends BaseState<T> {
     }
 
     @Override
-    public void handleTouchStart(float x, float y) {
-        // handle retap on flinging
-        _touching = true;
-        _context.getScroll().onTouchStart(y);
+    public boolean handleScroll(ScrollGesture gesture) {
+        _context.getScroll().onTouchMove(gesture.getY());
+        return true;
     }
 
     @Override
-    public void handleTouchEnd(float x, float y) {
+    public boolean handleMove(MoveGesture gesture) {
+        _context.getScroll().onTouchMove(gesture.getY());
+        return true;
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
         _context.getScroll().onTouchEnd();
         _touching = false;
+        return true;
     }
 
     @Override
-    public void handleMove(float x, float y) {
-        _context.getScroll().onTouchMove(y);
+    public boolean handleDown(DownGesture gesture) {
+        _context.getScroll().onTouchStart(gesture.getY());
+        _touching = true;
+        return true;
+    }
+
+    @Override
+    public boolean isCatchingGestures() {
+        return _touching || _context.getScroll().isFlinging();
     }
 
     @Override

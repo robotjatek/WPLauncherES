@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * A minimal flex layout implementation
  */
-public class FlexLayout implements ILayout, UIElement {
+public class FlexLayout implements ILayout {
     public enum Direction {
         ROW,
         COLUMN
@@ -301,18 +301,8 @@ public class FlexLayout implements ILayout, UIElement {
     }
 
     @Override
-    public void onTouchStart(float x, float y) {
-
-    }
-
-    @Override
-    public void onTouchEnd(float x, float y) {
-
-    }
-
-    @Override
-    public void onTouchMove(float x, float y) {
-
+    public UIElement findChildAt(float x, float y) {
+        return null; // TODO: implement
     }
 
     @Override
@@ -373,10 +363,5 @@ public class FlexLayout implements ILayout, UIElement {
             TileUtil.deleteTexture(_bgTexture);
             _disposed = true;
         }
-    }
-
-    @Override
-    public void onTap() {
-        // Ignore for now
     }
 }

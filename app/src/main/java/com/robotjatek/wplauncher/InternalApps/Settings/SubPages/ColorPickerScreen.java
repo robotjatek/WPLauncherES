@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Components.List.ListItem;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.Components.List.ListView;
@@ -63,18 +64,8 @@ public class ColorPickerScreen implements IScreen {
     }
 
     @Override
-    public void onTouchStart(float x, float y) {
-        _view.touchStart(x, y);
-    }
-
-    @Override
-    public void onTouchEnd(float x, float y) {
-        _view.touchEnd(x, y);
-    }
-
-    @Override
-    public void onTouchMove(float x, float y) {
-        _view.touchMove(x, y);
+    public boolean handleGesture(Gesture gesture) {
+        return _view.handleGesture(gesture);
     }
 
     @Override

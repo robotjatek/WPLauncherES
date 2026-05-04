@@ -1,5 +1,7 @@
 package com.robotjatek.wplauncher.StartPage.States;
 
+import com.robotjatek.wplauncher.Gestures.ScrollGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
 /**
@@ -21,27 +23,25 @@ public class SwipingState extends BaseState {
     }
 
     @Override
-    public void handleTouchStart(float x, float y) {
-    }
+    public boolean handleScroll(ScrollGesture gesture) {
+        var dx = gesture.getX() - _lastX;
+        _lastX = gesture.getX();
 
-    @Override
-    public void handleMove(float x, float y) {
-        var dx = x - _lastX;
-        _lastX = x;
         _context.setPageOffset(_context.getPageOffset() + dx);
-        _context.getCurrentPage().touchMove(x, y);
+        return true;
     }
 
     @Override
-    public void handleTouchEnd(float x, float y) {
+    public boolean handleUp(UpGesture gesture) {
         var threshold = _context.getScreenWidth() / 10f;
         if (_context.getPageOffset() > threshold) {
             _context.previousPage();
-        }
-        else if (_context.getPageOffset() < -threshold) {
+        } else if (_context.getPageOffset() < -threshold) {
             _context.nextPage();
         }
+
         _context.setPageOffset(0);
         _context.changeState(_context.IDLE_STATE());
+        return true;
     }
 }

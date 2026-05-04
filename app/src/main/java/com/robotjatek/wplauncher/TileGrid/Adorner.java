@@ -41,10 +41,11 @@ public class Adorner {
     }
 
     public boolean isTapped(float x, float y) {
-        var left = _context.xOf(this);
-        var top = _context.yOf(this);
-        var right = left + _context.widthOf(this);
-        var bottom = top + _context.heightOf(this);
+        var padding = 64;
+        var left = _context.xOf(this) - padding;
+        var top = _context.yOf(this) - padding;
+        var right = left + _context.widthOf(this) + (padding * 2);
+        var bottom = top + _context.heightOf(this) + (padding * 2);
 
         return x >= left && x <= right && y >= top && y <= bottom;
     }

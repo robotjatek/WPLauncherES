@@ -1,19 +1,20 @@
-package com.robotjatek.wplauncher.Components.ListPage.States;
+package com.robotjatek.wplauncher.Components.ListView.States;
 
-import com.robotjatek.wplauncher.Components.ListPage.ListPage;
+import com.robotjatek.wplauncher.Components.ListPage.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListView;
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 
 public class IdleState<T> extends BaseState<T> {
-
-    public IdleState(ListPage<T> context) {
+    public IdleState(ListView<T> context) {
         super(context);
     }
 
     @Override
     public boolean handleTap(TapGesture gesture) {
-        _context.changeState(_context.TAPPED_STATE(gesture.getY()));
+        var item = getItemAt(gesture.getX(),gesture.getY());
+        item.ifPresent(ListItem::onTap);
         return true;
     }
 
@@ -25,9 +26,10 @@ public class IdleState<T> extends BaseState<T> {
 
     @Override
     public boolean handleLongPress(LongPressGesture gesture) {
-        if (_context.hasContextMenu()) {
-            _context.changeState(_context.CONTEXT_MENU_STATE(gesture.getX(), gesture.getY()));
-        }
-        return _context.handleLongPress(gesture);
+//        if (_context.hasContextMenu()) {
+//
+//        }
+//        return _context.handleLongPress(gesture); // TODO: return true?
+        return true;
     }
 }

@@ -27,6 +27,8 @@ public class CrashLogScreen implements IScreen {
     private final ListView<AccentColor> _crashList = new ListView<>();
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _view = new float[16];
+    private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
+    private final Label _subTitleLabel = new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0);
 
     public CrashLogScreen(IScreenNavigator navigator) {
         _navigator = navigator;
@@ -41,7 +43,7 @@ public class CrashLogScreen implements IScreen {
                 new ListItem<>(i.name(),
                         new ColorDrawable(i.color()),
                         Colors.TRANSPARENT,
-                        null, i)).toList();
+                        () -> _crashList.removeItemByPayload(i), i)).toList();
     }
 
     // TODO: load file list
@@ -60,7 +62,10 @@ public class CrashLogScreen implements IScreen {
     @Override
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
-        _crashList.setSize(new Size<>(width, height));
+        var itemsHeight = _titleLabel.measure().height() +
+                _subTitleLabel.measure().height() + StackLayout.TOP_MARGIN_PX;
+        var listHeight = height - itemsHeight - 264;
+        _crashList.setSize(new Size<>(width, listHeight));
         _layout.onResize(width, height);
     }
 

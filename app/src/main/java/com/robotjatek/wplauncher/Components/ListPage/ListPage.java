@@ -149,6 +149,10 @@ public class ListPage<T> implements IItemListContainer<T>, Page {
         _contextMenu = menu;
     }
 
+    public boolean hasContextMenu() {
+        return _contextMenu != null;
+    }
+
     private void setScrollBounds() {
         var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + TOP_MARGIN_PX;
         var min = Math.min(0, _viewPortHeight - (contentHeight + PAGE_PADDING_PX + BOTTOM_MARGIN_PX));

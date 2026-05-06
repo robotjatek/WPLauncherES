@@ -33,7 +33,7 @@ public class Settings implements IScreen {
     public Settings(IScreenNavigator navigator, SettingsService settings, Context context) {
         _navigator = navigator;
         _themeScreen = new ThemeScreen(navigator, settings, context);
-        _crashScreen = new CrashLogScreen(navigator);
+        _crashScreen = new CrashLogScreen(navigator, context);
         _layout = new StackLayout();
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
 

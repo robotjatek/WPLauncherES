@@ -30,7 +30,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
             var writer = new FileWriter(file, true);
             e.printStackTrace(new PrintWriter(writer));
             writer.close();
-            // TODO: signal new crash
+            // No reason to signal a crash as the application will close anyway
         } catch (IOException ex) {
             // Ignore
         }

@@ -13,6 +13,7 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
 import com.robotjatek.wplauncher.TileGrid.Position;
@@ -24,7 +25,7 @@ public class CrashLogScreen implements IScreen {
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final StackLayout _layout = new StackLayout();
-    private final ListView<AccentColor> _crashList = new ListView<>();
+    private final ListView<AccentColor> _crashList;
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _view = new float[16];
     private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
@@ -32,6 +33,7 @@ public class CrashLogScreen implements IScreen {
 
     public CrashLogScreen(IScreenNavigator navigator) {
         _navigator = navigator;
+        _crashList = new ListView<>(0, LauncherRenderer.SCREEN_DATA.bottomInset);
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(_crashList);
@@ -64,7 +66,7 @@ public class CrashLogScreen implements IScreen {
         _size = new Size<>(width, height);
         var itemsHeight = _titleLabel.measure().height() +
                 _subTitleLabel.measure().height() + StackLayout.TOP_MARGIN_PX;
-        var listHeight = height - itemsHeight - 264;
+        var listHeight = height - itemsHeight - LauncherRenderer.SCREEN_DATA.bottomInset;
         _crashList.setSize(new Size<>(width, listHeight));
         _layout.onResize(width, height);
     }

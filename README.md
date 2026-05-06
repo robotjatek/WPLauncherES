@@ -105,6 +105,8 @@ Try to make it usable for the less crazy people
 - [x] GLES 3.2
 - [x] Make ContextMenu and MenuOption to use layouts and labels
 - [x] Make ListItem use high level UI components
+- [x] Embeddable ListView component
+  - [ ] Make ListPage use ListView internally
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
   - [ ] Photos
@@ -124,8 +126,8 @@ Try to make it usable for the less crazy people
 - [ ] Bug fixes
   - [x] Fix: crash on empty notification content
   - [x] Fix: crash on concurrent access to navigation stack
-  - [x] Fix: Crash when onDestroy() fires before onSurfaceCreated()
-  - [x] Crash logs
+  - [x] Fix: crash when onDestroy() fires before onSurfaceCreated()
+  - [x] View crash logs
 - [ ] Multi lang support
 - [ ] Light mode/Dark mode support
   - [ ] Dropdown 

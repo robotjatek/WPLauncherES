@@ -1,8 +1,10 @@
 package com.robotjatek.wplauncher.Components.ListView;
 
+import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
+import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.ListPage.ListItem;
 import com.robotjatek.wplauncher.Components.ListPage.ListItemDrawContext;
 import com.robotjatek.wplauncher.Components.ListView.States.IdleState;
@@ -12,6 +14,7 @@ import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.IState;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
 
@@ -21,12 +24,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-// TODO: click on items
-// TODO: disallow click on elements that are scrolled out of the view
-// TODO: do not render elements that are scrolled out of the view
-
 /**
- * A list that is embeddable to any layouts
+ * A list that is embeddable to any layouts, with arbitrary size (if the said layout supports it)
  * @param <T> The type of the payload
  */
 public class ListView<T> implements UIElement, IItemListContainer<T> {
@@ -42,6 +41,8 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     private IState _state = IDLE_STATE();
     private final ListItemDrawContext<T, ListView<T>> _itemDrawContext = new ListItemDrawContext<>(PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this); // TODO: remove hardcoded values
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
+    private final int _topMargin;
+    private final int _bottomMargin;
 
     public IState IDLE_STATE() {
         return new IdleState<>(this);
@@ -49,6 +50,11 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
 
     public IState SCROLL_STATE(float y) {
         return new ScrollState<>(this, y);
+    }
+
+    public ListView(int topMargin, int bottomMargin) {
+        _topMargin = topMargin;
+        _bottomMargin = bottomMargin;
     }
 
     @Override
@@ -71,10 +77,15 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         Matrix.translateM(_modelMatrix, 0, x, y + _scroll.getScrollOffset(), 0);
         Matrix.multiplyMM(_modelMatrix, 0, _modelMatrix, 0, view, 0);
 
+        var screenHeight = LauncherRenderer.SCREEN_DATA.screenHeight;
+        var glY = screenHeight - y - h - _bottomMargin;
+        GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
+        GLES32.glScissor((int) x, (int) glY, w, h);
         for (var item : _items) {
             item.update(_itemDrawContext);
-            item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer);
+            item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer); // TODO: do not call draw() for elements that are scrolled out of the view
         }
+        GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
 
         // TODO: draw context menu
     }
@@ -88,9 +99,9 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     }
 
     private void setScrollBounds() {
-        var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX);
+        var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + _bottomMargin;
         var min = Math.min(0, _size.height() - (contentHeight + PADDING_PX));
-        _scroll.setBounds(min, 0); // TODO: az alja így mindig kilóg? inset?
+        _scroll.setBounds(min, 0);
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
+import com.robotjatek.wplauncher.InternalApps.TextReaderPage;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
@@ -21,6 +22,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class CrashLogScreen implements IScreen {
@@ -34,6 +36,7 @@ public class CrashLogScreen implements IScreen {
     private final float[] _view = new float[16];
     private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
     private final Label _subTitleLabel = new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0);
+    private TextReaderPage _page;
 
     public CrashLogScreen(IScreenNavigator navigator, Context context) {
         _navigator = navigator;
@@ -79,18 +82,27 @@ public class CrashLogScreen implements IScreen {
         return Arrays.stream(file).filter(f -> f.getName().startsWith("crash_")).toList();
     }
 
-    // TODO: listitem without icon
     private List<ListItem<File>> createItems() {
         var files = listFiles();
-        return files.stream().map(f ->
+        return files.stream().sorted(Comparator.comparing(File::lastModified)).map(f ->
                 new ListItem<>(
                         f.getName(),
-                        new ColorDrawable(Colors.TILE_RED),
+                        new ColorDrawable(Colors.TILE_RED), // TODO: listitem without icon
                         Colors.TRANSPARENT,
-                        () -> _crashList.removeItemByPayload(f), f)).toList(); // TODO: open tapped file
+                        () -> openFileReaderPage(f), f)).toList();
     }
 
-    // TODO: reload button
+    private void openFileReaderPage(File file) {
+        _page = new TextReaderPage(_navigator, file, (File payload) -> {
+            if (payload != null) {
+                _crashList.removeItemByPayload(file);
+            }
+            _page.dispose();
+        });
+        _page.onResize(_size.width(), _size.height());
+        _navigator.push(_page);
+    }
+    
     // TODO: create a contextmenu here with open and delete commands
 
     @Override

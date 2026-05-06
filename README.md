@@ -98,7 +98,7 @@ I'm already daily-driving, you shouldn't be.
 - [x] Use AbsoluteLayout in the ClockHUB tile
 - [x] Press "Home" button to jump back to the top of the tile-grid  
 
-### M3 - beta
+### M3 - pre-beta
 
 Try to make it usable for the less crazy people
 
@@ -107,16 +107,8 @@ Try to make it usable for the less crazy people
 - [x] Make ListItem use high level UI components
 - [x] Embeddable ListView component
   - [ ] Make ListPage use ListView internally
-- [ ] More tiles & specific tiles for common apps
-  - [ ] Tasks
-  - [ ] Photos
-  - [ ] Weather
-  - [ ] Messenger
-  - [ ] Messages
-  - [ ] Contacts
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Animation after swipe
-- [ ] Generic carousel view
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI
@@ -128,10 +120,6 @@ Try to make it usable for the less crazy people
   - [x] Fix: crash on concurrent access to navigation stack
   - [x] Fix: crash when onDestroy() fires before onSurfaceCreated()
   - [x] View crash logs
-- [ ] Multi lang support
-- [ ] Light mode/Dark mode support
-  - [ ] Dropdown 
-- [ ] Radiobutton
 - [ ] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings
 - [ ] Search bar in the app-list
@@ -141,8 +129,24 @@ Try to make it usable for the less crazy people
 
 Try it at your own risk
 
+- [ ] Make the crash-log viewer scrollable
 - [ ] Maybe a closed beta (?)
 - [ ] TBD
+
+## M4 - Beta
+
+- [ ] More tiles & specific tiles for common apps
+  - [ ] Tasks
+  - [ ] Photos
+  - [ ] Weather
+  - [ ] Messenger
+  - [ ] Messages
+  - [ ] Contacts
+- [ ] Generic carousel view
+- [ ] Multi lang support
+- [ ] Light mode/Dark mode support
+  - [ ] Dropdown
+- [ ] Radiobutton
 
 ### M4 - RC
 

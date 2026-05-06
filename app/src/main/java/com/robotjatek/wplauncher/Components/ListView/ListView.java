@@ -4,7 +4,6 @@ import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
-import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.ListPage.ListItem;
 import com.robotjatek.wplauncher.Components.ListPage.ListItemDrawContext;
 import com.robotjatek.wplauncher.Components.ListView.States.IdleState;

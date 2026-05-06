@@ -130,6 +130,7 @@ Try to make it usable for the less crazy people
 Try it at your own risk
 
 - [ ] Make the crash-log viewer scrollable
+- [ ] Adjust button border drawing when no icon is set
 - [ ] Maybe a closed beta (?)
 - [ ] TBD
 

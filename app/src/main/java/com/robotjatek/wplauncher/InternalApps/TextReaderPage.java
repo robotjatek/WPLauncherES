@@ -1,10 +1,8 @@
 package com.robotjatek.wplauncher.InternalApps;
 
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
@@ -43,8 +41,7 @@ public class TextReaderPage implements IScreen {
         _onClose = onClose;
         var content = readFileContent(file);
         _textbox = new TextBox(content, 38, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, -1);
-        var icon = BitmapUtil.createRect(64, 64, 8, 0);
-        _deleteButton = new Button("Delete log", new BitmapDrawable(icon), this::deleteFileAndExit); // TODO: button without icon
+        _deleteButton = new Button("Delete log", null, this::deleteFileAndExit);
         _layout.addChild(_deleteButton);
         _layout.addChild(_textbox); // TODO: make this scrollable. ScrollView?
     }

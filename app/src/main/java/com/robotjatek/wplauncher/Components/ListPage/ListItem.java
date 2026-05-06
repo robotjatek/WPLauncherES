@@ -18,13 +18,15 @@ public class ListItem<T> {
     private T _payload;
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _textLabel;
-    private final Icon _icon;
+    private Icon _icon;
 
     public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
         _onTap = onTap;
         _payload = payload;
         _textLabel = new Label(label, 60, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
-        _icon = new Icon(icon, iconBgColor);
+        if (icon != null) {
+            _icon = new Icon(icon, iconBgColor);
+        }
     }
 
     public String getLabel() {
@@ -67,14 +69,18 @@ public class ListItem<T> {
         if (_dirty) {
             var w = (int) context.widthOf(this);
             var h = (int) context.heightOf(this);
-            _icon.setSize(new Size<>(h, h));
             _textLabel.setMaxWidth(w - h);
 
-            var labelX = _icon.measure().width() + w * 0.02f;
-            var labelY = (h - _textLabel.measure().height()) / 2f;
+            var labelX = w * 0.02f;
+            var labelY = (h - _textLabel.measure().height()) / 2f;;
 
-            _layout.removeChild(_icon);
-            _layout.addChild(_icon, Position.ZERO);
+            if (_icon != null) {
+                _icon.setSize(new Size<>(h, h));
+                labelX = _icon.measure().width() + w * 0.02f;
+                _layout.removeChild(_icon);
+                _layout.addChild(_icon, Position.ZERO);
+            }
+
             _layout.removeChild(_textLabel);
             _layout.addChild(_textLabel, new Position<>(labelX, labelY));
             _dirty = false;

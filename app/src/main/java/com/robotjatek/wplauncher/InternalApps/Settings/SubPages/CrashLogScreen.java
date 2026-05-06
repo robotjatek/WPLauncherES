@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
@@ -87,7 +86,7 @@ public class CrashLogScreen implements IScreen {
         return files.stream().sorted(Comparator.comparing(File::lastModified)).map(f ->
                 new ListItem<>(
                         f.getName(),
-                        new ColorDrawable(Colors.TILE_RED), // TODO: listitem without icon
+                        null,
                         Colors.TRANSPARENT,
                         () -> openFileReaderPage(f), f)).toList();
     }
@@ -102,7 +101,7 @@ public class CrashLogScreen implements IScreen {
         _page.onResize(_size.width(), _size.height());
         _navigator.push(_page);
     }
-    
+
     // TODO: create a contextmenu here with open and delete commands
 
     @Override

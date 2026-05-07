@@ -30,6 +30,7 @@ public class TextBox implements UIElement {
     private boolean _dirty = true;
     private int _textureId = -1;
     private Size<Integer> _cachedSize = new Size<>(0, 0);
+    private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public TextBox(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
         this(text, textSize, typeFace, textColor, bgColor, maxWidth, -1);
@@ -76,17 +77,16 @@ public class TextBox implements UIElement {
     }
 
     private int createMultilineTexture() {
-        var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
-        paint.setTextSize(_textSize);
-        paint.setColor(_textColor);
+        _paint.setTextAlign(Paint.Align.LEFT);
+        _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
+        _paint.setTextSize(_textSize);
+        _paint.setColor(_textColor);
 
         // Wrap text into lines
-        var lines = wrapText(_text, _maxWidth, paint);
+        var lines = wrapText(_text, _maxWidth, _paint);
 
         // Calculate total height
-        var fm = paint.getFontMetrics();
+        var fm = _paint.getFontMetrics();
         var lineHeight = (int) ((fm.descent - fm.ascent) * _lineSpacing);
         var totalHeight = lineHeight * lines.size();
 
@@ -117,7 +117,7 @@ public class TextBox implements UIElement {
         // Draw each line
         var baselineY = -fm.ascent; // First baseline
         for (var line : lines) {
-            canvas.drawText(line, 0, baselineY, paint);
+            canvas.drawText(line, 0, baselineY, _paint);
             baselineY += lineHeight;
         }
 
@@ -185,13 +185,12 @@ public class TextBox implements UIElement {
     @Override
     public Size<Integer> measure() {
         if (_dirty) {
-            var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            paint.setTextAlign(Paint.Align.LEFT);
-            paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
-            paint.setTextSize(_textSize);
+            _paint.setTextAlign(Paint.Align.LEFT);
+            _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
+            _paint.setTextSize(_textSize);
 
-            var lines = wrapText(_text, _maxWidth, paint);
-            var fm = paint.getFontMetrics();
+            var lines = wrapText(_text, _maxWidth, _paint);
+            var fm = _paint.getFontMetrics();
             var lineHeight = (int) ((fm.descent - fm.ascent) * _lineSpacing);
             var totalHeight = lineHeight * lines.size();
 

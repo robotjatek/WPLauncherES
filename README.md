@@ -114,6 +114,7 @@ Try to make it usable for the less crazy people
 - [ ] Device resolution independent UI
 - [ ] Optimizations
   - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
+  - [x] Reduce GC pressure when measuring labels and textboxes during rendering
   - [ ] On-demand alloc of internal apps and screens
 - [ ] Bug fixes
   - [x] Fix: crash on empty notification content

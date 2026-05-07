@@ -25,6 +25,7 @@ public class Label implements UIElement {
     private boolean _dirty = true;
     private int _textureId = -1;
     private final Runnable _onTap;
+    private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
         this(text, textSize, typeFace, textColor, bgColor, -1, null);
@@ -82,12 +83,11 @@ public class Label implements UIElement {
     }
 
     private String truncateText(String text, float maxWidth) {
-        var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
-        paint.setTextSize(_textSize);
+        _paint.setTextAlign(Paint.Align.LEFT);
+        _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
+        _paint.setTextSize(_textSize);
 
-        var textWidth = paint.measureText(text);
+        var textWidth = _paint.measureText(text);
 
         // Text fits - no truncation needed
         if (textWidth <= maxWidth) {
@@ -96,7 +96,7 @@ public class Label implements UIElement {
 
         // Need to truncate - binary search for the right length
         var ellipsis = "...";
-        var ellipsisWidth = paint.measureText(ellipsis);
+        var ellipsisWidth = _paint.measureText(ellipsis);
         var availableWidth = maxWidth - ellipsisWidth;
 
         if (availableWidth <= 0) {
@@ -111,7 +111,7 @@ public class Label implements UIElement {
         while (left <= right) {
             int mid = (left + right) / 2;
             var substring = text.substring(0, mid);
-            var substringWidth = paint.measureText(substring);
+            var substringWidth = _paint.measureText(substring);
 
             if (substringWidth <= availableWidth) {
                 bestLength = mid;
@@ -126,20 +126,19 @@ public class Label implements UIElement {
 
     @Override
     public Size<Integer> measure() {
-        var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
-        paint.setTextSize(_textSize);
+        _paint.setTextAlign(Paint.Align.LEFT);
+        _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
+        _paint.setTextSize(_textSize);
 
         var displayText = _maxWidth > 0 ? truncateText(_text, _maxWidth) : _text;
-        var textWidth = paint.measureText(displayText);
+        var textWidth = _paint.measureText(displayText);
 
         // If max width is set, don't exceed it
         if (_maxWidth > 0 && textWidth > _maxWidth) {
             textWidth = _maxWidth;
         }
 
-        var fm = paint.getFontMetrics();
+        var fm = _paint.getFontMetrics();
         var textHeight = fm.descent - fm.ascent;
         return new Size<>((int)textWidth, (int)textHeight);
     }

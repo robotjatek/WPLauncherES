@@ -15,8 +15,8 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
     private final IDrawContext<ContextMenu<T>> _context;
     private final List<MenuOption<T>> _options = new ArrayList<>();
     public Position<Float> _position;
-    private T _payload;
-    private boolean _isOpened = false;
+    private volatile T _payload;
+    private volatile boolean _isOpened = false;
 
     public ContextMenu(Position<Float> position, IDrawContext<ContextMenu<T>> context) {
         _context = context;
@@ -41,9 +41,12 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
     }
 
     public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer) {
+        var payload = _payload;
+        if (payload == null) return;
+
         for (var i = 0; i < _options.size(); i++) {
             // draw each option
-            _options.get(i).draw(delta, proj, view, renderer, _payload);
+            _options.get(i).draw(delta, proj, view, renderer, payload);
         }
     }
 

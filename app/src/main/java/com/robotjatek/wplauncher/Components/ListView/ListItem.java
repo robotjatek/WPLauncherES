@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.Components.ListPage;
+package com.robotjatek.wplauncher.Components.ListView;
 
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;

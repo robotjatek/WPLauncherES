@@ -34,6 +34,8 @@ public class MenuOption<T> {
     }
 
     public void onTap(T payload) {
+        if (payload == null) return;
+
         if (_isEnabled == null && _action != null) {
             _action.accept(payload);
             return;
@@ -57,7 +59,7 @@ public class MenuOption<T> {
 
         _option.setMaxWidth(w);
 
-        if (_isEnabled != null) {
+        if (_isEnabled != null && payload != null) {
             var isEnabled = _isEnabled.apply(payload);
             if (isEnabled != _prevEnabled) {
                 var color = isEnabled ? Colors.WHITE : Colors.LIGHT_GRAY;

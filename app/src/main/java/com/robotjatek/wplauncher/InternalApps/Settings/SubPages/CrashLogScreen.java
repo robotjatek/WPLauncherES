@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
@@ -10,7 +11,7 @@ import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
-import com.robotjatek.wplauncher.Components.ListPage.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.ListView.ListView;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
@@ -44,7 +45,7 @@ public class CrashLogScreen implements IScreen {
     public CrashLogScreen(IScreenNavigator navigator, Context context) {
         _navigator = navigator;
         _context = context;
-        _crashList = new ListView<>(0, LauncherRenderer.SCREEN_DATA.bottomInset);
+        _crashList = new ListView<>(0, LauncherRenderer.SCREEN_DATA.bottomInset, 0);
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(_crashList);
@@ -119,7 +120,9 @@ public class CrashLogScreen implements IScreen {
     }
 
     private void deleteFile(File f) {
-        f.delete();
+        if(!f.delete()) {
+            Log.e(CrashLogScreen.class.getName(), "Failed to delete file: " + f.getName());
+        }
         _crashList.removeItemByPayload(f);
     }
 

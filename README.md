@@ -106,8 +106,8 @@ Try to make it usable for the less crazy people
 - [x] Make ContextMenu and MenuOption to use layouts and labels
 - [x] Make ListItem use high level UI components
 - [x] Embeddable ListView component
-  - [ ] Make ListPage use ListView internally
-- [ ] Feedback to the user when clicked (Rotation/animations/etc)
+  - [x] Make ListPage use ListView internally
+- [ ] Feedback to the user on tap (Rotation/animations/etc)
 - [ ] Animation after swipe
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
@@ -119,6 +119,7 @@ Try to make it usable for the less crazy people
   - [x] Fix: crash on empty notification content
   - [x] Fix: crash on concurrent access to navigation stack
   - [x] Fix: crash when onDestroy() fires before onSurfaceCreated()
+  - [x] Fix: null reference error crash in context menu
   - [x] View crash logs
 - [ ] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings
@@ -132,6 +133,7 @@ Try it at your own risk
 - [ ] Make the crash-log viewer scrollable
 - [ ] Adjust button border drawing when no icon is set
 - [ ] About page in Launcher Settings
+- [ ] ScrollView in crash log reader
 - [ ] Maybe a closed beta (?)
 - [ ] TBD
 

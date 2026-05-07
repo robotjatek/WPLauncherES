@@ -3,7 +3,7 @@ package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 import android.graphics.drawable.ColorDrawable;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.Components.ListPage.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;

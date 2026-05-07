@@ -1,180 +1,83 @@
 package com.robotjatek.wplauncher.Components.ListPage;
 
-import android.opengl.Matrix;
-
-import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
-import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
+import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
+import com.robotjatek.wplauncher.Components.ListView.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListView;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
-import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.Components.ListPage.States.ContextMenuState;
-import com.robotjatek.wplauncher.Components.ListPage.States.IdleState;
-import com.robotjatek.wplauncher.Components.ListPage.States.ScrollState;
-import com.robotjatek.wplauncher.Components.ListPage.States.TappedState;
-import com.robotjatek.wplauncher.Page;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.ScrollController;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
-import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.List;
 
-public class ListPage<T> implements IItemListContainer<T>, Page {
-    public IState IDLE_STATE() {
-        return new IdleState<>(this);
-    }
-
-    public IState SCROLL_STATE(float y) {
-        return new ScrollState<>(this, y);
-    }
-
-    public IState TAPPED_STATE(float y) {
-        return new TappedState<>(this, y);
-    }
-
-    public IState CONTEXT_MENU_STATE(float x, float y) {
-        return new ContextMenuState<>(this, x, y);
-    }
-
+/**
+ * Wraps the listview into a full screen list component
+ * @param <T> The type of the payload
+ */
+public class ListPage<T> {
     private boolean _disposed = false;
-    private IState _state = IDLE_STATE();
-    public static final int TOP_MARGIN_PX = 0;
-    public static final int ITEM_HEIGHT_PX = 128;
-    public static final int ITEM_GAP_PX = 5;
     private static final int PAGE_PADDING_PX = 60;
-    public static final float BOTTOM_MARGIN_PX = 240;
-    private final float[] scrollMatrix = new float[16];
-    private final ScrollController _scroll = new ScrollController();
-    private final ListItemDrawContext<T, ListPage<T>> _drawContext;
-    private final ContextMenuDrawContext<T> _contextMenuDrawContext;
-    private final List<ListItem<T>> _items = Collections.synchronizedList(new ArrayList<>());
-    private int _viewPortHeight;
-    private ContextMenu<T> _contextMenu;
+    private Size<Integer> _size = new Size<>(-1, -1);
+    private final StackLayout _layout = new StackLayout();
+    private final ListView<T> _appList = new ListView<>(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset, PAGE_PADDING_PX);
 
     public ListPage() {
-        _drawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
-        _contextMenuDrawContext = new ContextMenuDrawContext<>(0, _viewPortHeight);
+        _layout.addChild(_appList);
     }
 
-    @Override
     public List<ListItem<T>> getItems() {
-        return _items;
+        return _appList.getItems();
     }
 
-    @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {
-        _state.update(delta);
-        Matrix.setIdentityM(scrollMatrix, 0);
-        Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
-        Matrix.multiplyMM(scrollMatrix, 0, scrollMatrix, 0, viewMatrix, 0);
-
-        for (var i : _items) {
-            i.update(_drawContext);
-            i.draw(delta, projMatrix, scrollMatrix, _drawContext, renderer);
-        }
-
-        // Draw the context menu last so it shows up above everything else
-        if (_contextMenu != null && _contextMenu.isOpened()) {
-            _contextMenu.draw(delta, projMatrix, viewMatrix, renderer);
-        }
+        _layout.draw(delta, projMatrix, viewMatrix, renderer, Position.ZERO, _size);
     }
-    
-    @Override
+
     public boolean handleGesture(Gesture gesture) {
-        return _state.handleGesture(gesture);
+        return _layout.handleGesture(gesture);
     }
 
-    @Override
     public void onSizeChanged(int width, int height) {
-        _viewPortHeight = height;
-        _drawContext.onResize(width);
-        var _listWidth = width - 2 * PAGE_PADDING_PX;
-        _contextMenuDrawContext.onResize(_listWidth, height);
-        _items.forEach(ListItem::setDirty);
-        setScrollBounds();
+        _size = new Size<>(width, height);
+        var listWidth = width - 2 * PAGE_PADDING_PX;
+        _appList.setSize(new Size<>(listWidth, height - LauncherRenderer.SCREEN_DATA.bottomInset));
+        _layout.onResize(width, height);
     }
 
-    @Override
     public void resetState() {
-        if (!(_state instanceof IdleState<?>)) {
-            changeState(IDLE_STATE());
-        }
+        _appList.resetState();
     }
 
     public void addItem(int index, ListItem<T> item) {
-        _items.add(index, item);
-        setScrollBounds();
+          _appList.addItem(index, item);
     }
 
     public void addItems(List<ListItem<T>> items) {
-        _items.addAll(items);
-        _items.forEach(ListItem::setDirty);
-        setScrollBounds();
+        _appList.addItems(items);
     }
 
     public void removeItem(ListItem<T> item) {
-        _items.remove(item);
-        item.dispose();
-        setScrollBounds();
-    }
-
-    public void changeState(IState state) {
-        _state.exit();
-        _state = state;
-        _state.enter();
-    }
-
-    public ScrollController getScroll() {
-        return _scroll;
-    }
-
-    public ContextMenu<T> openContextMenu(float x, float y, T item) {
-        if (_contextMenu != null) {
-            _contextMenu.open(new Position<>(x, y), item);
-        }
-        return _contextMenu;
-    }
-
-    public void closeContextMenu() {
-        if (_contextMenu != null) {
-            _contextMenu.close();
-        }
+        _appList.removeItemByPayload(item.getPayload());
     }
 
     public void setContextMenu(ContextMenu<T> menu) {
-        if (_contextMenu != null) {
-            _contextMenu.dispose();
-        }
-        _contextMenu = menu;
-    }
-
-    public boolean hasContextMenu() {
-        return _contextMenu != null;
-    }
-
-    private void setScrollBounds() {
-        var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + TOP_MARGIN_PX;
-        var min = Math.min(0, _viewPortHeight - (contentHeight + PAGE_PADDING_PX + BOTTOM_MARGIN_PX));
-        _scroll.setBounds(min, 0);
+        _appList.setContextMenu(menu);
     }
 
     public void resetScroll() {
-        _scroll.setScrollOffset(0);
+        _appList.getScroll().setScrollOffset(0);
     }
 
-    @Override
     public boolean isCatchingGestures() {
-        return _state.isCatchingGestures();
+        return _appList.isCatchingGestures();
     }
 
-    @Override
     public void dispose() {
         if (!_disposed) {
-            _items.forEach(ListItem::dispose);
-            if (_contextMenu != null) {
-                _contextMenu.dispose();
-            }
+            _layout.dispose();
             _disposed = true;
         }
     }

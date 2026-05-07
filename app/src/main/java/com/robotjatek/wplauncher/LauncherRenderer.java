@@ -10,19 +10,19 @@ import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.StartPage.StartScreen;
 
-import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigator {
+    public static ScreenData SCREEN_DATA = new ScreenData();
     private boolean _disposed = false;
     private float lastTime = System.nanoTime();
     private int frameCount = 0;
     private long fpsTime = System.currentTimeMillis();
 
-    private final Deque<IScreen> _navigationStack = new ArrayDeque<>();
+    private final Deque<IScreen> _navigationStack = new ConcurrentLinkedDeque<>();
     private final Context _context;
     private final float[] _projMatrix = new float[16];
-    private int _topInset = 0;
     private final LocationService _locationService;
     private final AppChangeReceiver _appChangeReceiver;
     private Shader _shader;
@@ -64,15 +64,17 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
     @Override
     public void onSurfaceChanged(javax.microedition.khronos.opengles.GL10 glUnused, int width, int height) {
+        SCREEN_DATA.screenHeight = height;
+        SCREEN_DATA.screenWidth = width;
         GLES32.glViewport(0, 0, width, height);
         Matrix.orthoM(_projMatrix, 0, 0, width, height, 0, -1, 1);
-        Matrix.translateM(_projMatrix, 0, 0, _topInset, 0);
+        Matrix.translateM(_projMatrix, 0, 0, SCREEN_DATA.topInset, 0); // translate everything below the top inset to a "safe" area
         _navigationStack.forEach(s -> s.onResize(width, height));
     }
 
     public void handleGesture(Gesture gesture) {
         if (!_navigationStack.isEmpty()) {
-            _navigationStack.getFirst().handleGesture(gesture.copyWithOffset(0, -_topInset));
+            _navigationStack.getFirst().handleGesture(gesture.copyWithOffset(0, -SCREEN_DATA.topInset)); // corrigate screen coordinates with the insets
         }
     }
 
@@ -102,13 +104,15 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     public void dispose() {
         if (!_disposed) {
             _navigationStack.forEach(IScreen::dispose);
-            _renderer.dispose();
-            _shader.delete();
+            _navigationStack.clear();
+            if (_renderer != null) _renderer.dispose();
+            if (_shader != null) _shader.delete();
             _disposed = true;
         }
     }
 
     public void setInsets(int left, int top, int right, int bottom) {
-        _topInset = top;
+        SCREEN_DATA.topInset = top;
+        SCREEN_DATA.bottomInset = bottom;
     }
 }

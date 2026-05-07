@@ -1,0 +1,62 @@
+package com.robotjatek.wplauncher.Components.ListPage.States;
+
+import com.robotjatek.wplauncher.Components.ListPage.ListPage;
+import com.robotjatek.wplauncher.Gestures.DownGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.ScrollGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
+
+public class ScrollState<T> extends BaseState<T> {
+    private final float _startY;
+    private boolean _touching = true;
+
+    public ScrollState(ListPage<T> context, float y) {
+        super(context);
+        _startY = y;
+    }
+
+    @Override
+    public void enter() {
+        super.enter();
+        _context.getScroll().onTouchStart(_startY);
+    }
+
+    @Override
+    public boolean handleScroll(ScrollGesture gesture) {
+        _context.getScroll().onTouchMove(gesture.getY());
+        return true;
+    }
+
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        _context.getScroll().onTouchMove(gesture.getY());
+        return true;
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
+        _context.getScroll().onTouchEnd();
+        _touching = false;
+        return true;
+    }
+
+    @Override
+    public boolean handleDown(DownGesture gesture) {
+        _context.getScroll().onTouchStart(gesture.getY());
+        _touching = true;
+        return true;
+    }
+
+    @Override
+    public boolean isCatchingGestures() {
+        return _touching || _context.getScroll().isFlinging();
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        if (!_touching && !_context.getScroll().isFlinging()) {
+            _context.changeState(_context.IDLE_STATE());
+        }
+    }
+}

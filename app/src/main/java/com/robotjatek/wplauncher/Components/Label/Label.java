@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
+import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -23,22 +24,24 @@ public class Label implements UIElement {
     private float _maxWidth; // -1 means no limit
     private boolean _dirty = true;
     private int _textureId = -1;
+    private final Runnable _onTap;
 
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
-        this(text, textSize, typeFace, textColor, bgColor, -1);
+        this(text, textSize, typeFace, textColor, bgColor, -1, null);
     }
 
-    public Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
+    public Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, Runnable onTap) {
         _text = text;
         _textSize = textSize;
         _typeFace = typeFace;
         _textColor = textColor;
         _bgColor = bgColor;
         _maxWidth = maxWidth;
+        _onTap = onTap;
     }
 
     @Override
-    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+    public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
         var w = (int)drawContext.widthOf(this);
@@ -179,6 +182,14 @@ public class Label implements UIElement {
 
     public int getTypeFace() {
         return _typeFace;
+    }
+
+    @Override
+    public boolean handleTap(TapGesture gesture) {
+        if (_onTap != null) {
+            _onTap.run();
+        }
+        return true;
     }
 
     @Override

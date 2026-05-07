@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.Components.List;
+package com.robotjatek.wplauncher.Components.ListPage;
 
 import android.opengl.Matrix;
 
@@ -7,10 +7,10 @@ import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.Components.List.States.ContextMenuState;
-import com.robotjatek.wplauncher.Components.List.States.IdleState;
-import com.robotjatek.wplauncher.Components.List.States.ScrollState;
-import com.robotjatek.wplauncher.Components.List.States.TappedState;
+import com.robotjatek.wplauncher.Components.ListPage.States.ContextMenuState;
+import com.robotjatek.wplauncher.Components.ListPage.States.IdleState;
+import com.robotjatek.wplauncher.Components.ListPage.States.ScrollState;
+import com.robotjatek.wplauncher.Components.ListPage.States.TappedState;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ListView<T> implements IItemListContainer<T>, Page {
+public class ListPage<T> implements IItemListContainer<T>, Page {
     public IState IDLE_STATE() {
         return new IdleState<>(this);
     }
@@ -46,13 +46,13 @@ public class ListView<T> implements IItemListContainer<T>, Page {
     public static final float BOTTOM_MARGIN_PX = 240;
     private final float[] scrollMatrix = new float[16];
     private final ScrollController _scroll = new ScrollController();
-    private final ListItemDrawContext<T, ListView<T>> _drawContext;
+    private final ListItemDrawContext<T, ListPage<T>> _drawContext;
     private final ContextMenuDrawContext<T> _contextMenuDrawContext;
     private final List<ListItem<T>> _items = Collections.synchronizedList(new ArrayList<>());
     private int _viewPortHeight;
     private ContextMenu<T> _contextMenu;
 
-    public ListView() {
+    public ListPage() {
         _drawContext = new ListItemDrawContext<>(PAGE_PADDING_PX, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(0, _viewPortHeight);
     }
@@ -147,6 +147,10 @@ public class ListView<T> implements IItemListContainer<T>, Page {
             _contextMenu.dispose();
         }
         _contextMenu = menu;
+    }
+
+    public boolean hasContextMenu() {
+        return _contextMenu != null;
     }
 
     private void setScrollBounds() {

@@ -98,32 +98,28 @@ I'm already daily-driving, you shouldn't be.
 - [x] Use AbsoluteLayout in the ClockHUB tile
 - [x] Press "Home" button to jump back to the top of the tile-grid  
 
-### M3 - beta
+### M3 - pre-beta
 
 Try to make it usable for the less crazy people
 
 - [x] GLES 3.2
 - [x] Make ContextMenu and MenuOption to use layouts and labels
 - [x] Make ListItem use high level UI components
-- [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
-- [ ] More tiles & specific tiles for common apps
-  - [ ] Tasks
-  - [ ] Photos
-  - [ ] Weather
-  - [ ] Messenger
-  - [ ] Messages
-  - [ ] Contacts
+- [x] Embeddable ListView component
+  - [ ] Make ListPage use ListView internally
 - [ ] Feedback to the user when clicked (Rotation/animations/etc)
 - [ ] Animation after swipe
-- [ ] Generic carousel view
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
+- [ ] Device resolution independent UI
 - [ ] Optimizations
+  - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
+  - [ ] On-demand alloc of internal apps and screens
 - [ ] Bug fixes
-- [ ] Multi lang support
-- [ ] Light mode/Dark mode support
-  - [ ] Dropdown 
-- [ ] Radiobutton
+  - [x] Fix: crash on empty notification content
+  - [x] Fix: crash on concurrent access to navigation stack
+  - [x] Fix: crash when onDestroy() fires before onSurfaceCreated()
+  - [x] View crash logs
 - [ ] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings
 - [ ] Search bar in the app-list
@@ -133,10 +129,28 @@ Try to make it usable for the less crazy people
 
 Try it at your own risk
 
+- [ ] Make the crash-log viewer scrollable
+- [ ] Adjust button border drawing when no icon is set
+- [ ] About page in Launcher Settings
 - [ ] Maybe a closed beta (?)
 - [ ] TBD
 
-### M4 - RC
+## M4 - Beta
+
+- [ ] More tiles & specific tiles for common apps
+  - [ ] Tasks
+  - [ ] Photos
+  - [ ] Weather
+  - [ ] Messenger
+  - [ ] Messages
+  - [ ] Contacts
+- [ ] Generic carousel view
+- [ ] Multi lang support
+- [ ] Light mode/Dark mode support
+- [ ] Dropdown
+- [ ] Radiobutton
+
+### M5 - RC
 
 - [ ] Landscape mode support
 - [ ] Background image with transparent tiles

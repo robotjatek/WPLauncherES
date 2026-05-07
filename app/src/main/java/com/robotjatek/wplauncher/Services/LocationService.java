@@ -11,12 +11,21 @@ import java.util.concurrent.Executors;
 public class LocationService {
     private static final long REFRESH_INTERVAL_MS = 10 * 60 * 1000;
     private boolean _hasPermission = false;
+    private boolean _isPaused = false;
     private String _city = "";
     private long _lastRequest = 0;
     private final Context _context;
 
     public LocationService(Context context) {
         _context = context;
+    }
+
+    public void pause() {
+        _isPaused = true;
+    }
+
+    public void resume() {
+        _isPaused = false;
     }
 
     public String getCity() {
@@ -45,7 +54,7 @@ public class LocationService {
 
     private void getLocation() {
         final var now = System.currentTimeMillis();
-        if (!_hasPermission || now - _lastRequest < REFRESH_INTERVAL_MS) {
+        if (!_hasPermission || now - _lastRequest < REFRESH_INTERVAL_MS || _isPaused) {
             return;
         }
 

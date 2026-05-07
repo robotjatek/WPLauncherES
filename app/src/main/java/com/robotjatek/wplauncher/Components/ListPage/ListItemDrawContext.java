@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.Components.List;
+package com.robotjatek.wplauncher.Components.ListPage;
 
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.IDrawContext;

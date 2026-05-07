@@ -46,7 +46,7 @@ public class TextBox implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+    public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
 
@@ -56,7 +56,7 @@ public class TextBox implements UIElement {
             }
 
             var size = measure();
-            if (size.width() == 0 || size.height() == 0) {
+            if (size.width() <= 0 || size.height() <= 0) {
                 return; // Do not draw invisible element
             }
 
@@ -64,7 +64,7 @@ public class TextBox implements UIElement {
             _dirty = false;
         }
 
-        if (_cachedSize.width() == 0 || _cachedSize.height() == 0) {
+        if (_cachedSize.width() <= 0 || _cachedSize.height() <= 0) {
             return; // Do not draw invisible element
         }
 
@@ -128,8 +128,6 @@ public class TextBox implements UIElement {
 
     private List<String> wrapText(String text, int maxWidth, Paint paint) {
         var lines = new ArrayList<String>();
-
-        // Split by explicit line breaks first
         var paragraphs = text.split("\n");
 
         for (var paragraph : paragraphs) {
@@ -142,11 +140,32 @@ public class TextBox implements UIElement {
             var currentLine = new StringBuilder();
 
             for (var word : words) {
-                var testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
-                var testWidth = paint.measureText(testLine);
+                // If the word itself is wider than maxWidth, force-break it
+                if (paint.measureText(word) > maxWidth) {
+                    // flush current line first
+                    if (currentLine.length() > 0) {
+                        lines.add(currentLine.toString());
+                        currentLine = new StringBuilder();
+                    }
+                    // break the word character by character
+                    var chunk = new StringBuilder();
+                    for (var ch : word.toCharArray()) {
+                        var testChunk = chunk.toString() + ch;
+                        if (paint.measureText(testChunk) > maxWidth && chunk.length() > 0) {
+                            lines.add(chunk.toString());
+                            chunk = new StringBuilder(String.valueOf(ch));
+                        } else {
+                            chunk.append(ch);
+                        }
+                    }
+                    if (chunk.length() > 0) {
+                        currentLine = chunk; // remainder continues on current line
+                    }
+                    continue;
+                }
 
-                if (testWidth > maxWidth && currentLine.length() > 0) {
-                    // Current line is full, start a new one
+                var testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+                if (paint.measureText(testLine) > maxWidth && currentLine.length() > 0) {
                     lines.add(currentLine.toString());
                     currentLine = new StringBuilder(word);
                 } else {

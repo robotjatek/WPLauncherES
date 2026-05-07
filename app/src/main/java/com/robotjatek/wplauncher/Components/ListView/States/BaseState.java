@@ -1,25 +1,25 @@
-package com.robotjatek.wplauncher.Components.List.States;
+package com.robotjatek.wplauncher.Components.ListView.States;
 
-
-import static com.robotjatek.wplauncher.Components.List.ListView.ITEM_GAP_PX;
-import static com.robotjatek.wplauncher.Components.List.ListView.ITEM_HEIGHT_PX;
-import static com.robotjatek.wplauncher.Components.List.ListView.TOP_MARGIN_PX;
+import static com.robotjatek.wplauncher.Components.ListView.ListView.ITEM_GAP_PX;
+import static com.robotjatek.wplauncher.Components.ListView.ListView.ITEM_HEIGHT_PX;
+import static com.robotjatek.wplauncher.Components.ListView.ListView.PADDING_PX;
 
 import android.util.Log;
 
-import com.robotjatek.wplauncher.Components.List.ListItem;
+import com.robotjatek.wplauncher.Components.ListPage.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListView;
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.Components.List.ListView;
 
 import java.util.Optional;
 
 public class BaseState<T> implements IState {
 
-    ListView<T> _context;
+    protected ListView<T> _context;
 
     protected BaseState(ListView<T> context) {
         _context = context;
     }
+
 
     @Override
     public void enter() {
@@ -28,7 +28,6 @@ public class BaseState<T> implements IState {
 
     @Override
     public void exit() {
-
     }
 
     @Override
@@ -37,7 +36,7 @@ public class BaseState<T> implements IState {
     }
 
     protected Optional<ListItem<T>> getItemAt(float y) {
-        var adjustedY = y - (_context.getScroll().getScrollOffset() + TOP_MARGIN_PX);
+        var adjustedY = y - (_context.getScroll().getScrollOffset() + PADDING_PX);
         var index = (int)(adjustedY / (ITEM_HEIGHT_PX + ITEM_GAP_PX));
         if (index >= 0 && index < _context.getItems().size()) {
             return Optional.of(_context.getItems().get(index));

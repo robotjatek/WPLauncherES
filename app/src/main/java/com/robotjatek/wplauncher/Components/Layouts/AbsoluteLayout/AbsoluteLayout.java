@@ -118,19 +118,18 @@ public class AbsoluteLayout implements ILayout {
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
 
         for (var child : _positionedElements) {
-            child._element.draw(proj, _modelMatrix, _drawContext, renderer);
+            child._element.draw(delta, proj, _modelMatrix, _drawContext, renderer);
         }
     }
 
     @Override
-    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+    public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
         var width = (int) drawContext.widthOf(this);
         var height = (int) drawContext.heightOf(this);
 
-        // TODO: add delta to the interface
-        draw(0, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
+        draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
     }
 
     @Override

@@ -34,7 +34,7 @@ public class Button implements UIElement {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+    public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
         var w = (int) drawContext.widthOf(this);
@@ -71,11 +71,13 @@ public class Button implements UIElement {
         renderer.draw(proj, _modelMatrix, _foreground);
 
         // draw icon
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x+4, y+4, 0);
-        Matrix.scaleM(_modelMatrix, 0, h, h-8, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _iconTexture);
+        if (_icon != null) {
+            Matrix.setIdentityM(_modelMatrix, 0);
+            Matrix.translateM(_modelMatrix, 0, x+4, y+4, 0);
+            Matrix.scaleM(_modelMatrix, 0, h, h-8, 0);
+            Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
+            renderer.draw(proj, _modelMatrix, _iconTexture);
+        }
     }
 
     @Override

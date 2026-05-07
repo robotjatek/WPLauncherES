@@ -38,7 +38,7 @@ public class StackLayout implements ILayout {
                      Size<Integer> size) {
         Matrix.translateM(view, 0, position.x(), position.y() + TOP_MARGIN_PX, 0);
         for (var child : _children) {
-            child.draw(proj, view, _drawContext, renderer);
+            child.draw(delta, proj, view, _drawContext, renderer);
         }
     }
 
@@ -79,14 +79,13 @@ public class StackLayout implements ILayout {
     }
 
     @Override
-    public void draw(float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+    public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
         var width = (int) drawContext.widthOf(this);
         var height = (int) drawContext.heightOf(this);
 
-        // TODO: add delta
-        draw(0, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
+        draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(width, height));
     }
 
     @Override

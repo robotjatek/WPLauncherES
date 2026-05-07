@@ -11,7 +11,7 @@ public interface Page extends IGestureHandler {
     }
 
     void onSizeChanged(int width, int height);
-    
+
 	void resetState();
 
     boolean handleGesture(Gesture gesture);

@@ -35,7 +35,7 @@ public class BaseState<T> implements IState {
         _context.getScroll().update(delta);
     }
 
-    protected Optional<ListItem<T>> getItemAt(float x, float y) {
+    protected Optional<ListItem<T>> getItemAt(float y) {
         var adjustedY = y - (_context.getScroll().getScrollOffset() + PADDING_PX);
         var index = (int)(adjustedY / (ITEM_HEIGHT_PX + ITEM_GAP_PX));
         if (index >= 0 && index < _context.getItems().size()) {

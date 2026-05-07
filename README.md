@@ -131,6 +131,7 @@ Try it at your own risk
 
 - [ ] Make the crash-log viewer scrollable
 - [ ] Adjust button border drawing when no icon is set
+- [ ] About page in Launcher Settings
 - [ ] Maybe a closed beta (?)
 - [ ] TBD
 
@@ -146,10 +147,10 @@ Try it at your own risk
 - [ ] Generic carousel view
 - [ ] Multi lang support
 - [ ] Light mode/Dark mode support
-  - [ ] Dropdown
+- [ ] Dropdown
 - [ ] Radiobutton
 
-### M4 - RC
+### M5 - RC
 
 - [ ] Landscape mode support
 - [ ] Background image with transparent tiles

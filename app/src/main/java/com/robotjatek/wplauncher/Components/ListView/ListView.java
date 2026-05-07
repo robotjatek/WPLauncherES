@@ -4,8 +4,10 @@ import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
+import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ListPage.ListItem;
 import com.robotjatek.wplauncher.Components.ListPage.ListItemDrawContext;
+import com.robotjatek.wplauncher.Components.ListView.States.ContextMenuState;
 import com.robotjatek.wplauncher.Components.ListView.States.IdleState;
 import com.robotjatek.wplauncher.Components.ListView.States.ScrollState;
 import com.robotjatek.wplauncher.Components.Size;
@@ -16,6 +18,7 @@ import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,6 +45,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
     private final int _topMargin;
     private final int _bottomMargin;
+    private ContextMenu<T> _contextMenu;
 
     public IState IDLE_STATE() {
         return new IdleState<>(this);
@@ -49,6 +53,10 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
 
     public IState SCROLL_STATE(float y) {
         return new ScrollState<>(this, y);
+    }
+
+    public IState CONTEXT_MENU_STATE(float x, float y) {
+        return new ContextMenuState<>(this, x, y);
     }
 
     public ListView(int topMargin, int bottomMargin) {
@@ -86,14 +94,16 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         }
         GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
 
-        // TODO: draw context menu
+        // Draw the context menu last so it shows up above everything else
+        if (_contextMenu != null && _contextMenu.isOpened()) {
+            _contextMenu.draw(delta, proj, _modelMatrix, renderer);
+        }
     }
 
     public void setSize(Size<Integer> size) {
         _size = size;
         _itemDrawContext.onResize(size.width());
         setScrollBounds();
-        //_contextMenuDrawContext.onResize(_listWidth, height); // TODO
         _dirty = true;
     }
 
@@ -131,13 +141,6 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         });
     }
 
-    private void executeCommands() {
-        Runnable command;
-        while ((command = _commands.poll()) != null) {
-            command.run();
-        }
-    }
-
     @Override
     public Size<Integer> measure() {
         // explicitly sized
@@ -159,8 +162,39 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         return _state.handleGesture(gesture);
     }
 
+    public void setContextMenu(ContextMenu<T> menu) {
+        if (_contextMenu != null) {
+            _contextMenu.dispose();
+        }
+        _contextMenu = menu;
+    }
+
+    public boolean hasContextMenu() {
+        return _contextMenu != null;
+    }
+
+    public ContextMenu<T> openContextMenu(float x, float y, T item) {
+        if (_contextMenu != null) {
+            _contextMenu.open(new Position<>(x, y), item);
+        }
+        return _contextMenu;
+    }
+
+    public void closeContextMenu() {
+        if (_contextMenu != null) {
+            _contextMenu.close();
+        }
+    }
+
     public ScrollController getScroll() {
         return _scroll;
+    }
+
+    private void executeCommands() {
+        Runnable command;
+        while ((command = _commands.poll()) != null) {
+            command.run();
+        }
     }
 
     @Override

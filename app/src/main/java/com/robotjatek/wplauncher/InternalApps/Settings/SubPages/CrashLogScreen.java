@@ -5,6 +5,9 @@ import android.graphics.Typeface;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
+import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
+import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.ListPage.ListItem;
@@ -36,6 +39,7 @@ public class CrashLogScreen implements IScreen {
     private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
     private final Label _subTitleLabel = new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0);
     private TextReaderPage _page;
+    private final ContextMenuDrawContext<File> _contextMenuDrawContext = new ContextMenuDrawContext<>(-1, -1);
 
     public CrashLogScreen(IScreenNavigator navigator, Context context) {
         _navigator = navigator;
@@ -66,6 +70,8 @@ public class CrashLogScreen implements IScreen {
         var listHeight = height - itemsHeight - LauncherRenderer.SCREEN_DATA.bottomInset;
         _crashList.setSize(new Size<>(width, listHeight));
         _layout.onResize(width, height);
+        _contextMenuDrawContext.onResize(width, listHeight);
+        _crashList.setContextMenu(createContextMenu());
     }
 
     @Override
@@ -102,7 +108,20 @@ public class CrashLogScreen implements IScreen {
         _navigator.push(_page);
     }
 
-    // TODO: create a contextmenu here with open and delete commands
+    private ContextMenu<File> createContextMenu() {
+        var menu = new ContextMenu<>(Position.ZERO, _contextMenuDrawContext);
+        var options = List.of(
+                new MenuOption<>("Open", this::openFileReaderPage, menu, null),
+                new MenuOption<>("Delete", this::deleteFile, menu, null)
+        );
+        menu.addOptions(options);
+        return menu;
+    }
+
+    private void deleteFile(File f) {
+        f.delete();
+        _crashList.removeItemByPayload(f);
+    }
 
     @Override
     public void dispose() {

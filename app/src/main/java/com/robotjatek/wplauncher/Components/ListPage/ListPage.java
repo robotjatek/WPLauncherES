@@ -14,7 +14,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 import java.util.List;
 
 /**
- * Wraps the listview into a full screen list component
+ * Wraps the ListView into a full screen list component
  * @param <T> The type of the payload
  */
 public class ListPage<T> {
@@ -43,7 +43,8 @@ public class ListPage<T> {
     public void onSizeChanged(int width, int height) {
         _size = new Size<>(width, height);
         var listWidth = width - 2 * PAGE_PADDING_PX;
-        _appList.setSize(new Size<>(listWidth, height - LauncherRenderer.SCREEN_DATA.bottomInset));
+        _appList.setMargins(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset);
+        _appList.setSize(new Size<>(listWidth, height));
         _layout.onResize(width, height);
     }
 

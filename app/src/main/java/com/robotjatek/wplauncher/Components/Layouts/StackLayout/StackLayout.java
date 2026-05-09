@@ -56,6 +56,7 @@ public class StackLayout implements ILayout {
     public void onResize(int width, int height) {
         _width = width;
         _height = height;
+        layout();
     }
 
     @Override

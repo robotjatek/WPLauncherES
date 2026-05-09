@@ -46,8 +46,8 @@ public class CrashLogScreen implements IScreen {
         _navigator = navigator;
         _context = context;
         _crashList = new ListView<>(0, LauncherRenderer.SCREEN_DATA.bottomInset, 0);
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout.addChild(_titleLabel);
+        _layout.addChild(_subTitleLabel);
         _layout.addChild(_crashList);
         _crashList.addItems(createItems());
     }
@@ -68,8 +68,9 @@ public class CrashLogScreen implements IScreen {
         _size = new Size<>(width, height);
         var itemsHeight = _titleLabel.measure().height() +
                 _subTitleLabel.measure().height() + StackLayout.TOP_MARGIN_PX;
-        var listHeight = height - itemsHeight - LauncherRenderer.SCREEN_DATA.bottomInset;
+        var listHeight = height - itemsHeight;
         _crashList.setSize(new Size<>(width, listHeight));
+        _crashList.setMargins(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset);
         _layout.onResize(width, height);
         _contextMenuDrawContext.onResize(width, listHeight);
         _crashList.setContextMenu(createContextMenu());

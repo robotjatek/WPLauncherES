@@ -43,8 +43,8 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
 
     private final int _padding;
-    private final int _topMargin;
-    private final int _bottomMargin;
+    private int _topMargin;
+    private int _bottomMargin;
     private ContextMenu<T> _contextMenu;
 
     public IState IDLE_STATE() {
@@ -91,7 +91,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         Matrix.multiplyMM(_modelMatrix, 0, _modelMatrix, 0, view, 0);
 
         var screenHeight = LauncherRenderer.SCREEN_DATA.screenHeight;
-        var glY = screenHeight - y - h - _bottomMargin;
+        var glY = screenHeight - y - h - _bottomMargin + _topMargin;
         GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
         GLES32.glScissor((int) x, (int) glY, w, h);
         for (var item : _items) {
@@ -118,7 +118,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
 
     private void setScrollBounds() {
         var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + _bottomMargin;
-        var min = Math.min(0, _size.height() - (contentHeight + _padding));
+        var min = Math.min(0, _size.height() - (contentHeight + _topMargin + _bottomMargin));
         _scroll.setBounds(min, 0);
     }
 
@@ -216,6 +216,15 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     public void resetState() {
         if (!(_state instanceof IdleState<?>)) {
             changeState(IDLE_STATE());
+        }
+    }
+
+    public void setMargins(int topMargin, int bottomMargin) {
+        if (_topMargin != topMargin || _bottomMargin != bottomMargin) {
+            _topMargin = topMargin;
+            _bottomMargin = bottomMargin;
+            setScrollBounds();
+            _dirty = true;
         }
     }
 

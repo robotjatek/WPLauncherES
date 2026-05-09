@@ -96,6 +96,7 @@ public class FlexLayout implements ILayout {
     public void addChild(UIElement element) {
         _children.add(element);
         _dirty = true;
+        layout();
     }
 
     public void setBgColor(int bgColor) {
@@ -245,6 +246,7 @@ public class FlexLayout implements ILayout {
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
         _dirty = true;
+        layout();
     }
 
     @Override

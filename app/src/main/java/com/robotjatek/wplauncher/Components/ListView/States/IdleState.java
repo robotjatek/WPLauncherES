@@ -13,7 +13,7 @@ public class IdleState<T> extends BaseState<T> {
 
     @Override
     public boolean handleTap(TapGesture gesture) {
-        var item = getItemAt(gesture.getY());
+        var item = getItemAt(gesture.getX(), gesture.getY());
         item.ifPresent(ListItem::onTap);
         return true;
     }

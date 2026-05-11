@@ -5,11 +5,14 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 
+import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
+import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.ListView.ListItem;
-import com.robotjatek.wplauncher.Components.ListPage.ListPage;
+import com.robotjatek.wplauncher.Components.ListView.ListView;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.LauncherRenderer;
@@ -32,14 +35,15 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     private static final int PAGE_PADDING_PX = 60;
     private boolean _disposed = false;
-    private int _listWidth;
-    private int _viewPortHeight;
     private final Context _context;
     private final TileService _tileService;
     private final ContextMenuDrawContext<App> _contextMenuDrawContext;
     private final IPageNavigator _navigator;
     private final SettingsService _settingsService;
-    private final ListPage<App> _list;
+    private Size<Integer> _size = new Size<>(-1, -1);
+    private final StackLayout _layout = new StackLayout();
+    private final ListView<App> _list = new ListView<>(0, 0, PAGE_PADDING_PX);
+    private final Button _button = new Button("Search", null, null); // TODO: placeholder for an inputbox
 
     public AppList(Context context, IPageNavigator navigator, TileService tileService,
                    InternalAppsService internalAppsService, SettingsService settingsService,
@@ -49,8 +53,11 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _tileService = tileService;
         _settingsService = settingsService;
         _settingsService.subscribe(this);
-        _contextMenuDrawContext = new ContextMenuDrawContext<>(_listWidth, _viewPortHeight);
-        _list = new ListPage<>();
+        _contextMenuDrawContext = new ContextMenuDrawContext<>(-1, -1);
+
+        _layout.addChild(_button);
+        _layout.addChild(_list);
+
         var internalApps = internalAppsService.getInternalApps().stream();
         var apps = Stream.concat(loadAppList(), internalApps)
                 .sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER)).toList();
@@ -60,19 +67,22 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {
-        _list.draw(delta, projMatrix, viewMatrix, renderer);
+        _layout.draw(delta, projMatrix, viewMatrix, renderer, Position.ZERO, _size);
     }
 
     public void resetScroll() {
-        _list.resetScroll();
+        _list.getScroll().setScrollOffset(0);
     }
 
     @Override
     public void onSizeChanged(int width, int height) {
-        _viewPortHeight = height;
-        _listWidth = width - 2 * PAGE_PADDING_PX;
-        _contextMenuDrawContext.onResize(_listWidth, height - LauncherRenderer.SCREEN_DATA.bottomInset - LauncherRenderer.SCREEN_DATA.topInset);
-        _list.onSizeChanged(width, height);
+        _size = new Size<>(width, height);
+        var itemsHeight = _button.measure().height() + StackLayout.TOP_MARGIN_PX;
+        var listHeight = height - itemsHeight;
+        _list.setSize(new Size<>(width, listHeight));
+        _list.setMargins(PAGE_PADDING_PX + itemsHeight, LauncherRenderer.SCREEN_DATA.bottomInset);
+        _layout.onResize(width, height);
+        _contextMenuDrawContext.onResize(width, listHeight);
         _list.setContextMenu(createContextMenu()); // Context menu must be created when the size information is available
     }
 
@@ -83,7 +93,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     @Override
     public boolean handleGesture(Gesture gesture) {
-        return _list.handleGesture(gesture);
+        return _layout.handleGesture(gesture);
     }
 
     private ContextMenu<App> createContextMenu() {
@@ -136,7 +146,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private void pinApp(App app) {
         if (!_tileService.isPinned(app)) {
             _tileService.queuePinTile(app);
-            _list.resetScroll();
+            _list.getScroll().setScrollOffset(0);
             _navigator.previousPage();
         }
     }
@@ -162,7 +172,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     @Override
     public void onAppRemove(String packageName) {
         var item = _list.getItems().stream().filter(i -> i.getPayload().packageName().equals(packageName)).findFirst();
-        item.ifPresent(_list::removeItem);
+        item.ifPresent(i -> _list.removeItemByPayload(i.getPayload()));
     }
 
     @Override

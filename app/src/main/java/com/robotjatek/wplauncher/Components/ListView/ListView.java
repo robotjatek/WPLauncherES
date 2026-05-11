@@ -91,7 +91,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         Matrix.multiplyMM(_modelMatrix, 0, _modelMatrix, 0, view, 0);
 
         var screenHeight = LauncherRenderer.SCREEN_DATA.screenHeight;
-        var glY = screenHeight - y - h - _bottomMargin + _topMargin;
+        var glY = screenHeight - _topMargin - y - h;
         GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
         GLES32.glScissor((int) x, (int) glY, w, h);
         for (var item : _items) {
@@ -226,6 +226,10 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
             setScrollBounds();
             _dirty = true;
         }
+    }
+
+    public IDrawContext<ListItem<T>> getItemDrawContext() {
+        return _itemDrawContext;
     }
 
     private void executeCommands() {

@@ -45,7 +45,7 @@ public class CrashLogScreen implements IScreen {
     public CrashLogScreen(IScreenNavigator navigator, Context context) {
         _navigator = navigator;
         _context = context;
-        _crashList = new ListView<>(0, LauncherRenderer.SCREEN_DATA.bottomInset, 0);
+        _crashList = new ListView<>(0, 0, 0);
         _layout.addChild(_titleLabel);
         _layout.addChild(_subTitleLabel);
         _layout.addChild(_crashList);

@@ -124,11 +124,12 @@ Try to make it usable for the less crazy people
   - [x] Fix: null reference error crash in context menu
   - [x] Fix: call layout() in StackLayout on resize
   - [x] Fix: textbox: force-wrap overly wide words
+  - [x] Fix: do not go  into context menu state when long-pressing a non-interactive element (fixes null reference crash in context menu)
   - [ ] Fix: crash: concurrent modification exception in TextReaderScreen.draw() -> StackLayout.draw()  
 - [ ] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings
-- [ ] Search bar in the app-list
-  - [ ] Kill ListPage in the app-list and replace it with a StackLayout + search box + ListView
+- [x] Search bar in the app-list
+  - [x] Kill ListPage in the app-list and replace it with a StackLayout + search box + ListView
 - [ ] Scissor test on tiles to prevent drawing out of the tile
 
 ### M3.5

@@ -1,6 +1,6 @@
 package com.robotjatek.wplauncher.Components.ListView.States;
 
-import com.robotjatek.wplauncher.Components.ListPage.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.ListView.ListView;
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;

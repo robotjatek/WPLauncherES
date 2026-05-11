@@ -8,10 +8,11 @@ import android.net.Uri;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
-import com.robotjatek.wplauncher.Components.ListPage.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.ListPage.ListPage;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
@@ -70,7 +71,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     public void onSizeChanged(int width, int height) {
         _viewPortHeight = height;
         _listWidth = width - 2 * PAGE_PADDING_PX;
-        _contextMenuDrawContext.onResize(_listWidth, height);
+        _contextMenuDrawContext.onResize(_listWidth, height - LauncherRenderer.SCREEN_DATA.bottomInset - LauncherRenderer.SCREEN_DATA.topInset);
         _list.onSizeChanged(width, height);
         _list.setContextMenu(createContextMenu()); // Context menu must be created when the size information is available
     }
@@ -88,11 +89,12 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private ContextMenu<App> createContextMenu() {
         var menu = new ContextMenu<>(new Position<>(0f, 0f), _contextMenuDrawContext);
         var options = List.of(
-                new MenuOption<>("Pin", this::pinApp, menu, (a) -> !_tileService.isPinned(a)),
+                new MenuOption<>("Pin", this::pinApp, menu, (a) -> a != null && !_tileService.isPinned(a)),
                 new MenuOption<>("Uninstall", (a) -> {
+                    if (a == null) return;
                     uninstallApp(a.packageName());
                     _tileService.queueUnpinTile(a.packageName());
-                }, menu, (a) -> !a.isSystemApp()));
+                }, menu, (a) -> a != null && !a.isSystemApp()));
         menu.addOptions(options);
         return menu;
     }

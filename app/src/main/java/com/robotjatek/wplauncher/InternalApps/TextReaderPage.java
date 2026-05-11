@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.InternalApps;
 
 import android.graphics.Typeface;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
@@ -86,7 +87,9 @@ public class TextReaderPage implements IScreen {
     }
 
     private void deleteFileAndExit() {
-        _file.delete();
+        if (!_file.delete()) {
+            Log.e(TextReaderPage.class.getName(), "Failed to delete file: " + _file.getName());
+        }
         _navigator.pop();
         _onClose.accept(_file);
     }

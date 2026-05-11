@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
@@ -10,7 +11,7 @@ import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
-import com.robotjatek.wplauncher.Components.ListPage.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.ListView.ListView;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
@@ -44,9 +45,9 @@ public class CrashLogScreen implements IScreen {
     public CrashLogScreen(IScreenNavigator navigator, Context context) {
         _navigator = navigator;
         _context = context;
-        _crashList = new ListView<>(0, LauncherRenderer.SCREEN_DATA.bottomInset);
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        _crashList = new ListView<>(0, LauncherRenderer.SCREEN_DATA.bottomInset, 0);
+        _layout.addChild(_titleLabel);
+        _layout.addChild(_subTitleLabel);
         _layout.addChild(_crashList);
         _crashList.addItems(createItems());
     }
@@ -67,8 +68,9 @@ public class CrashLogScreen implements IScreen {
         _size = new Size<>(width, height);
         var itemsHeight = _titleLabel.measure().height() +
                 _subTitleLabel.measure().height() + StackLayout.TOP_MARGIN_PX;
-        var listHeight = height - itemsHeight - LauncherRenderer.SCREEN_DATA.bottomInset;
+        var listHeight = height - itemsHeight;
         _crashList.setSize(new Size<>(width, listHeight));
+        _crashList.setMargins(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset);
         _layout.onResize(width, height);
         _contextMenuDrawContext.onResize(width, listHeight);
         _crashList.setContextMenu(createContextMenu());
@@ -119,7 +121,9 @@ public class CrashLogScreen implements IScreen {
     }
 
     private void deleteFile(File f) {
-        f.delete();
+        if(!f.delete()) {
+            Log.e(CrashLogScreen.class.getName(), "Failed to delete file: " + f.getName());
+        }
         _crashList.removeItemByPayload(f);
     }
 

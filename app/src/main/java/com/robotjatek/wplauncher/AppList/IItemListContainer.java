@@ -1,6 +1,6 @@
 package com.robotjatek.wplauncher.AppList;
 
-import com.robotjatek.wplauncher.Components.ListPage.ListItem;
+import com.robotjatek.wplauncher.Components.ListView.ListItem;
 
 import java.util.List;
 

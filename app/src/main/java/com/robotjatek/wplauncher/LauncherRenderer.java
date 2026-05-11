@@ -27,6 +27,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     private final AppChangeReceiver _appChangeReceiver;
     private Shader _shader;
     private QuadRenderer _renderer;
+    private int _width, _height;
+    private boolean _needsResize = false;
 
     public LauncherRenderer(Context context, LocationService locationService, AppChangeReceiver appChangeReceiver) {
         _context = context;
@@ -49,6 +51,11 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
     @Override
     public void onDrawFrame(javax.microedition.khronos.opengles.GL10 glUnused) {
+        if (_needsResize && _width > 0 && _height > 0) {
+            updateLayout();
+            _needsResize = false;
+        }
+
         var now = System.nanoTime();
         var delta = (now - lastTime) / 1000000f;
         lastTime = now;
@@ -64,12 +71,9 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
     @Override
     public void onSurfaceChanged(javax.microedition.khronos.opengles.GL10 glUnused, int width, int height) {
-        SCREEN_DATA.screenHeight = height;
-        SCREEN_DATA.screenWidth = width;
-        GLES32.glViewport(0, 0, width, height);
-        Matrix.orthoM(_projMatrix, 0, 0, width, height, 0, -1, 1);
-        Matrix.translateM(_projMatrix, 0, 0, SCREEN_DATA.topInset, 0); // translate everything below the top inset to a "safe" area
-        _navigationStack.forEach(s -> s.onResize(width, height));
+        _width = width;
+        _height = height;
+        updateLayout();
     }
 
     public void handleGesture(Gesture gesture) {
@@ -112,7 +116,23 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     }
 
     public void setInsets(int left, int top, int right, int bottom) {
-        SCREEN_DATA.topInset = top;
-        SCREEN_DATA.bottomInset = bottom;
+        if (SCREEN_DATA.topInset != top || SCREEN_DATA.bottomInset != bottom) {
+            SCREEN_DATA.topInset = top;
+            SCREEN_DATA.bottomInset = bottom;
+            _needsResize = true;
+        }
+    }
+
+    private void updateLayout() {
+        if (_width <= 0 || _height <= 0) {
+            return;
+        }
+
+        SCREEN_DATA.screenHeight = _height;
+        SCREEN_DATA.screenWidth = _width;
+        GLES32.glViewport(0, 0, _width, _height);
+        Matrix.orthoM(_projMatrix, 0, 0, _width, _height, 0, -1, 1);
+        Matrix.translateM(_projMatrix, 0, 0, SCREEN_DATA.topInset, 0);
+        _navigationStack.forEach(s -> s.onResize(_width, _height));
     }
 }

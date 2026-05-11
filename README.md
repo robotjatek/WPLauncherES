@@ -106,23 +106,29 @@ Try to make it usable for the less crazy people
 - [x] Make ContextMenu and MenuOption to use layouts and labels
 - [x] Make ListItem use high level UI components
 - [x] Embeddable ListView component
-  - [ ] Make ListPage use ListView internally
-- [ ] Feedback to the user when clicked (Rotation/animations/etc)
-- [ ] Animation after swipe
+  - [x] Make ListPage use ListView internally
+- [ ] Feedback to the user on tap (Rotation/animations/etc)
+- [ ] Swipe animation
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI
 - [ ] Optimizations
   - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
+  - [x] Reduce GC pressure when measuring labels and textboxes during rendering
   - [ ] On-demand alloc of internal apps and screens
 - [ ] Bug fixes
+  - [x] View crash logs
   - [x] Fix: crash on empty notification content
   - [x] Fix: crash on concurrent access to navigation stack
   - [x] Fix: crash when onDestroy() fires before onSurfaceCreated()
-  - [x] View crash logs
+  - [x] Fix: null reference error crash in context menu
+  - [x] Fix: call layout() in StackLayout on resize
+  - [x] Fix: textbox: force-wrap overly wide words
+  - [ ] Fix: crash: concurrent modification exception in TextReaderScreen.draw() -> StackLayout.draw()  
 - [ ] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings
 - [ ] Search bar in the app-list
+  - [ ] Kill ListPage in the app-list and replace it with a StackLayout + search box + ListView
 - [ ] Scissor test on tiles to prevent drawing out of the tile
 
 ### M3.5
@@ -132,6 +138,8 @@ Try it at your own risk
 - [ ] Make the crash-log viewer scrollable
 - [ ] Adjust button border drawing when no icon is set
 - [ ] About page in Launcher Settings
+- [ ] ScrollView in crash log reader
+- [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [ ] Maybe a closed beta (?)
 - [ ] TBD
 

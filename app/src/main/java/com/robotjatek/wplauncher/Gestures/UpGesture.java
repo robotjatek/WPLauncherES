@@ -1,9 +1,11 @@
 package com.robotjatek.wplauncher.Gestures;
 
+import com.robotjatek.wplauncher.IUIContext;
+
 public class UpGesture extends Gesture {
 
-    public UpGesture(float x, float y){
-        super(x, y);
+    public UpGesture(float x, float y, IUIContext uiContext) {
+        super(x, y, uiContext);
     }
 
     @Override
@@ -13,6 +15,6 @@ public class UpGesture extends Gesture {
 
     @Override
     public Gesture copyWithOffset(float dx, float dy) {
-        return new UpGesture(_x + dx, _y + dy);
+        return new UpGesture(_x + dx, _y + dy, _uiContext);
     }
 }

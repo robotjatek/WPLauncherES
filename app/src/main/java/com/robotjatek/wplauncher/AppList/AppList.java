@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.net.Uri;
 
-import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
+import com.robotjatek.wplauncher.Components.InputBox.InputBox;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.ListView.ListView;
@@ -43,7 +43,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private Size<Integer> _size = new Size<>(-1, -1);
     private final StackLayout _layout = new StackLayout();
     private final ListView<App> _list = new ListView<>(0, 0, PAGE_PADDING_PX);
-    private final Button _button = new Button("Search", null, null); // TODO: placeholder for an inputbox
+    private final InputBox _searchBox;
 
     public AppList(Context context, IPageNavigator navigator, TileService tileService,
                    InternalAppsService internalAppsService, SettingsService settingsService,
@@ -55,7 +55,8 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _settingsService.subscribe(this);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(-1, -1);
 
-        _layout.addChild(_button);
+        _searchBox = new InputBox("Search", this::onSearchTextChanged);
+        _layout.addChild(_searchBox);
         _layout.addChild(_list);
 
         var internalApps = internalAppsService.getInternalApps().stream();
@@ -63,6 +64,11 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
                 .sorted(Comparator.comparing(App::name, String.CASE_INSENSITIVE_ORDER)).toList();
         _list.addItems(createItems(apps));
         appChangeReceiver.subscribe(this);
+    }
+
+    private void onSearchTextChanged(String query) {
+        var lowerQuery = query.toLowerCase();
+        _list.filter(lowerQuery);
     }
 
     @Override
@@ -77,7 +83,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     @Override
     public void onSizeChanged(int width, int height) {
         _size = new Size<>(width, height);
-        var itemsHeight = _button.measure().height() + StackLayout.TOP_MARGIN_PX;
+        var itemsHeight = _searchBox.measure().height() + StackLayout.TOP_MARGIN_PX;
         var listHeight = height - itemsHeight;
         _list.setSize(new Size<>(width, listHeight));
         _list.setMargins(PAGE_PADDING_PX + itemsHeight, LauncherRenderer.SCREEN_DATA.bottomInset);
@@ -159,7 +165,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     @Override
     public void dispose() {
         if (!_disposed) {
-            _list.dispose();
+            _layout.dispose();
             _disposed = true;
         }
     }

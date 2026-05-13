@@ -8,7 +8,7 @@ import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Size;
-import com.robotjatek.wplauncher.Components.TextBox.TextBox;
+import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
@@ -30,7 +30,7 @@ public class TextReaderPage implements IScreen {
     private final float[] _modelMatrix = new float[16];
     private Size<Integer> _size = new Size<>(-1, -1);
     private final StackLayout _layout = new StackLayout();
-    private final TextBox _textbox;
+    private final TextBlock _textbox;
     private final Button _deleteButton; // delete the file and close the page
     private final File _file;
     private boolean _dirty = true;
@@ -41,7 +41,7 @@ public class TextReaderPage implements IScreen {
         _file = file;
         _onClose = onClose;
         var content = readFileContent(file);
-        _textbox = new TextBox(content, 38, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, -1);
+        _textbox = new TextBlock(content, 38, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, -1);
         _deleteButton = new Button("Delete log", null, this::deleteFileAndExit);
         _layout.addChild(_deleteButton);
         _layout.addChild(_textbox); // TODO: make this scrollable. ScrollView?

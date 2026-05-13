@@ -18,13 +18,17 @@ import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.NotificationListener;
+
+import java.util.List;
 
 
 public class MainActivity extends ComponentActivity {
@@ -45,6 +49,24 @@ public class MainActivity extends ComponentActivity {
 
         _surface = new LauncherSurfaceView(this, _locationService, _appChangeReceiver);
         _surface.setPreserveEGLContextOnPause(true);
+
+        ViewCompat.setWindowInsetsAnimationCallback(getWindow().getDecorView(),
+                new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
+                    @NonNull
+                    @Override
+                    public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets, @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
+                        return insets;
+                    }
+
+                    @Override
+                    public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
+                        var rootInsets = ViewCompat.getRootWindowInsets(getWindow().getDecorView());
+                        if (rootInsets != null && !rootInsets.isVisible(WindowInsetsCompat.Type.ime())) {
+                            _surface.cancelFocus();
+                        }
+                    }
+                });
+
         ViewCompat.setOnApplyWindowInsetsListener(_surface, (view, insets) -> {
             var sys = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             _surface.getRenderer().setInsets(sys.left, sys.top, sys.right, sys.bottom);

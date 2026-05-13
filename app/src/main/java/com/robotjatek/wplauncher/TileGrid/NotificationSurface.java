@@ -8,7 +8,7 @@ import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
-import com.robotjatek.wplauncher.Components.TextBox.TextBox;
+import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.INotificationChangedListener;
 import com.robotjatek.wplauncher.Services.NotificationListener;
@@ -32,7 +32,7 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     private final List<InternalNotification> _notifications = Collections.synchronizedList(new ArrayList<>());
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _titleLabel = new Label("Should not be seen", 56, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-    private final TextBox _textBox = new TextBox("", 52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400);
+    private final TextBlock _textBox = new TextBlock("", 52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400);
 
     public NotificationSurface(App app) {
         _packageName = app.packageName();

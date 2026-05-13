@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.Components.TextBox;
+package com.robotjatek.wplauncher.Components.TextBlock;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -16,7 +16,7 @@ import com.robotjatek.wplauncher.TileUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TextBox implements UIElement {
+public class TextBlock implements UIElement {
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private String _text;
@@ -32,11 +32,11 @@ public class TextBox implements UIElement {
     private Size<Integer> _cachedSize = new Size<>(0, 0);
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    public TextBox(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
+    public TextBlock(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
         this(text, textSize, typeFace, textColor, bgColor, maxWidth, -1);
     }
 
-    public TextBox(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, int maxHeight) {
+    public TextBlock(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, int maxHeight) {
         _text = text;
         _textSize = textSize;
         _typeFace = typeFace;

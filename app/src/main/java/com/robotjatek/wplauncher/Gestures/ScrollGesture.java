@@ -1,11 +1,13 @@
 package com.robotjatek.wplauncher.Gestures;
 
+import com.robotjatek.wplauncher.IUIContext;
+
 public class ScrollGesture extends Gesture {
 
     private final float _dx, _dy;
 
-    public ScrollGesture(float x, float y, float dx, float dy) {
-        super(x, y);
+    public ScrollGesture(float x, float y, float dx, float dy, IUIContext uiContext) {
+        super(x, y, uiContext);
         _dx = dx;
         _dy = dy;
     }
@@ -17,7 +19,7 @@ public class ScrollGesture extends Gesture {
 
     @Override
     public Gesture copyWithOffset(float dx, float dy) {
-        return new ScrollGesture(_x + dx, _y + dy, _dx, _dy);
+        return new ScrollGesture(_x + dx, _y + dy, _dx, _dy, _uiContext);
     }
 
     public float getDx() {

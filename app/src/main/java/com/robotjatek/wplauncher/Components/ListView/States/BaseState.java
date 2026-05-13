@@ -1,8 +1,5 @@
 package com.robotjatek.wplauncher.Components.ListView.States;
 
-import static com.robotjatek.wplauncher.Components.ListView.ListView.ITEM_GAP_PX;
-import static com.robotjatek.wplauncher.Components.ListView.ListView.ITEM_HEIGHT_PX;
-
 import android.util.Log;
 
 import com.robotjatek.wplauncher.Components.ListView.ListItem;
@@ -35,7 +32,7 @@ public class BaseState<T> implements IState {
     }
 
     protected Optional<ListItem<T>> getItemAt(float x, float y) {
-        var _children = _context.getItems();
+        var _children = _context.getVisibleItems();
         var _drawContext = _context.getItemDrawContext();
         for (var child : _children) {
             var left = _drawContext.xOf(child);

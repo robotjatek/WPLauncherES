@@ -35,13 +35,13 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     private boolean _dirty = true;
     private final float[] _modelMatrix = new float[16];
     private final float[] _menuMatrix = new float[16];
-    private final List<ListItem<T>> _items = Collections.synchronizedList(new ArrayList<>());
+    private final List<ListItem<T>> _allItems = Collections.synchronizedList(new ArrayList<>());
+    private final List<ListItem<T>> _visibleItems = Collections.synchronizedList(new ArrayList<>());
     private Size<Integer> _size = new Size<>(-1, -1);
     private final ScrollController _scroll = new ScrollController();
     private IState _state = IDLE_STATE();
     private final ListItemDrawContext<T, ListView<T>> _itemDrawContext;
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
-
     private final int _padding;
     private int _topMargin;
     private int _bottomMargin;
@@ -70,6 +70,16 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         return _padding;
     }
 
+    public void filter(String filter) {
+        _commands.add(() -> {
+            _visibleItems.clear();
+            var filtered = _allItems.stream().filter(i -> i.getLabel().toLowerCase().contains(filter)).toList();
+            _visibleItems.addAll(filtered);
+            setScrollBounds();
+            _dirty = true;
+        });
+    }
+
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         executeCommands();
@@ -82,7 +92,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
 
         if (_dirty) {
             _itemDrawContext.onResize(w);
-            _items.forEach(ListItem::setDirty);
+            _allItems.forEach(ListItem::setDirty);
             _dirty = false;
         }
 
@@ -91,10 +101,10 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         Matrix.multiplyMM(_modelMatrix, 0, _modelMatrix, 0, view, 0);
 
         var screenHeight = LauncherRenderer.SCREEN_DATA.screenHeight;
-        var glY = screenHeight - y - h - _bottomMargin + _topMargin;
+        var glY = screenHeight - _topMargin - y - h;
         GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
         GLES32.glScissor((int) x, (int) glY, w, h);
-        for (var item : _items) {
+        for (var item : _visibleItems) {
             item.update(_itemDrawContext);
             item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer); // TODO: do not call draw() for elements that are scrolled out of the view
         }
@@ -117,14 +127,19 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     }
 
     private void setScrollBounds() {
-        var contentHeight = _items.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + _bottomMargin;
+        var contentHeight = _visibleItems.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + _bottomMargin;
         var min = Math.min(0, _size.height() - (contentHeight + _topMargin + _bottomMargin));
         _scroll.setBounds(min, 0);
     }
 
     @Override
     public List<ListItem<T>> getItems() {
-        return _items;
+        return _allItems;
+    }
+
+    @Override
+    public List<ListItem<T>> getVisibleItems() {
+        return _visibleItems;
     }
 
     public void changeState(IState state) {
@@ -135,7 +150,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
 
     public void addItem(int index, ListItem<T> item) {
         _commands.add(() -> {
-            _items.add(index, item);
+            _allItems.add(index, item);
             item.setDirty();
             setScrollBounds();
         });
@@ -143,17 +158,19 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
 
     public void addItems(List<ListItem<T>> items) {
         _commands.add(() -> {
-            _items.addAll(items);
-            _items.forEach(ListItem::setDirty);
+            _allItems.addAll(items);
+            _allItems.forEach(ListItem::setDirty);
+            _visibleItems.addAll(items);
             setScrollBounds();
         });
     }
 
     public void removeItemByPayload(T payload) {
         _commands.add(() -> {
-            var item = _items.stream().filter(i -> i.getPayload().equals(payload)).findFirst();
+            var item = _allItems.stream().filter(i -> i.getPayload().equals(payload)).findFirst();
             item.ifPresent(i -> {
-                _items.remove(i);
+                _allItems.remove(i);
+                _visibleItems.remove(i);
                 i.dispose();
             });
             setScrollBounds();
@@ -169,7 +186,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
 
         // No size was given: measure
         // Items are fixed sized as of now
-        var height = (ITEM_HEIGHT_PX + ITEM_GAP_PX) * _items.size();
+        var height = (ITEM_HEIGHT_PX + ITEM_GAP_PX) * _allItems.size();
         var width = -1; // TODO: how to measure width? ask the parent? measure the elements?
         _size = new Size<>(width, height);
         setScrollBounds();
@@ -228,6 +245,10 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         }
     }
 
+    public IDrawContext<ListItem<T>> getItemDrawContext() {
+        return _itemDrawContext;
+    }
+
     private void executeCommands() {
         Runnable command;
         while ((command = _commands.poll()) != null) {
@@ -238,7 +259,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
     @Override
     public void dispose() {
         if (!_disposed) {
-            _items.forEach(ListItem::dispose);
+            _allItems.forEach(ListItem::dispose);
             _disposed = true;
         }
     }

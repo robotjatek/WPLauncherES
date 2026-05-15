@@ -29,7 +29,7 @@ public class ListItemDrawContext<T, U extends IItemListContainer<T>> implements 
 
     @Override
     public float yOf(ListItem<T> item) {
-        var index = _itemContainer.getItems().indexOf(item);
+        var index = _itemContainer.getVisibleItems().indexOf(item);
         if (index == -1) {
             throw new RuntimeException("List item not found");
         }

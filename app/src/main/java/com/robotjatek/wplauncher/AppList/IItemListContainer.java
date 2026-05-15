@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface IItemListContainer<T> {
     List<ListItem<T>> getItems();
+    List<ListItem<T>> getVisibleItems();
 }

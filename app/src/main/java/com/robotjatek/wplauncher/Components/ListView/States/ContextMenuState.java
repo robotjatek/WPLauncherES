@@ -18,11 +18,11 @@ public class ContextMenuState<T> extends BaseState<T> {
     @Override
     public void enter() {
         super.enter();
-        var tappedItem = getItemAt(_y);
-        tappedItem.ifPresent(i -> {
+        var tappedItem = getItemAt(_x, _y);
+        tappedItem.ifPresentOrElse(i -> {
             _context.closeContextMenu();
             _menu = _context.openContextMenu(_x, _y, i.getPayload());
-        });
+        }, () -> _context.changeState(_context.IDLE_STATE()));
     }
 
     @Override

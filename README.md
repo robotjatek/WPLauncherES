@@ -114,7 +114,7 @@ Try to make it usable for the less crazy people
 - [ ] Device resolution independent UI
 - [ ] Optimizations
   - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
-  - [x] Reduce GC pressure when measuring labels and textboxes during rendering
+  - [x] Reduce GC pressure when measuring labels and textblocks during rendering
   - [ ] On-demand alloc of internal apps and screens
 - [ ] Bug fixes
   - [x] View crash logs
@@ -123,12 +123,15 @@ Try to make it usable for the less crazy people
   - [x] Fix: crash when onDestroy() fires before onSurfaceCreated()
   - [x] Fix: null reference error crash in context menu
   - [x] Fix: call layout() in StackLayout on resize
-  - [x] Fix: textbox: force-wrap overly wide words
+  - [x] Fix: textblock: force-wrap overly wide words
+  - [x] Fix: do not go into context menu state when long-pressing a non-interactive element (fixes null reference crash in context menu)
   - [ ] Fix: crash: concurrent modification exception in TextReaderScreen.draw() -> StackLayout.draw()  
 - [ ] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings
-- [ ] Search bar in the app-list
-  - [ ] Kill ListPage in the app-list and replace it with a StackLayout + search box + ListView
+- [x] Search bar in the app-list
+  - [x] Kill ListPage in the app-list and replace it with a StackLayout + search box + ListView
+  - [x] InputBox component
+  - [x] ListView filter
 - [ ] Scissor test on tiles to prevent drawing out of the tile
 
 ### M3.5
@@ -140,10 +143,21 @@ Try it at your own risk
 - [ ] About page in Launcher Settings
 - [ ] ScrollView in crash log reader
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
+- [ ] Clear search-box on back press in the app-list
+- [ ] Support cursor in input boxes
+-  [ ] Show current cursor position
+-  [ ] Set cursor position
+-  [ ] Insert text at cursor position
+-  [ ] Delete text at cursor position
+- [ ] Debug menu
+  - [ ] Crash app button
+  - [ ] Reset StartPage state machine button
 - [ ] Maybe a closed beta (?)
 - [ ] TBD
 
 ## M4 - Beta
+
+Feature-creep!
 
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
@@ -157,6 +171,8 @@ Try it at your own risk
 - [ ] Light mode/Dark mode support
 - [ ] Dropdown
 - [ ] Radiobutton
+- [ ] Group apps by the first letter in the app list
+- [ ] Set background image for the start screen + transparency option for tiles
 
 ### M5 - RC
 
@@ -165,6 +181,9 @@ Try it at your own risk
 - [ ] 6 column mode setting
 - [ ] WP7/7.8 start screen setting
 - [ ] Custom tile color
+- [ ] Application icon
+- [ ] Privacy policy
+- [ ] License
 
 ### Bugs that need repro:
 

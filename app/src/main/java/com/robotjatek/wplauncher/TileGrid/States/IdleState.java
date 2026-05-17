@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher.TileGrid.States;
 
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
-import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.TileGrid.Tile;
@@ -31,11 +30,5 @@ public class IdleState extends BaseState {
     public boolean handleScroll(ScrollGesture gesture) {
         _context.changeState(_context.SCROLL_STATE(gesture.getY()));
         return _context.handleGesture(gesture);
-    }
-
-    @Override
-    public void enter() {
-        super.enter();
-        _context.cancelSelection();
     }
 }

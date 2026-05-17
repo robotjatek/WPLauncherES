@@ -41,10 +41,11 @@ public class Tile {
     }
 
     /**
-     * Draw matrix with an offset of its original position
+     * Draw tile with an offset to its original position
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
                                Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
+        // TODO: these calculations are duplicated in the tilegrid
         var width = (int) (drawContext.widthOf(this) * _scale);
         var height = (int) (drawContext.heightOf(this) * _scale);
         var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
@@ -173,6 +174,10 @@ public class Tile {
         if (_backContent != null) {
             _backContent.forceRedraw();
         }
+    }
+
+    public float getScale() {
+        return _scale;
     }
 
     public void dispose() {

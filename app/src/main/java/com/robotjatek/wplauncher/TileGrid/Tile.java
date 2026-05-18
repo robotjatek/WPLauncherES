@@ -1,10 +1,12 @@
 package com.robotjatek.wplauncher.TileGrid;
 
+import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 public class Tile {
@@ -41,7 +43,7 @@ public class Tile {
     }
 
     /**
-     * Draw matrix with an offset of its original position
+     * Draw tile with an offset to its original position
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
                                Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
@@ -96,6 +98,11 @@ public class Tile {
             }
         }
 
+        var screenX = viewMatrix[12] + correctedX;
+        var screenY = viewMatrix[13] + correctedY;
+        var glY = (LauncherRenderer.SCREEN_DATA.screenHeight - (screenY + height + LauncherRenderer.SCREEN_DATA.topInset));
+        GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
+        GLES32.glScissor((int) screenX, (int)glY, width, height); // TODO: stencil test instead (with 2 pass rendering)
         // Draw only the visible side
         if (scaleY >= 0) {
             _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
@@ -104,6 +111,7 @@ public class Tile {
                 _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
             }
         }
+        GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
     }
 
     public void onTap() {

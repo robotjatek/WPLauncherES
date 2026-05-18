@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-// TODO: resize tile
 public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedListener, AppChangeReceiver.IAppChangeListener {
 
     public IState IDLE_STATE() {
@@ -109,7 +108,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
             _unpinButton.draw(projMatrix, scrollMatrix, renderer);
             _resizeButton.draw(projMatrix, scrollMatrix, renderer);
         }
-
     }
 
     public void changeState(IState state) {
@@ -204,6 +202,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
             for (var tile : _tiles) {
                 tile.setScale(1f);
             }
+            _selectedTile.getDragInfo().reset();
             _selectedTile = null;
         });
     }

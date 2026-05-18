@@ -1,10 +1,12 @@
 package com.robotjatek.wplauncher.TileGrid;
 
+import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 public class Tile {
@@ -45,7 +47,6 @@ public class Tile {
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
                                Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
-        // TODO: these calculations are duplicated in the tilegrid
         var width = (int) (drawContext.widthOf(this) * _scale);
         var height = (int) (drawContext.heightOf(this) * _scale);
         var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
@@ -97,6 +98,11 @@ public class Tile {
             }
         }
 
+        var screenX = viewMatrix[12] + correctedX;
+        var screenY = viewMatrix[13] + correctedY;
+        var glY = (LauncherRenderer.SCREEN_DATA.screenHeight - (screenY + height + LauncherRenderer.SCREEN_DATA.topInset));
+        GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
+        GLES32.glScissor((int) screenX, (int)glY, width, height); // TODO: stencil test instead (with 2 pass rendering)
         // Draw only the visible side
         if (scaleY >= 0) {
             _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
@@ -105,6 +111,7 @@ public class Tile {
                 _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
             }
         }
+        GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
     }
 
     public void onTap() {
@@ -174,10 +181,6 @@ public class Tile {
         if (_backContent != null) {
             _backContent.forceRedraw();
         }
-    }
-
-    public float getScale() {
-        return _scale;
     }
 
     public void dispose() {

@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher.TileGrid;
 
 import android.content.Context;
-import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import androidx.core.content.ContextCompat;
@@ -9,7 +8,6 @@ import androidx.core.content.ContextCompat;
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.ITileListChangedListener;
 
@@ -26,7 +24,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-// TODO: resize tile
 public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedListener, AppChangeReceiver.IAppChangeListener {
 
     public IState IDLE_STATE() {
@@ -99,49 +96,18 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
             if (tile == _selectedTile) {
                 continue;
             }
-            drawTileWithScissor(tile, delta, projMatrix, renderer);
+            tile.drawWithOffset(delta, projMatrix, scrollMatrix, Position.ZERO, _tileDrawContext, renderer);
         }
 
         // render the selected tile with different scaling, and on its current drag position
         if (_selectedTile != null) {
-            drawTileWithScissor(_selectedTile, delta, projMatrix, renderer);
+            _selectedTile.drawWithOffset(delta, projMatrix, scrollMatrix,
+                    new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
+                    _tileDrawContext,
+                    renderer);
             _unpinButton.draw(projMatrix, scrollMatrix, renderer);
             _resizeButton.draw(projMatrix, scrollMatrix, renderer);
         }
-    }
-
-    /**
-     * Draws a tile using scissor test to prevent it from drawing outside its bounds
-     */
-    private void drawTileWithScissor(Tile tile, float delta, float[] projMatrix, QuadRenderer renderer) {
-        var baseX = _tileDrawContext.xOf(tile);
-        var baseY = _tileDrawContext.yOf(tile);
-        var baseW = _tileDrawContext.widthOf(tile);
-        var baseH = _tileDrawContext.heightOf(tile);
-
-        // account for tile's internal scale (tile knows its own scale)
-        var scale = tile.getScale(); // added getter on Tile
-        var width = (int) (baseW * scale);
-        var height = (int) (baseH * scale);
-
-        // corrections for scaling (same calculations Tile does for its own model matrix)
-        var xDiff = (width - baseW) / 2f;
-        var yDiff = (height - baseH) / 2f;
-
-        var offsetX = tile.getDragInfo() != null ? tile.getDragInfo().totalX : 0f;
-        var offsetY = tile.getDragInfo() != null ? tile.getDragInfo().totalY : 0f;
-
-        var correctedX = baseX + offsetX + 0f - xDiff;
-        var correctedY_screen = baseY + offsetY + _scroll.getScrollOffset() + TOP_MARGIN_PX - yDiff + LauncherRenderer.SCREEN_DATA.topInset;
-        var glY = (int) (LauncherRenderer.SCREEN_DATA.screenHeight - (correctedY_screen + height));
-
-        GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
-        GLES32.glScissor((int) correctedX, glY, width, height);
-        tile.drawWithOffset(delta, projMatrix, scrollMatrix,
-                new Position<>(offsetX, offsetY),
-                _tileDrawContext,
-                renderer);
-        GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
     }
 
     public void changeState(IState state) {

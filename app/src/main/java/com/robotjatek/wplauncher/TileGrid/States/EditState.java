@@ -51,12 +51,6 @@ public class EditState extends BaseState {
     }
 
     @Override
-    public void exit() {
-        super.exit();
-        //_context.cancelSelection();
-    }
-
-    @Override
     public boolean handleGesture(Gesture gesture) {
         return _state.handleGesture(gesture);
     }

@@ -132,7 +132,7 @@ Try to make it usable for the less crazy people
   - [x] Kill ListPage in the app-list and replace it with a StackLayout + search box + ListView
   - [x] InputBox component
   - [x] ListView filter
-- [ ] Scissor test on tiles to prevent drawing out of the tile
+- [x] Scissor test on tiles to prevent drawing out of the tile
 
 ### M3.5
 
@@ -152,6 +152,7 @@ Try it at your own risk
 - [ ] Debug menu
   - [ ] Crash app button
   - [ ] Reset StartPage state machine button
+- [ ] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
 - [ ] Maybe a closed beta (?)
 - [ ] TBD
 

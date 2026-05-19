@@ -7,9 +7,13 @@ import android.graphics.Typeface;
 import android.opengl.GLES32;
 import android.opengl.GLUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class TileUtil {
 
     private static final int CONTENT_PADDING_PX = 0;
+    private static final Map<Integer, Typeface> TYPEFACE_MAP = new HashMap<>();
 
     public static int createTextTexture(
             String text,
@@ -27,9 +31,10 @@ public class TileUtil {
         var canvas = new Canvas(bitmap);
         canvas.drawColor(bgColor);
 
+        var typeface = TYPEFACE_MAP.computeIfAbsent(typefaceStyle, style -> Typeface.create("sans-serif-light", style));
         var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setColor(textColor);
-        paint.setTypeface(Typeface.create("sans-serif-light", typefaceStyle));
+        paint.setTypeface(typeface);
         paint.setTextSize(textSize);
         paint.setTextAlign(Paint.Align.LEFT);
 

@@ -68,7 +68,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         _unpinButton = new Adorner(() -> _commands.add(() -> {
             if (_selectedTile != null) {
                 _tileService.queueUnpinTile(_selectedTile.getPackageName());
-                _selectedTile = null;
+                cancelSelection();
             }
         }), icon, new Position<>(1f, 0f), adornerDrawContext);
 
@@ -202,8 +202,10 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
             for (var tile : _tiles) {
                 tile.setScale(1f);
             }
-            _selectedTile.getDragInfo().reset();
-            _selectedTile = null;
+            if (_selectedTile != null) {
+                _selectedTile.getDragInfo().reset();
+                _selectedTile = null;
+            }
         });
     }
 

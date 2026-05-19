@@ -115,6 +115,8 @@ Try to make it usable for the less crazy people
 - [ ] Optimizations
   - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
   - [x] Reduce GC pressure when measuring labels and textblocks during rendering
+  - [x] Reduce icon texture size in the app-list to 96x96
+  - [x] Reduce icon texture size on the tiles to 256x256
   - [ ] On-demand alloc of internal apps and screens
 - [ ] Bug fixes
   - [x] View crash logs
@@ -125,6 +127,7 @@ Try to make it usable for the less crazy people
   - [x] Fix: call layout() in StackLayout on resize
   - [x] Fix: textblock: force-wrap overly wide words
   - [x] Fix: do not go into context menu state when long-pressing a non-interactive element (fixes null reference crash in context menu)
+  - [x] Recycle unused temp bitmaps after texture upload
   - [ ] Fix: crash: concurrent modification exception in TextReaderScreen.draw() -> StackLayout.draw()  
 - [ ] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings

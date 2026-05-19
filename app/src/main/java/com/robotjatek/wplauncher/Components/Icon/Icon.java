@@ -12,8 +12,6 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 
 public class Icon implements UIElement {
-
-    private static final int ICON_TEX_SIZE_PX = 512;
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private Drawable _iconDrawable;
@@ -21,15 +19,16 @@ public class Icon implements UIElement {
     private int _bgColorTextureId = -1;
     private int _bgColor;
     private boolean _dirty = true;
-    private Size<Integer> _size = new Size<>(0, 0);
+    private Size<Integer> _size;
 
-    public Icon(Drawable iconDrawable, int bgColor) {
+    public Icon(Drawable iconDrawable, int bgColor, Size<Integer> size) {
         _iconDrawable = iconDrawable;
         _bgColor = bgColor;
+        _size = size;
     }
 
-    public Icon(Drawable iconDrawable) {
-        this(iconDrawable, Colors.TRANSPARENT);
+    public Icon(Drawable iconDrawable, Size<Integer> size) {
+         this(iconDrawable, Colors.TRANSPARENT, size);
     }
 
     @Override
@@ -46,7 +45,7 @@ public class Icon implements UIElement {
             if (_bgColorTextureId > 0) {
                 TileUtil.deleteTexture(_bgColorTextureId);
             }
-            _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, ICON_TEX_SIZE_PX, ICON_TEX_SIZE_PX);
+            _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
             if (_bgColor != Colors.TRANSPARENT) {
                 _bgColorTextureId = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, _bgColor));
             }

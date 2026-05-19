@@ -19,13 +19,14 @@ public class ListItem<T> {
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _textLabel;
     private Icon _icon;
+    private final static Size<Integer> DEFAULT_SIZE = new Size<>(96, 96);
 
     public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
         _onTap = onTap;
         _payload = payload;
         _textLabel = new Label(label, 60, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
         if (icon != null) {
-            _icon = new Icon(icon, iconBgColor);
+            _icon = new Icon(icon, iconBgColor, DEFAULT_SIZE);
         }
     }
 

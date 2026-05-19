@@ -27,6 +27,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     private Icon _icon;
     private final AbsoluteLayout _layout;
     private final Label _notificationLabel;
+    private final static Size<Integer> ICON_SIZE = new Size<>(256, 256);
 
     public StaticTileContent(App app) {
         _packageName = app.packageName();
@@ -43,7 +44,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         if (_titleLabel != null) {
             _titleLabel.dispose();
         }
-        _icon = new Icon(app.icon());
+        _icon = new Icon(app.icon(), ICON_SIZE);
         _titleLabel = new Label("", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
         _dirty = true;
     }

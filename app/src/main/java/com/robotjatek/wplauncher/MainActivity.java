@@ -41,7 +41,7 @@ public class MainActivity extends ComponentActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(this));
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(getApplicationContext()));
         EdgeToEdge.enable(this);
         _locationPermission = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),

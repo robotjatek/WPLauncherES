@@ -129,7 +129,7 @@ Try to make it usable for the less crazy people
   - [x] Fix: do not go into context menu state when long-pressing a non-interactive element (fixes null reference crash in context menu)
   - [x] Recycle unused temp bitmaps after texture upload
   - [ ] Fix: crash: concurrent modification exception in TextReaderScreen.draw() -> StackLayout.draw()  
-- [ ] Disable landscape mode
+- [x] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings
 - [x] Search bar in the app-list
   - [x] Kill ListPage in the app-list and replace it with a StackLayout + search box + ListView

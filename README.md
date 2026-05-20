@@ -128,7 +128,7 @@ Try to make it usable for the less crazy people
   - [x] Fix: textblock: force-wrap overly wide words
   - [x] Fix: do not go into context menu state when long-pressing a non-interactive element (fixes null reference crash in context menu)
   - [x] Recycle unused temp bitmaps after texture upload
-  - [ ] Fix: crash: concurrent modification exception in TextReaderScreen.draw() -> StackLayout.draw()  
+  - [x] Fix: crash: concurrent modification exception in TextReaderScreen.draw() -> StackLayout.draw() [hopefully fixed by moving gesture handling to the gl thread]
 - [x] Disable landscape mode
 - [ ] Re-ask for permissions from the launcher settings
 - [x] Search bar in the app-list

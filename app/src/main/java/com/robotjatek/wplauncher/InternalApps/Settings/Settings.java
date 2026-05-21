@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.Spacer.Spacer;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
@@ -36,8 +37,7 @@ public class Settings implements IScreen {
         _crashScreen = new CrashLogScreen(navigator, context);
         _layout = new StackLayout();
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
-
-        _layout.addChild(new Label("", 160, Typeface.NORMAL, Colors.WHITE, 0, -1, null)); // TODO: proper spacer (dedicated element, or an empty layout?)
+        _layout.addChild(new Spacer(0, 160));
         _layout.addChild(new Label("theme", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
                 () -> navigator.push(_themeScreen)));
         _layout.addChild(new Label("crash log", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,

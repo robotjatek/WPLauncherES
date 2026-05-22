@@ -44,7 +44,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private final ScrollController _scroll = new ScrollController();
     private final TileDrawContext _tileDrawContext;
     private final float[] scrollMatrix = new float[16]; // Stores the state of the scroll position transformation
-    private Tile _selectedTile;
+    private volatile Tile _selectedTile;
     private List<Tile> _tiles;
     public static final int COLUMNS = 4;
     public static final float TOP_MARGIN_PX = 0;

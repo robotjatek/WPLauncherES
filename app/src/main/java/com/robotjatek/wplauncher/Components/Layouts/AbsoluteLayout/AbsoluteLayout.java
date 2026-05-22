@@ -13,13 +13,13 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileUtil;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 public class AbsoluteLayout implements ILayout {
     private boolean _disposed = false;
-    private final List<PositionedElement> _positionedElements = new ArrayList<>();
+    private final List<PositionedElement> _positionedElements = new CopyOnWriteArrayList<>();
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _modelMatrix = new float[16];
     private int _bgColor = Colors.TRANSPARENT;

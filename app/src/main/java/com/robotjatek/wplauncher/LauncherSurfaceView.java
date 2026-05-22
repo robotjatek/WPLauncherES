@@ -40,25 +40,34 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
                if (_focusedInputHandler != null) {
                    post(_uiContext::cancelFocus);
                } else {
-                   _renderer.handleGesture(new TapGesture(e.getX(), e.getY(), _uiContext));
+                   // extract the x and y coordinates before queueing the event, to avoid potential issues with the MotionEvent being recycled before the event is processed
+                   var x = e.getX();
+                   var y = e.getY();
+                   queueEvent(() -> _renderer.handleGesture(new TapGesture(x, y, _uiContext)));
                }
                return true;
            }
 
            @Override
            public void onLongPress(@NonNull MotionEvent e) {
-               _renderer.handleGesture(new LongPressGesture(e.getX(), e.getY(), _uiContext));
+               var x = e.getX();
+               var y = e.getY();
+               queueEvent(() -> _renderer.handleGesture(new LongPressGesture(x, y, _uiContext)));
            }
 
            @Override
            public boolean onScroll(MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
-               _renderer.handleGesture(new ScrollGesture(e2.getX(), e2.getY(), distanceX, distanceY, _uiContext));
+               var x = e2.getX();
+               var y = e2.getY();
+               queueEvent(() -> _renderer.handleGesture(new ScrollGesture(x, y, distanceX, distanceY, _uiContext)));
                return true;
            }
 
            @Override
            public boolean onDown(@NonNull MotionEvent e) {
-               _renderer.handleGesture(new DownGesture(e.getX(), e.getY(), _uiContext));
+               var x = e.getX();
+               var y = e.getY();
+               queueEvent(() -> _renderer.handleGesture(new DownGesture(x, y, _uiContext)));
                return true;
            }
 
@@ -79,14 +88,14 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
+        var x = event.getX();
+        var y = event.getY();
 
         _gestureDetector.onTouchEvent(event);
 
         switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_UP -> _renderer.handleGesture(new UpGesture(x, y, this));
-            case MotionEvent.ACTION_MOVE -> _renderer.handleGesture(new MoveGesture(x, y, this));
+            case MotionEvent.ACTION_UP -> queueEvent(() -> _renderer.handleGesture(new UpGesture(x, y, this)));
+            case MotionEvent.ACTION_MOVE -> queueEvent(() -> _renderer.handleGesture(new MoveGesture(x, y, this)));
         }
         return true;
     }
@@ -129,7 +138,7 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
             cancelFocus();
             return;
         }
-        _renderer.onBackPressed();
+        queueEvent(_renderer::onBackPressed);
     }
 
     public void onHomePressed() {

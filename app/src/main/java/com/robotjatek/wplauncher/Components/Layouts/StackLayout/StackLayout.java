@@ -10,15 +10,15 @@ import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StackLayout implements ILayout {
     private boolean _disposed = false;
     public static final int TOP_MARGIN_PX = 0;
-    private final List<UIElement> _children = new ArrayList<>();
+    private final List<UIElement> _children = new CopyOnWriteArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
     private final StackLayoutDrawContext _drawContext;
     private int _width;

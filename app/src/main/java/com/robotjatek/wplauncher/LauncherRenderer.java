@@ -39,6 +39,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     @Override
     public void onSurfaceCreated(javax.microedition.khronos.opengles.GL10 glUnused,
                                  javax.microedition.khronos.egl.EGLConfig config) {
+        Thread.currentThread().setUncaughtExceptionHandler(new CrashHandler(_context.getApplicationContext())); // Log GL thread crashes as well
         // Init screens and every GL related objects in surfaceCreated so no accidental gl calls before the surface is ready
         GLES32.glClearColor(0f, 0f, 0f, 1f);
         GLES32.glEnable(GLES32.GL_CULL_FACE);

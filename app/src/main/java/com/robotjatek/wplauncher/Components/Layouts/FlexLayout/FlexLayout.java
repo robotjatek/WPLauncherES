@@ -13,10 +13,10 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileUtil;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 // TODO: layout padding
 /**
@@ -53,7 +53,7 @@ public class FlexLayout implements ILayout {
     }
 
     private boolean _disposed = false;
-    private final List<UIElement> _children = new ArrayList<>();
+    private final List<UIElement> _children =  new CopyOnWriteArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _modelMatrix = new float[16];

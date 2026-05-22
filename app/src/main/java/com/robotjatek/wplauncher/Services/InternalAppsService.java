@@ -65,6 +65,7 @@ public class InternalAppsService {
     public void dispose() {
         if (!_disposed) {
             _settingsScreen.dispose();
+            _clockScreen.dispose();
             _disposed = true;
         }
     }

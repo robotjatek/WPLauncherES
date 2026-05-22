@@ -103,7 +103,12 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
     @Override
     public void pop() {
+        var current = _navigationStack.peek();
         _navigationStack.pop();
+        if (current != null) {
+            // TODO: on demand alloc on internal app open
+            // TODO: current.onClose() / dispose?
+        }
     }
 
     public void dispose() {

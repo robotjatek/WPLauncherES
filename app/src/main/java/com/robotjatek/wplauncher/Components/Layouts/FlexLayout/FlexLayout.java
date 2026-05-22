@@ -53,7 +53,7 @@ public class FlexLayout implements ILayout {
     }
 
     private boolean _disposed = false;
-    private final List<UIElement> _children =  new CopyOnWriteArrayList<>();
+    private final List<UIElement> _children = new CopyOnWriteArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new HashMap<>();
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _modelMatrix = new float[16];

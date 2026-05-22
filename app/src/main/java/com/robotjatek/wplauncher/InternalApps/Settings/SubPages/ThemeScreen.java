@@ -26,7 +26,6 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
-    private final ColorPickerScreen _colorPickerScreen;
     private final Button _colorPickerBtn;
     private Bitmap _icon;
     private final Context _context;
@@ -43,13 +42,16 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         _layout.addChild(new Label("theme", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
 
-        _colorPickerScreen = new ColorPickerScreen(navigator);
-        _colorPickerScreen.subscribe(this);
-
         var color = settings.getAccentColor();
         _icon = BitmapUtil.createRect(64, 64, 8, color.color());
-        _colorPickerBtn = new Button(color.name(), new BitmapDrawable(context.getResources(), _icon),
-                () -> navigator.push(_colorPickerScreen));
+        _colorPickerBtn = new Button(
+                color.name(),
+                new BitmapDrawable(context.getResources(), _icon),
+                () -> {
+                    var colorPickerScreen = new ColorPickerScreen(navigator);
+                    colorPickerScreen.subscribe(this);
+                    navigator.push(colorPickerScreen);
+                });
         _layout.addChild(_colorPickerBtn);
 
         // TODO: Light/Dark mode selector
@@ -70,7 +72,6 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
         _layout.onResize(width, height);
-        _colorPickerScreen.onResize(width, height);
     }
 
     @Override
@@ -91,7 +92,6 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     public void dispose() {
         if (!_disposed) {
             _layout.dispose();
-            _colorPickerScreen.dispose();
             _icon.recycle();
             _disposed = true;
         }

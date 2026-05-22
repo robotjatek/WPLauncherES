@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.Clock.Clock;
 import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
@@ -24,19 +23,22 @@ public class InternalAppsService {
     private final Context _context;
     private final Map<String, Drawable> _appIcons = new HashMap<>();
     private final Map<String, App> _internalApps = new HashMap<>();
-    private final IScreen _settingsScreen;
-    private final IScreen _clockScreen;
 
     public InternalAppsService(Context context, SettingsService settings, IScreenNavigator navigator) {
         _context = context;
         initAppIcons();
 
-        _settingsScreen = new Settings(navigator, settings, context);
-        var setting = new App("Launcher Settings", SETTINGS_NAME, getAppIcon(SETTINGS_NAME),
-                () -> navigator.push(_settingsScreen), true);
-        _clockScreen = new Clock(navigator, context);
-        var clock = new App("Clock HUB", CLOCK_NAME, getAppIcon(CLOCK_NAME),
-                () -> navigator.push(_clockScreen), true);
+        var setting = new App(
+                "Launcher Settings",
+                SETTINGS_NAME,
+                getAppIcon(SETTINGS_NAME),
+                () -> navigator.push(new Settings(navigator, settings, context)), true);
+
+        var clock = new App(
+                "Clock HUB",
+                CLOCK_NAME,
+                getAppIcon(CLOCK_NAME),
+                () -> navigator.push(new Clock(navigator, context)), true);
 
         _internalApps.put(SETTINGS_NAME, setting);
         _internalApps.put(CLOCK_NAME, clock);
@@ -64,13 +66,7 @@ public class InternalAppsService {
 
     public void dispose() {
         if (!_disposed) {
-            _settingsScreen.dispose();
             _disposed = true;
         }
-    }
-
-    public void onSizeChanged(int width, int height) {
-        _settingsScreen.onResize(width, height);
-        _clockScreen.onResize(width, height);
     }
 }

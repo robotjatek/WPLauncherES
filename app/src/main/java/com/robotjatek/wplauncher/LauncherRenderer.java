@@ -5,6 +5,8 @@ import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import androidx.annotation.NonNull;
+
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
@@ -97,13 +99,18 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     }
 
     @Override
-    public void push(IScreen screen) {
+    public void push(@NonNull IScreen screen) {
+        screen.onResize(SCREEN_DATA.screenWidth, SCREEN_DATA.screenHeight);
         _navigationStack.push(screen);
     }
 
     @Override
     public void pop() {
+        var current = _navigationStack.peek();
         _navigationStack.pop();
+        if (current != null) {
+            current.dispose();
+        }
     }
 
     public void dispose() {

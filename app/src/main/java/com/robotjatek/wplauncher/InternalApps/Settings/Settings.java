@@ -28,20 +28,16 @@ public class Settings implements IScreen {
     private final StackLayout _layout;
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _view = new float[16];
-    private final ThemeScreen _themeScreen;
-    private final CrashLogScreen _crashScreen;
 
     public Settings(IScreenNavigator navigator, SettingsService settings, Context context) {
         _navigator = navigator;
-        _themeScreen = new ThemeScreen(navigator, settings, context);
-        _crashScreen = new CrashLogScreen(navigator, context);
         _layout = new StackLayout();
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Spacer(0, 160));
         _layout.addChild(new Label("theme", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
-                () -> navigator.push(_themeScreen)));
+                () -> navigator.push(new ThemeScreen(navigator, settings, context))));
         _layout.addChild(new Label("crash log", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
-                () -> navigator.push(_crashScreen)));
+                () -> navigator.push(new CrashLogScreen(navigator, context))));
         _layout.addChild(new Label("about", 96, Typeface.NORMAL, Colors.WHITE, 0, -1, null));
     }
 
@@ -60,8 +56,6 @@ public class Settings implements IScreen {
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
         _layout.onResize(width, height);
-        _themeScreen.onResize(width, height); // TODO: calling onResize manually for children is very error prone
-        _crashScreen.onResize(width, height);
     }
 
     @Override
@@ -73,8 +67,6 @@ public class Settings implements IScreen {
     public void dispose() {
         if (!_disposed) {
             _layout.dispose();
-            _themeScreen.dispose();
-            _crashScreen.dispose();
             _disposed = true;
         }
     }

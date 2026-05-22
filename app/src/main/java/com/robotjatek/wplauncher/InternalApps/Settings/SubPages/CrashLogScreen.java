@@ -39,7 +39,6 @@ public class CrashLogScreen implements IScreen {
     private final float[] _view = new float[16];
     private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
     private final Label _subTitleLabel = new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0);
-    private TextReaderPage _page;
     private final ContextMenuDrawContext<File> _contextMenuDrawContext = new ContextMenuDrawContext<>(-1, -1);
 
     public CrashLogScreen(IScreenNavigator navigator, Context context) {
@@ -100,14 +99,12 @@ public class CrashLogScreen implements IScreen {
     }
 
     private void openFileReaderPage(File file) {
-        _page = new TextReaderPage(_navigator, file, (File payload) -> {
+        var page = new TextReaderPage(_navigator, file, (File payload) -> {
             if (payload != null) {
                 _crashList.removeItemByPayload(file);
             }
-            _page.dispose();
         });
-        _page.onResize(_size.width(), _size.height());
-        _navigator.push(_page);
+        _navigator.push(page);
     }
 
     private ContextMenu<File> createContextMenu() {

@@ -101,7 +101,6 @@ public class StartScreen implements IPageNavigator, IScreen {
         _screenWidth = width;
         _tileGrid.onSizeChanged(width, height);
         _appList.onSizeChanged(width, height);
-        _internalAppsService.onSizeChanged(width, height);
     }
 
     @Override

@@ -66,11 +66,10 @@ public class TextReaderPage implements IScreen {
     @Override
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
-        _layout.onResize(width, height);
-
         var itemsHeight = _deleteButton.measure().height() + StackLayout.TOP_MARGIN_PX;
         _textbox.setMaxWidth(width);
         _textbox.setMaxHeight(height - itemsHeight - LauncherRenderer.SCREEN_DATA.bottomInset);
+        _layout.onResize(width, height);
     }
 
     @Override

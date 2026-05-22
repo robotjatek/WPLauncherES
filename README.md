@@ -117,7 +117,8 @@ Try to make it usable for the less crazy people
   - [x] Reduce GC pressure when measuring labels and textblocks during rendering
   - [x] Reduce icon texture size in the app-list to 96x96
   - [x] Reduce icon texture size on the tiles to 256x256
-  - [ ] On-demand alloc of internal apps and screens
+  - [x] On-demand alloc of internal apps and screens
+  - [x] Optimize text wrapping in textblock
 - [ ] Bug fixes
   - [x] View crash logs
   - [x] Fix: crash on empty notification content

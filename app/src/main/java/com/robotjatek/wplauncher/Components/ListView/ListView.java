@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
+import com.robotjatek.wplauncher.Components.ContextMenu.IContextMenuParent;
 import com.robotjatek.wplauncher.Components.ListView.States.ContextMenuState;
 import com.robotjatek.wplauncher.Components.ListView.States.IdleState;
 import com.robotjatek.wplauncher.Components.ListView.States.ScrollState;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * A list that is embeddable to any layouts, with arbitrary size (if the said layout supports it)
  * @param <T> The type of the payload
  */
-public class ListView<T> implements UIElement, IItemListContainer<T> {
+public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMenuParent {
     public static final int ITEM_HEIGHT_PX = 128;
     public static final int ITEM_GAP_PX = 5;
     private boolean _disposed = false;
@@ -124,6 +125,11 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
         _itemDrawContext.onResize(size.width());
         setScrollBounds();
         _dirty = true;
+    }
+
+    @Override
+    public Size<Integer> getSize() {
+        return _size;
     }
 
     private void setScrollBounds() {
@@ -243,6 +249,16 @@ public class ListView<T> implements UIElement, IItemListContainer<T> {
             setScrollBounds();
             _dirty = true;
         }
+    }
+
+    @Override
+    public int getTopMargin() {
+        return _topMargin;
+    }
+
+    @Override
+    public int getBottomMargin() {
+        return _bottomMargin;
     }
 
     public IDrawContext<ListItem<T>> getItemDrawContext() {

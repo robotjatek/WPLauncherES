@@ -53,7 +53,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _tileService = tileService;
         _settingsService = settingsService;
         _settingsService.subscribe(this);
-        _contextMenuDrawContext = new ContextMenuDrawContext<>(-1, -1);
+        _contextMenuDrawContext = new ContextMenuDrawContext<>(_list);
 
         _searchBox = new InputBox("Search", this::onSearchTextChanged);
         _layout.addChild(_searchBox);
@@ -88,7 +88,6 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _list.setSize(new Size<>(width, listHeight));
         _list.setMargins(PAGE_PADDING_PX + itemsHeight, LauncherRenderer.SCREEN_DATA.bottomInset);
         _layout.onResize(width, height);
-        _contextMenuDrawContext.onResize(width, listHeight);
         _list.setContextMenu(createContextMenu()); // Context menu must be created when the size information is available
     }
 

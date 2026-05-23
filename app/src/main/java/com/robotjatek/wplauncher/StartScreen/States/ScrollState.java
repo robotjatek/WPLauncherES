@@ -1,9 +1,9 @@
-package com.robotjatek.wplauncher.StartPage.States;
+package com.robotjatek.wplauncher.StartScreen.States;
 
 import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
-import com.robotjatek.wplauncher.StartPage.StartScreen;
+import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
 /**
  * {@link ScrollState} Relays move intent to the children and disregards any other input

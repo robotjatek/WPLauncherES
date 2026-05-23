@@ -108,7 +108,7 @@ Try to make it usable for the less crazy people
 - [x] Embeddable ListView component
   - [x] Make ListPage use ListView internally
 - [ ] Feedback to the user on tap (Rotation/animations/etc)
-- [ ] Swipe animation
+- [x] Swipe animation on StartScreen
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI
@@ -119,6 +119,7 @@ Try to make it usable for the less crazy people
   - [x] Reduce icon texture size on the tiles to 256x256
   - [x] On-demand alloc of internal apps and screens
   - [x] Optimize text wrapping in textblock
+  - [ ] Do not render list items that are outside the viewport
 - [ ] Bug fixes
   - [x] View crash logs
   - [x] Fix: crash on empty notification content
@@ -143,10 +144,9 @@ Try to make it usable for the less crazy people
 
 Try it at your own risk
 
-- [ ] Make the crash-log viewer scrollable
+- [ ] Make the crash-log viewer scrollable (scrollview component)
 - [ ] Adjust button border drawing when no icon is set
 - [ ] About page in Launcher Settings
-- [ ] ScrollView in crash log reader
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [ ] Clear search-box on back press in the app-list
 - [ ] Support cursor in input boxes

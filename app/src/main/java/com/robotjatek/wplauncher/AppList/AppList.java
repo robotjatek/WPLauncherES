@@ -22,7 +22,7 @@ import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.SettingsService;
-import com.robotjatek.wplauncher.StartPage.IPageNavigator;
+import com.robotjatek.wplauncher.StartScreen.IPageNavigator;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.Services.TileService;
 

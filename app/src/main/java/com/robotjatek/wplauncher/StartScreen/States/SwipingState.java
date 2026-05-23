@@ -1,12 +1,13 @@
-package com.robotjatek.wplauncher.StartPage.States;
+package com.robotjatek.wplauncher.StartScreen.States;
 
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
-import com.robotjatek.wplauncher.StartPage.StartScreen;
+import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
 /**
  * Updates page offset while moving, changes page on touch end if a threshold is reached
- * Moves to {@link IdleState} on touch end
+ * Moves to {@link SnapState} on touch end
  */
 public class SwipingState extends BaseState {
     private float _lastX;
@@ -23,6 +24,15 @@ public class SwipingState extends BaseState {
     }
 
     @Override
+    public boolean handleMove(MoveGesture gesture) {
+        var dx = gesture.getX() - _lastX;
+        _lastX = gesture.getX();
+
+        _context.setPageOffset(_context.getPageOffset() + dx);
+        return true;
+    }
+
+    @Override
     public boolean handleScroll(ScrollGesture gesture) {
         var dx = gesture.getX() - _lastX;
         _lastX = gesture.getX();
@@ -33,15 +43,18 @@ public class SwipingState extends BaseState {
 
     @Override
     public boolean handleUp(UpGesture gesture) {
-        var threshold = _context.getScreenWidth() / 10f;
-        if (_context.getPageOffset() > threshold) {
+        var threshold = _context.getScreenWidth() / 8f;
+        var currentOffset = _context.getPageOffset();
+
+        if (currentOffset > threshold) {
             _context.previousPage();
-        } else if (_context.getPageOffset() < -threshold) {
+            _context.setPageOffset(currentOffset - _context.getScreenWidth());
+        } else if (currentOffset < -threshold) {
             _context.nextPage();
+            _context.setPageOffset(currentOffset + _context.getScreenWidth());
         }
 
-        _context.setPageOffset(0);
-        _context.changeState(_context.IDLE_STATE());
+        _context.changeState(_context.SNAP_STATE());
         return true;
     }
 }

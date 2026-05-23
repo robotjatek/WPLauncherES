@@ -43,7 +43,7 @@ public class SwipingState extends BaseState {
 
     @Override
     public boolean handleUp(UpGesture gesture) {
-        var threshold = _context.getScreenWidth() / 8f;
+        var threshold = _context.getScreenWidth() / 10f;
         var currentOffset = _context.getPageOffset();
 
         if (currentOffset > threshold) {

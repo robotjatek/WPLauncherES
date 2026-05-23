@@ -21,7 +21,6 @@ public class SnapState extends BaseState {
 
     @Override
     public void update(float delta) {
-
         _smoothDelta = _smoothDelta * 0.8f + delta * 0.2f;
         _elapsed += _smoothDelta;
         if (_elapsed >= DURATION) {

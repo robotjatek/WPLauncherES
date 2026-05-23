@@ -107,8 +107,11 @@ Try to make it usable for the less crazy people
 - [x] Make ListItem use high level UI components
 - [x] Embeddable ListView component
   - [x] Make ListPage use ListView internally
-- [ ] Feedback to the user on tap (Rotation/animations/etc)
-- [x] Swipe animation on StartScreen
+- [ ] Animations 
+  - [x] Swipe animation on StartScreen
+  - [x] Animated snap on StartScreen when back or home button is pressed
+  - [x] Animate scroll to top on tile-grid when home or back button is pressed
+  - [ ] Feedback to the user on tap (Rotation/animations/etc)
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI

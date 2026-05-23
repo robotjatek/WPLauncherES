@@ -1,7 +1,7 @@
-package com.robotjatek.wplauncher.StartPage.States;
+package com.robotjatek.wplauncher.StartScreen.States;
 
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.StartPage.StartScreen;
+import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
 public abstract class BaseState implements IState {
 

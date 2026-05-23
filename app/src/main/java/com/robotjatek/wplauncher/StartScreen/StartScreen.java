@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.StartPage;
+package com.robotjatek.wplauncher.StartScreen;
 
 import android.content.Context;
 import android.opengl.Matrix;
@@ -13,11 +13,12 @@ import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.SettingsService;
-import com.robotjatek.wplauncher.StartPage.States.ChildControlState;
+import com.robotjatek.wplauncher.StartScreen.States.ChildControlState;
 import com.robotjatek.wplauncher.IState;
-import com.robotjatek.wplauncher.StartPage.States.IdleState;
-import com.robotjatek.wplauncher.StartPage.States.ScrollState;
-import com.robotjatek.wplauncher.StartPage.States.SwipingState;
+import com.robotjatek.wplauncher.StartScreen.States.IdleState;
+import com.robotjatek.wplauncher.StartScreen.States.ScrollState;
+import com.robotjatek.wplauncher.StartScreen.States.SnapState;
+import com.robotjatek.wplauncher.StartScreen.States.SwipingState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 import com.robotjatek.wplauncher.Services.TileService;
 
@@ -51,6 +52,10 @@ public class StartScreen implements IPageNavigator, IScreen {
 
     public IState SWIPE_STATE(float initialX) {
         return new SwipingState(this, initialX);
+    }
+
+    public IState SNAP_STATE() {
+        return new SnapState(this);
     }
 
     public void changeState(IState state) {

@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.StartPage;
+package com.robotjatek.wplauncher.StartScreen;
 
 public interface IPageNavigator {
     void nextPage();

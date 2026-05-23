@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
-import com.robotjatek.wplauncher.StartPage.StartScreen;
+import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;

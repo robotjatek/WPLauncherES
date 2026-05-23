@@ -1,10 +1,10 @@
-package com.robotjatek.wplauncher.StartPage.States;
+package com.robotjatek.wplauncher.StartScreen.States;
 
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
-import com.robotjatek.wplauncher.StartPage.StartScreen;
+import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
 public class IdleState extends BaseState {
 

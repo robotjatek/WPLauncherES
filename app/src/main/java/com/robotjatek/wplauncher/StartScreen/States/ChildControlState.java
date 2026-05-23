@@ -1,7 +1,7 @@
-package com.robotjatek.wplauncher.StartPage.States;
+package com.robotjatek.wplauncher.StartScreen.States;
 
 import com.robotjatek.wplauncher.Gestures.Gesture;
-import com.robotjatek.wplauncher.StartPage.StartScreen;
+import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
 /**
  * {@link ChildControlState} relays all input to its children, without doing anything.

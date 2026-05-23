@@ -119,6 +119,7 @@ Try to make it usable for the less crazy people
   - [x] Reduce icon texture size on the tiles to 256x256
   - [x] On-demand alloc of internal apps and screens
   - [x] Optimize text wrapping in textblock
+  - [ ] Do not render list items that are outside the viewport
 - [ ] Bug fixes
   - [x] View crash logs
   - [x] Fix: crash on empty notification content

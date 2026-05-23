@@ -3,6 +3,10 @@ package com.robotjatek.wplauncher.StartScreen.States;
 import com.robotjatek.wplauncher.Gestures.DownGesture;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
+/**
+ * Smoothly animates page offset back to 0 after a swipe, moves to {@link IdleState} when done
+ * Moves to {@link SwipingState} on touch down
+ */
 public class SnapState extends BaseState {
 
     private final float _startOffset;
@@ -17,7 +21,7 @@ public class SnapState extends BaseState {
 
     @Override
     public void update(float delta) {
-        //super.update(delta);
+
         _smoothDelta = _smoothDelta * 0.8f + delta * 0.2f;
         _elapsed += _smoothDelta;
         if (_elapsed >= DURATION) {
@@ -34,6 +38,6 @@ public class SnapState extends BaseState {
     @Override
     public boolean handleDown(DownGesture gesture) {
         _context.changeState(_context.SWIPE_STATE(_context.getPageOffset()));
-        return _context.handleGesture(gesture); // pass gesture to the new state
+        return true;
     }
 }

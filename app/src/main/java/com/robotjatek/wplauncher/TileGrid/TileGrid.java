@@ -19,6 +19,7 @@ import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.States.IdleState;
 import com.robotjatek.wplauncher.TileGrid.States.ScrollState;
 import com.robotjatek.wplauncher.Services.TileService;
+import com.robotjatek.wplauncher.TileGrid.States.SnapToTopState;
 
 import java.util.List;
 import java.util.Queue;
@@ -36,6 +37,10 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     public IState EDIT_STATE(float x, float y) {
         return new EditState(this, x, y);
+    }
+
+    public IState SNAP_TO_TOP_STATE() {
+        return new SnapToTopState(this);
     }
 
     private IState _state = IDLE_STATE();
@@ -174,7 +179,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     public void resetScroll() {
-        _scroll.setScrollOffset(0);
+        changeState(SNAP_TO_TOP_STATE());
     }
 
     public TileDrawContext getDrawContext() {

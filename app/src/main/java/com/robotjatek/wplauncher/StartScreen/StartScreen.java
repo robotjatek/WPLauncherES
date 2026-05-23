@@ -116,7 +116,7 @@ public class StartScreen implements IPageNavigator, IScreen {
         _pageOffset =  _pageOffset - _currentPage * _screenWidth;
         _currentPage = 0;
         changeState(SNAP_STATE());
-        _tileGrid.resetScroll(); // TODO: animate tilegrid scroll reset
+        _tileGrid.resetScroll();
         _appList.resetScroll();
     }
 

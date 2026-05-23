@@ -110,7 +110,7 @@ Try to make it usable for the less crazy people
 - [ ] Animations 
   - [x] Swipe animation on StartScreen
   - [x] Animated snap on StartScreen when back or home button is pressed
-  - [ ] Animate scroll to top on tile-grid when home or back button is pressed
+  - [x] Animate scroll to top on tile-grid when home or back button is pressed
   - [ ] Feedback to the user on tap (Rotation/animations/etc)
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)

@@ -108,11 +108,15 @@ public class StartScreen implements IPageNavigator, IScreen {
         _appList.onSizeChanged(width, height);
     }
 
+    /**
+     * Navigates back to the first page animating the page offset back to zero
+     */
     @Override
     public void onBackPressed() {
-        // Navigate to page 0 set scroll offset to 0
+        _pageOffset =  _pageOffset - _currentPage * _screenWidth;
         _currentPage = 0;
-        _tileGrid.resetScroll();
+        changeState(SNAP_STATE());
+        _tileGrid.resetScroll(); // TODO: animate tilegrid scroll reset
         _appList.resetScroll();
     }
 

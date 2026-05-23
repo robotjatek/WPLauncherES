@@ -94,7 +94,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
             var startScreen = _navigationStack.getLast();
             _navigationStack.clear();
             _navigationStack.add(startScreen);
-            startScreen.onBackPressed(); // TODO: animated scroll to top
+            startScreen.onBackPressed();
         }
     }
 

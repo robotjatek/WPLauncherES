@@ -112,6 +112,10 @@ Try to make it usable for the less crazy people
   - [x] Animated snap on StartScreen when back or home button is pressed
   - [x] Animate scroll to top on tile-grid when home or back button is pressed
   - [ ] Feedback to the user on tap (Rotation/animations/etc)
+    - [ ] Button
+    - [ ] Tiles
+    - [ ] List items
+    - [ ] Labels with onclick handlers
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI
@@ -122,7 +126,8 @@ Try to make it usable for the less crazy people
   - [x] Reduce icon texture size on the tiles to 256x256
   - [x] On-demand alloc of internal apps and screens
   - [x] Optimize text wrapping in textblock
-  - [ ] Do not render list items that are outside the viewport
+  - [x] Do not render list items that are outside the viewport
+  - [ ] Do not store textures when a single uniform color can be used (e.g. for the tile background)
 - [ ] Bug fixes
   - [x] View crash logs
   - [x] Fix: crash on empty notification content

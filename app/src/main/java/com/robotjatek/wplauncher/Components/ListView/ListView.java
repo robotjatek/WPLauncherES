@@ -37,7 +37,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
     private final float[] _modelMatrix = new float[16];
     private final float[] _menuMatrix = new float[16];
     private final List<ListItem<T>> _allItems = Collections.synchronizedList(new ArrayList<>());
-    private final List<ListItem<T>> _visibleItems = Collections.synchronizedList(new ArrayList<>());
+    private final List<ListItem<T>> _filteredItems = Collections.synchronizedList(new ArrayList<>());
     private Size<Integer> _size = new Size<>(-1, -1);
     private final ScrollController _scroll = new ScrollController();
     private IState _state = IDLE_STATE();
@@ -73,9 +73,9 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
 
     public void filter(String filter) {
         _commands.add(() -> {
-            _visibleItems.clear();
+            _filteredItems.clear();
             var filtered = _allItems.stream().filter(i -> i.getLabel().toLowerCase().contains(filter)).toList();
-            _visibleItems.addAll(filtered);
+            _filteredItems.addAll(filtered);
             setScrollBounds();
             _dirty = true;
         });
@@ -105,9 +105,14 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         var glY = screenHeight - _topMargin - y - h;
         GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
         GLES32.glScissor((int) x, (int) glY, w, h);
-        for (var item : _visibleItems) {
+        for (var item : _filteredItems) {
+            // skip drawing items that are out of the view
+            if (!_itemDrawContext.isVisible(item)) {
+                 continue;
+            }
+
             item.update(_itemDrawContext);
-            item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer); // TODO: do not call draw() for elements that are scrolled out of the view
+            item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer);
         }
         GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
 
@@ -133,9 +138,10 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
     }
 
     private void setScrollBounds() {
-        var contentHeight = _visibleItems.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + _bottomMargin;
+        var contentHeight = _filteredItems.size() * (ITEM_HEIGHT_PX + ITEM_GAP_PX) + _bottomMargin;
         var min = Math.min(0, _size.height() - (contentHeight + _topMargin + _bottomMargin));
         _scroll.setBounds(min, 0);
+        _itemDrawContext.invalidateCache();
     }
 
     @Override
@@ -145,7 +151,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
 
     @Override
     public List<ListItem<T>> getVisibleItems() {
-        return _visibleItems;
+        return _filteredItems;
     }
 
     public void changeState(IState state) {
@@ -166,7 +172,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         _commands.add(() -> {
             _allItems.addAll(items);
             _allItems.forEach(ListItem::setDirty);
-            _visibleItems.addAll(items);
+            _filteredItems.addAll(items);
             setScrollBounds();
         });
     }
@@ -176,7 +182,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
             var item = _allItems.stream().filter(i -> i.getPayload().equals(payload)).findFirst();
             item.ifPresent(i -> {
                 _allItems.remove(i);
-                _visibleItems.remove(i);
+                _filteredItems.remove(i);
                 i.dispose();
             });
             setScrollBounds();
@@ -232,6 +238,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         return _state.isCatchingGestures();
     }
 
+    @Override
     public ScrollController getScroll() {
         return _scroll;
     }

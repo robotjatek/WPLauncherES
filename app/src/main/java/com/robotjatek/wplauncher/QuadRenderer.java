@@ -108,6 +108,31 @@ public class QuadRenderer {
 
         Matrix.multiplyMM(_mvp, 0, projMatrix, 0, modelMatrix, 0);
         _shader.setMat4Uniform("uMVP", _mvp);
+        _shader.setIntUniform("uUseTexture", 1);
+
+        GLES32.glBindVertexArray(_vaoId);
+        GLES32.glDrawElements(GLES32.GL_TRIANGLES, INDICES.length, GLES32.GL_UNSIGNED_SHORT, 0);
+
+        GLES32.glBindVertexArray(0);
+    }
+
+    private final float[] colorBuf = new float[4];
+
+    public void drawFlat(float[] projMatrix, float[] modelMatrix, int color) {
+        _shader.use();
+
+        colorBuf[0] = ((color >> 24) & 0xFF) / 255.0f; // A
+        colorBuf[1] = ((color >> 16) & 0xFF) / 255.0f; // R
+        colorBuf[2] = ((color >> 8) & 0xFF) / 255.0f;  // G
+        colorBuf[3] = (color & 0xFF) / 255.0f; // B
+        _shader.setVec4Uniform("uColor", colorBuf[1], colorBuf[2], colorBuf[3], colorBuf[0]);
+        _shader.setIntUniform("uUseTexture", 0);
+
+        GLES32.glEnable(GLES32.GL_BLEND);
+        GLES32.glBlendFunc(GLES32.GL_SRC_ALPHA, GLES32.GL_ONE_MINUS_SRC_ALPHA);
+
+        Matrix.multiplyMM(_mvp, 0, projMatrix, 0, modelMatrix, 0);
+        _shader.setMat4Uniform("uMVP", _mvp);
 
         GLES32.glBindVertexArray(_vaoId);
         GLES32.glDrawElements(GLES32.GL_TRIANGLES, INDICES.length, GLES32.GL_UNSIGNED_SHORT, 0);

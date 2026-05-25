@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout;
 
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
@@ -11,7 +10,6 @@ import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
-import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -23,7 +21,6 @@ public class AbsoluteLayout implements ILayout {
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _modelMatrix = new float[16];
     private int _bgColor = Colors.TRANSPARENT;
-    private int _bgTexture = -1;
     private boolean _dirty = true;
     private final IDrawContext<UIElement> _drawContext = new AbsoluteLayoutDrawContext(this);
 
@@ -99,18 +96,12 @@ public class AbsoluteLayout implements ILayout {
             _dirty = true;
         }
 
-        if (_dirty) {
-            TileUtil.deleteTexture(_bgTexture);
-            _bgTexture = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, _bgColor));
-            _dirty = false;
-        }
-
         // Draw background
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _bgTexture);
+        renderer.drawFlat(proj, _modelMatrix, _bgColor);
 
         // Draw children with offset
         Matrix.setIdentityM(_modelMatrix, 0);
@@ -172,7 +163,6 @@ public class AbsoluteLayout implements ILayout {
         if (!_disposed) {
             _positionedElements.forEach(c -> c._element.dispose());
             _positionedElements.clear();
-            TileUtil.deleteTexture(_bgTexture);
             _disposed = true;
         }
     }

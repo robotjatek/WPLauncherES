@@ -1,5 +1,7 @@
 package com.robotjatek.wplauncher.StartScreen.States;
 
+import android.util.Log;
+
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
@@ -13,7 +15,7 @@ public abstract class BaseState implements IState {
 
     @Override
     public void enter() {
-    //    Log.d(IState.class.toString(), this.getClass().toString());
+        Log.d(IState.class.toString(), this.getClass().toString());
     }
 
     @Override

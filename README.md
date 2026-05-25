@@ -127,7 +127,7 @@ Try to make it usable for the less crazy people
   - [x] On-demand alloc of internal apps and screens
   - [x] Optimize text wrapping in textblock
   - [x] Do not render list items that are outside the viewport
-  - [ ] Do not store textures when a single uniform color can be used (e.g. for the tile background)
+  - [x] Do not store textures when a single uniform color can be used (e.g. for the tile background)
 - [ ] Bug fixes
   - [x] View crash logs
   - [x] Fix: crash on empty notification content

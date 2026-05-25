@@ -22,7 +22,6 @@ public class Button implements UIElement {
     private String _text;
     private Drawable _icon;
     private final Runnable _onTap;
-    private int _bgTexture = -1;
     private int _foreground = -1;
     private int _iconTexture = -1;
     private boolean _isDirty = true;
@@ -44,7 +43,6 @@ public class Button implements UIElement {
             // 1 px white border
             TileUtil.deleteTexture(_foreground);
             TileUtil.deleteTexture(_iconTexture);
-            _bgTexture = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, Colors.WHITE));
             _foreground = TileUtil.createTextTexture(_text, w - 1, h - 1, 48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, HorizontalAlign.LEFT, VerticalAlign.CENTER);
             if (_icon != null) {
                 _iconTexture = BitmapUtil.createTextureFromDrawable(_icon, h, h);
@@ -52,12 +50,12 @@ public class Button implements UIElement {
             _isDirty = false;
         }
 
-        // BG:
+        // Border:
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _bgTexture);
+        renderer.drawFlat(proj, _modelMatrix, Colors.WHITE);
         var textOffset = 0;
         if (_icon != null) {
             textOffset = h;
@@ -107,8 +105,6 @@ public class Button implements UIElement {
     @Override
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_bgTexture);
-            _bgTexture = -1;
             TileUtil.deleteTexture(_foreground);
             _foreground = -1;
             TileUtil.deleteTexture(_iconTexture);

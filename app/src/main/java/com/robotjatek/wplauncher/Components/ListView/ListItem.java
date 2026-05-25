@@ -73,7 +73,7 @@ public class ListItem<T> {
             _textLabel.setMaxWidth(w - h);
 
             var labelX = w * 0.02f;
-            var labelY = (h - _textLabel.measure().height()) / 2f;;
+            var labelY = (h - _textLabel.measure().height()) / 2f;
 
             if (_icon != null) {
                 _icon.setSize(new Size<>(h, h));

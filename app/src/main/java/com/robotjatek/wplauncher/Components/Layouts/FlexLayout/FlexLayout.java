@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.Components.Layouts.FlexLayout;
 
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
@@ -11,7 +10,6 @@ import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
-import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +62,6 @@ public class FlexLayout implements ILayout {
     private final IDrawContext<UIElement> _itemDrawContext;
     private boolean _dirty = true;
     private int _bgColor = Colors.TRANSPARENT;
-    private int _bgTexture = -1;
 
     public FlexLayout(
             JustifyContent justify,
@@ -276,8 +273,6 @@ public class FlexLayout implements ILayout {
         }
         if (_dirty) {
             layout();
-            TileUtil.deleteTexture(_bgTexture);
-            _bgTexture = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, _bgColor));
             _dirty = false;
         }
 
@@ -290,7 +285,7 @@ public class FlexLayout implements ILayout {
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.draw(projMatrix, _modelMatrix, _bgTexture);
+        renderer.drawFlat(projMatrix, _modelMatrix, _bgColor);
     }
 
     private void drawChildren(float delta, float[] proj, float[] viewMatrix, QuadRenderer renderer, Position<Float> position) {
@@ -362,7 +357,6 @@ public class FlexLayout implements ILayout {
         if (!_disposed) {
             _children.forEach(UIElement::dispose);
             _children.clear();
-            TileUtil.deleteTexture(_bgTexture);
             _disposed = true;
         }
     }

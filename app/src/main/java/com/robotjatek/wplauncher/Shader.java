@@ -25,9 +25,15 @@ public class Shader {
                 "#version 300 es\n" +
                         "precision mediump float;" +
                         "uniform sampler2D uTexture;" +
+                        "uniform vec4 uColor;" +
+                        "uniform int uUseTexture;" +
                         "in vec2 vTexCoord;" +
                         "out vec4 color;" +
                         "void main() {" +
+                        "  if (uUseTexture == 0) {" +
+                        "    color = uColor;" +
+                        "    return;" +
+                        "  }" +
                         "  vec4 texColor = texture(uTexture, vTexCoord);" +
                         "  color = texColor;" +
                         "}";

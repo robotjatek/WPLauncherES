@@ -16,7 +16,6 @@ public class Icon implements UIElement {
     private final float[] _modelMatrix = new float[16];
     private Drawable _iconDrawable;
     private int _textureId = -1;
-    private int _bgColorTextureId = -1;
     private int _bgColor;
     private boolean _dirty = true;
     private Size<Integer> _size;
@@ -31,6 +30,10 @@ public class Icon implements UIElement {
          this(iconDrawable, Colors.TRANSPARENT, size);
     }
 
+    public Icon(int _bgColor, Size<Integer> size) {
+        this(null, _bgColor, size);
+    }
+
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         var x = drawContext.xOf(this);
@@ -42,13 +45,7 @@ public class Icon implements UIElement {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
             }
-            if (_bgColorTextureId > 0) {
-                TileUtil.deleteTexture(_bgColorTextureId);
-            }
             _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
-            if (_bgColor != Colors.TRANSPARENT) {
-                _bgColorTextureId = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, _bgColor));
-            }
             _dirty = false;
         }
 
@@ -57,8 +54,8 @@ public class Icon implements UIElement {
         Matrix.scaleM(_modelMatrix, 0, w, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
 
-        if (_bgColorTextureId > 0) {
-            renderer.draw(proj, _modelMatrix, _bgColorTextureId);
+        if (_bgColor != Colors.TRANSPARENT) {
+            renderer.drawFlat(proj, _modelMatrix, _bgColor);
         }
 
         renderer.draw(proj, _modelMatrix, _textureId);
@@ -90,10 +87,6 @@ public class Icon implements UIElement {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
                 _textureId = -1;
-            }
-            if (_bgColorTextureId > 0) {
-                TileUtil.deleteTexture(_bgColorTextureId);
-                _bgColorTextureId = -1;
             }
             _disposed = true;
         }

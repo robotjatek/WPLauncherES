@@ -3,7 +3,6 @@ package com.robotjatek.wplauncher.Components.InputBox;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
@@ -22,7 +21,6 @@ public class InputBox implements UIElement, ITextInputHandler {
     private boolean _disposed = false;
     private boolean _isDirty = true;
     private final float[] _modelMatrix = new float[16];
-    private int _bgTexture = -1;
     private int _foregroundTexture = -1;
     private String _text = "";
     private final String _placeholder;
@@ -42,9 +40,7 @@ public class InputBox implements UIElement, ITextInputHandler {
         var h = (int) drawContext.heightOf(this);
 
         if (_isDirty) {
-            TileUtil.deleteTexture(_bgTexture);
             TileUtil.deleteTexture(_foregroundTexture);
-            _bgTexture = BitmapUtil.createTextureFromBitmap(BitmapUtil.createRect(1, 1, 0, Colors.WHITE));
             if (_text.isEmpty()) {
                 _foregroundTexture = TileUtil.createTextTexture(_placeholder, w - 1, h - 1, 48, Typeface.BOLD,
                         Colors.LIGHT_GRAY, Colors.BLACK, HorizontalAlign.LEFT, VerticalAlign.CENTER);
@@ -59,7 +55,7 @@ public class InputBox implements UIElement, ITextInputHandler {
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
         Matrix.scaleM(_modelMatrix, 0, w, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _bgTexture);
+        renderer.drawFlat(proj, _modelMatrix, Colors.WHITE);
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x + 4, y + 4, 0);
@@ -119,7 +115,6 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_bgTexture);
             TileUtil.deleteTexture(_foregroundTexture);
             _disposed = true;
         }

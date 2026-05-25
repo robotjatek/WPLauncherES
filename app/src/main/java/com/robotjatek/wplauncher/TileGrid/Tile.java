@@ -17,6 +17,8 @@ public class Tile {
     private final float[] _backViewMatrix = new float[16];
     private static final float TIME_BEFORE_FLIP_MIN = 4000f;
     private static final float TIME_BEFORE_FLIP_MAX = 8000f;
+    private static final float TAP_ACTION_DELAY_MS = 50f;
+    private float _tapDelayRemainingMs = 0f;
     private boolean _disposed = false;
     private Position<Integer> _position;
     private Size<Integer> _size;
@@ -47,6 +49,8 @@ public class Tile {
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
                                Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
+        updateTapDelay(delta);
+
         var width = (int) (drawContext.widthOf(this) * _scale);
         var height = (int) (drawContext.heightOf(this) * _scale);
         var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
@@ -114,12 +118,6 @@ public class Tile {
         GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
     }
 
-    public void onTap() {
-        if (_app != null) {
-            _app.action().run();
-        }
-    }
-
     public String getPackageName() {
         if (_app == null) {
             return "";
@@ -183,8 +181,47 @@ public class Tile {
         }
     }
 
+    public void onPress() {
+        cancelPendingTap();
+        setScale(0.95f);
+    }
+
+    public void onRelease(boolean fireTap) {
+        setScale(1f);
+        if (fireTap) {
+            scheduleTapAction();
+        }
+    }
+
+    public void cancelPendingTap() {
+        _tapDelayRemainingMs = 0f;
+    }
+
+    private void scheduleTapAction() {
+        _tapDelayRemainingMs = TAP_ACTION_DELAY_MS;
+    }
+
+
+    private void updateTapDelay(float delta) {
+        if (_tapDelayRemainingMs <= 0f) {
+            return;
+        }
+        _tapDelayRemainingMs -= delta;
+        if (_tapDelayRemainingMs <= 0f) {
+            _tapDelayRemainingMs = 0f;
+            runTapAction();
+        }
+    }
+
+    private void runTapAction() {
+        if (_app != null) {
+            _app.action().run();
+        }
+    }
+
     public void dispose() {
         if (!_disposed) {
+            cancelPendingTap();
             _content.dispose();
             if (_backContent != null) {
                 _backContent.dispose();

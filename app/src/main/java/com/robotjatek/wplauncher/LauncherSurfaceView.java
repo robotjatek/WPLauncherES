@@ -91,12 +91,12 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
         var x = event.getX();
         var y = event.getY();
 
-        _gestureDetector.onTouchEvent(event);
-
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_UP -> queueEvent(() -> _renderer.handleGesture(new UpGesture(x, y, this)));
             case MotionEvent.ACTION_MOVE -> queueEvent(() -> _renderer.handleGesture(new MoveGesture(x, y, this)));
         }
+
+        _gestureDetector.onTouchEvent(event);
         return true;
     }
 

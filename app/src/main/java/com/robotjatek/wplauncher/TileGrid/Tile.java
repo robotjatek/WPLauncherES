@@ -17,6 +17,8 @@ public class Tile {
     private final float[] _backViewMatrix = new float[16];
     private static final float TIME_BEFORE_FLIP_MIN = 4000f;
     private static final float TIME_BEFORE_FLIP_MAX = 8000f;
+    private static final float TAP_ACTION_DELAY_MS = 50f;
+    private float _tapDelayRemainingMs = 0f;
     private boolean _disposed = false;
     private Position<Integer> _position;
     private Size<Integer> _size;
@@ -116,12 +118,6 @@ public class Tile {
         GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
     }
 
-    public void onTap() {
-        if (_app != null) {
-            _app.action().run();
-        }
-    }
-
     public String getPackageName() {
         if (_app == null) {
             return "";
@@ -184,10 +180,6 @@ public class Tile {
             _backContent.forceRedraw();
         }
     }
-
-    private static final float TAP_ACTION_DELAY_MS = 50f;
-    private float _tapDelayRemainingMs = 0f;
-
 
     public void onPress() {
         cancelPendingTap();

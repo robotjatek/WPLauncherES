@@ -1,9 +1,12 @@
 package com.robotjatek.wplauncher.StartScreen.States;
 
+import com.robotjatek.wplauncher.Gestures.DownGesture;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Gestures.LongPressGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.ScrollGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
 public class IdleState extends BaseState {
@@ -41,6 +44,23 @@ public class IdleState extends BaseState {
             _context.changeState(_context.SCROLL_STATE());
         }
         return _context.handleGesture(gesture);
+    }
+
+    @Override
+    public boolean handleDown(DownGesture gesture) {
+        return _context.getCurrentPage().handleGesture(gesture);
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
+        _context.getCurrentPage().handleGesture(gesture);
+        return true;
+    }
+
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        _context.getCurrentPage().handleGesture(gesture);
+        return true;
     }
 
     @Override

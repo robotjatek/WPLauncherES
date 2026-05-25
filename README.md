@@ -111,9 +111,10 @@ Try to make it usable for the less crazy people
   - [x] Swipe animation on StartScreen
   - [x] Animated snap on StartScreen when back or home button is pressed
   - [x] Animate scroll to top on tile-grid when home or back button is pressed
+  - [ ] Animate internal app/subpage opening (clock hub, launcher settings)
   - [ ] Feedback to the user on tap (Rotation/animations/etc)
     - [ ] Button
-    - [ ] Tiles
+    - [x] Tiles
     - [ ] List items
     - [ ] Labels with onclick handlers
 - [x] Gesture system refactor
@@ -187,6 +188,7 @@ Feature-creep!
 - [ ] Radiobutton
 - [ ] Group apps by the first letter in the app list
 - [ ] Set background image for the start screen + transparency option for tiles
+- [ ] Try perspective projection instead of orthographic
 
 ### M5 - RC
 

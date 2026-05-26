@@ -1,6 +1,5 @@
 package com.robotjatek.wplauncher.Components.ListView;
 
-import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.IDrawContext;
 
 import java.util.HashMap;

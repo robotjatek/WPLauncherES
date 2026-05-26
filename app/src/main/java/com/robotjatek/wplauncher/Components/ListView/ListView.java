@@ -3,7 +3,6 @@ package com.robotjatek.wplauncher.Components.ListView;
 import android.opengl.GLES32;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.IContextMenuParent;
 import com.robotjatek.wplauncher.Components.ListView.States.ContextMenuState;

@@ -56,7 +56,7 @@ public class Shader {
     }
 
     public void delete() {
-        GLES32.glDeleteShader(_shaderProgram);
+        GLES32.glDeleteProgram(_shaderProgram);
     }
 
     public int getId() {

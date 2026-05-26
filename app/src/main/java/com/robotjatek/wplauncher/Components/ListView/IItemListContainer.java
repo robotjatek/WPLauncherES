@@ -1,6 +1,5 @@
-package com.robotjatek.wplauncher.AppList;
+package com.robotjatek.wplauncher.Components.ListView;
 
-import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.ScrollController;
 

@@ -1,38 +1,23 @@
 package com.robotjatek.wplauncher.Components.Button;
 
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
-import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.States.IdleState;
 import com.robotjatek.wplauncher.Components.Button.States.PressedState;
 import com.robotjatek.wplauncher.Components.Button.States.ReleaseState;
+import com.robotjatek.wplauncher.Components.Icon.Icon;
+import com.robotjatek.wplauncher.Components.Label.Label;
+import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.Gesture;
-import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.TileUtil;
-import com.robotjatek.wplauncher.VerticalAlign;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class Button implements UIElement {
-
-    private boolean _disposed = false;
-    private final float[] _modelMatrix = new float[16];
-    private String _text;
-    private Drawable _icon;
-    private final Runnable _onTap;
-    private int _textTexture = -1;
-    private int _iconTexture = -1;
-    private boolean _isDirty = true;
-    private static final float TAP_ACTION_DELAY_MS = 50f;
-    private float _tapDelayRemainingMs = 0f;
-    private int _textBgColor = Colors.BLACK;
-    private int _textColor = Colors.WHITE;
 
     public IState IDLE_STATE() {
         return new IdleState(this);
@@ -47,60 +32,56 @@ public class Button implements UIElement {
     }
 
     private IState _state = IDLE_STATE();
+    private boolean _disposed = false;
+    private final Runnable _onTap;
+    private boolean _isDirty = true;
+    private static final float TAP_ACTION_DELAY_MS = 50f;
+    private float _tapDelayRemainingMs = 0f;
+    private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
+    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final Label _label;
+    private Icon _icon;
 
-    public Button(String text, Drawable icon, Runnable onTap) {
-        _text = text;
+    public Button(String text, Icon icon, Runnable onTap) {
+        _label = new Label(text, 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
         _icon = icon;
         _onTap = onTap;
+        _borderLayout.setBgColor(Colors.WHITE);
+        _layout.setBgColor(Colors.BLACK);
     }
+
+    private static final int BORDER_SIZE_PX = 4;
 
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
         _state.update(delta);
-        updateTapDelay(delta);
-
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
         if (_isDirty) {
-            // 1 px white border
-            TileUtil.deleteTexture(_textTexture);
-            TileUtil.deleteTexture(_iconTexture);
-            _textTexture = TileUtil.createTextTexture(_text, w - 1, h - 1, 48, Typeface.BOLD, _textColor, _textBgColor, HorizontalAlign.LEFT, VerticalAlign.CENTER);
+            _borderLayout.removeChild(_layout);
+            _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
+            _borderLayout.addChild(_layout, new Position<>((float)BORDER_SIZE_PX, (float)BORDER_SIZE_PX));
+
+            var textOffset = 16f;
+            _layout.removeChild(_label);
+
             if (_icon != null) {
-                _iconTexture = BitmapUtil.createTextureFromDrawable(_icon, h, h);
+                var iconSize = h - BORDER_SIZE_PX * 2 - 16;
+                textOffset += iconSize;
+                _icon.setSize(new Size<>(iconSize, iconSize));
+                _layout.removeChild(_icon);
+                _layout.addChild(_icon, new Position<>(BORDER_SIZE_PX * 2f, BORDER_SIZE_PX * 2f));
             }
+            _layout.addChild(_label, new Position<>(textOffset, (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
             _isDirty = false;
         }
 
-        // Border:
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, w, h, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.drawFlat(proj, _modelMatrix, Colors.WHITE);
+        _borderLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
 
-        // text:
-        var textOffset = 0;
-        if (_icon != null) {
-            textOffset = h;
-        }
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x+4+textOffset, y+4, 0);
-        Matrix.scaleM(_modelMatrix, 0, w-8-textOffset, h-8, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _textTexture);
-
-        // draw icon
-        if (_icon != null) {
-            Matrix.setIdentityM(_modelMatrix, 0);
-            Matrix.translateM(_modelMatrix, 0, x+4, y+4, 0);
-            Matrix.scaleM(_modelMatrix, 0, h, h-8, 0);
-            Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-            renderer.draw(proj, _modelMatrix, _iconTexture);
-        }
+        updateTapDelay(delta);
     }
 
     public void changeState(IState state) {
@@ -114,13 +95,11 @@ public class Button implements UIElement {
      */
     public void onPress() {
         cancelPendingTap();
-        _textBgColor = Colors.WHITE;
-        _isDirty = true;
+        _layout.setBgColor(Colors.WHITE);
     }
 
     public void onRelease(boolean fireTap) {
-        _textBgColor = Colors.BLACK;
-        _isDirty = true;
+        _layout.setBgColor(Colors.BLACK);
         if (fireTap) {
             scheduleTap();
         }
@@ -162,11 +141,13 @@ public class Button implements UIElement {
     }
 
     public void setText(String text) {
-        _text = text;
-        _isDirty = true;
+        _label.setText(text);
     }
 
-    public void setIcon(Drawable icon) {
+    public void setIcon(Icon icon) {
+        if (_icon != null) {
+            _icon.dispose();
+        }
         _icon = icon;
         _isDirty = true;
     }
@@ -174,10 +155,7 @@ public class Button implements UIElement {
     @Override
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_textTexture);
-            _textTexture = -1;
-            TileUtil.deleteTexture(_iconTexture);
-            _iconTexture = -1;
+            _borderLayout.dispose();
             _disposed = true;
         }
     }

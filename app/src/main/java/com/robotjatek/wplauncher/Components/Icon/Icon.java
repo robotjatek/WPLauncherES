@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Components.Icon;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.opengl.Matrix;
 
@@ -45,7 +46,9 @@ public class Icon implements UIElement {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
             }
-            _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
+            if (_iconDrawable != null) {
+                _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
+            }
             _dirty = false;
         }
 
@@ -58,7 +61,9 @@ public class Icon implements UIElement {
             renderer.drawFlat(proj, _modelMatrix, _bgColor);
         }
 
-        renderer.draw(proj, _modelMatrix, _textureId);
+        if (_textureId > 0) {
+            renderer.draw(proj, _modelMatrix, _textureId);
+        }
     }
 
     @Override

@@ -13,7 +13,7 @@ public class ReleaseState extends ButtonBaseState {
 
     public ReleaseState(Button context, boolean pressAlreadyVisible) {
         super(context);
-        _pressAlreadyVisible = false;
+        _pressAlreadyVisible = pressAlreadyVisible;
     }
 
     @Override

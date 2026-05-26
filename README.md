@@ -113,9 +113,10 @@ Try to make it usable for the less crazy people
   - [x] Animate scroll to top on tile-grid when home or back button is pressed
   - [ ] Animate internal app/subpage opening (clock hub, launcher settings)
   - [ ] Feedback to the user on tap (Rotation/animations/etc)
-    - [ ] Button
+    - [x] Button
     - [x] Tiles
     - [x] List items
+    - [ ] InputBox
     - [ ] Labels with onclick handlers
 - [x] Gesture system refactor
 - [ ] Device resolution independent UI
@@ -153,7 +154,7 @@ Try to make it usable for the less crazy people
 Try it at your own risk
 
 - [ ] Make the crash-log viewer scrollable (scrollview component)
-- [ ] Adjust button border drawing when no icon is set
+- [x] Adjust button border drawing when no icon is set
 - [ ] About page in Launcher Settings
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [ ] Clear search-box on back press in the app-list

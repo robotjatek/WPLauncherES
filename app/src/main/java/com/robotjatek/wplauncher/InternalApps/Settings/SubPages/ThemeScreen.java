@@ -9,6 +9,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
+import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Size;
@@ -27,7 +28,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
     private final Button _colorPickerBtn;
-    private Bitmap _icon;
+    private Icon _icon;
     private final Context _context;
     private final SettingsService _settings;
     private final float[] _view = new float[16];
@@ -43,10 +44,10 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
 
         var color = settings.getAccentColor();
-        _icon = BitmapUtil.createRect(64, 64, 8, color.color());
+        _icon = new Icon(color.color(), new Size<>(64, 64));
         _colorPickerBtn = new Button(
                 color.name(),
-                new BitmapDrawable(context.getResources(), _icon),
+                _icon,
                 () -> {
                     var colorPickerScreen = new ColorPickerScreen(navigator);
                     colorPickerScreen.subscribe(this);
@@ -77,10 +78,10 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     @Override
     public void changed(AccentColor changed) {
         _settings.setAccentColor(changed);
-        _icon.recycle();
+        _icon.dispose();
         _colorPickerBtn.setText(changed.name());
-        _icon = BitmapUtil.createRect(64, 64, 8, changed.color()); // TODO: real icon component?
-        _colorPickerBtn.setIcon(new BitmapDrawable(_context.getResources(), _icon));
+        _icon = new Icon(changed.color(), new Size<>(64, 64));
+        _colorPickerBtn.setIcon(_icon);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     public void dispose() {
         if (!_disposed) {
             _layout.dispose();
-            _icon.recycle();
+            _icon.dispose();
             _disposed = true;
         }
     }

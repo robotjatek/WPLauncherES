@@ -31,7 +31,7 @@ public class BaseState<T> implements IState {
         _context.getScroll().update(delta);
     }
 
-    protected Optional<ListItem<T>> getItemAt(float x, float y) {
+    public Optional<ListItem<T>> getItemAt(float x, float y) {
         var _children = _context.getVisibleItems();
         var _drawContext = _context.getItemDrawContext();
         for (var child : _children) {

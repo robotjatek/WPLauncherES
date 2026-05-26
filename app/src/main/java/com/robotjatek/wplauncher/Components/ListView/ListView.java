@@ -3,7 +3,6 @@ package com.robotjatek.wplauncher.Components.ListView;
 import android.opengl.GLES32;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.AppList.IItemListContainer;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.IContextMenuParent;
 import com.robotjatek.wplauncher.Components.ListView.States.ContextMenuState;
@@ -111,7 +110,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
                  continue;
             }
 
-            item.update(_itemDrawContext);
+            item.update(delta, _itemDrawContext);
             item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer);
         }
         GLES32.glDisable(GLES32.GL_SCISSOR_TEST);

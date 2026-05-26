@@ -2,34 +2,63 @@ package com.robotjatek.wplauncher.Components.ListView.States;
 
 import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.ListView.ListView;
-import com.robotjatek.wplauncher.Gestures.LongPressGesture;
-import com.robotjatek.wplauncher.Gestures.ScrollGesture;
-import com.robotjatek.wplauncher.Gestures.TapGesture;
+import com.robotjatek.wplauncher.Components.ListView.States.IdleStates.IdlePressState;
+import com.robotjatek.wplauncher.Components.ListView.States.IdleStates.IdleReadyState;
+import com.robotjatek.wplauncher.Components.ListView.States.IdleStates.IdleReleaseState;
+import com.robotjatek.wplauncher.Gestures.Gesture;
+import com.robotjatek.wplauncher.IState;
 
+/**
+ * Hierarchical state machine to represent idle state.
+ * Its purpose is to delegate gestures and calls to its substates
+ * @param <T> The type of the payload of the list
+ */
 public class IdleState<T> extends BaseState<T> {
+
+    public IState IDLE_READY_STATE() {
+        return new IdleReadyState<>(_context, this);
+    }
+
+    public IState PRESS_STATE(ListItem<T> item, float downX, float downY) {
+        return new IdlePressState<>(_context, this, item, downX, downY);
+    }
+
+    public IState RELEASE_STATE(ListItem<T> item, boolean pressAlreadyVisible) {
+        return new IdleReleaseState<>(_context, this, item, pressAlreadyVisible);
+    }
+
+    private IState _state = IDLE_READY_STATE();
+
     public IdleState(ListView<T> context) {
         super(context);
     }
 
-    @Override
-    public boolean handleTap(TapGesture gesture) {
-        var item = getItemAt(gesture.getX(), gesture.getY());
-        item.ifPresent(ListItem::onTap);
-        return true;
+    public void changeState(IState state) {
+        _state.exit();
+        _state = state;
+        _state.enter();
     }
 
     @Override
-    public boolean handleScroll(ScrollGesture gesture) {
-        _context.changeState(_context.SCROLL_STATE(gesture.getY()));
-        return _context.handleGesture(gesture); // delegate the gesture to scroll state
+    public void enter() {
+        super.enter();
+        _state.enter();
     }
 
     @Override
-    public boolean handleLongPress(LongPressGesture gesture) {
-        if (_context.hasContextMenu()) {
-            _context.changeState(_context.CONTEXT_MENU_STATE(gesture.getX(), gesture.getY()));
-            return true; // menu opened, we consumed the interaction
-        }
-        return false; // no menu to open, tell the parent we didn't do anything with that gesture
+    public void exit() {
+        super.exit();
+        _state.exit();
+    }
+
+    @Override
+    public void update(float delta) {
+        super.update(delta);
+        _state.update(delta);
+    }
+
+    @Override
+    public boolean handleGesture(Gesture gesture) {
+        return _state.handleGesture(gesture);
     }
 }

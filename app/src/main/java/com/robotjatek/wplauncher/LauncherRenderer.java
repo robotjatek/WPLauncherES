@@ -47,6 +47,18 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
         GLES32.glEnable(GLES32.GL_CULL_FACE);
         GLES32.glFrontFace(GLES32.GL_CW);
         GLES32.glCullFace(GLES32.GL_BACK);
+
+        if (_shader != null) {
+            _shader.delete();
+        }
+        if (_renderer != null) {
+            _renderer.dispose();
+        }
+
+        while (!_navigationStack.isEmpty()) {
+            _navigationStack.pop().dispose();
+        }
+
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
         _navigationStack.push(new StartScreen(_context, this, _locationService, _appChangeReceiver));
@@ -91,9 +103,10 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
     public void onHomePressed() {
         if (!_navigationStack.isEmpty()) {
+            while (_navigationStack.size() > 1) {
+                _navigationStack.pop().dispose();
+            }
             var startScreen = _navigationStack.getLast();
-            _navigationStack.clear();
-            _navigationStack.add(startScreen);
             startScreen.onBackPressed();
         }
     }

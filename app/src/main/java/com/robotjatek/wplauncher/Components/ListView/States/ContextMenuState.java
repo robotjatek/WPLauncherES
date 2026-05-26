@@ -26,6 +26,12 @@ public class ContextMenuState<T> extends BaseState<T> {
     }
 
     @Override
+    public void exit() {
+        super.exit();
+        _context.closeContextMenu();
+    }
+
+    @Override
     public boolean handleTap(TapGesture gesture) {
         if (_menu.isTappedOn(gesture.getX(), gesture.getY())) {
             _menu.onTap(gesture.getX(), gesture.getY());

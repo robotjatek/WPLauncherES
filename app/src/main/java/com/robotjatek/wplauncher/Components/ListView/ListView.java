@@ -110,7 +110,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
                  continue;
             }
 
-            item.update(_itemDrawContext);
+            item.update(delta, _itemDrawContext);
             item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer);
         }
         GLES32.glDisable(GLES32.GL_SCISSOR_TEST);

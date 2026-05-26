@@ -51,21 +51,6 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         }
     }
 
-    private void setApp(App app) {
-        if (app != _lastApp) {
-            _lastApp = app;
-        }
-        if (_icon != null) {
-            _icon.dispose();
-        }
-        if (_titleLabel != null) {
-            _titleLabel.dispose();
-        }
-        _icon = new Icon(app.icon(), ICON_SIZE);
-        _titleLabel = new Label("", 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-        _dirty = true;
-    }
-
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
                      Tile tile, Position<Float> position, Size<Integer> size) {

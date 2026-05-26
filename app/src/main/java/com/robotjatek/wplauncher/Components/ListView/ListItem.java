@@ -19,7 +19,10 @@ public class ListItem<T> {
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _textLabel;
     private Icon _icon;
-    private final static Size<Integer> DEFAULT_SIZE = new Size<>(96, 96);
+    private float _scale = 1.0f;
+    private static final Size<Integer> DEFAULT_SIZE = new Size<>(96, 96);
+    private static final float TAP_ACTION_DELAY_MS = 50f;
+    private float _tapDelayRemainingMs = 0f;
 
     public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
         _onTap = onTap;
@@ -61,17 +64,21 @@ public class ListItem<T> {
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, IDrawContext<ListItem<T>> context, QuadRenderer renderer) {
         var x = context.xOf(this);
         var y = context.yOf(this);
-        var w = (int) context.widthOf(this);
-        var h = (int) context.heightOf(this);
+        var w = (int) (context.widthOf(this) * _scale);
+        var h = (int) (context.heightOf(this) * _scale);
         _layout.draw(delta, projMatrix, viewMatrix, renderer, new Position<>(x, y), new Size<>(w, h));
     }
 
-    public void update(IDrawContext<ListItem<T>> context) {
+    public void update(float delta, IDrawContext<ListItem<T>> context) {
+        updateTapDelay(delta);
         if (_dirty) {
-            var w = (int) context.widthOf(this);
-            var h = (int) context.heightOf(this);
-            _textLabel.setMaxWidth(w - h);
+            var w = (int) (context.widthOf(this) * _scale);
+            var h = (int) (context.heightOf(this) * _scale);
+            var xDiff = (w - context.widthOf(this)) / 2; // correction for the scaling
+            var yDiff = (h - context.heightOf(this)) / 2; // correction for the scaling
 
+            _textLabel.setMaxWidth(w - h);
+            _textLabel.setTextSize((int)(60 * _scale));
             var labelX = w * 0.02f;
             var labelY = (h - _textLabel.measure().height()) / 2f;
 
@@ -79,19 +86,58 @@ public class ListItem<T> {
                 _icon.setSize(new Size<>(h, h));
                 labelX = _icon.measure().width() + w * 0.02f;
                 _layout.removeChild(_icon);
-                _layout.addChild(_icon, Position.ZERO);
+                _layout.addChild(_icon, new Position<>(-xDiff, -yDiff));
             }
 
             _layout.removeChild(_textLabel);
-            _layout.addChild(_textLabel, new Position<>(labelX, labelY));
+            _layout.addChild(_textLabel, new Position<>(-xDiff + labelX, -yDiff + labelY));
             _dirty = false;
         }
     }
 
-    public void onTap() {
+    /**
+     * Shrinks the item and cancels any pending tap event
+     */
+    public void onPress() {
+        cancelPendingTap();
+        setScale(0.97f);
+    }
+
+    public void onRelease(boolean fireTap) {
+        setScale(1f);
+        if (fireTap) {
+            scheduleTap();
+        }
+    }
+
+    public void cancelPendingTap() {
+        _tapDelayRemainingMs = 0f;
+    }
+
+    private void scheduleTap() {
+        _tapDelayRemainingMs = TAP_ACTION_DELAY_MS;
+    }
+
+    private void updateTapDelay(float delta) {
+        if (_tapDelayRemainingMs <= 0f) {
+            return;
+        }
+        _tapDelayRemainingMs -= delta;
+        if (_tapDelayRemainingMs <= 0f) {
+            _tapDelayRemainingMs = 0f;
+            runTapAction();
+        }
+    }
+
+    private void runTapAction() {
         if (_onTap != null) {
             _onTap.run();
         }
+    }
+
+    public void setScale(float scale) {
+        _scale = scale;
+        _dirty = true;
     }
 
     public void setDirty() {

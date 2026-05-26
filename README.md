@@ -115,7 +115,7 @@ Try to make it usable for the less crazy people
   - [ ] Feedback to the user on tap (Rotation/animations/etc)
     - [ ] Button
     - [x] Tiles
-    - [ ] List items
+    - [x] List items
     - [ ] Labels with onclick handlers
 - [x] Gesture system refactor
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)

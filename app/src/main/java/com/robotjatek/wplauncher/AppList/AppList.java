@@ -77,6 +77,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     }
 
     public void resetScroll() {
+        _list.changeState(_list.IDLE_STATE());
         _list.getScroll().setScrollOffset(0);
     }
 

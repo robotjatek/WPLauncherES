@@ -24,15 +24,4 @@ public abstract class IdleBaseState<T> implements IState {
     @Override
     public void update(float delta) {}
 
-    protected void abortPress(ListItem<T> item, boolean shrunk) {
-        if (shrunk) {
-            // if the item was shrunk, unshrunk it, and DO NOT schedule the tap event
-            // this is called when the item was only tapped for a brief period. E.g. right before scrolling
-            item.onRelease(false);
-        } else {
-            // if a fire event was scheduled, cancel it
-            item.cancelPendingTap();
-        }
-    }
-
 }

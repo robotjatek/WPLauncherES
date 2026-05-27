@@ -27,8 +27,6 @@ public class ListItem<T> implements ITouchable {
     private Icon _icon;
     private float _scale = 1.0f;
     private static final Size<Integer> DEFAULT_SIZE = new Size<>(96, 96);
-    private static final float TAP_ACTION_DELAY_MS = 50f;
-    private float _tapDelayRemainingMs = 0f;
 
     public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
         _onTap = onTap;
@@ -77,7 +75,6 @@ public class ListItem<T> implements ITouchable {
 
     public void update(float delta, IDrawContext<ListItem<T>> context) {
         _touchHandler.update(delta);
-        updateTapDelay(delta);
         if (_dirty) {
             var w = (int) (context.widthOf(this) * _scale);
             var h = (int) (context.heightOf(this) * _scale);
@@ -105,38 +102,18 @@ public class ListItem<T> implements ITouchable {
     /**
      * Shrinks the item and cancels any pending tap event
      */
+    @Override
     public void onPress() {
-        cancelPendingTap();
         setScale(0.97f);
     }
 
-    public void onRelease(boolean fireTap) {
+    @Override
+    public void onRelease() {
         setScale(1f);
-        if (fireTap) {
-            scheduleTap();
-        }
     }
 
-    public void cancelPendingTap() {
-        _tapDelayRemainingMs = 0f;
-    }
-
-    private void scheduleTap() {
-        _tapDelayRemainingMs = TAP_ACTION_DELAY_MS;
-    }
-
-    private void updateTapDelay(float delta) {
-        if (_tapDelayRemainingMs <= 0f) {
-            return;
-        }
-        _tapDelayRemainingMs -= delta;
-        if (_tapDelayRemainingMs <= 0f) {
-            _tapDelayRemainingMs = 0f;
-            runTapAction();
-        }
-    }
-
-    private void runTapAction() {
+    @Override
+    public void onAction() {
         if (_onTap != null) {
             _onTap.run();
         }

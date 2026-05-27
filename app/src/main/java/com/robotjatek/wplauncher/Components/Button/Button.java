@@ -23,8 +23,6 @@ public class Button implements UIElement, ITouchable {
     private boolean _disposed = false;
     private final Runnable _onTap;
     private boolean _isDirty = true;
-    private static final float TAP_ACTION_DELAY_MS = 50f;
-    private float _tapDelayRemainingMs = 0f;
     private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _label;
@@ -69,45 +67,22 @@ public class Button implements UIElement, ITouchable {
         }
 
         _borderLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
-
-        updateTapDelay(delta);
     }
 
     /**
      * Shrinks the item and cancels any pending tap event
      */
     public void onPress() {
-        cancelPendingTap();
         _layout.setBgColor(Colors.WHITE);
     }
 
-    public void onRelease(boolean fireTap) {
+    @Override
+    public void onRelease() {
         _layout.setBgColor(Colors.BLACK);
-        if (fireTap) {
-            scheduleTap();
-        }
     }
 
-    public void cancelPendingTap() {
-        _tapDelayRemainingMs = 0f;
-    }
-
-    private void scheduleTap() {
-        _tapDelayRemainingMs = TAP_ACTION_DELAY_MS;
-    }
-
-    private void updateTapDelay(float delta) {
-        if (_tapDelayRemainingMs <= 0f) {
-            return;
-        }
-        _tapDelayRemainingMs -= delta;
-        if (_tapDelayRemainingMs <= 0f) {
-            _tapDelayRemainingMs = 0f;
-            runTapAction();
-        }
-    }
-
-    private void runTapAction() {
+    @Override
+    public void onAction() {
         if (_onTap != null) {
             _onTap.run();
         }

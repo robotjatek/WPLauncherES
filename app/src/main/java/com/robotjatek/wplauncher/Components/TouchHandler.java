@@ -1,83 +1,92 @@
 package com.robotjatek.wplauncher.Components;
 
 public class TouchHandler {
-    private static final float PRESS_VISUAL_DELAY_MS = 100f;
-    private static final float ACTION_DELAY_MS = 50f;
-    private static final float MOVE_THRESHOLD_PX = 16f;
-    public static final float MOVE_THRESHOLD_SQUARED = MOVE_THRESHOLD_PX * MOVE_THRESHOLD_PX;
+    private enum State {
+        IDLE,
+        WAIT_FOR_PRESS,
+        PRESS_ACTIVE,
+        WAIT_FOR_ACTION
+    }
+
+    private static final float PRESS_DELAY = 100f;
+    private static final float MIN_PRESS_TIME = 50f;
+    private static final float ACTION_DELAY = 50f;
+    public static final float MOVE_THRESHOLD_SQUARED = 16f * 16f;
+
     private final ITouchable _target;
+    private State _state = State.IDLE;
     private float _timer = 0;
-    private boolean _isPressed = false;
-    private boolean _isWaitingForAction = false;
-    private float _downX;
-    private float _downY;
+    private boolean _fingerDown = false;
+    private float _downX, _downY;
 
     public TouchHandler(ITouchable target) {
         _target = target;
     }
 
     public void onDown(float x, float y) {
-        reset();
         _downX = x;
         _downY = y;
-        _timer = PRESS_VISUAL_DELAY_MS;
+        _fingerDown = true;
+        _state = State.WAIT_FOR_PRESS;
+        _timer = PRESS_DELAY;
     }
 
     public void onUp() {
-        if (_isPressed) {
-            _target.onRelease(false);
-            _isPressed = false;
-            _isWaitingForAction = true;
-            _timer = ACTION_DELAY_MS;
-        } else if (_timer > 0) {
-            _target.onPress();
-            _isWaitingForAction = true;
-            _timer = ACTION_DELAY_MS;
-        } else {
-            cancel();
+        _fingerDown = false;
+        if (_state == State.WAIT_FOR_PRESS) {
+            _timer = 0;
         }
     }
 
     public void onMove(float x, float y) {
-        if (_isWaitingForAction) {
-            return;
-        }
-
-        var dx = x - _downX;
-        var dy = y - _downY;
-        if (dx * dx + dy * dy > MOVE_THRESHOLD_SQUARED) {
-            cancel();
-        }
-    }
-
-    public void update(float delta) {
-        if (_timer <= 0) {
-            return;
-        }
-
-        _timer -= delta;
-        if (_timer <= 0) {
-            if (!_isPressed && !_isWaitingForAction) {
-                _isPressed = true;
-                _target.onPress();
-            } else if (_isWaitingForAction) {
-                _target.onRelease(true);
-                reset();
+        if (_state == State.WAIT_FOR_PRESS || _state == State.PRESS_ACTIVE) {
+            float dx = x - _downX;
+            float dy = y - _downY;
+            if (dx * dx + dy * dy > MOVE_THRESHOLD_SQUARED) {
+                cancel();
             }
         }
     }
 
-    public void cancel() {
-        if (_isPressed) {
-            _target.onRelease(false);
+    public void update(float delta) {
+        if (_state == State.IDLE) return;
+
+        if (_timer > 0) {
+            _timer -= delta;
         }
-        reset();
+
+        switch (_state) {
+            case WAIT_FOR_PRESS:
+                if (_timer <= 0) {
+                    _target.onPress();
+                    _state = State.PRESS_ACTIVE;
+                    _timer = MIN_PRESS_TIME;
+                }
+                break;
+
+            case PRESS_ACTIVE:
+                if (_timer <= 0 && !_fingerDown) {
+                    _target.onRelease();
+                    _state = State.WAIT_FOR_ACTION;
+                    _timer = ACTION_DELAY;
+                }
+                break;
+
+            case WAIT_FOR_ACTION:
+                if (_timer <= 0) {
+                    _target.onAction();
+                    _state = State.IDLE;
+                }
+                break;
+        }
     }
 
-    private void reset() {
+    public void cancel() {
+        if (_state == State.PRESS_ACTIVE) {
+            _target.onRelease();
+        }
+        _state = State.IDLE;
+        _fingerDown = false;
         _timer = 0;
-        _isPressed = false;
-        _isWaitingForAction = false;
     }
-
 }

@@ -1,12 +1,8 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
-import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
@@ -29,14 +25,12 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     private final StackLayout _layout;
     private final Button _colorPickerBtn;
     private Icon _icon;
-    private final Context _context;
     private final SettingsService _settings;
     private final float[] _view = new float[16];
     private Size<Integer> _size = new Size<>(-1, -1);
 
-    public ThemeScreen(IScreenNavigator navigator, SettingsService settings, Context context) {
+    public ThemeScreen(IScreenNavigator navigator, SettingsService settings) {
         _navigator = navigator;
-        _context = context;
         _settings = settings;
         _layout = new StackLayout();
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));

@@ -23,8 +23,8 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     private boolean _dirty = true;
     private final String _packageName;
     private final Deque<StatusBarNotification> _notifications = new ConcurrentLinkedDeque<>();
-    private Label _titleLabel;
-    private Icon _icon;
+    private final Label _titleLabel;
+    private final Icon _icon;
     private final AbsoluteLayout _layout;
     private final Label _notificationLabel;
     private boolean _isNotificationLabelAdded = false;

@@ -3,35 +3,23 @@ package com.robotjatek.wplauncher.Components.Button;
 import android.graphics.Typeface;
 
 import com.robotjatek.wplauncher.Colors;
-import com.robotjatek.wplauncher.Components.Button.States.IdleState;
-import com.robotjatek.wplauncher.Components.Button.States.PressedState;
-import com.robotjatek.wplauncher.Components.Button.States.ReleaseState;
+import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
+import com.robotjatek.wplauncher.Components.PressHandler;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
-import com.robotjatek.wplauncher.Gestures.Gesture;
+import com.robotjatek.wplauncher.Gestures.DownGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.IDrawContext;
-import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
-public class Button implements UIElement {
+public class Button implements UIElement, ITouchable {
 
-    public IState IDLE_STATE() {
-        return new IdleState(this);
-    }
-
-    public IState PRESSED_STATE(float downX, float downY) {
-        return new PressedState(this, downX, downY);
-    }
-
-    public IState RELEASE_STATE(boolean pressAlreadyVisible) {
-        return new ReleaseState(this, pressAlreadyVisible);
-    }
-
-    private IState _state = IDLE_STATE();
+    private final PressHandler _pressHandler = new PressHandler(this);
     private boolean _disposed = false;
     private final Runnable _onTap;
     private boolean _isDirty = true;
@@ -54,7 +42,8 @@ public class Button implements UIElement {
 
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
-        _state.update(delta);
+        _pressHandler.update(delta);
+
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
         var w = (int) drawContext.widthOf(this);
@@ -82,12 +71,6 @@ public class Button implements UIElement {
         _borderLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
 
         updateTapDelay(delta);
-    }
-
-    public void changeState(IState state) {
-        _state.exit();
-        _state = state;
-        _state.enter();
     }
 
     /**
@@ -131,8 +114,21 @@ public class Button implements UIElement {
     }
 
     @Override
-    public boolean handleGesture(Gesture gesture) {
-        return _state.handleGesture(gesture);
+    public boolean handleDown(DownGesture gesture) {
+        _pressHandler.onDown(gesture.getX(), gesture.getY());
+        return true;
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
+        _pressHandler.onUp();
+        return true;
+    }
+
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        _pressHandler.onMove(gesture.getX(), gesture.getY());
+        return true;
     }
 
     @Override

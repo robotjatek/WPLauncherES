@@ -4,7 +4,6 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.TileGrid.States.IdleStates.IdlePressState;
 import com.robotjatek.wplauncher.TileGrid.States.IdleStates.IdleReadyState;
-import com.robotjatek.wplauncher.TileGrid.States.IdleStates.IdleReleaseState;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
@@ -20,7 +19,6 @@ import com.robotjatek.wplauncher.TileGrid.TileGrid;
  * <ul>
  *   <li>{@link IdleReadyState} - default state, waiting for input</li>
  *   <li>{@link IdlePressState} - finger down with delayed press activation and movement cancellation</li>
- *   <li>{@link IdleReleaseState} - finger released, ensures press visibility timing and triggers launch</li>
  * </ul>
  */
 public class IdleState extends BaseState {
@@ -33,10 +31,6 @@ public class IdleState extends BaseState {
 
     public IState PRESS(Tile tile, float downX, float downY) {
         return new IdlePressState(this, _context, tile, downX, downY);
-    }
-
-    public IState RELEASE(Tile tile, boolean pressAlreadyVisible) {
-        return new IdleReleaseState(this, _context, tile, pressAlreadyVisible);
     }
 
     public void changeState(IState state) {

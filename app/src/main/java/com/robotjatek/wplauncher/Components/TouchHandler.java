@@ -1,11 +1,10 @@
 package com.robotjatek.wplauncher.Components;
 
-public class PressHandler {
+public class TouchHandler {
     private static final float PRESS_VISUAL_DELAY_MS = 100f;
     private static final float ACTION_DELAY_MS = 50f;
     private static final float MOVE_THRESHOLD_PX = 16f;
-    private static final float MOVE_THRESHOLD_SQUARED = MOVE_THRESHOLD_PX * MOVE_THRESHOLD_PX;
-
+    public static final float MOVE_THRESHOLD_SQUARED = MOVE_THRESHOLD_PX * MOVE_THRESHOLD_PX;
     private final ITouchable _target;
     private float _timer = 0;
     private boolean _isPressed = false;
@@ -13,7 +12,7 @@ public class PressHandler {
     private float _downX;
     private float _downY;
 
-    public PressHandler(ITouchable target) {
+    public TouchHandler(ITouchable target) {
         _target = target;
     }
 

@@ -7,7 +7,7 @@ import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
-import com.robotjatek.wplauncher.Components.PressHandler;
+import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.DownGesture;
@@ -19,7 +19,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class Button implements UIElement, ITouchable {
 
-    private final PressHandler _pressHandler = new PressHandler(this);
+    private final TouchHandler _touchHandler = new TouchHandler(this);
     private boolean _disposed = false;
     private final Runnable _onTap;
     private boolean _isDirty = true;
@@ -42,7 +42,7 @@ public class Button implements UIElement, ITouchable {
 
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
-        _pressHandler.update(delta);
+        _touchHandler.update(delta);
 
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
@@ -115,19 +115,19 @@ public class Button implements UIElement, ITouchable {
 
     @Override
     public boolean handleDown(DownGesture gesture) {
-        _pressHandler.onDown(gesture.getX(), gesture.getY());
+        _touchHandler.onDown(gesture.getX(), gesture.getY());
         return true;
     }
 
     @Override
     public boolean handleUp(UpGesture gesture) {
-        _pressHandler.onUp();
+        _touchHandler.onUp();
         return true;
     }
 
     @Override
     public boolean handleMove(MoveGesture gesture) {
-        _pressHandler.onMove(gesture.getX(), gesture.getY());
+        _touchHandler.onMove(gesture.getX(), gesture.getY());
         return true;
     }
 

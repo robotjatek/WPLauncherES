@@ -4,7 +4,6 @@ import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.ListView.ListView;
 import com.robotjatek.wplauncher.Components.ListView.States.IdleStates.IdlePressState;
 import com.robotjatek.wplauncher.Components.ListView.States.IdleStates.IdleReadyState;
-import com.robotjatek.wplauncher.Components.ListView.States.IdleStates.IdleReleaseState;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
 
@@ -21,10 +20,6 @@ public class IdleState<T> extends BaseState<T> {
 
     public IState PRESS_STATE(ListItem<T> item, float downX, float downY) {
         return new IdlePressState<>(_context, this, item, downX, downY);
-    }
-
-    public IState RELEASE_STATE(ListItem<T> item, boolean pressAlreadyVisible) {
-        return new IdleReleaseState<>(_context, this, item, pressAlreadyVisible);
     }
 
     private IState _state = IDLE_READY_STATE();

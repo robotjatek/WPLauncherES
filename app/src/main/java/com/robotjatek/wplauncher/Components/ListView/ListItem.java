@@ -4,15 +4,21 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
-public class ListItem<T> {
+public class ListItem<T> implements ITouchable {
+    private final TouchHandler _touchHandler = new TouchHandler(this);
+    public TouchHandler getTouchHandler() {
+        return _touchHandler;
+    }
     private Runnable _onTap;
     private boolean _dirty = true;
     private T _payload;
@@ -70,6 +76,7 @@ public class ListItem<T> {
     }
 
     public void update(float delta, IDrawContext<ListItem<T>> context) {
+        _touchHandler.update(delta);
         updateTapDelay(delta);
         if (_dirty) {
             var w = (int) (context.widthOf(this) * _scale);

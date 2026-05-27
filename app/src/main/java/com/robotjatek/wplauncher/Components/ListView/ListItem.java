@@ -4,15 +4,21 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
-public class ListItem<T> {
+public class ListItem<T> implements ITouchable {
+    private final TouchHandler _touchHandler = new TouchHandler(this);
+    public TouchHandler getTouchHandler() {
+        return _touchHandler;
+    }
     private Runnable _onTap;
     private boolean _dirty = true;
     private T _payload;
@@ -21,8 +27,6 @@ public class ListItem<T> {
     private Icon _icon;
     private float _scale = 1.0f;
     private static final Size<Integer> DEFAULT_SIZE = new Size<>(96, 96);
-    private static final float TAP_ACTION_DELAY_MS = 50f;
-    private float _tapDelayRemainingMs = 0f;
 
     public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
         _onTap = onTap;
@@ -70,7 +74,7 @@ public class ListItem<T> {
     }
 
     public void update(float delta, IDrawContext<ListItem<T>> context) {
-        updateTapDelay(delta);
+        _touchHandler.update(delta);
         if (_dirty) {
             var w = (int) (context.widthOf(this) * _scale);
             var h = (int) (context.heightOf(this) * _scale);
@@ -98,38 +102,18 @@ public class ListItem<T> {
     /**
      * Shrinks the item and cancels any pending tap event
      */
+    @Override
     public void onPress() {
-        cancelPendingTap();
         setScale(0.97f);
     }
 
-    public void onRelease(boolean fireTap) {
+    @Override
+    public void onRelease() {
         setScale(1f);
-        if (fireTap) {
-            scheduleTap();
-        }
     }
 
-    public void cancelPendingTap() {
-        _tapDelayRemainingMs = 0f;
-    }
-
-    private void scheduleTap() {
-        _tapDelayRemainingMs = TAP_ACTION_DELAY_MS;
-    }
-
-    private void updateTapDelay(float delta) {
-        if (_tapDelayRemainingMs <= 0f) {
-            return;
-        }
-        _tapDelayRemainingMs -= delta;
-        if (_tapDelayRemainingMs <= 0f) {
-            _tapDelayRemainingMs = 0f;
-            runTapAction();
-        }
-    }
-
-    private void runTapAction() {
+    @Override
+    public void onAction() {
         if (_onTap != null) {
             _onTap.run();
         }

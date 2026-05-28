@@ -20,6 +20,7 @@ public class InputBox implements UIElement, ITextInputHandler {
 
     private boolean _disposed = false;
     private boolean _isDirty = true;
+    private boolean _focused = false;
     private final float[] _modelMatrix = new float[16];
     private int _foregroundTexture = -1;
     private String _text = "";
@@ -41,7 +42,7 @@ public class InputBox implements UIElement, ITextInputHandler {
 
         if (_isDirty) {
             TileUtil.deleteTexture(_foregroundTexture);
-            if (_text.isEmpty()) {
+            if (_text.isEmpty() && !_focused) {
                 _foregroundTexture = TileUtil.createTextTexture(_placeholder, w - 1, h - 1, 48, Typeface.BOLD,
                         Colors.LIGHT_GRAY, Colors.BLACK, HorizontalAlign.LEFT, VerticalAlign.CENTER);
             } else {
@@ -75,7 +76,6 @@ public class InputBox implements UIElement, ITextInputHandler {
         return true;
     }
 
-
     @Override
     public void onTextInput(String text) {
         _text += text;
@@ -94,6 +94,18 @@ public class InputBox implements UIElement, ITextInputHandler {
             _text = _text.substring(0, _text.length() - 1);
             apply();
         }
+    }
+
+    @Override
+    public void onFocus() {
+        _focused = true;
+        _isDirty = true;
+    }
+
+    @Override
+    public void onFocusLost() {
+        _focused = false;
+        _isDirty = true;
     }
 
     private String replaceComposing(String base, String composing) {

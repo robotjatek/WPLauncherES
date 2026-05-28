@@ -4,4 +4,6 @@ public interface ITextInputHandler {
         void onTextInput(String newText);
         void onComposingText(String text);
         void onBackspace();
+        void onFocus();
+        void onFocusLost();
 }

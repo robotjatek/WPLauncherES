@@ -115,6 +115,7 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     @Override
     public void requestFocus(ITextInputHandler element) {
         _focusedInputHandler = element;
+        element.onFocus();
         element.onComposingText("");
         post(() -> {
             requestFocus();
@@ -125,6 +126,7 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
 
     @Override
     public void cancelFocus() {
+        _focusedInputHandler.onFocusLost();
         _focusedInputHandler = null;
         post(() -> {
             clearFocus();

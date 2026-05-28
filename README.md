@@ -112,14 +112,14 @@ Try to make it usable for the less crazy people
   - [x] Animated snap on StartScreen when back or home button is pressed
   - [x] Animate scroll to top on tile-grid when home or back button is pressed
   - [ ] Animate internal app/subpage opening (clock hub, launcher settings)
-  - [ ] Feedback to the user on tap (Rotation/animations/etc)
+  - [x] Feedback to the user on tap (Rotation/animations/etc)
     - [x] Button
     - [x] Tiles
     - [x] List items
     - [x] InputBox
     - [x] Labels with onclick handlers
+    - [ ] Context menu
 - [x] Gesture system refactor
-- [ ] Device resolution independent UI
 - [ ] Optimizations
   - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
   - [x] Reduce GC pressure when measuring labels and textblocks during rendering
@@ -192,6 +192,7 @@ Feature-creep!
 - [ ] Try perspective projection instead of orthographic
 - [ ] Re-ask for permissions from the launcher settings
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
+- [ ] Device resolution independent UI
 
 ### M5 - RC
 

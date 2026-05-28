@@ -19,6 +19,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class Button implements UIElement, ITouchable {
 
+    private static final int BORDER_SIZE_PX = 4;
     private final TouchHandler _touchHandler = new TouchHandler(this);
     private boolean _disposed = false;
     private final Runnable _onTap;
@@ -35,8 +36,6 @@ public class Button implements UIElement, ITouchable {
         _borderLayout.setBgColor(Colors.WHITE);
         _layout.setBgColor(Colors.BLACK);
     }
-
-    private static final int BORDER_SIZE_PX = 4;
 
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {

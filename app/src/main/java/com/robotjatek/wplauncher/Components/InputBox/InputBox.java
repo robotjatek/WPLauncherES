@@ -1,28 +1,29 @@
 package com.robotjatek.wplauncher.Components.InputBox;
 
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Label.Label;
+import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
-import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.TileUtil;
-import com.robotjatek.wplauncher.VerticalAlign;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.function.Consumer;
 
 // TODO: when refocusing, the keyboard should start with the text
 public class InputBox implements UIElement, ITextInputHandler {
 
+    private static final int BORDER_SIZE_PX = 4;
     private boolean _disposed = false;
     private boolean _isDirty = true;
     private boolean _focused = false;
-    private final float[] _modelMatrix = new float[16];
-    private int _foregroundTexture = -1;
+    private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
+    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final Label _label;
     private String _text = "";
     private final String _placeholder;
     private final Consumer<String> _onTextChanged;
@@ -31,6 +32,10 @@ public class InputBox implements UIElement, ITextInputHandler {
     public InputBox(String placeholder, Consumer<String> onTextChanged) {
         _placeholder = placeholder;
         _onTextChanged = onTextChanged;
+
+        _label = new Label(_placeholder, 48, Typeface.BOLD, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
+        _borderLayout.setBgColor(Colors.WHITE);
+        _layout.setBgColor(Colors.BLACK);
     }
 
     @Override
@@ -41,28 +46,24 @@ public class InputBox implements UIElement, ITextInputHandler {
         var h = (int) drawContext.heightOf(this);
 
         if (_isDirty) {
-            TileUtil.deleteTexture(_foregroundTexture);
+            _borderLayout.removeChild(_layout);
+            _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
+            _borderLayout.addChild(_layout, new Position<>((float) BORDER_SIZE_PX, (float) BORDER_SIZE_PX));
+            var textOffset = 16f;
+            _layout.removeChild(_label);
+            _layout.addChild(_label, new Position<>(textOffset, (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
+
             if (_text.isEmpty() && !_focused) {
-                _foregroundTexture = TileUtil.createTextTexture(_placeholder, w - 1, h - 1, 48, Typeface.BOLD,
-                        Colors.LIGHT_GRAY, Colors.BLACK, HorizontalAlign.LEFT, VerticalAlign.CENTER);
+                _label.setText(_placeholder);
+                _label.setTextColor(Colors.LIGHT_GRAY);
             } else {
-                _foregroundTexture = TileUtil.createTextTexture(_text, w - 1, h - 1, 48, Typeface.BOLD,
-                        Colors.WHITE, Colors.BLACK, HorizontalAlign.LEFT, VerticalAlign.CENTER);
+                _label.setText(_text);
+                _label.setTextColor(Colors.WHITE);
             }
             _isDirty = false;
         }
 
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, w, h, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.drawFlat(proj, _modelMatrix, Colors.WHITE);
-
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x + 4, y + 4, 0);
-        Matrix.scaleM(_modelMatrix, 0, w - 8, h - 8, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _foregroundTexture);
+        _borderLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
     }
 
     @Override
@@ -127,7 +128,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_foregroundTexture);
+            _borderLayout.dispose();
             _disposed = true;
         }
     }

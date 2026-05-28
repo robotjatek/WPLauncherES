@@ -118,7 +118,7 @@ Try to make it usable for the less crazy people
     - [x] List items
     - [x] InputBox
     - [x] Labels with onclick handlers
-    - [ ] Context menu
+    - [x] Context menu
 - [x] Gesture system refactor
 - [ ] Optimizations
   - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
@@ -169,7 +169,6 @@ Try it at your own risk
 - [ ] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
 - [ ] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
 - [ ] Maybe a closed beta (?)
-- [ ] TBD
 
 ## M4 - Beta
 

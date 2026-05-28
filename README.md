@@ -107,11 +107,10 @@ Try to make it usable for the less crazy people
 - [x] Make ListItem use high level UI components
 - [x] Embeddable ListView component
   - [x] Make ListPage use ListView internally
-- [ ] Animations 
+- [x] Animations 
   - [x] Swipe animation on StartScreen
   - [x] Animated snap on StartScreen when back or home button is pressed
   - [x] Animate scroll to top on tile-grid when home or back button is pressed
-  - [ ] Animate internal app/subpage opening (clock hub, launcher settings)
   - [x] Feedback to the user on tap (Rotation/animations/etc)
     - [x] Button
     - [x] Tiles
@@ -120,7 +119,7 @@ Try to make it usable for the less crazy people
     - [x] Labels with onclick handlers
     - [x] Context menu
 - [x] Gesture system refactor
-- [ ] Optimizations
+- [x] Optimizations
   - [x] Fix: janky scroll on the TileGrid + remain in ScrollState while flinging
   - [x] Reduce GC pressure when measuring labels and textblocks during rendering
   - [x] Reduce icon texture size in the app-list to 96x96
@@ -129,7 +128,7 @@ Try to make it usable for the less crazy people
   - [x] Optimize text wrapping in textblock
   - [x] Do not render list items that are outside the viewport
   - [x] Do not store textures when a single uniform color can be used (e.g. for the tile background)
-- [ ] Bug fixes
+- [x] Bug fixes
   - [x] View crash logs
   - [x] Fix: crash on empty notification content
   - [x] Fix: crash on concurrent access to navigation stack
@@ -186,6 +185,8 @@ Feature-creep!
 - [ ] Light mode/Dark mode support
 - [ ] Dropdown
 - [ ] Radiobutton
+- [ ] Animated tile resize
+- [ ] Animate internal app/subpage opening (clock hub, launcher settings)
 - [ ] Group apps by the first letter in the app list
 - [ ] Set background image for the start screen + transparency option for tiles
 - [ ] Try perspective projection instead of orthographic
@@ -212,7 +213,7 @@ Feature-creep!
 
 ### Current progress
 
-M3 is in progress
+M3.5 is in progress
 
 ## Planned live custom tiles / "widgets"
 

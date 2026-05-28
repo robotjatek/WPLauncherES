@@ -90,14 +90,21 @@ public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
         return _options.size() * ITEM_HEIGHT_PX;
     }
 
-    public void onTap(float x, float y) {
-        var tappedItem = getOptionAt(x, y);
-        tappedItem.ifPresent(t -> t.onTap(_payload));
-    }
-
     public boolean isTappedOn(float x, float y) {
         return x >= _context.xOf(this) && x <= _context.xOf(this) + _context.widthOf(this) &&
                 y >= _context.yOf(this) && y <= _context.yOf(this) + _context.heightOf(this);
+    }
+
+    public void onDown(float x, float y) {
+        getOptionAt(x, y).ifPresent(o -> o.getTouchHandler().onDown(x, y));
+    }
+
+    public void onUp() {
+        _options.forEach(o -> o.getTouchHandler().onUp());
+    }
+
+    public void onMove(float x, float y) {
+        _options.forEach(o -> o.getTouchHandler().onMove(x, y));
     }
 
     private Optional<MenuOption<T>> getOptionAt(float x, float y) {

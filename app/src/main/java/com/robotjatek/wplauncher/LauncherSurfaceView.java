@@ -126,7 +126,9 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
 
     @Override
     public void cancelFocus() {
-        _focusedInputHandler.onFocusLost();
+        if (_focusedInputHandler != null) {
+            _focusedInputHandler.onFocusLost();
+        }
         _focusedInputHandler = null;
         post(() -> {
             clearFocus();

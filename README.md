@@ -117,7 +117,7 @@ Try to make it usable for the less crazy people
     - [x] Tiles
     - [x] List items
     - [ ] InputBox
-    - [ ] Labels with onclick handlers
+    - [x] Labels with onclick handlers
 - [x] Gesture system refactor
 - [ ] Device resolution independent UI
 - [ ] Optimizations

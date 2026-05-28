@@ -4,16 +4,20 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.Components.UIElement;
-import com.robotjatek.wplauncher.Gestures.TapGesture;
+import com.robotjatek.wplauncher.Gestures.DownGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
-public class Label implements UIElement {
+public class Label implements UIElement, ITouchable {
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private String _text;
@@ -21,11 +25,13 @@ public class Label implements UIElement {
     private int _typeFace;
     private int _textColor;
     private int _bgColor;
+    private float _scale = 1f;
     private float _maxWidth; // -1 means no limit
     private boolean _dirty = true;
     private int _textureId = -1;
     private final Runnable _onTap;
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final TouchHandler _touchHandler = new TouchHandler(this);
 
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
         this(text, textSize, typeFace, textColor, bgColor, -1, null);
@@ -43,10 +49,16 @@ public class Label implements UIElement {
 
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+        _touchHandler.update(delta);
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
-        var w = (int)drawContext.widthOf(this);
-        var h = (int)drawContext.heightOf(this);
+        var w = (int) drawContext.widthOf(this) * _scale;
+        var h = (int) drawContext.heightOf(this) * _scale;
+
+        var xDiff = (w - drawContext.widthOf(this)) / 2f;
+        var yDiff = (h - drawContext.heightOf(this)) / 2f;
+        var correctedX = x - xDiff;
+        var correctedY = y - yDiff;
 
         if (_dirty) {
             if (_textureId > 0) {
@@ -60,9 +72,9 @@ public class Label implements UIElement {
             var displayText = _maxWidth > 0 ? truncateText(_text, _maxWidth) : _text;
 
             _textureId = TileUtil.createTextTexture(displayText,
-                    w,
-                    h,
-                    _textSize,
+                    (int) w,
+                    (int) h,
+                    (int) (_textSize * _scale),
                     _typeFace,
                     _textColor,
                     _bgColor,
@@ -76,7 +88,7 @@ public class Label implements UIElement {
         }
 
         Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0);
+        Matrix.translateM(_modelMatrix, 0, correctedX, correctedY, 0);
         Matrix.scaleM(_modelMatrix, 0, w, h, 0);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         renderer.draw(proj, _modelMatrix, _textureId);
@@ -184,11 +196,46 @@ public class Label implements UIElement {
     }
 
     @Override
-    public boolean handleTap(TapGesture gesture) {
+    public boolean handleDown(DownGesture gesture) {
+        if (_onTap == null) {
+            return false;
+        }
+
+        _touchHandler.onDown(gesture.getX(), gesture.getY());
+        return true;
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
+        if (_onTap == null) {
+            return false;
+        }
+
+        _touchHandler.onUp();
+        return true;
+    }
+
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        _touchHandler.onMove(gesture.getX(), gesture.getY());
+        return true;
+    }
+
+    @Override
+    public void onPress() {
+        _scale = 0.95f;
+    }
+
+    @Override
+    public void onRelease() {
+        _scale = 1f;
+    }
+
+    @Override
+    public void onAction() {
         if (_onTap != null) {
             _onTap.run();
         }
-        return true;
     }
 
     @Override

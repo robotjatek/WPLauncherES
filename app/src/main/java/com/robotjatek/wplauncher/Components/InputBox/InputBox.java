@@ -109,6 +109,12 @@ public class InputBox implements UIElement, ITextInputHandler {
         _isDirty = true;
     }
 
+    @Override
+    public void clearText() {
+        _text = "";
+        apply();
+    }
+
     private String replaceComposing(String base, String composing) {
         int i = 0;
         while (i < base.length() &&

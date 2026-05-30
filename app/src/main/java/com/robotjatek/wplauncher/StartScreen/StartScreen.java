@@ -114,6 +114,7 @@ public class StartScreen implements IPageNavigator, IScreen {
     @Override
     public void onBackPressed() {
         _pageOffset =  _pageOffset - _currentPage * _screenWidth;
+        _pages.get(_currentPage).onBackPressed();
         _currentPage = 0;
         changeState(SNAP_STATE());
         _tileGrid.resetScroll();

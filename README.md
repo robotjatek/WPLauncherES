@@ -156,7 +156,7 @@ Try it at your own risk
 - [x] Adjust button border drawing when no icon is set
 - [ ] About page in Launcher Settings
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
-- [ ] Clear search-box on back press in the app-list
+- [x] Clear search-box when pressing back press on the app-list
 - [ ] Support cursor in input boxes
 -  [ ] Show current cursor position
 -  [ ] Set cursor position

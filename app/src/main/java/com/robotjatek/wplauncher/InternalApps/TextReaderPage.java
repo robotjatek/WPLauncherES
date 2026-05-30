@@ -7,6 +7,7 @@ import android.util.Log;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
+import com.robotjatek.wplauncher.Components.ScrollView.ScrollView;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
 import com.robotjatek.wplauncher.Gestures.Gesture;
@@ -32,6 +33,8 @@ public class TextReaderPage implements IScreen {
     private final StackLayout _layout = new StackLayout();
     private final TextBlock _textbox;
     private final Button _deleteButton; // delete the file and close the page
+    private final ScrollView _scrollView;
+
     private final File _file;
     private boolean _dirty = true;
     private final Consumer<File> _onClose;
@@ -41,10 +44,12 @@ public class TextReaderPage implements IScreen {
         _file = file;
         _onClose = onClose;
         var content = readFileContent(file);
-        _textbox = new TextBlock(content, 38, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, -1);
         _deleteButton = new Button("Delete log", null, this::deleteFileAndExit);
+        _textbox = new TextBlock(content, 38, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, -1);
+        _scrollView = new ScrollView(_textbox, 0, LauncherRenderer.SCREEN_DATA.bottomInset);
         _layout.addChild(_deleteButton);
-        _layout.addChild(_textbox); // TODO: make this scrollable. ScrollView?
+        _layout.addChild(_scrollView);
+
     }
 
     @Override
@@ -68,7 +73,7 @@ public class TextReaderPage implements IScreen {
         _size = new Size<>(width, height);
         var itemsHeight = _deleteButton.measure().height() + StackLayout.TOP_MARGIN_PX;
         _textbox.setMaxWidth(width);
-        _textbox.setMaxHeight(height - itemsHeight - LauncherRenderer.SCREEN_DATA.bottomInset);
+        _scrollView.setSize(new Size<>(width, height - itemsHeight - LauncherRenderer.SCREEN_DATA.topInset));
         _layout.onResize(width, height);
     }
 

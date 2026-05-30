@@ -152,7 +152,7 @@ Try to make it usable for the less crazy people
 
 Try it at your own risk
 
-- [ ] Make the crash-log viewer scrollable (scrollview component)
+- [x] Make the crash-log viewer scrollable (ScrollView component)
 - [x] Adjust button border drawing when no icon is set
 - [ ] About page in Launcher Settings
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)

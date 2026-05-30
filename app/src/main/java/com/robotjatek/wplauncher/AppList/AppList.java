@@ -207,4 +207,9 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
             i.setPayload(app);
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        _searchBox.clearText();
+    }
 }

@@ -17,5 +17,7 @@ public interface Page extends IGestureHandler {
     boolean handleGesture(Gesture gesture);
 
     void dispose();
+
+    default void onBackPressed() {}
 }
 

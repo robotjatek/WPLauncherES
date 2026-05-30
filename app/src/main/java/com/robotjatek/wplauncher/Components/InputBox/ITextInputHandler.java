@@ -6,4 +6,5 @@ public interface ITextInputHandler {
         void onBackspace();
         void onFocus();
         void onFocusLost();
+        void clearText();
 }

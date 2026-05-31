@@ -116,10 +116,10 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     public void requestFocus(ITextInputHandler element) {
         _focusedInputHandler = element;
         element.onFocus();
-        element.onComposingText("");
         post(() -> {
             requestFocus();
             var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.restartInput(this);
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
         });
     }

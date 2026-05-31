@@ -68,9 +68,7 @@ public class Button implements UIElement, ITouchable {
         _borderLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
     }
 
-    /**
-     * Shrinks the item and cancels any pending tap event
-     */
+    @Override
     public void onPress() {
         _layout.setBgColor(Colors.WHITE);
     }

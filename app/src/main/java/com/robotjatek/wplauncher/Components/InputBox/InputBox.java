@@ -14,7 +14,6 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.function.Consumer;
 
-// TODO: when refocusing, the keyboard should start with the text
 public class InputBox implements UIElement, ITextInputHandler {
 
     private static final int BORDER_SIZE_PX = 4;
@@ -25,6 +24,10 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _label;
     private String _text = "";
+    private int _cursorPosition = 0;
+    private final static int BLINK_TIMEOUT = 500;
+    private float _blinkTimer = BLINK_TIMEOUT; // ms
+    private boolean _cursorVisible = true;
     private final String _placeholder;
     private final Consumer<String> _onTextChanged;
     private final Size<Integer> _size = new Size<>(0, 100); // TODO: configurable size
@@ -45,6 +48,15 @@ public class InputBox implements UIElement, ITextInputHandler {
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
+        if (_focused) {
+            _blinkTimer += delta;
+            if (_blinkTimer > BLINK_TIMEOUT) {
+                _cursorVisible = !_cursorVisible;
+                _blinkTimer = 0f;
+                _isDirty = true;
+            }
+        }
+
         if (_isDirty) {
             _borderLayout.removeChild(_layout);
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
@@ -57,7 +69,9 @@ public class InputBox implements UIElement, ITextInputHandler {
                 _label.setText(_placeholder);
                 _label.setTextColor(Colors.LIGHT_GRAY);
             } else {
-                _label.setText(_text);
+                var cursor = _cursorVisible ? "|" : " ";
+                var textWithCursor = _text.substring(0, _cursorPosition) + cursor + _text.substring(_cursorPosition);
+                _label.setText(textWithCursor);
                 _label.setTextColor(Colors.WHITE);
             }
             _isDirty = false;
@@ -78,21 +92,24 @@ public class InputBox implements UIElement, ITextInputHandler {
     }
 
     @Override
-    public void onTextInput(String text) {
-        _text += text;
+    public void onTextInput(String input) {
+        _text = _text.substring(0, _cursorPosition) + input + _text.substring(_cursorPosition);
+        _cursorPosition += input.length();
         apply();
     }
 
     @Override
     public void onComposingText(String text) {
         _text = replaceComposing(_text, text);
+        _cursorPosition += text.length();
         apply();
     }
 
     @Override
     public void onBackspace() {
-        if (!_text.isEmpty()) {
-            _text = _text.substring(0, _text.length() - 1);
+        if (_cursorPosition > 0) {
+            _text = _text.substring(0, _cursorPosition - 1) + _text.substring(_cursorPosition);
+            _cursorPosition--;
             apply();
         }
     }
@@ -112,7 +129,18 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public void clearText() {
         _text = "";
+        _cursorPosition = 0;
         apply();
+    }
+
+    @Override
+    public String getText() {
+        return _text;
+    }
+
+    @Override
+    public int getCursorPosition() {
+        return _cursorPosition;
     }
 
     private String replaceComposing(String base, String composing) {
@@ -122,7 +150,6 @@ public class InputBox implements UIElement, ITextInputHandler {
                 base.charAt(i) == composing.charAt(i)) {
             i++;
         }
-
         return base.substring(0, i) + composing.substring(i);
     }
 

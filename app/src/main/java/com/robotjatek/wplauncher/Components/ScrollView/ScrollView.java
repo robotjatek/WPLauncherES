@@ -98,7 +98,6 @@ public class ScrollView implements UIElement {
         var contentHeight = _drawContext.heightOf(_child);
         // The minimum scroll offset is the difference between viewport and content
         // If content is smaller than viewport, min should be 0 (no scrolling)
-        //var minScroll = Math.min(0, viewportHeight - contentHeight - _bottomPadding);
         var minScroll = Math.min(0, viewportHeight - (contentHeight + _topPadding + _bottomPadding));
         _scroll.setBounds(minScroll, 0);
     }

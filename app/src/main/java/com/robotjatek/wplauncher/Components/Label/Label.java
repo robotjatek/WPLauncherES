@@ -191,8 +191,8 @@ public class Label implements UIElement, ITouchable {
         _dirty = true;
     }
 
-    public int getTypeFace() {
-        return _typeFace;
+    public Typeface getTypeFace() {
+        return _paint.getTypeface();
     }
 
     @Override

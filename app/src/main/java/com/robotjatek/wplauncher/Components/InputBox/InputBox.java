@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Components.InputBox;
 
+import android.graphics.Paint;
 import android.graphics.Typeface;
 
 import com.robotjatek.wplauncher.Colors;
@@ -7,6 +8,8 @@ import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
+import com.robotjatek.wplauncher.Gestures.DownGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -25,8 +28,9 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final Label _label;
     private String _text = "";
     private int _cursorPosition = 0;
-    private final static int BLINK_TIMEOUT = 500;
-    private float _blinkTimer = BLINK_TIMEOUT; // ms
+    private float _textStartX = 0;
+    private final static int BLINK_TIMEOUT = 500; // ms
+    private float _blinkTimer = BLINK_TIMEOUT;
     private boolean _cursorVisible = true;
     private final String _placeholder;
     private final Consumer<String> _onTextChanged;
@@ -48,20 +52,14 @@ public class InputBox implements UIElement, ITextInputHandler {
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
-        if (_focused) {
-            _blinkTimer += delta;
-            if (_blinkTimer > BLINK_TIMEOUT) {
-                _cursorVisible = !_cursorVisible;
-                _blinkTimer = 0f;
-                _isDirty = true;
-            }
-        }
+        blinkCursor(delta);
 
         if (_isDirty) {
             _borderLayout.removeChild(_layout);
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
             _borderLayout.addChild(_layout, new Position<>((float) BORDER_SIZE_PX, (float) BORDER_SIZE_PX));
             var textOffset = 16f;
+            _textStartX = x + BORDER_SIZE_PX + textOffset; // TODO: tuti?
             _layout.removeChild(_label);
             _layout.addChild(_label, new Position<>(textOffset, (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
 
@@ -69,7 +67,7 @@ public class InputBox implements UIElement, ITextInputHandler {
                 _label.setText(_placeholder);
                 _label.setTextColor(Colors.LIGHT_GRAY);
             } else {
-                var cursor = _cursorVisible ? "|" : " ";
+                var cursor = _cursorVisible ? "|" : " "; // TODO: do not integrate the cursor into the text, but draw an "adorner" above instead
                 var textWithCursor = _text.substring(0, _cursorPosition) + cursor + _text.substring(_cursorPosition);
                 _label.setText(textWithCursor);
                 _label.setTextColor(Colors.WHITE);
@@ -80,6 +78,17 @@ public class InputBox implements UIElement, ITextInputHandler {
         _borderLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
     }
 
+    private void blinkCursor(float delta) {
+        if (_focused) {
+            _blinkTimer += delta;
+            if (_blinkTimer > BLINK_TIMEOUT) {
+                _cursorVisible = !_cursorVisible;
+                _blinkTimer = 0f;
+                _isDirty = true;
+            }
+        }
+    }
+
     @Override
     public Size<Integer> measure() {
         return _size;
@@ -87,8 +96,54 @@ public class InputBox implements UIElement, ITextInputHandler {
 
     @Override
     public boolean handleTap(TapGesture gesture) {
-        gesture.getUIContext().requestFocus(this);
+        if (!_focused) {
+            gesture.getUIContext().requestFocus(this);
+        }
         return true;
+    }
+
+    @Override
+    public boolean handleDown(DownGesture gesture) {
+        if (_focused) {
+            setCursorPosition(gesture.getX());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        if (_focused) {
+            setCursorPosition(gesture.getX());
+            return true;
+        }
+        return false;
+    }
+
+    private void setCursorPosition(float x) {
+        var insideX = x - _textStartX;
+        if (insideX <= 0) {
+            _cursorPosition = 0;
+            _isDirty = true;
+            return;
+        }
+
+        var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setTypeface(_label.getTypeFace());
+        paint.setTextSize(_label.getTextSize());
+        for (var i = 0; i < _text.length(); i++) {
+            var measured = paint.measureText(_text, 0, i);
+            if (measured >= insideX) {
+                var prev = i > 0 ? paint.measureText(_text, 0, i - 1) : 0;
+                _cursorPosition = (insideX - prev < measured - insideX) ? i - 1 : i;
+                _isDirty = true;
+                return;
+            }
+        }
+
+        // text is shorter than the tap position
+        _cursorPosition = _text.length();
+        _isDirty = true;
     }
 
     @Override

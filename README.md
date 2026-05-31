@@ -1,7 +1,6 @@
 # WPLauncher ES
 
-A reimplementation of my original WPLauncher project using OpenGL ES. 
-The goal remains the same: a WP7/8 style launcher, now with no external UI frameworks.
+A Windows Phone inspired launcher for Android written in OpenGL ES
 
 ## Planned features
 
@@ -157,11 +156,11 @@ Try it at your own risk
 - [ ] About page in Launcher Settings
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [x] Clear search-box when pressing back on the app-list
-- [ ] Support cursor in input boxes
--  [ ] Show current cursor position
--  [ ] Set cursor position
--  [ ] Insert text at cursor position
--  [ ] Delete text at cursor position
+- [x] Support cursor in input boxes
+  - [x] Show current cursor position
+  - [x] Set cursor position
+  - [x] Insert text at cursor position
+  - [x] Delete text at cursor position
 - [ ] Debug menu
   - [ ] Crash app button
   - [ ] Reset StartPage state machine button
@@ -193,6 +192,7 @@ Feature-creep!
 - [ ] Re-ask for permissions from the launcher settings
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI
+- [ ] Cursor handle in the input box
 
 ### M5 - RC
 

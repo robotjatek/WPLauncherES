@@ -37,14 +37,10 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
         {
            @Override
            public boolean onSingleTapUp(@NonNull MotionEvent e) {
-               if (_focusedInputHandler != null) {
-                   post(_uiContext::cancelFocus);
-               } else {
-                   // extract the x and y coordinates before queueing the event, to avoid potential issues with the MotionEvent being recycled before the event is processed
-                   var x = e.getX();
-                   var y = e.getY();
-                   queueEvent(() -> _renderer.handleGesture(new TapGesture(x, y, _uiContext)));
-               }
+               // extract the x and y coordinates before queueing the event, to avoid potential issues with the MotionEvent being recycled before the event is processed
+               var x = e.getX();
+               var y = e.getY();
+               queueEvent(() -> _renderer.handleGesture(new TapGesture(x, y, _uiContext)));
                return true;
            }
 
@@ -116,10 +112,10 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     public void requestFocus(ITextInputHandler element) {
         _focusedInputHandler = element;
         element.onFocus();
-        element.onComposingText("");
         post(() -> {
             requestFocus();
             var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.restartInput(this);
             imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT);
         });
     }

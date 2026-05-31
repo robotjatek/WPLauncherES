@@ -159,7 +159,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     @Override
     public boolean isCatchingGestures() {
-        return _list.isCatchingGestures();
+        return _list.isCatchingGestures() || !_searchBox.getText().isEmpty();
     }
 
     @Override

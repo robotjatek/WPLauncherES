@@ -18,9 +18,6 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
-/**
- * Note: Settings page should be completely STATELESS as it's a singleton!
- */
 public class Settings implements IScreen {
 
     private boolean _disposed = false;

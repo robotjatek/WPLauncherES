@@ -72,7 +72,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         var icon = ContextCompat.getDrawable(context, R.drawable.close_circle);
         _unpinButton = new Adorner(() -> _commands.add(() -> {
             if (_selectedTile != null) {
-                _tileService.queueUnpinTile(_selectedTile.getPackageName());
+                _tileService.queueUnpinTile(_selectedTile.getPackageName(), _selectedTile.getApp().className());
                 cancelSelection();
             }
         }), icon, new Position<>(1f, 0f), adornerDrawContext);
@@ -259,6 +259,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     @Override
     public void onAppRemove(String packageName) {
-        _tileService.queueUnpinTile(packageName);
+        _tileService.queueUnpinAllTilesForPackage(packageName);
     }
 }

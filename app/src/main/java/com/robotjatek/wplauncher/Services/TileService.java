@@ -1,6 +1,8 @@
 package com.robotjatek.wplauncher.Services;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
@@ -79,9 +81,9 @@ public class TileService implements OnChangeListener<AccentColor> {
      * NOTE: this has to be put in the command queue because it disposes the unpinned tile
      * @param packageName The name of the package the tile corresponds to
      */
-    public void queueUnpinTile(String packageName) {
+    public void queueUnpinTile(String packageName, String className) {
         var tile = _tiles.stream()
-                .filter(t -> t.getPackageName().equals(packageName))
+                .filter(t -> t.getPackageName().equals(packageName) && t.getApp().className().equals(className))
                 .findFirst();
         tile.ifPresent(t -> _tileCommands.add(() -> {
             _tiles.remove(t);
@@ -92,10 +94,27 @@ public class TileService implements OnChangeListener<AccentColor> {
         }));
     }
 
+    public void queueUnpinAllTilesForPackage(String packageName) {
+        var tiles = _tiles.stream()
+                .filter(t -> t.getPackageName().equals(packageName))
+                .toList();
+        for (var t : tiles) {
+            _tileCommands.add(() -> {
+               _tiles.remove(t);
+               t.dispose();
+               notifySubscribers();
+               compactGrid();
+               persistTiles();
+            });
+        }
+    }
+
     public boolean isPinned(App app) {
         return _tiles.stream()
-                .anyMatch(t -> t.getPackageName().equals(app.packageName()));
+                .anyMatch(t -> t.getApp().packageName().equals(app.packageName()) &&
+                        Objects.equals(t.getApp().className(), app.className()));
     }
+
 
     public void resizeTile(Tile tile) {
         // 4x2 => 2x2 => 1x1 => 4x2
@@ -128,21 +147,21 @@ public class TileService implements OnChangeListener<AccentColor> {
                 var colSpan = obj.getInt("colSpan");
                 var rowSpan = obj.getInt("rowSpan");
                 var title = obj.getString("title");
-                App app;
+                final App app;
                 if (obj.has("packageName")) {
                     var packageName = obj.getString("packageName");
+                    var className = obj.getString("className");
                     if (packageName.startsWith("launcher:")) {
                         app = _internalAppsService.getInternalApp(packageName);
                     } else {
-                        var intent = _context.getPackageManager().getLaunchIntentForPackage(packageName);
-                        if (intent == null) { // the package was uninstalled
-                            Log.w("loadPersistedTiles", "Could not find package: " + packageName);
-                            continue;
-                        }
+                        var intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                        intent.setComponent(new ComponentName(packageName, className));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         var icon = _context.getPackageManager().getActivityIcon(intent);
                         var info = _context.getPackageManager().getApplicationInfo(packageName, 0);
                         var isSystemApp = (info.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
-                        app = new App(title, packageName, icon, () -> _context.startActivity(intent), isSystemApp);
+                        app = new App(title, packageName, className, icon, () -> _context.startActivity(intent), isSystemApp);
                     }
                     tiles.add(createTile(new Position<>(x, y), new Size<>(colSpan, rowSpan), app));
                 }
@@ -204,6 +223,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                 tileJson.put("rowSpan", tile.getSize().height());
                 tileJson.put("title", tile.getApp().name());
                 tileJson.put("packageName", tile.getPackageName());
+                tileJson.put("className", tile.getApp().className());
                 tileArray.put(tileJson);
             }
 

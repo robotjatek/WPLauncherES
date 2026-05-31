@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher.Services;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -40,16 +41,15 @@ public class AppChangeReceiver extends BroadcastReceiver {
                 var replacing = intent.getBooleanExtra(Intent.EXTRA_REPLACING, false);
                 if (replacing) {
                     try {
-                        var app = loadAppByPackageName(context, packageName);
-                        _listeners.forEach(l -> l.onAppReplace(app));
+                        var apps = loadAppsByPackageName(context, packageName);
+                        apps.forEach(app -> _listeners.forEach(l -> l.onAppReplace(app)));
                     } catch (PackageManager.NameNotFoundException e) {
                         Log.e("AppChangeReceiver", "Installed app not found: " + packageName);
                     }
-
                 } else {
                     try {
-                        var app = loadAppByPackageName(context, packageName);
-                        _listeners.forEach(l -> l.onAppInstall(app));
+                        var apps = loadAppsByPackageName(context, packageName);
+                        apps.forEach(app -> _listeners.forEach(l -> l.onAppInstall(app)));
                     } catch (PackageManager.NameNotFoundException e) {
                         Log.e("AppChangeReceiver", "Installed app not found: " + packageName);
                     }
@@ -64,8 +64,8 @@ public class AppChangeReceiver extends BroadcastReceiver {
             }
             case Intent.ACTION_PACKAGE_REPLACED -> {
                 try {
-                    var app = loadAppByPackageName(context, packageName);
-                    _listeners.forEach(l -> l.onAppReplace(app));
+                    var apps = loadAppsByPackageName(context, packageName);
+                    apps.forEach(app -> _listeners.forEach(l -> l.onAppReplace(app)));
                 } catch (PackageManager.NameNotFoundException e) {
                     Log.e("AppChangeReceiver", "Installed app not found: " + packageName);
                 }
@@ -73,13 +73,24 @@ public class AppChangeReceiver extends BroadcastReceiver {
         }
     }
 
-    private App loadAppByPackageName(Context context, String packageName) throws PackageManager.NameNotFoundException {
+    private List<App> loadAppsByPackageName(Context context, String packageName) throws PackageManager.NameNotFoundException {
         var pm = context.getPackageManager();
-        var info = pm.getApplicationInfo(packageName, 0);
-        var name = pm.getApplicationLabel(info).toString();
-        var icon = pm.getApplicationIcon(info);
-        var isSystemApp = (info.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
-        var launchIntent = pm.getLaunchIntentForPackage(packageName);
-        return new App(name, packageName, icon, () -> context.startActivity(launchIntent), isSystemApp);
+        var intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setPackage(packageName);
+        var activities = pm.queryIntentActivities(intent, 0);
+
+        return activities.stream().map(resolveInfo -> {
+           var label = resolveInfo.loadLabel(pm).toString();
+           var icon = resolveInfo.loadIcon(pm);
+           var isSystemApp = (resolveInfo.activityInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+           var className = resolveInfo.activityInfo.name;
+
+           var launchIntent = new Intent(Intent.ACTION_MAIN);
+           launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+           launchIntent.setComponent(new ComponentName(packageName, className));
+
+           return new App(label, packageName, className, icon, () -> context.startActivity(launchIntent), isSystemApp);
+        }).toList();
     }
 }

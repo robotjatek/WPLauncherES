@@ -165,7 +165,7 @@ Try it at your own risk
   - [ ] Crash app button
   - [ ] Reset StartPage state machine button
 - [ ] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
-- [ ] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
+- [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
 - [ ] Maybe a closed beta (?)
 
 ## M4 - Beta
@@ -193,6 +193,7 @@ Feature-creep!
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI
 - [ ] Cursor handle in the input box
+- [ ] Pin some default tiles to the start screen on first start
 
 ### M5 - RC
 

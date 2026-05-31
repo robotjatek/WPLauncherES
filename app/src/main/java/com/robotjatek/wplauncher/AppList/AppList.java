@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.AppList;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -109,7 +110,6 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
                 new MenuOption<>("Uninstall", (a) -> {
                     if (a == null) return;
                     uninstallApp(a.packageName());
-                    _tileService.queueUnpinTile(a.packageName());
                 }, menu, (a) -> a != null && !a.isSystemApp()));
         menu.addOptions(options);
         return menu;
@@ -125,10 +125,14 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
             var label = resolveInfo.loadLabel(pm).toString();
             var packageName = resolveInfo.activityInfo.packageName;
             var icon = resolveInfo.loadIcon(pm);
-            var launchIntent = pm.getLaunchIntentForPackage(packageName);
             var isSystemApp = (resolveInfo.activityInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+            var className = resolveInfo.activityInfo.name;
+            var launchIntent = new Intent(Intent.ACTION_MAIN);
+            launchIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+            launchIntent.setComponent(new ComponentName(packageName, className));
+            launchIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-            return new App(label, packageName, icon, () -> _context.startActivity(launchIntent), isSystemApp);
+            return new App(label, packageName, className, icon, () -> _context.startActivity(launchIntent), isSystemApp);
         });
     }
 
@@ -146,13 +150,14 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         var intent = new Intent(Intent.ACTION_DELETE);
         intent.setData(Uri.parse("package:" + packageName));
         _context.startActivity(intent);
-        _tileService.queueUnpinTile(packageName);
+        _searchBox.clearText();
     }
 
     private void pinApp(App app) {
         if (!_tileService.isPinned(app)) {
             _tileService.queuePinTile(app);
-            _list.getScroll().setScrollOffset(0);
+            resetScroll();
+            _searchBox.clearText();
             _navigator.previousPage();
         }
     }
@@ -177,8 +182,8 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     @Override
     public void onAppRemove(String packageName) {
-        var item = _list.getItems().stream().filter(i -> i.getPayload().packageName().equals(packageName)).findFirst();
-        item.ifPresent(i -> _list.removeItemByPayload(i.getPayload()));
+        var items = _list.getItems().stream().filter(i -> i.getPayload().packageName().equals(packageName));
+        items.forEach(i -> _list.removeItemByPayload(i.getPayload()));
     }
 
     @Override

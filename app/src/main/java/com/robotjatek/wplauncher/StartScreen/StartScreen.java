@@ -7,6 +7,7 @@ import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
+import com.robotjatek.wplauncher.LauncherSurfaceView;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
@@ -74,8 +75,9 @@ public class StartScreen implements IPageNavigator, IScreen {
     private final InternalAppsService _internalAppsService;
     private final SettingsService _settingsService;
     private final float[] pageMatrix = new float[16]; // stores the page translation relative to each other
+    private final LauncherSurfaceView _view;
 
-    public StartScreen(Context context, IScreenNavigator navigator, LocationService locationService, AppChangeReceiver appChangeReceiver) {
+    public StartScreen(Context context, IScreenNavigator navigator, LocationService locationService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
         _state = IDLE_STATE();
         _settingsService = new SettingsService(context);
         _internalAppsService = new InternalAppsService(context, _settingsService, navigator);
@@ -83,6 +85,7 @@ public class StartScreen implements IPageNavigator, IScreen {
         _tileGrid = new TileGrid(_tileService, context, appChangeReceiver);
         _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService, appChangeReceiver);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
+        _view = view;
     }
 
     public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
@@ -152,6 +155,7 @@ public class StartScreen implements IPageNavigator, IScreen {
             return;
         }
         _currentPage++;
+        _view.cancelFocus();
     }
 
     public void previousPage() {
@@ -159,6 +163,7 @@ public class StartScreen implements IPageNavigator, IScreen {
             return;
         }
         _currentPage--;
+        _view.cancelFocus();
     }
 
     public void dispose() {

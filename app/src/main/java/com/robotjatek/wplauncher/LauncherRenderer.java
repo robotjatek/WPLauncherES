@@ -34,11 +34,13 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     private QuadRenderer _renderer;
     private int _width, _height;
     private boolean _needsResize = false;
+    private final LauncherSurfaceView _view;
 
-    public LauncherRenderer(Context context, LocationService locationService, AppChangeReceiver appChangeReceiver) {
+    public LauncherRenderer(Context context, LocationService locationService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
         _context = context;
         _locationService = locationService;
         _appChangeReceiver = appChangeReceiver;
+        _view = view;
     }
 
     @Override
@@ -64,7 +66,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
-        _navigationStack.push(new StartScreen(_context, this, _locationService, _appChangeReceiver));
+        _navigationStack.push(new StartScreen(_context, this, _locationService, _appChangeReceiver, _view));
     }
 
     @Override

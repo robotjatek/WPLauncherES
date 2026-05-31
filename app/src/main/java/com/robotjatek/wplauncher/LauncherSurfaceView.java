@@ -32,7 +32,7 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
 
     public LauncherSurfaceView(Context context, LocationService locationService, AppChangeReceiver appChangeReceiver) {
         super(context);
-        _renderer = new LauncherRenderer(context, locationService, appChangeReceiver);
+        _renderer = new LauncherRenderer(context, locationService, appChangeReceiver, this);
         _gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
            @Override

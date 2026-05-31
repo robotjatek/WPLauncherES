@@ -31,12 +31,14 @@ public class InternalAppsService {
         var setting = new App(
                 "Launcher Settings",
                 SETTINGS_NAME,
+                null,
                 getAppIcon(SETTINGS_NAME),
                 () -> navigator.push(new Settings(navigator, settings, context)), true);
 
         var clock = new App(
                 "Clock HUB",
                 CLOCK_NAME,
+                null,
                 getAppIcon(CLOCK_NAME),
                 () -> navigator.push(new Clock(navigator, context)), true);
 

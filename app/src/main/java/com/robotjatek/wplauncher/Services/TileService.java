@@ -150,12 +150,12 @@ public class TileService implements OnChangeListener<AccentColor> {
                 final App app;
                 if (obj.has("packageName")) {
                     var packageName = obj.getString("packageName");
-                    var className = obj.getString("className");
                     if (packageName.startsWith("launcher:")) {
                         app = _internalAppsService.getInternalApp(packageName);
                     } else {
                         var intent = new Intent(Intent.ACTION_MAIN);
                         intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                        var className = obj.getString("className");
                         intent.setComponent(new ComponentName(packageName, className));
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         var icon = _context.getPackageManager().getActivityIcon(intent);
@@ -251,7 +251,7 @@ public class TileService implements OnChangeListener<AccentColor> {
 
     /**
      * Removes empty rows between tiles
-     * Note: this works on a row-by-row basis so its not very efficient
+     * Note: this works on a row-by-row basis so it is not very efficient
      */
     public void compactGrid() {
         var maxRow = calculateGroupLowestPoint(_tiles);

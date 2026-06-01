@@ -166,7 +166,6 @@ Try it at your own risk
   - [ ] Reset StartPage state machine button
 - [ ] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
-- [ ] Maybe a closed beta (?)
 
 ## M4 - Beta
 

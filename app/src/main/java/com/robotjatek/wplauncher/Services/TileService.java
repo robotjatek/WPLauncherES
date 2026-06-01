@@ -83,7 +83,7 @@ public class TileService implements OnChangeListener<AccentColor> {
      */
     public void queueUnpinTile(String packageName, String className) {
         var tile = _tiles.stream()
-                .filter(t -> t.getPackageName().equals(packageName) && t.getApp().className().equals(className))
+                .filter(t -> t.getPackageName().equals(packageName) && Objects.equals(t.getApp().className(), className))
                 .findFirst();
         tile.ifPresent(t -> _tileCommands.add(() -> {
             _tiles.remove(t);

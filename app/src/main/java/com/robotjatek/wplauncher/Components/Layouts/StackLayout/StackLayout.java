@@ -37,9 +37,11 @@ public class StackLayout implements ILayout {
     public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position,
                      Size<Integer> size) {
         Matrix.translateM(view, 0, position.x(), position.y() + TOP_MARGIN_PX, 0);
+        renderer.pushLayer();
         for (var child : _children) {
             child.draw(delta, proj, view, _drawContext, renderer);
         }
+        renderer.popLayer();
     }
 
     public void addChild(UIElement element) {

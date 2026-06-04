@@ -17,6 +17,7 @@ public class QuadRenderer {
     private final int _iboId;
     private final int _texCoordVBOId;
     private final Shader _shader;
+    private float _offsetLevel = 0f;
     private static final int POSITION_LOCATION = 0;
     private static final int TEX_COORD_LOCATION = 1;
 
@@ -138,6 +139,26 @@ public class QuadRenderer {
         GLES32.glDrawElements(GLES32.GL_TRIANGLES, INDICES.length, GLES32.GL_UNSIGNED_SHORT, 0);
 
         GLES32.glBindVertexArray(0);
+    }
+
+    public void pushLayer() {
+        _offsetLevel -= 1f;
+        applyLayer();
+    }
+
+    public void popLayer() {
+        _offsetLevel += 1f;
+        applyLayer();
+    }
+
+    private void applyLayer() {
+
+        if (_offsetLevel == 0) {
+            GLES32.glDisable(GLES32.GL_POLYGON_OFFSET_FILL);
+        } else {
+            GLES32.glEnable(GLES32.GL_POLYGON_OFFSET_FILL);
+            GLES32.glPolygonOffset(-1f, _offsetLevel);
+        }
     }
 
     public void dispose() {

@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout;
 
+import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
@@ -103,6 +104,7 @@ public class AbsoluteLayout implements ILayout {
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         renderer.drawFlat(proj, _modelMatrix, _bgColor);
 
+        renderer.pushLayer();
         // Draw children with offset
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
@@ -111,6 +113,7 @@ public class AbsoluteLayout implements ILayout {
         for (var child : _positionedElements) {
             child._element.draw(delta, proj, _modelMatrix, _drawContext, renderer);
         }
+        renderer.popLayer();
     }
 
     @Override

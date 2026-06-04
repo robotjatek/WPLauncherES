@@ -164,6 +164,7 @@ Try it at your own risk
 - [ ] Debug menu
   - [ ] Crash app button
   - [ ] Reset StartPage state machine button
+- [x] Try perspective projection instead of orthographic
 - [ ] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
 
@@ -187,7 +188,6 @@ Feature-creep!
 - [ ] Animate internal app/subpage opening (clock hub, launcher settings)
 - [ ] Group apps by the first letter in the app list
 - [ ] Set background image for the start screen + transparency option for tiles
-- [ ] Try perspective projection instead of orthographic
 - [ ] Re-ask for permissions from the launcher settings
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI

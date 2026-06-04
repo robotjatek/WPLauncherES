@@ -166,6 +166,8 @@ Try it at your own risk
   - [ ] Reset StartPage state machine button
 - [x] Try perspective projection instead of orthographic
 - [x] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
+- [x] Use stencil buffer to clip list view
+- [x] Use stencil buffer to clip scroll view
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
 
 ## M4 - Beta

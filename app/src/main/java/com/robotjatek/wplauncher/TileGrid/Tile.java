@@ -30,7 +30,7 @@ public class Tile implements ITouchable {
     private final ITileContent _backContent;
     private float _scale = 1.0f;
     private float _rot = 0;
-    private float _targetRot = 180f;
+    private float _targetRot = 0f;
     private float _timeOnSide = 0f;
     private float _flipInterval;
 
@@ -53,27 +53,25 @@ public class Tile implements ITouchable {
         _touchHandler.update(delta);
         var width = (int) (drawContext.widthOf(this) * _scale);
         var height = (int) (drawContext.heightOf(this) * _scale);
-        var xDiff = (width - drawContext.widthOf(this)) / 2; // correction for the scaling
-        var yDiff = (height - drawContext.heightOf(this)) / 2; // correction for the scaling
+        var xDiff = (width - drawContext.widthOf(this)) / 2;
+        var yDiff = (height - drawContext.heightOf(this)) / 2;
 
-        var correctedX = drawContext.xOf(this) + offset.x() - xDiff; // x corrected by the scaling and the offset
-        var correctedY = drawContext.yOf(this) + offset.y() - yDiff; // y corrected by the scaling and the offset
-
-        // fake perspective
-        var scaleY = (float) Math.cos(Math.toRadians(_rot));
+        var correctedX = drawContext.xOf(this) + offset.x() - xDiff;
+        var correctedY = drawContext.yOf(this) + offset.y() - yDiff;
 
         Matrix.setIdentityM(_frontViewMatrix, 0);
-        Matrix.translateM(_frontViewMatrix, 0, correctedX + width / 2f, correctedY + height/2f, 0f);
-        Matrix.scaleM(_frontViewMatrix, 0, 1, scaleY, 1);
-        Matrix.translateM(_frontViewMatrix, 0, -width / 2f, -height / 2f, 0f);
+        Matrix.translateM(_frontViewMatrix, 0, correctedX + width / 2f, correctedY + height / 2f, 0f);
+        Matrix.rotateM(_frontViewMatrix, 0, _rot, -1f, 0f, 0f);
+        Matrix.translateM(_frontViewMatrix, 0, -width / 2f, -height / 2f, 0.1f);
         Matrix.multiplyMM(_frontViewMatrix, 0, viewMatrix, 0, _frontViewMatrix, 0);
 
+        // Back face: Match tile rotation, then flip vertically.
+        // Rotation (1 flip) + Scale Y -1 (1 flip) = 2 flips = Clockwise winding (Visible).
         Matrix.setIdentityM(_backViewMatrix, 0);
         Matrix.translateM(_backViewMatrix, 0, correctedX + width / 2f, correctedY + height / 2f, 0f);
-        // 2 combined scales: first mirror, then rotate
-        Matrix.scaleM(_backViewMatrix, 0, 1, -1, 1); // Mirror the back side
-        Matrix.scaleM(_backViewMatrix, 0, 1, scaleY, 1); // Then apply rotation scale
-        Matrix.translateM(_backViewMatrix, 0, -width / 2f, -height / 2f, 0f);
+        Matrix.rotateM(_backViewMatrix, 0, _rot, -1f, 0f, 0f);
+        Matrix.scaleM(_backViewMatrix, 0, 1f, -1f, 1f); // Mirror the back side
+        Matrix.translateM(_backViewMatrix, 0, -width / 2f, -height / 2f, -0.1f);
         Matrix.multiplyMM(_backViewMatrix, 0, viewMatrix, 0, _backViewMatrix, 0);
 
         var backHasContent = _backContent != null && _backContent.hasContent() && !_size.equals(Tile.SMALL);
@@ -81,11 +79,14 @@ public class Tile implements ITouchable {
             _timeOnSide += delta;
             if (_timeOnSide >= _flipInterval) {
                 _timeOnSide = 0;
-                _targetRot = (_targetRot == 0f) ? 180f : 0f;
+                _targetRot += 180f;
+                if (_targetRot > 36000f) { // after 200 flips
+                    _targetRot -= 36000f;
+                    _rot -= 36000f;
+                }
                 _flipInterval = TIME_BEFORE_FLIP_MIN +
                         (float) (Math.random() * (TIME_BEFORE_FLIP_MAX - TIME_BEFORE_FLIP_MIN));
             }
-
         } else {
             _targetRot = 0;
             _timeOnSide = 0;
@@ -106,14 +107,10 @@ public class Tile implements ITouchable {
         var screenY = viewMatrix[13] + correctedY;
         var glY = (LauncherRenderer.SCREEN_DATA.screenHeight - (screenY + height + LauncherRenderer.SCREEN_DATA.topInset));
         GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
-        GLES32.glScissor((int) screenX, (int)glY, width, height); // TODO: stencil test instead (with 2 pass rendering)
-        // Draw only the visible side
-        if (scaleY >= 0) {
-            _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
-        } else {
-            if (_backContent != null) {
-                _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
-            }
+        GLES32.glScissor((int) screenX, (int)glY, width, height);
+        _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
+        if (_backContent != null) {
+            _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
         }
         GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
     }

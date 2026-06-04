@@ -52,6 +52,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
         GLES32.glEnable(GLES32.GL_CULL_FACE);
         GLES32.glFrontFace(GLES32.GL_CW);
         GLES32.glCullFace(GLES32.GL_BACK);
+        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
+        GLES32.glDepthFunc(GLES32.GL_LEQUAL);
 
         if (_shader != null) {
             _shader.delete();
@@ -86,7 +88,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
             frameCount = 0;
             fpsTime = System.currentTimeMillis();
         }
-        GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT);
+        GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT);
         _navigationStack.getFirst().draw(delta, _projMatrix, _renderer); // TODO: animation
     }
 
@@ -158,7 +160,25 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
         SCREEN_DATA.screenHeight = _height;
         SCREEN_DATA.screenWidth = _width;
         GLES32.glViewport(0, 0, _width, _height);
-        Matrix.orthoM(_projMatrix, 0, 0, _width, _height, 0, -1, 1);
+
+        var fov = 45f;
+        var aspect = (float) _width / _height;
+        var zNear = 10.0f;
+        var zFar = 10000f;
+        Matrix.perspectiveM(_projMatrix, 0, fov, aspect, zNear, zFar);
+
+        // Distance to the Z=0 plane where 1 world unit = 1 screen pixel
+        var distance = (float) ((_height / 2f) / Math.tan(Math.toRadians(fov / 2f)));
+
+        var viewMatrix = new float[16];
+        // Camera at -distance looking at 0.
+        // With Up=(0,-1,0) and looking along +Z, world (0,0) is at screen Top-Left.
+        Matrix.setLookAtM(viewMatrix, 0,
+                _width / 2f, _height / 2f, -distance,
+                _width / 2f, _height / 2f, 0f,
+                0f, -1f, 0f);
+
+        Matrix.multiplyMM(_projMatrix, 0, _projMatrix, 0, viewMatrix, 0);
         Matrix.translateM(_projMatrix, 0, 0, SCREEN_DATA.topInset, 0);
         _navigationStack.forEach(s -> s.onResize(_width, _height));
     }

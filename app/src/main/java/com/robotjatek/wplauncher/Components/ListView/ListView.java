@@ -115,12 +115,13 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         }
         GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
 
-        // Draw the context menu last so it shows up above everything else
         if (_contextMenu != null && _contextMenu.isOpened()) {
+            renderer.pushLayer();
             Matrix.setIdentityM(_menuMatrix, 0);
             Matrix.translateM(_menuMatrix, 0, x, y, 0);
             Matrix.multiplyMM(_menuMatrix, 0, view, 0, _menuMatrix, 0);
             _contextMenu.draw(delta, proj, _menuMatrix, renderer);
+            renderer.popLayer();
         }
     }
 

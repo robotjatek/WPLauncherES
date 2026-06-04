@@ -169,6 +169,7 @@ Try it at your own risk
 - [x] Use stencil buffer to clip list view
 - [x] Use stencil buffer to clip scroll view
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
+- [x] Viewport culling on tile-grid
 
 ## M4 - Beta
 

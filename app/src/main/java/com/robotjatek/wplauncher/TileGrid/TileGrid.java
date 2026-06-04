@@ -98,7 +98,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
         for (var tile : _tiles) {
             // Do not render the selected tile here
-            if (tile == _selectedTile) {
+            if (tile == _selectedTile || !_tileDrawContext.isVisible(tile)) {
                 continue;
             }
             tile.drawWithOffset(delta, projMatrix, scrollMatrix, Position.ZERO, _tileDrawContext, renderer);

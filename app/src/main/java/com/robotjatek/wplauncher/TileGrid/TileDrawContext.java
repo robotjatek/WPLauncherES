@@ -41,6 +41,15 @@ public class TileDrawContext implements IDrawContext<Tile> {
         return t.getSize().height() * _tileSizePx + (t.getSize().height() - 1) * TILE_GAP_PX;
     }
 
+    public boolean isVisible(Tile tile) {
+        var scrollOffset = _parent.getScroll().getScrollOffset();
+        var containerHeight = _parent.getPageHeight();
+        var y = yOf(tile);
+        var height = heightOf(tile);
+
+        return !(y + height + PAGE_PADDING_PX < -scrollOffset || y > -scrollOffset + containerHeight);
+    }
+
     public ScrollController getScroll() {
         return _parent.getScroll();
     }

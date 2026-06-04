@@ -156,7 +156,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public void onComposingText(String text) {
         _text = replaceComposing(_text, text);
-        _cursorPosition += text.length();
+        _cursorPosition = Math.min(_text.length(), text.length());
         apply();
     }
 

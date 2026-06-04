@@ -88,7 +88,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
             frameCount = 0;
             fpsTime = System.currentTimeMillis();
         }
-        GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT);
+        GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT | GLES32.GL_STENCIL_BUFFER_BIT);
+        GLES32.glDisable(GLES32.GL_STENCIL_TEST);
         _navigationStack.getFirst().draw(delta, _projMatrix, _renderer); // TODO: animation
     }
 

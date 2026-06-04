@@ -59,7 +59,7 @@ public class InputBox implements UIElement, ITextInputHandler {
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
             _borderLayout.addChild(_layout, new Position<>((float) BORDER_SIZE_PX, (float) BORDER_SIZE_PX));
             var textOffset = 16f;
-            _textStartX = x + BORDER_SIZE_PX + textOffset; // TODO: tuti?
+            _textStartX = x + BORDER_SIZE_PX + textOffset;
             _layout.removeChild(_label);
             _layout.addChild(_label, new Position<>(textOffset, (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
 
@@ -68,6 +68,7 @@ public class InputBox implements UIElement, ITextInputHandler {
                 _label.setTextColor(Colors.LIGHT_GRAY);
             } else {
                 var cursor = _cursorVisible ? "|" : " "; // TODO: do not integrate the cursor into the text, but draw an "adorner" above instead
+                _cursorPosition = Math.max(0, Math.min(_cursorPosition, _text.length()));
                 var textWithCursor = _text.substring(0, _cursorPosition) + cursor + _text.substring(_cursorPosition);
                 _label.setText(textWithCursor);
                 _label.setTextColor(Colors.WHITE);

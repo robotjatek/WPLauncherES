@@ -1,6 +1,5 @@
 package com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout;
 
-import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;

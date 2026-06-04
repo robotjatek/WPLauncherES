@@ -165,7 +165,7 @@ Try it at your own risk
   - [ ] Crash app button
   - [ ] Reset StartPage state machine button
 - [x] Try perspective projection instead of orthographic
-- [ ] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
+- [x] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
 
 ## M4 - Beta

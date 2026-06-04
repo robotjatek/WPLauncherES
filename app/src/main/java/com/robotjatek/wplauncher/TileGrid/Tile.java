@@ -1,6 +1,5 @@
 package com.robotjatek.wplauncher.TileGrid;
 
-import android.opengl.GLES32;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.AppList.App;
@@ -8,7 +7,6 @@ import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.IDrawContext;
-import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 public class Tile implements ITouchable {
@@ -18,6 +16,7 @@ public class Tile implements ITouchable {
     public static final Size<Integer> WIDE = new Size<>(4, 2);
     private final float[] _frontViewMatrix = new float[16];
     private final float[] _backViewMatrix = new float[16];
+    private final float[] _clipMatrix = new float[16];
     private static final float TIME_BEFORE_FLIP_MIN = 4000f;
     private static final float TIME_BEFORE_FLIP_MAX = 8000f;
     private boolean _disposed = false;
@@ -59,21 +58,6 @@ public class Tile implements ITouchable {
         var correctedX = drawContext.xOf(this) + offset.x() - xDiff;
         var correctedY = drawContext.yOf(this) + offset.y() - yDiff;
 
-        Matrix.setIdentityM(_frontViewMatrix, 0);
-        Matrix.translateM(_frontViewMatrix, 0, correctedX + width / 2f, correctedY + height / 2f, 0f);
-        Matrix.rotateM(_frontViewMatrix, 0, _rot, -1f, 0f, 0f);
-        Matrix.translateM(_frontViewMatrix, 0, -width / 2f, -height / 2f, 0.1f);
-        Matrix.multiplyMM(_frontViewMatrix, 0, viewMatrix, 0, _frontViewMatrix, 0);
-
-        // Back face: Match tile rotation, then flip vertically.
-        // Rotation (1 flip) + Scale Y -1 (1 flip) = 2 flips = Clockwise winding (Visible).
-        Matrix.setIdentityM(_backViewMatrix, 0);
-        Matrix.translateM(_backViewMatrix, 0, correctedX + width / 2f, correctedY + height / 2f, 0f);
-        Matrix.rotateM(_backViewMatrix, 0, _rot, -1f, 0f, 0f);
-        Matrix.scaleM(_backViewMatrix, 0, 1f, -1f, 1f); // Mirror the back side
-        Matrix.translateM(_backViewMatrix, 0, -width / 2f, -height / 2f, -0.1f);
-        Matrix.multiplyMM(_backViewMatrix, 0, viewMatrix, 0, _backViewMatrix, 0);
-
         var backHasContent = _backContent != null && _backContent.hasContent() && !_size.equals(Tile.SMALL);
         if (backHasContent) {
             _timeOnSide += delta;
@@ -103,16 +87,32 @@ public class Tile implements ITouchable {
             }
         }
 
-        var screenX = viewMatrix[12] + correctedX;
-        var screenY = viewMatrix[13] + correctedY;
-        var glY = (LauncherRenderer.SCREEN_DATA.screenHeight - (screenY + height + LauncherRenderer.SCREEN_DATA.topInset));
-        GLES32.glEnable(GLES32.GL_SCISSOR_TEST);
-        GLES32.glScissor((int) screenX, (int)glY, width, height);
+        buildTileMatrix(_frontViewMatrix, viewMatrix, correctedX, correctedY, width, height, -0.1f, 1f);
+        buildTileMatrix(_backViewMatrix, viewMatrix, correctedX, correctedY, width, height, 0.1f, -1f);
+
+        Matrix.setIdentityM(_clipMatrix, 0);
+        Matrix.translateM(_clipMatrix, 0, correctedX, correctedY, 0f);
+        Matrix.scaleM(_clipMatrix, 0, width, height, 1f);
+        Matrix.multiplyMM(_clipMatrix, 0, viewMatrix, 0, _clipMatrix, 0);
+
+        renderer.beginClip(projMatrix, _clipMatrix);
         _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
         if (_backContent != null) {
             _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
         }
-        GLES32.glDisable(GLES32.GL_SCISSOR_TEST);
+        renderer.endClip();
+    }
+
+    private void buildTileMatrix(float[] out, float[] viewMatrix, float correctedX, float correctedY,
+                                 int width, int height, float offsetZ, float scaleY) {
+        Matrix.setIdentityM(out, 0);
+        Matrix.translateM(out, 0, correctedX + width / 2f, correctedY + height / 2f, 0f);
+        Matrix.rotateM(out, 0, _rot, -1f, 0f, 0f);
+        if (scaleY != 1f) {
+            Matrix.scaleM(out, 0, 1f, scaleY, 1f);
+        }
+        Matrix.translateM(out, 0, -width / 2f, -height / 2f, offsetZ);
+        Matrix.multiplyMM(out, 0, viewMatrix, 0, out, 0);
     }
 
     public String getPackageName() {

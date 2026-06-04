@@ -18,6 +18,7 @@ public class QuadRenderer {
     private final int _texCoordVBOId;
     private final Shader _shader;
     private float _offsetLevel = 0f;
+    private int _stencilLevel = 0;
     private static final int POSITION_LOCATION = 0;
     private static final int TEX_COORD_LOCATION = 1;
 
@@ -139,6 +140,45 @@ public class QuadRenderer {
         GLES32.glDrawElements(GLES32.GL_TRIANGLES, INDICES.length, GLES32.GL_UNSIGNED_SHORT, 0);
 
         GLES32.glBindVertexArray(0);
+    }
+
+    public void beginClip(float[] projMatrix, float[] modelMatrix) {
+        _stencilLevel++;
+        var stencilValue = _stencilLevel & 0xFF;
+
+        GLES32.glEnable(GLES32.GL_STENCIL_TEST);
+        GLES32.glStencilMask(0xFF);
+        GLES32.glStencilFunc(GLES32.GL_ALWAYS, stencilValue, 0xFF);
+        GLES32.glStencilOp(GLES32.GL_REPLACE, GLES32.GL_REPLACE, GLES32.GL_REPLACE);
+
+        GLES32.glColorMask(false, false, false, false);
+        GLES32.glDepthMask(false);
+        GLES32.glDepthFunc(GLES32.GL_ALWAYS);
+
+        drawFlat(projMatrix, modelMatrix, 0);
+
+        GLES32.glDepthFunc(GLES32.GL_LEQUAL);
+        GLES32.glDepthMask(true);
+        GLES32.glColorMask(true, true, true, true);
+
+        GLES32.glStencilFunc(GLES32.GL_EQUAL, stencilValue, 0xFF);
+        GLES32.glStencilOp(GLES32.GL_KEEP, GLES32.GL_KEEP, GLES32.GL_KEEP);
+    }
+
+    public void endClip() {
+        _stencilLevel--;
+        GLES32.glDisable(GLES32.GL_STENCIL_TEST);
+        GLES32.glStencilMask(0xFF);
+        GLES32.glStencilFunc(GLES32.GL_ALWAYS, 0, 0xFF);
+        GLES32.glStencilOp(GLES32.GL_KEEP, GLES32.GL_KEEP, GLES32.GL_KEEP);
+    }
+
+    public void enableDepthTest() {
+        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
+    }
+
+    public void disableDepthTest() {
+        GLES32.glDisable(GLES32.GL_DEPTH_TEST);
     }
 
     public void pushLayer() {

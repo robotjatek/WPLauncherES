@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher.TileGrid;
 
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.ScrollController;
 
 public class TileDrawContext implements IDrawContext<Tile> {
@@ -47,7 +48,7 @@ public class TileDrawContext implements IDrawContext<Tile> {
         var y = yOf(tile);
         var height = heightOf(tile);
 
-        return !(y + height + PAGE_PADDING_PX < -scrollOffset || y > -scrollOffset + containerHeight);
+        return !(y + height + PAGE_PADDING_PX + LauncherRenderer.SCREEN_DATA.topInset < -scrollOffset || y > -scrollOffset + containerHeight);
     }
 
     public ScrollController getScroll() {

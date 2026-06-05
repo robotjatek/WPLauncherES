@@ -112,8 +112,10 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                     new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
                     _tileDrawContext,
                     renderer);
+            renderer.pushLayer();
             _unpinButton.draw(projMatrix, scrollMatrix, renderer);
             _resizeButton.draw(projMatrix, scrollMatrix, renderer);
+            renderer.popLayer();
             renderer.enableDepthTest();
             renderer.popLayer();
         }

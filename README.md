@@ -153,8 +153,7 @@ Try it at your own risk
 
 - [x] Make the crash-log viewer scrollable (ScrollView component)
 - [x] Adjust button border drawing when no icon is set
-- [ ] About page in Launcher Settings
-- [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
+- [x] About page in Launcher Settings
 - [x] Clear search-box when pressing back on the app-list
 - [x] Support cursor in input boxes
   - [x] Show current cursor position
@@ -213,6 +212,12 @@ Feature-creep!
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
 - [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware, needs repro)
 - [ ] Fix: Tile bg after resize is dark (needs repro)
+
+### Backlog
+
+Nice to have, but I feel no pressure to implement them for now 
+
+- [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 
 ### Current progress
 

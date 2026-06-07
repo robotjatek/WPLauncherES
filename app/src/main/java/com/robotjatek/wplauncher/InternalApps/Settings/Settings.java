@@ -14,6 +14,7 @@ import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.AboutScreen;
 import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.CrashLogScreen;
+import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.DebugScreen;
 import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.ThemeScreen;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.SettingsService;
@@ -34,8 +35,11 @@ public class Settings implements IScreen {
         _layout.addChild(new Spacer(0, 160));
         _layout.addChild(new Label("theme", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
                 () -> navigator.push(new ThemeScreen(navigator, settings))));
+        _layout.addChild(new Label("permissions", 96, Typeface.NORMAL, Colors.WHITE, 0, -1, null));
         _layout.addChild(new Label("crash log", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
                 () -> navigator.push(new CrashLogScreen(navigator, context))));
+        _layout.addChild(new Label("debug", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+                () -> navigator.push(new DebugScreen(navigator))));
         _layout.addChild(new Label("about", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
                 () -> navigator.push(new AboutScreen(navigator, context, settings))));
     }

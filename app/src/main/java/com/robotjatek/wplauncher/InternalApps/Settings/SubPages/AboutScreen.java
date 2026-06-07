@@ -16,7 +16,6 @@ import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IScreenNavigator;
-import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.Position;

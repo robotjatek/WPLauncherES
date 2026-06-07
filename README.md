@@ -161,7 +161,7 @@ Try it at your own risk
   - [x] Insert text at cursor position
   - [x] Delete text at cursor position
 - [ ] Debug menu
-  - [ ] Crash app button
+  - [x] Crash app button
   - [ ] Reset StartPage state machine button
 - [x] Try perspective projection instead of orthographic
 - [x] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
@@ -170,7 +170,7 @@ Try it at your own risk
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
 - [x] Viewport culling on tile-grid
 
-## M4 - Beta
+### M4 - Beta
 
 Feature-creep!
 
@@ -181,7 +181,8 @@ Feature-creep!
   - [ ] Messenger
   - [ ] Messages
   - [ ] Contacts
-- [ ] Generic carousel view
+- [ ] Generic pivot view (tabbed view)
+  - [ ] Settings subpages use pivot view with one tab
 - [ ] Multi lang support
 - [ ] Light mode/Dark mode support
 - [ ] Dropdown
@@ -191,7 +192,6 @@ Feature-creep!
 - [ ] Group apps by the first letter in the app list
 - [ ] Set background image for the start screen + transparency option for tiles
 - [ ] Re-ask for permissions from the launcher settings
-- [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Device resolution independent UI
 - [ ] Cursor handle in the input box
 - [ ] Pin some default tiles to the start screen on first start
@@ -218,6 +218,7 @@ Feature-creep!
 Nice to have, but I feel no pressure to implement them for now 
 
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
+- [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 
 ### Current progress
 

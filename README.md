@@ -160,7 +160,6 @@ Try it at your own risk
   - [x] Set cursor position
   - [x] Insert text at cursor position
   - [x] Delete text at cursor position
-
 - [x] Try perspective projection instead of orthographic
 - [x] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
 - [x] Use stencil buffer to clip list view

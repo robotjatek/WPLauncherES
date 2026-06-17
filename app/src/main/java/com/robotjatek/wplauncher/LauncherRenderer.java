@@ -11,16 +11,12 @@ import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 public class LauncherRenderer implements GLSurfaceView.Renderer {
     public static ScreenData SCREEN_DATA = new ScreenData();
     private boolean _disposed = false;
     private float lastTime = System.nanoTime();
     private int frameCount = 0;
     private long fpsTime = System.currentTimeMillis();
-    private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
     private final Context _context;
     private final float[] _projMatrix = new float[16];
     private final LocationService _locationService;
@@ -64,7 +60,6 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(javax.microedition.khronos.opengles.GL10 glUnused) {
-        executeCommands();
         if (_needsResize && _width > 0 && _height > 0) {
             updateLayout();
             _needsResize = false;
@@ -150,12 +145,4 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         Matrix.translateM(_projMatrix, 0, 0, SCREEN_DATA.topInset, 0);
         _navigator.onResize(_width, _height);
     }
-
-    private void executeCommands() {
-        Runnable command;
-        while ((command = _commands.poll()) != null) {
-            command.run();
-        }
-    }
-
 }

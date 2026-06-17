@@ -160,9 +160,7 @@ Try it at your own risk
   - [x] Set cursor position
   - [x] Insert text at cursor position
   - [x] Delete text at cursor position
-- [ ] Debug menu
-  - [x] Crash app button
-  - [ ] Reset StartPage state machine button
+
 - [x] Try perspective projection instead of orthographic
 - [x] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
 - [x] Use stencil buffer to clip list view
@@ -170,7 +168,6 @@ Try it at your own risk
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
 - [x] Viewport culling on tile-grid
 - [x] Extract ScreenNavigator into a separate component
-- [ ] Show modal
 
 ### M4 - Beta
 
@@ -197,6 +194,10 @@ Feature-creep!
 - [ ] Device resolution independent UI
 - [ ] Cursor handle in the input box
 - [ ] Pin some default tiles to the start screen on first start
+- [x] Modal
+- [ ] Debug menu
+  - [x] Crash app button
+  - [ ] Reset StartPage state machine button
 
 ### M5 - RC
 
@@ -224,7 +225,7 @@ Nice to have, but I feel no pressure to implement them for now
 
 ### Current progress
 
-M3.5 is in progress
+M4 is in progress
 
 ## Planned live custom tiles / "widgets"
 

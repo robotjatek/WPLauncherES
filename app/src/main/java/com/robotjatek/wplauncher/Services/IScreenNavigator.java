@@ -22,4 +22,5 @@ public interface IScreenNavigator {
 
     void onBackPressed();
     void openModal(IModal modal);
+    void dismissModal();
 }

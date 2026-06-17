@@ -11,10 +11,13 @@ import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 import java.util.Deque;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class ScreenNavigator implements IScreenNavigator {
 
+    private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
     private IModal _modal;
     private final Deque<IScreen> _navigationStack = new ConcurrentLinkedDeque<>();
     private int _width = -1;
@@ -22,6 +25,7 @@ public class ScreenNavigator implements IScreenNavigator {
     private final float[] _model = new float[16];
 
     public void draw(float delta, float[] proj, QuadRenderer renderer) {
+        executeCommands();
         _navigationStack.getFirst().draw(delta, proj, renderer); // TODO: animated screen change
         if (_modal != null) {
             Matrix.setIdentityM(_model, 0);
@@ -36,13 +40,15 @@ public class ScreenNavigator implements IScreenNavigator {
 
     @Override
     public void push(@NonNull IScreen screen) {
-        screen.onResize(_width, _height);
-        _navigationStack.push(screen);
+        _commands.add(() -> {
+            screen.onResize(_width, _height);
+            _navigationStack.push(screen);
+        });
     }
 
     @Override
     public void pop() {
-        _navigationStack.pop().dispose();
+        _commands.add(() -> _navigationStack.pop().dispose());
     }
 
     public void init(IScreen screen) {
@@ -77,8 +83,7 @@ public class ScreenNavigator implements IScreenNavigator {
     public void onBackPressed() {
         // if modal is open dismiss it
         if (_modal != null) {
-            _modal.dispose();
-            _modal = null;
+            dismissModal();
             return;
         }
 
@@ -86,13 +91,19 @@ public class ScreenNavigator implements IScreenNavigator {
     }
 
     public void onHomePressed() {
-        if (!_navigationStack.isEmpty()) {
-            while (_navigationStack.size() > 1) {
-                _navigationStack.pop().dispose();
+        _commands.add(() -> {
+            if (_modal != null) {
+                dismissModal();
             }
-            var startScreen = _navigationStack.getLast();
-            startScreen.onBackPressed();
-        }
+
+            if (!_navigationStack.isEmpty()) {
+                while (_navigationStack.size() > 1) {
+                    _navigationStack.pop().dispose();
+                }
+                var startScreen = _navigationStack.getLast();
+                startScreen.onBackPressed();
+            }
+        });
     }
 
     public void onResize(int width, int height) {
@@ -104,6 +115,23 @@ public class ScreenNavigator implements IScreenNavigator {
     @Override
     public void openModal(IModal modal) {
         _modal = modal;
+    }
+
+    @Override
+    public void dismissModal() {
+        _commands.add(() -> {
+            if (_modal != null) {
+                _modal.dispose();
+                _modal = null;
+            }
+        });
+    }
+
+    private void executeCommands() {
+        Runnable command;
+        while ((command = _commands.poll()) != null) {
+            command.run();
+        }
     }
 
     public void dispose() {

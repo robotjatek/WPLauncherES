@@ -63,7 +63,8 @@ public class DebugScreen implements IScreen {
     private void showCrashAppMessageBox() {
         var modal = new Modal("WARNING!", "This will crash the application! A log will be created in the crash-log", () -> {
             throw new RuntimeException("App was crashed from the debug screen");
-        });
+        }, _navigator::dismissModal);
+
         _navigator.openModal(modal);
     }
 

@@ -26,7 +26,7 @@ public class Modal implements IModal {
     private final TextBlock _messageBlock = new TextBlock("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, 0);
     private final float[] _model = new float[16];
 
-    public Modal(String title, String message, Runnable onOk) {
+    public Modal(String title, String message, Runnable onOk, Runnable onDismiss) {
         _layout.setBgColor(Colors.CONTEXT_MENU_GRAY);
         _layout.addChild(_contentLayout);
         _contentLayout.addChild(new Spacer(0, LauncherRenderer.SCREEN_DATA.topInset));
@@ -36,6 +36,7 @@ public class Modal implements IModal {
         _contentLayout.addChild(_messageBlock);
         _layout.addChild(_buttonSpacer);
         _buttonLayout.addChild(new Button("OK", null, onOk));
+        _buttonLayout.addChild(new Button("Cancel", null, onDismiss));
         _layout.addChild(_buttonLayout); // TODO: buttons on the bottom
     }
 

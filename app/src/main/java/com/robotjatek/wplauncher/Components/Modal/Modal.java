@@ -36,8 +36,9 @@ public class Modal implements IModal {
         _contentLayout.addChild(_messageBlock);
         _layout.addChild(_buttonSpacer);
         _buttonLayout.addChild(new Button("OK", null, onOk));
+        _buttonLayout.addChild(new Spacer(-1, 16));
         _buttonLayout.addChild(new Button("Cancel", null, onDismiss));
-        _layout.addChild(_buttonLayout); // TODO: buttons on the bottom
+        _layout.addChild(_buttonLayout);
     }
 
     @Override

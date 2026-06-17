@@ -1,5 +1,7 @@
 package com.robotjatek.wplauncher.Services;
 
+import android.opengl.Matrix;
+
 import androidx.annotation.NonNull;
 
 import com.robotjatek.wplauncher.Components.Modal.IModal;
@@ -16,13 +18,16 @@ public class ScreenNavigator implements IScreenNavigator {
     private final Deque<IScreen> _navigationStack = new ConcurrentLinkedDeque<>();
     private int _width = -1;
     private int _height = -1;
+    private final float[] _model = new float[16];
 
     public void draw(float delta, float[] proj, QuadRenderer renderer) {
         _navigationStack.getFirst().draw(delta, proj, renderer); // TODO: animated screen change
         if (_modal != null) {
-            // TODO: draw full screen transparent overlay
+            Matrix.setIdentityM(_model, 0);
+            Matrix.scaleM(_model, 0, _width, _height, 1);
             _modal.onResize(_width, _height / 3);
             renderer.pushLayer();
+            renderer.drawFlat(proj, _model, 0xee050505);
             _modal.draw(delta, proj, renderer);
             renderer.popLayer();
         }

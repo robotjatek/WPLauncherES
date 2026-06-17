@@ -1,6 +1,8 @@
-package com.robotjatek.wplauncher;
+package com.robotjatek.wplauncher.Services;
 
 import androidx.annotation.NonNull;
+
+import com.robotjatek.wplauncher.IScreen;
 
 public interface IScreenNavigator {
 

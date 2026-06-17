@@ -5,26 +5,21 @@ import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
-import androidx.annotation.NonNull;
-
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
+import com.robotjatek.wplauncher.Services.ScreenNavigator;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
-import java.util.Deque;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigator {
+public class LauncherRenderer implements GLSurfaceView.Renderer {
     public static ScreenData SCREEN_DATA = new ScreenData();
     private boolean _disposed = false;
     private float lastTime = System.nanoTime();
     private int frameCount = 0;
     private long fpsTime = System.currentTimeMillis();
-
-    private final Deque<IScreen> _navigationStack = new ConcurrentLinkedDeque<>();
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
     private final Context _context;
     private final float[] _projMatrix = new float[16];
@@ -35,6 +30,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     private int _width, _height;
     private boolean _needsResize = false;
     private final LauncherSurfaceView _view;
+    private final ScreenNavigator _navigator = new ScreenNavigator();
 
     public LauncherRenderer(Context context, LocationService locationService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
         _context = context;
@@ -61,14 +57,9 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
         if (_renderer != null) {
             _renderer.dispose();
         }
-
-        while (!_navigationStack.isEmpty()) {
-            _navigationStack.pop().dispose();
-        }
-
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
-        _navigationStack.push(new StartScreen(_context, this, _locationService, _appChangeReceiver, _view));
+        _navigator.init(new StartScreen(_context, _navigator, _locationService, _appChangeReceiver, _view));
     }
 
     @Override
@@ -90,7 +81,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
         }
         GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT | GLES32.GL_STENCIL_BUFFER_BIT);
         GLES32.glDisable(GLES32.GL_STENCIL_TEST);
-        _navigationStack.getFirst().draw(delta, _projMatrix, _renderer); // TODO: animation
+        _navigator.draw(delta, _projMatrix, _renderer);
     }
 
     @Override
@@ -101,44 +92,20 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
     }
 
     public void handleGesture(Gesture gesture) {
-        if (!_navigationStack.isEmpty()) {
-            _navigationStack.getFirst().handleGesture(gesture.copyWithOffset(0, -SCREEN_DATA.topInset)); // corrigate screen coordinates with the insets
-        }
+        _navigator.handleGesture(gesture.copyWithOffset(0, -SCREEN_DATA.topInset)); // corrigate screen coordinates with the insets
     }
 
     public void onBackPressed() {
-        _navigationStack.getFirst().onBackPressed();
+        _navigator.onBackPressed();
     }
 
     public void onHomePressed() {
-        if (!_navigationStack.isEmpty()) {
-            while (_navigationStack.size() > 1) {
-                _navigationStack.pop().dispose();
-            }
-            var startScreen = _navigationStack.getLast();
-            startScreen.onBackPressed();
-        }
-    }
-
-    @Override
-    public void push(@NonNull IScreen screen) {
-        screen.onResize(SCREEN_DATA.screenWidth, SCREEN_DATA.screenHeight);
-        _navigationStack.push(screen);
-    }
-
-    @Override
-    public void pop() {
-        var current = _navigationStack.peek();
-        _navigationStack.pop();
-        if (current != null) {
-            _commands.add(current::dispose);
-        }
+        _navigator.onHomePressed();
     }
 
     public void dispose() {
         if (!_disposed) {
-            _navigationStack.forEach(IScreen::dispose);
-            _navigationStack.clear();
+            _navigator.dispose();
             if (_renderer != null) _renderer.dispose();
             if (_shader != null) _shader.delete();
             _disposed = true;
@@ -181,7 +148,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer, IScreenNavigato
 
         Matrix.multiplyMM(_projMatrix, 0, _projMatrix, 0, viewMatrix, 0);
         Matrix.translateM(_projMatrix, 0, 0, SCREEN_DATA.topInset, 0);
-        _navigationStack.forEach(s -> s.onResize(_width, _height));
+        _navigator.onResize(_width, _height);
     }
 
     private void executeCommands() {

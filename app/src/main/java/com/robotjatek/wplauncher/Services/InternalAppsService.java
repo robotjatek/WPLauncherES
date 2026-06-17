@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.Clock.Clock;
 import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
 import com.robotjatek.wplauncher.R;

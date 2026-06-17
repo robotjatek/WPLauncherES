@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import com.robotjatek.wplauncher.Components.Modal.IModal;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 import java.util.Deque;
@@ -52,15 +53,23 @@ public class ScreenNavigator implements IScreenNavigator {
     }
 
     public void handleGesture(Gesture gesture) {
-        // TODO: modal gesture routing
-        // TODO: tapped on modal or not?
-        //  onModal -> route gesture to modal
-        //  else -> route gesture to screen
+        var modalTop = -LauncherRenderer.SCREEN_DATA.topInset;
+        var modalHeight = _height / 3f;
+        var modalBottom = modalTop + modalHeight;
+
+        if (_modal != null) {
+            if (gesture.getY() >= modalTop && gesture.getY() <= modalBottom) {
+                _modal.handleGesture(gesture);
+            } else {
+                _modal.dispose();
+                _modal = null;
+            }
+            return;
+        }
+
+
         if (!_navigationStack.isEmpty()) {
             _navigationStack.getFirst().handleGesture(gesture);
-        }
-        if (_modal != null) {
-            _modal.handleGesture(gesture);
         }
     }
 

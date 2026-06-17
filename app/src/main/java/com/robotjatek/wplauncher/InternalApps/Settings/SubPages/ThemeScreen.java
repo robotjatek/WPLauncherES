@@ -42,6 +42,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         _colorPickerBtn = new Button(
                 color.name(),
                 _icon,
+                new Size<>(0, 100),
                 () -> {
                     var colorPickerScreen = new ColorPickerScreen(navigator);
                     colorPickerScreen.subscribe(this);

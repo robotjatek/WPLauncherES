@@ -20,13 +20,19 @@ public class Modal implements IModal {
     private boolean _disposed = false;
     private final StackLayout _layout = new StackLayout();
     private final StackLayout _contentLayout = new StackLayout();
-    private final StackLayout _buttonLayout = new StackLayout();
+    private final StackLayout _buttonLayout = new StackLayout(StackLayout.Orientation.HORIZONTAL);
+    private final Spacer _buttonTopSpacer = new Spacer(-1, -1);
     private final Spacer _buttonSpacer = new Spacer(-1, -1);
     private final Label _titleLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, 0);
     private final TextBlock _messageBlock = new TextBlock("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, 0);
+    private final Button _okButton = new Button("OK", null, new Size<>(-1, -1), null);
+    private final Button _cancelButton = new Button("Cancel", null, new Size<>(-1, -1), null);
     private final float[] _model = new float[16];
 
     public Modal(String title, String message, Runnable onOk, Runnable onDismiss) {
+        _okButton.setOnTap(onOk);
+        _cancelButton.setOnTap(onDismiss);
+
         _layout.setBgColor(Colors.CONTEXT_MENU_GRAY);
         _layout.addChild(_contentLayout);
         _contentLayout.addChild(new Spacer(0, LauncherRenderer.SCREEN_DATA.topInset));
@@ -34,10 +40,10 @@ public class Modal implements IModal {
         _contentLayout.addChild(_titleLabel);
         _messageBlock.setText(message);
         _contentLayout.addChild(_messageBlock);
-        _layout.addChild(_buttonSpacer);
-        _buttonLayout.addChild(new Button("OK", null, onOk));
-        _buttonLayout.addChild(new Spacer(-1, 16));
-        _buttonLayout.addChild(new Button("Cancel", null, onDismiss));
+        _layout.addChild(_buttonTopSpacer);
+        _buttonLayout.addChild(_okButton);
+        _buttonLayout.addChild(_buttonSpacer);
+        _buttonLayout.addChild(_cancelButton);
         _layout.addChild(_buttonLayout);
     }
 
@@ -51,6 +57,10 @@ public class Modal implements IModal {
     @Override
     public void onResize(int width, int height) {
         _messageBlock.setMaxWidth(width);
+        var buttonWidth = (int)(width / 2f * 0.98f);
+        _okButton.setSize(new Size<>(buttonWidth, 100));
+        _cancelButton.setSize(new Size<>(buttonWidth, 100));
+        _buttonSpacer.setSize(width - buttonWidth * 2, 0);
 
         var topPadding = LauncherRenderer.SCREEN_DATA.topInset;
         var titleHeight = _titleLabel.measure().height();
@@ -60,12 +70,12 @@ public class Modal implements IModal {
         _messageBlock.setMaxHeight(Math.max(0, height - reserved));
 
         _contentLayout.onResize(width, height);
-        _buttonLayout.onResize(width, height);
+        _buttonLayout.onResize(width, buttonAreaHeight);
 
         var totalContentHeight = _contentLayout.measure().height();
         var finalButtonHeight = _buttonLayout.measure().height();
         var spacerHeight = Math.max(0, height - totalContentHeight - finalButtonHeight);
-        _buttonSpacer.setSize(width, spacerHeight);
+        _buttonTopSpacer.setSize(width, spacerHeight);
         _layout.onResize(width, height);
     }
 

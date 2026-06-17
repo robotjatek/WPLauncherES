@@ -17,17 +17,28 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StackLayout implements ILayout {
+    public enum Orientation {
+        VERTICAL,
+        HORIZONTAL
+    }
+
     private boolean _disposed = false;
     private int _bgColor = Colors.TRANSPARENT;
     public static final int TOP_MARGIN_PX = 0;
     private final List<UIElement> _children = new CopyOnWriteArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new ConcurrentHashMap<>();
     private final StackLayoutDrawContext _drawContext;
+    private final Orientation _orientation;
     private int _width;
     private int _height;
     private final float[] _model = new float[16];
 
     public StackLayout() {
+        this(Orientation.VERTICAL);
+    }
+
+    public StackLayout(Orientation orientation) {
+        _orientation = orientation;
         _drawContext = new StackLayoutDrawContext(this);
     }
 
@@ -85,11 +96,16 @@ public class StackLayout implements ILayout {
 
     public void layout() {
         _layoutInfo.clear();
-        var height = 0f;
+        var offset = 0f;
         for (var child : _children) {
             var size = child.measure();
-            _layoutInfo.put(child, new LayoutInfo(0, height));
-            height += size.height();
+            if (_orientation == Orientation.VERTICAL) {
+                _layoutInfo.put(child, new LayoutInfo(0, offset));
+                offset += size.height();
+            } else {
+                _layoutInfo.put(child, new LayoutInfo(offset, 0));
+                offset += size.width();
+            }
         }
     }
 
@@ -106,13 +122,27 @@ public class StackLayout implements ILayout {
     @Override
     public Size<Integer> measure() {
         var totalHeight = 0;
-        var maxWidth = 0;
+        var totalWidth = 0;
+        var maxChildWidth = 0;
+        var maxChildHeight = 0;
         for (var child : _children) {
             var size = child.measure();
-            totalHeight += size.height();
-            maxWidth = Math.max(maxWidth, size.width());
+            if (_orientation == Orientation.VERTICAL) {
+                totalHeight += size.height();
+                maxChildWidth = Math.max(maxChildWidth, size.width());
+            } else {
+                totalWidth += size.width();
+                maxChildHeight = Math.max(maxChildHeight, size.height());
+            }
+
         }
-        return new Size<>(maxWidth, totalHeight);
+        return _orientation == Orientation.VERTICAL ?
+                new Size<>(maxChildWidth, totalHeight) :
+                new Size<>(totalWidth, maxChildHeight);
+    }
+
+    public Orientation getOrientation() {
+        return _orientation;
     }
 
     @Override

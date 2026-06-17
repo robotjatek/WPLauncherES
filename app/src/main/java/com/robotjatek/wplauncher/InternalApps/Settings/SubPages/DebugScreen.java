@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
+import com.robotjatek.wplauncher.Components.Modal.Modal;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.Spacer.Spacer;
 import com.robotjatek.wplauncher.Gestures.Gesture;
@@ -60,12 +61,10 @@ public class DebugScreen implements IScreen {
     }
 
     private void showCrashAppMessageBox() {
-        // TODO: WP7 like messagebox: 1/3 of the top of the screen with an ok and cancel button
-        //  Stacklayout
-        //  Title label on top slighly larger text, bold, spacer, textblock with message spacer, ok and cancel button next to each other
-        // TODO: make navigation stack to be able render "half" pages so that pages below are visible too? (if top is is-popup render the page below)
-
-        throw new RuntimeException("App was crashed from the debug screen");
+        var modal = new Modal("WARNING!", "This will crash the application! A log will be created in the crash-log", () -> {
+            throw new RuntimeException("App was crashed from the debug screen");
+        });
+        _navigator.openModal(modal);
     }
 
     private void resetStateMachine() {

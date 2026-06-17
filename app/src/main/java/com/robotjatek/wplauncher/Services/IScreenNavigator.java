@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.Services;
 
 import androidx.annotation.NonNull;
 
+import com.robotjatek.wplauncher.Components.Modal.IModal;
 import com.robotjatek.wplauncher.IScreen;
 
 public interface IScreenNavigator {
@@ -18,4 +19,7 @@ public interface IScreenNavigator {
      * Disposes the popped screen.
      */
     void pop();
+
+    void onBackPressed();
+    void openModal(IModal modal);
 }

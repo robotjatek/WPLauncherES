@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.Components.Layouts.StackLayout;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.Components.UIElement;
@@ -17,12 +18,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StackLayout implements ILayout {
     private boolean _disposed = false;
+    private int _bgColor = Colors.TRANSPARENT;
     public static final int TOP_MARGIN_PX = 0;
     private final List<UIElement> _children = new CopyOnWriteArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new ConcurrentHashMap<>();
     private final StackLayoutDrawContext _drawContext;
     private int _width;
     private int _height;
+    private final float[] _model = new float[16];
 
     public StackLayout() {
         _drawContext = new StackLayoutDrawContext(this);
@@ -36,10 +39,19 @@ public class StackLayout implements ILayout {
     @Override
     public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position,
                      Size<Integer> size) {
-        Matrix.translateM(view, 0, position.x(), position.y() + TOP_MARGIN_PX, 0);
+
+        Matrix.setIdentityM(_model, 0);
+        Matrix.translateM(_model, 0, position.x(), position.y(), 0f);
+        Matrix.scaleM(_model, 0, size.width(), size.height(), 1f);
+        Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
+        renderer.drawFlat(proj, _model, _bgColor);
+
         renderer.pushLayer();
+        Matrix.setIdentityM(_model, 0);
+        Matrix.translateM(_model, 0, position.x(), position.y() + TOP_MARGIN_PX, 0f);
+        Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
         for (var child : _children) {
-            child.draw(delta, proj, view, _drawContext, renderer);
+            child.draw(delta, proj, _model, _drawContext, renderer);
         }
         renderer.popLayer();
     }
@@ -71,7 +83,7 @@ public class StackLayout implements ILayout {
         return _height;
     }
 
-    private void layout() {
+    public void layout() {
         _layoutInfo.clear();
         var height = 0f;
         for (var child : _children) {
@@ -115,6 +127,10 @@ public class StackLayout implements ILayout {
             }
         }
         return null;
+    }
+
+    public void setBgColor(int color) {
+        _bgColor = color;
     }
 
     public void dispose() {

@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.Services;
 
 import androidx.annotation.NonNull;
 
+import com.robotjatek.wplauncher.Components.Modal.IModal;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -11,13 +12,20 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class ScreenNavigator implements IScreenNavigator {
 
+    private IModal _modal;
     private final Deque<IScreen> _navigationStack = new ConcurrentLinkedDeque<>();
     private int _width = -1;
     private int _height = -1;
 
     public void draw(float delta, float[] proj, QuadRenderer renderer) {
-        _navigationStack.getFirst().draw(delta, proj, renderer); // TODO: animation
-        // TODO: modal
+        _navigationStack.getFirst().draw(delta, proj, renderer); // TODO: animated screen change
+        if (_modal != null) {
+            // TODO: draw full screen transparent overlay
+            _modal.onResize(_width, _height / 3);
+            renderer.pushLayer();
+            _modal.draw(delta, proj, renderer);
+            renderer.popLayer();
+        }
     }
 
     @Override
@@ -40,13 +48,26 @@ public class ScreenNavigator implements IScreenNavigator {
 
     public void handleGesture(Gesture gesture) {
         // TODO: modal gesture routing
+        // TODO: tapped on modal or not?
+        //  onModal -> route gesture to modal
+        //  else -> route gesture to screen
         if (!_navigationStack.isEmpty()) {
             _navigationStack.getFirst().handleGesture(gesture);
         }
+        if (_modal != null) {
+            _modal.handleGesture(gesture);
+        }
     }
 
+    @Override
     public void onBackPressed() {
-        // TODO: if modal is open dismiss it
+        // if modal is open dismiss it
+        if (_modal != null) {
+            _modal.dispose();
+            _modal = null;
+            return;
+        }
+
         _navigationStack.getFirst().onBackPressed();
     }
 
@@ -66,8 +87,17 @@ public class ScreenNavigator implements IScreenNavigator {
         _navigationStack.forEach(s -> s.onResize(width, height));
     }
 
+    @Override
+    public void openModal(IModal modal) {
+        _modal = modal;
+    }
+
     public void dispose() {
         _navigationStack.forEach(IScreen::dispose);
+        if (_modal != null) {
+            _modal.dispose();
+            _modal = null;
+        }
         _navigationStack.clear();
     }
 }

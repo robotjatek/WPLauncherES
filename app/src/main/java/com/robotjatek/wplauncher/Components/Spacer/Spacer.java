@@ -11,7 +11,7 @@ import com.robotjatek.wplauncher.QuadRenderer;
  */
 public class Spacer implements UIElement {
 
-    private final Size<Integer> _size;
+    private Size<Integer> _size;
 
     public Spacer(int width, int height) {
         _size = new Size<>(width, height);
@@ -25,6 +25,10 @@ public class Spacer implements UIElement {
     @Override
     public Size<Integer> measure() {
         return _size;
+    }
+
+    public void setSize(int width, int height) {
+        _size = new Size<>(width, height);
     }
 
     @Override

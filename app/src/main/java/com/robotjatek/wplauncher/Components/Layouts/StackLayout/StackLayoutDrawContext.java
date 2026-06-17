@@ -2,11 +2,10 @@ package com.robotjatek.wplauncher.Components.Layouts.StackLayout;
 
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.Components.UIElement;
-import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 
 public class StackLayoutDrawContext implements IDrawContext<UIElement> {
 
-    private final ILayout _layout;
+    private final StackLayout _layout;
 
     public StackLayoutDrawContext(StackLayout layout) {
         _layout = layout;
@@ -24,11 +23,19 @@ public class StackLayoutDrawContext implements IDrawContext<UIElement> {
 
     @Override
     public float widthOf(UIElement element) {
-        return _layout.getWidth();
+        if (_layout.getOrientation() == StackLayout.Orientation.VERTICAL) {
+            return _layout.getWidth() - _layout.getPadding() * 2;
+        } else {
+            return element.measure().width();
+        }
     }
 
     @Override
     public float heightOf(UIElement element) {
-        return element.measure().height();
+        if (_layout.getOrientation() == StackLayout.Orientation.VERTICAL) {
+            return element.measure().height();
+        } else {
+            return _layout.getHeight() - _layout.getPadding() * 2;
+        }
     }
 }

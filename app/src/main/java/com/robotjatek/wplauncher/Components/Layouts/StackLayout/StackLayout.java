@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.Components.Layouts.StackLayout;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.Components.UIElement;
@@ -16,15 +17,29 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StackLayout implements ILayout {
+    public enum Orientation {
+        VERTICAL,
+        HORIZONTAL
+    }
+
     private boolean _disposed = false;
+    private int _bgColor = Colors.TRANSPARENT;
+    private int _padding = 0;
     public static final int TOP_MARGIN_PX = 0;
     private final List<UIElement> _children = new CopyOnWriteArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new ConcurrentHashMap<>();
     private final StackLayoutDrawContext _drawContext;
+    private final Orientation _orientation;
     private int _width;
     private int _height;
+    private final float[] _model = new float[16];
 
     public StackLayout() {
+        this(Orientation.VERTICAL);
+    }
+
+    public StackLayout(Orientation orientation) {
+        _orientation = orientation;
         _drawContext = new StackLayoutDrawContext(this);
     }
 
@@ -36,10 +51,19 @@ public class StackLayout implements ILayout {
     @Override
     public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position,
                      Size<Integer> size) {
-        Matrix.translateM(view, 0, position.x(), position.y() + TOP_MARGIN_PX, 0);
+
+        Matrix.setIdentityM(_model, 0);
+        Matrix.translateM(_model, 0, position.x(), position.y(), 0f);
+        Matrix.scaleM(_model, 0, size.width(), size.height(), 1f);
+        Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
+        renderer.drawFlat(proj, _model, _bgColor);
+
         renderer.pushLayer();
+        Matrix.setIdentityM(_model, 0);
+        Matrix.translateM(_model, 0, position.x(), position.y() + TOP_MARGIN_PX, 0f);
+        Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
         for (var child : _children) {
-            child.draw(delta, proj, view, _drawContext, renderer);
+            child.draw(delta, proj, _model, _drawContext, renderer);
         }
         renderer.popLayer();
     }
@@ -71,13 +95,18 @@ public class StackLayout implements ILayout {
         return _height;
     }
 
-    private void layout() {
+    public void layout() {
         _layoutInfo.clear();
-        var height = 0f;
+        var offset = 0f;
         for (var child : _children) {
             var size = child.measure();
-            _layoutInfo.put(child, new LayoutInfo(0, height));
-            height += size.height();
+            if (_orientation == Orientation.VERTICAL) {
+                _layoutInfo.put(child, new LayoutInfo(_padding, offset + _padding));
+                offset += size.height();
+            } else {
+                _layoutInfo.put(child, new LayoutInfo(offset + _padding, _padding));
+                offset += size.width();
+            }
         }
     }
 
@@ -94,13 +123,27 @@ public class StackLayout implements ILayout {
     @Override
     public Size<Integer> measure() {
         var totalHeight = 0;
-        var maxWidth = 0;
+        var totalWidth = 0;
+        var maxChildWidth = 0;
+        var maxChildHeight = 0;
         for (var child : _children) {
             var size = child.measure();
-            totalHeight += size.height();
-            maxWidth = Math.max(maxWidth, size.width());
+            if (_orientation == Orientation.VERTICAL) {
+                totalHeight += size.height();
+                maxChildWidth = Math.max(maxChildWidth, size.width());
+            } else {
+                totalWidth += size.width();
+                maxChildHeight = Math.max(maxChildHeight, size.height());
+            }
+
         }
-        return new Size<>(maxWidth, totalHeight);
+        return _orientation == Orientation.VERTICAL ?
+                new Size<>(maxChildWidth + _padding * 2, totalHeight + _padding * 2) :
+                new Size<>(totalWidth + _padding * 2, maxChildHeight + _padding * 2);
+    }
+
+    public Orientation getOrientation() {
+        return _orientation;
     }
 
     @Override
@@ -115,6 +158,19 @@ public class StackLayout implements ILayout {
             }
         }
         return null;
+    }
+
+    public void setBgColor(int color) {
+        _bgColor = color;
+    }
+
+    public void setPadding(int padding) {
+        _padding = padding;
+        layout();
+    }
+
+    public int getPadding() {
+        return _padding;
     }
 
     public void dispose() {

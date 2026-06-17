@@ -12,7 +12,7 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
-import com.robotjatek.wplauncher.IScreenNavigator;
+import com.robotjatek.wplauncher.Services.IScreenNavigator;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
@@ -44,7 +44,7 @@ public class TextReaderPage implements IScreen {
         _file = file;
         _onClose = onClose;
         var content = readFileContent(file);
-        _deleteButton = new Button("Delete log", null, this::deleteFileAndExit);
+        _deleteButton = new Button("Delete log", null, new Size<>(0, 100), this::deleteFileAndExit);
         _textbox = new TextBlock(content, 38, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, -1);
         _scrollView = new ScrollView(_textbox, 0, LauncherRenderer.SCREEN_DATA.bottomInset);
         _layout.addChild(_deleteButton);

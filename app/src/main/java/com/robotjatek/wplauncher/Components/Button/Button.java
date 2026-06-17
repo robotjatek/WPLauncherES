@@ -22,15 +22,17 @@ public class Button implements UIElement, ITouchable {
     private static final int BORDER_SIZE_PX = 4;
     private final TouchHandler _touchHandler = new TouchHandler(this);
     private boolean _disposed = false;
-    private final Runnable _onTap;
+    private Runnable _onTap;
     private boolean _isDirty = true;
     private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _label;
     private Icon _icon;
+    private Size<Integer> _size;
 
-    public Button(String text, Icon icon, Runnable onTap) {
+    public Button(String text, Icon icon, Size<Integer> size, Runnable onTap) {
         _label = new Label(text, 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+        _size = size;
         _icon = icon;
         _onTap = onTap;
         _borderLayout.setBgColor(Colors.WHITE);
@@ -105,7 +107,7 @@ public class Button implements UIElement, ITouchable {
 
     @Override
     public Size<Integer> measure() {
-        return new Size<>(0, 100); // TODO: configure height
+        return _size;
     }
 
     public void setText(String text) {
@@ -118,6 +120,15 @@ public class Button implements UIElement, ITouchable {
         }
         _icon = icon;
         _isDirty = true;
+    }
+
+    public void setSize(Size<Integer> size) {
+        _size = size;
+        _isDirty = true;
+    }
+
+    public void setOnTap(Runnable onTap) {
+        _onTap = onTap;
     }
 
     @Override

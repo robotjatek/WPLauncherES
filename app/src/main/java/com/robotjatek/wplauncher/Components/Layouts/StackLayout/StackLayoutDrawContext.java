@@ -24,7 +24,7 @@ public class StackLayoutDrawContext implements IDrawContext<UIElement> {
     @Override
     public float widthOf(UIElement element) {
         if (_layout.getOrientation() == StackLayout.Orientation.VERTICAL) {
-            return _layout.getWidth();
+            return _layout.getWidth() - _layout.getPadding() * 2;
         } else {
             return element.measure().width();
         }
@@ -35,7 +35,7 @@ public class StackLayoutDrawContext implements IDrawContext<UIElement> {
         if (_layout.getOrientation() == StackLayout.Orientation.VERTICAL) {
             return element.measure().height();
         } else {
-            return _layout.getHeight();
+            return _layout.getHeight() - _layout.getPadding() * 2;
         }
     }
 }

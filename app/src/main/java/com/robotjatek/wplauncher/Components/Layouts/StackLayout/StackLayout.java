@@ -24,6 +24,7 @@ public class StackLayout implements ILayout {
 
     private boolean _disposed = false;
     private int _bgColor = Colors.TRANSPARENT;
+    private int _padding = 0;
     public static final int TOP_MARGIN_PX = 0;
     private final List<UIElement> _children = new CopyOnWriteArrayList<>();
     private final Map<UIElement, LayoutInfo> _layoutInfo = new ConcurrentHashMap<>();
@@ -100,10 +101,10 @@ public class StackLayout implements ILayout {
         for (var child : _children) {
             var size = child.measure();
             if (_orientation == Orientation.VERTICAL) {
-                _layoutInfo.put(child, new LayoutInfo(0, offset));
+                _layoutInfo.put(child, new LayoutInfo(_padding, offset + _padding));
                 offset += size.height();
             } else {
-                _layoutInfo.put(child, new LayoutInfo(offset, 0));
+                _layoutInfo.put(child, new LayoutInfo(offset + _padding, _padding));
                 offset += size.width();
             }
         }
@@ -137,8 +138,8 @@ public class StackLayout implements ILayout {
 
         }
         return _orientation == Orientation.VERTICAL ?
-                new Size<>(maxChildWidth, totalHeight) :
-                new Size<>(totalWidth, maxChildHeight);
+                new Size<>(maxChildWidth + _padding * 2, totalHeight + _padding * 2) :
+                new Size<>(totalWidth + _padding * 2, maxChildHeight + _padding * 2);
     }
 
     public Orientation getOrientation() {
@@ -161,6 +162,15 @@ public class StackLayout implements ILayout {
 
     public void setBgColor(int color) {
         _bgColor = color;
+    }
+
+    public void setPadding(int padding) {
+        _padding = padding;
+        layout();
+    }
+
+    public int getPadding() {
+        return _padding;
     }
 
     public void dispose() {

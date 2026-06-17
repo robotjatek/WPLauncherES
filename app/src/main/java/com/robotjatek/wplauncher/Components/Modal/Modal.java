@@ -34,6 +34,7 @@ public class Modal implements IModal {
         _cancelButton.setOnTap(onDismiss);
 
         _layout.setBgColor(Colors.CONTEXT_MENU_GRAY);
+        _layout.setPadding(16);
         _layout.addChild(_contentLayout);
         _contentLayout.addChild(new Spacer(0, LauncherRenderer.SCREEN_DATA.topInset));
         _titleLabel.setText(title);
@@ -56,26 +57,30 @@ public class Modal implements IModal {
 
     @Override
     public void onResize(int width, int height) {
-        _messageBlock.setMaxWidth(width);
-        var buttonWidth = (int)(width / 2f * 0.98f);
+        var rootPadding = _layout.getPadding();
+        var innerWidth = width - rootPadding * 2;
+        var innerHeight = height - rootPadding * 2;
+
+        _messageBlock.setMaxWidth(innerWidth);
+        var buttonWidth = (int)(innerWidth / 2f * 0.98f);
         _okButton.setSize(new Size<>(buttonWidth, 100));
         _cancelButton.setSize(new Size<>(buttonWidth, 100));
-        _buttonSpacer.setSize(width - buttonWidth * 2, 0);
+        _buttonSpacer.setSize(innerWidth - buttonWidth * 2, 0);
 
         var topPadding = LauncherRenderer.SCREEN_DATA.topInset;
         var titleHeight = _titleLabel.measure().height();
         var buttonAreaHeight = _buttonLayout.measure().height();
 
         var reserved = topPadding + titleHeight + buttonAreaHeight;
-        _messageBlock.setMaxHeight(Math.max(0, height - reserved));
+        _messageBlock.setMaxHeight(Math.max(0, innerHeight - reserved));
 
-        _contentLayout.onResize(width, height);
-        _buttonLayout.onResize(width, buttonAreaHeight);
+        _contentLayout.onResize(innerWidth, innerHeight);
+        _buttonLayout.onResize(innerWidth, buttonAreaHeight);
 
         var totalContentHeight = _contentLayout.measure().height();
         var finalButtonHeight = _buttonLayout.measure().height();
-        var spacerHeight = Math.max(0, height - totalContentHeight - finalButtonHeight);
-        _buttonTopSpacer.setSize(width, spacerHeight);
+        var spacerHeight = Math.max(0, innerHeight - totalContentHeight - finalButtonHeight);
+        _buttonTopSpacer.setSize(innerWidth, spacerHeight);
         _layout.onResize(width, height);
     }
 

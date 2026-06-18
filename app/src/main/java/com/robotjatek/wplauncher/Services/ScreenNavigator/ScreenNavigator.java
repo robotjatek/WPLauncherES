@@ -82,10 +82,11 @@ public class ScreenNavigator implements IScreenNavigator {
 
         Matrix.setIdentityM(_model, 0);
         _navigationStack.getFirst().draw(delta, proj, _model, renderer);
+        renderer.clearDepthBuffer(); // clearing the depth buffer, so the animated screen stays on top of everything else
 
         if (_animatedScreen != null) {
             Matrix.setIdentityM(_model, 0);
-            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
+            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, -1f);
 
             renderer.pushLayers(100);
             _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), new Size<>(_width, _height));

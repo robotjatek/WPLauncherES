@@ -125,13 +125,12 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         GLES32.glViewport(0, 0, _width, _height);
 
         var fov = 45f;
-        var aspect = (float) _width / _height;
-        var zNear = 10.0f;
-        var zFar = 10000f;
-        Matrix.perspectiveM(_projMatrix, 0, fov, aspect, zNear, zFar);
-
         // Distance to the Z=0 plane where 1 world unit = 1 screen pixel
         var distance = (float) ((_height / 2f) / Math.tan(Math.toRadians(fov / 2f)));
+        var aspect = (float) _width / _height;
+        var zNear = distance - 1100f;
+        var zFar = distance + 1100f;
+        Matrix.perspectiveM(_projMatrix, 0, fov, aspect, zNear, zFar);
 
         var viewMatrix = new float[16];
         // Camera at -distance looking at 0.

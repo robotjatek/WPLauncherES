@@ -31,7 +31,7 @@ public class AboutScreen implements IScreen {
     private final String _siteURL = "https://robotjatek.github.io/";
     private final TextBlock _description = new TextBlock("A Windows Phone inspired launcher for Android built from scratch in OpenGL ES",
             48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, -1);
-    private final TextBlock _free = new TextBlock("Free forever. No ads. No paywalls. No data collected.",
+    private final TextBlock _free = new TextBlock("Free forever. No ads. No paywalls. No data collected. No telemetry. No phoning home.",
             48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, -1);
 
     public AboutScreen(IScreenNavigator navigator, Context context, SettingsService settings) {

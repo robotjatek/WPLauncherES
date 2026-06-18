@@ -78,7 +78,7 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
         setFocusable(true);
         setFocusableInTouchMode(true);
         setEGLContextClientVersion(3);
-        setEGLConfigChooser(8, 8, 8, 8, 16, 8);
+        setEGLConfigChooser(8, 8, 8, 8, 24, 8);
         setRenderer(_renderer);
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }

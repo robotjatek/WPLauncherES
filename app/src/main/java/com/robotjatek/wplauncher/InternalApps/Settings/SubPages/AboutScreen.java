@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
@@ -26,7 +25,6 @@ public class AboutScreen implements IScreen {
     private final Context _context;
     private final IScreenNavigator _navigator;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final float[] _view = new float[16];
     private final StackLayout _layout = new StackLayout();
     private final Label _versionLabel = new Label("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0);
     private final String _githubURL = "https://github.com/robotjatek/WPLauncherES";
@@ -39,6 +37,7 @@ public class AboutScreen implements IScreen {
     public AboutScreen(IScreenNavigator navigator, Context context, SettingsService settings) {
         _navigator = navigator;
         _context = context;
+        _layout.setBgColor(Colors.BLACK);
 
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("about", 160, Typeface.NORMAL, Colors.WHITE, 0));
@@ -55,9 +54,8 @@ public class AboutScreen implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
-        Matrix.setIdentityM(_view, 0);
-        _layout.draw(delta, projMatrix, _view, renderer, Position.ZERO, _size);
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
+        _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 
     @Override

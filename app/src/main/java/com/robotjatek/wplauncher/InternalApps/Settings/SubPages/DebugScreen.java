@@ -1,14 +1,12 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Modal.Modal;
 import com.robotjatek.wplauncher.Components.Size;
-import com.robotjatek.wplauncher.Components.Spacer.Spacer;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
@@ -22,10 +20,10 @@ public class DebugScreen implements IScreen {
     private final IScreenNavigator _navigator;
     private final StackLayout _layout = new StackLayout();
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final float[] _view = new float[16];
 
     public DebugScreen(IScreenNavigator navigator) {
         _navigator = navigator;
+        _layout.setBgColor(Colors.BLACK);
         // Title
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("debug", 160, Typeface.NORMAL, Colors.WHITE, 0));
@@ -38,9 +36,8 @@ public class DebugScreen implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
-        Matrix.setIdentityM(_view, 0);
-        _layout.draw(delta, projMatrix, _view, renderer, Position.ZERO, _size);
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
+        _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 
     @Override

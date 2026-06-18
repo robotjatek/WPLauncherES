@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
@@ -26,13 +25,13 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     private final Button _colorPickerBtn;
     private Icon _icon;
     private final SettingsService _settings;
-    private final float[] _view = new float[16];
     private Size<Integer> _size = new Size<>(-1, -1);
 
     public ThemeScreen(IScreenNavigator navigator, SettingsService settings) {
         _navigator = navigator;
         _settings = settings;
         _layout = new StackLayout();
+        _layout.setBgColor(Colors.BLACK);
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("theme", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
@@ -54,9 +53,8 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
-        Matrix.setIdentityM(_view, 0);
-        _layout.draw(delta, projMatrix, _view, renderer, Position.ZERO, _size);
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
+        _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 
     @Override

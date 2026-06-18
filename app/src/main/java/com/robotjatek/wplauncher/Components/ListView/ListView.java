@@ -2,8 +2,10 @@ package com.robotjatek.wplauncher.Components.ListView;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.IContextMenuParent;
+import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.ListView.States.ContextMenuState;
 import com.robotjatek.wplauncher.Components.ListView.States.IdleState;
 import com.robotjatek.wplauncher.Components.ListView.States.ScrollState;
@@ -34,6 +36,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
     private final float[] _modelMatrix = new float[16];
     private final float[] _menuMatrix = new float[16];
     private final float[] _clipMatrix = new float[16];
+    private final StackLayout _bgLayout = new StackLayout();
     private final List<ListItem<T>> _allItems = Collections.synchronizedList(new ArrayList<>());
     private final List<ListItem<T>> _filteredItems = Collections.synchronizedList(new ArrayList<>());
     private Size<Integer> _size = new Size<>(-1, -1);
@@ -63,6 +66,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         _bottomMargin = bottomMargin;
         _padding = padding;
         _itemDrawContext = new ListItemDrawContext<>(padding, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
+        _bgLayout.setBgColor(Colors.BLACK);
     }
 
     public int getPadding() {
@@ -100,6 +104,8 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         Matrix.scaleM(_clipMatrix, 0, w, h, 1);
         Matrix.multiplyMM(_clipMatrix, 0, view, 0, _clipMatrix, 0);
         renderer.beginClip(proj, _clipMatrix);
+
+        _bgLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y + _scroll.getScrollOffset() + _padding, 0);

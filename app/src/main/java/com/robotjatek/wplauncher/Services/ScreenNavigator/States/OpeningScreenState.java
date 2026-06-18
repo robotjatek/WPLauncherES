@@ -1,30 +1,30 @@
 package com.robotjatek.wplauncher.Services.ScreenNavigator.States;
 
-import com.robotjatek.wplauncher.Components.Modal.IModal;
 import com.robotjatek.wplauncher.Gestures.Gesture;
+import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 
-public class OpeningModalState extends BaseState {
+public class OpeningScreenState extends BaseState {
 
-    private float _translationHeight;
-    private final IModal _modal;
-    private static final float DURATION = 250; // milliseconds
+    private final IScreen _screen;
+    private float _translation;
+    private static final float DURATION = 200; // milliseconds
     private float _elapsed = 0f;
     private float _smoothDelta = 0f;
 
-    public OpeningModalState(ScreenNavigator context, IModal modal) {
+    public OpeningScreenState(ScreenNavigator context, IScreen screen) {
         super(context);
-        _modal = modal;
+        _screen = screen;
     }
 
     @Override
     public void enter() {
         super.enter();
-        _modal.onResize(_context.getWidth(), _context.getHeight() / 3);
-        var modalHeight = _modal.getSize().height();
-        _translationHeight = -modalHeight;
-        _context.setModal(_modal);
-        _modal.setVerticalTranslation(_translationHeight);
+        var width = _context.getWidth();
+        _screen.onResize(width, _context.getHeight());
+        _translation = width;
+        _context.setAnimatedScreenTranslation(_translation);
+        _context.setAnimatedScreen(_screen);
     }
 
     @Override
@@ -33,17 +33,22 @@ public class OpeningModalState extends BaseState {
         _smoothDelta = _smoothDelta * 0.8f + delta * 0.2f;
         _elapsed += _smoothDelta;
         if (_elapsed >= DURATION) {
-            _modal.setVerticalTranslation(0);
+            _context.setAnimatedScreenTranslation(0);
             _context.changeState(_context.IDLE_STATE());
         } else {
             var t = _elapsed / DURATION;
             var factor = 1 - (1 - t) * (1 - t) * (1 - t);
-            _modal.setVerticalTranslation(_translationHeight * (1 - factor));
+            _context.setAnimatedScreenTranslation(_translation * (1 - factor));
         }
     }
 
     @Override
+    public void exit() {
+        _context.pushToNavigationStack(_screen);
+    }
+
+    @Override
     public boolean handleGesture(Gesture gesture) {
-        return false; // dismissing every gesture in this state
+        return false; // discard gestures while animating
     }
 }

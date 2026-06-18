@@ -4,14 +4,21 @@ import android.opengl.Matrix;
 
 import androidx.annotation.NonNull;
 
+import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Modal.IModal;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IState;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.ClosingModalState;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.States.ClosingScreenState;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.IdleState;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.OpeningModalState;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.States.OpeningScreenState;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.Deque;
 import java.util.Queue;
@@ -32,14 +39,28 @@ public class ScreenNavigator implements IScreenNavigator {
         return new ClosingModalState(this);
     }
 
-    private IState _state = IDLE_STATE();
+    public IState OPENING_SCREEN_STATE(IScreen screen) {
+        return new OpeningScreenState(this, screen);
+    }
 
+    public IState CLOSING_SCREEN_STATE(IScreen screen) {
+        return new ClosingScreenState(this, screen);
+    }
+
+    private IState _state = IDLE_STATE();
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
     private IModal _modal;
+    private IScreen _animatedScreen;
+    private float _animatedScreenTranslation;
     private final Deque<IScreen> _navigationStack = new ConcurrentLinkedDeque<>();
     private int _width = -1;
     private int _height = -1;
     private final float[] _model = new float[16];
+    private final StackLayout _fullscreen = new StackLayout();
+
+    public ScreenNavigator() {
+        _fullscreen.setBgColor(Colors.BLACK);
+    }
 
     public void changeState(IState state) {
         _state.exit();
@@ -47,11 +68,30 @@ public class ScreenNavigator implements IScreenNavigator {
         _state.enter();
     }
 
+    public void setAnimatedScreen(IScreen screen) {
+        _animatedScreen = screen;
+    }
+
+    public void setAnimatedScreenTranslation(float translation) {
+        _animatedScreenTranslation = translation;
+    }
+
     public void draw(float delta, float[] proj, QuadRenderer renderer) {
         executeCommands();
         _state.update(delta);
 
-        _navigationStack.getFirst().draw(delta, proj, renderer); // TODO: animated screen change
+        Matrix.setIdentityM(_model, 0);
+        _navigationStack.getFirst().draw(delta, proj, _model, renderer);
+
+        Matrix.setIdentityM(_model, 0);
+        Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
+        if (_animatedScreen != null) {
+            renderer.pushLayer();
+            _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), new Size<>(_width, _height));
+            _animatedScreen.draw(delta,  proj, _model, renderer);
+            renderer.popLayer();
+        }
+
         if (_modal != null) {
             Matrix.setIdentityM(_model, 0);
             Matrix.scaleM(_model, 0, _width, _height, 1);
@@ -64,15 +104,24 @@ public class ScreenNavigator implements IScreenNavigator {
 
     @Override
     public void push(@NonNull IScreen screen) {
+        changeState(OPENING_SCREEN_STATE(screen));
+    }
+
+    public void pushToNavigationStack(IScreen screen) {
         _commands.add(() -> {
-            screen.onResize(_width, _height);
             _navigationStack.push(screen);
+            _animatedScreen = null;
         });
     }
 
     @Override
     public void pop() {
-        _commands.add(() -> _navigationStack.pop().dispose());
+        var screen = _navigationStack.getFirst();
+        changeState(CLOSING_SCREEN_STATE(screen));
+    }
+
+    public void popFromNavigationStack() {
+        _commands.add(_navigationStack::pop);
     }
 
     public void init(IScreen screen) {
@@ -121,9 +170,7 @@ public class ScreenNavigator implements IScreenNavigator {
 
     @Override
     public void openModal(IModal modal) {
-        modal.onResize(_width, _height / 3);
         changeState(OPENING_MODAL_STATE(modal));
-        _modal = modal;
     }
 
     @Override
@@ -144,8 +191,16 @@ public class ScreenNavigator implements IScreenNavigator {
         return _modal;
     }
 
+    public void setModal(IModal modal) {
+        _modal = modal;
+    }
+
     public int getHeight() {
         return _height;
+    }
+
+    public int getWidth() {
+        return _width;
     }
 
     public IScreen getCurrentScreen() {
@@ -164,6 +219,7 @@ public class ScreenNavigator implements IScreenNavigator {
         if (_modal != null) {
             _modal.dispose();
             _modal = null;
+            _fullscreen.dispose();
         }
         _navigationStack.clear();
     }

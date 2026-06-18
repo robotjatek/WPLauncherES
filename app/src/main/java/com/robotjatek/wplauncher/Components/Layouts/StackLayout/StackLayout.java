@@ -52,11 +52,13 @@ public class StackLayout implements ILayout {
     public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position,
                      Size<Integer> size) {
 
+        renderer.pushLayer();
         Matrix.setIdentityM(_model, 0);
         Matrix.translateM(_model, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_model, 0, size.width(), size.height(), 1f);
         Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
         renderer.drawFlat(proj, _model, _bgColor);
+        renderer.popLayer();
 
         renderer.pushLayer();
         Matrix.setIdentityM(_model, 0);

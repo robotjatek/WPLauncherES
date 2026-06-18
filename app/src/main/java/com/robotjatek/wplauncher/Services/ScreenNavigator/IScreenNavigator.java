@@ -28,7 +28,7 @@ public interface IScreenNavigator {
     void onBackPressed();
 
     /**
-     * Opens the give modal on screen
+     * Opens the given modal on screen
      */
     void openModal(IModal modal);
 

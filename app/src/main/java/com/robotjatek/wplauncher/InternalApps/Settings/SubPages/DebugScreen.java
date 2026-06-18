@@ -29,7 +29,6 @@ public class DebugScreen implements IScreen {
         // Title
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("debug", 160, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Spacer(0, 48));
 
         // Content
         _layout.addChild(new Label("crash application", 72, Typeface.NORMAL, Colors.WHITE, 0, -1,

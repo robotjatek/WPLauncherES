@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.States.ClosingModalState;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.IdleState;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.OpeningModalState;
 
@@ -25,6 +26,10 @@ public class ScreenNavigator implements IScreenNavigator {
 
     public IState OPENING_MODAL_STATE(IModal modal) {
         return new OpeningModalState(this, modal);
+    }
+
+    public IState CLOSING_MODAL_STATE() {
+        return new ClosingModalState(this);
     }
 
     private IState _state = IDLE_STATE();
@@ -123,7 +128,10 @@ public class ScreenNavigator implements IScreenNavigator {
 
     @Override
     public void dismissModal() {
-        // TODO: animation
+        changeState(CLOSING_MODAL_STATE());
+    }
+
+    public void disposeModal() {
         _commands.add(() -> {
             if (_modal != null) {
                 _modal.dispose();

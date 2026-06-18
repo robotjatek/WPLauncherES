@@ -92,7 +92,7 @@ public class Modal implements IModal {
         return _size;
     }
 
-    public void setModalTranslationHeight(float height) {
+    public void setVerticalTranslation(float height) {
         _modalTranslationHeight = height;
     }
 

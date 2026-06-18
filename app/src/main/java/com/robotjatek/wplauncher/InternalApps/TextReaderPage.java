@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher.InternalApps;
 
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
@@ -28,7 +27,6 @@ public class TextReaderPage implements IScreen {
 
     private boolean _disposed = false;
     public final IScreenNavigator _navigator;
-    private final float[] _modelMatrix = new float[16];
     private Size<Integer> _size = new Size<>(-1, -1);
     private final StackLayout _layout = new StackLayout();
     private final TextBlock _textbox;
@@ -53,13 +51,12 @@ public class TextReaderPage implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
         if (_dirty) {
             _dirty = false;
         }
 
-        Matrix.setIdentityM(_modelMatrix, 0);
-        _layout.draw(delta, projMatrix, _modelMatrix, renderer, Position.ZERO, _size);
+        _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.InternalApps.Settings;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
@@ -26,11 +25,11 @@ public class Settings implements IScreen {
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final float[] _view = new float[16];
 
     public Settings(IScreenNavigator navigator, SettingsService settings, Context context) {
         _navigator = navigator;
         _layout = new StackLayout();
+        _layout.setBgColor(Colors.BLACK);
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Spacer(0, 160));
         _layout.addChild(new Label("theme", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
@@ -45,9 +44,8 @@ public class Settings implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
-        Matrix.setIdentityM(_view, 0);
-        _layout.draw(delta, projMatrix, _view, renderer, Position.ZERO, _size);
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
+        _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 
     @Override

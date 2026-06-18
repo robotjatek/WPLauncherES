@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
@@ -36,7 +35,6 @@ public class CrashLogScreen implements IScreen {
     private final StackLayout _layout = new StackLayout();
     private final ListView<File> _crashList;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final float[] _view = new float[16];
     private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
     private final Label _subTitleLabel = new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0);
     private final ContextMenuDrawContext<File> _contextMenuDrawContext;
@@ -50,12 +48,12 @@ public class CrashLogScreen implements IScreen {
         _layout.addChild(_subTitleLabel);
         _layout.addChild(_crashList);
         _crashList.addItems(createItems());
+        _layout.setBgColor(Colors.BLACK);
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
-        Matrix.setIdentityM(_view, 0);
-        _layout.draw(delta, projMatrix, _view, renderer, Position.ZERO, _size);
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
+        _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 
     @Override

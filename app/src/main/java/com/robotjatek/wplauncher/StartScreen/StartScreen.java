@@ -88,7 +88,7 @@ public class StartScreen implements IPageNavigator, IScreen {
         _view = view;
     }
 
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
         _tileService.executeCommands();
         for (var i = 0; i < _pages.size(); i++) {
             var xOffset = (i - _currentPage) * _screenWidth + _pageOffset;

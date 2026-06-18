@@ -8,7 +8,7 @@ public interface IModal {
     void draw(float delta, float[] projMatrix, QuadRenderer renderer);
     void onResize(int width, int height);
     Size<Integer> getSize();
-    void setModalTranslationHeight(float height);
+    void setVerticalTranslation(float height);
     boolean handleGesture(Gesture gesture);
     void dispose();
 }

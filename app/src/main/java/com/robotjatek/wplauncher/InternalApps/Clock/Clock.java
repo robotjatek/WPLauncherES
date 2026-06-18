@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.InternalApps.Clock;
 
 import android.content.Context;
 import android.graphics.Typeface;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
@@ -27,7 +26,6 @@ public class Clock implements IScreen {
     private final StackLayout _layout;
     private final Context _context;
     private boolean _locationEnabled;
-    private final float[] _pageMatrix = new float[16];
     private Size<Integer> _size = new Size<>(-1, -1);
 
     public Clock(IScreenNavigator navigator, Context context) {
@@ -36,6 +34,7 @@ public class Clock implements IScreen {
         loadSettings();
 
         _layout = new StackLayout();
+        _layout.setBgColor(Colors.BLACK);
         _layout.addChild(new Label("CLOCK HUB", 52, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("settings", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Checkbox("Show location on tile when available", _locationEnabled, (b) -> {
@@ -75,9 +74,8 @@ public class Clock implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
-        Matrix.setIdentityM(_pageMatrix, 0);
-        _layout.draw(delta, projMatrix, _pageMatrix, renderer, Position.ZERO, _size);
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
+        _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 
     @Override

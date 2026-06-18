@@ -12,6 +12,7 @@ import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.ClosingModalState;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.IdleState;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.OpeningModalState;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.States.OpeningScreenState;
 
 import java.util.Deque;
 import java.util.Queue;
@@ -32,10 +33,16 @@ public class ScreenNavigator implements IScreenNavigator {
         return new ClosingModalState(this);
     }
 
+    public IState OPENING_SCREEN_STATE(IScreen screen) {
+        return new OpeningScreenState(this, screen);
+    }
+
     private IState _state = IDLE_STATE();
 
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
     private IModal _modal;
+    private IScreen _animatedScreen;
+    private float _animatedScreenTranslation;
     private final Deque<IScreen> _navigationStack = new ConcurrentLinkedDeque<>();
     private int _width = -1;
     private int _height = -1;
@@ -47,11 +54,29 @@ public class ScreenNavigator implements IScreenNavigator {
         _state.enter();
     }
 
+    public void setAnimatedScreen(IScreen screen) {
+        _animatedScreen = screen;
+    }
+
+    public void setAnimatedScreenTranslation(float translation) {
+        _animatedScreenTranslation = translation;
+    }
+
     public void draw(float delta, float[] proj, QuadRenderer renderer) {
         executeCommands();
         _state.update(delta);
 
-        _navigationStack.getFirst().draw(delta, proj, renderer); // TODO: animated screen change
+        Matrix.setIdentityM(_model, 0);
+        _navigationStack.getFirst().draw(delta, proj, _model, renderer);
+
+        Matrix.setIdentityM(_model, 0);
+        Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
+        if (_animatedScreen != null) {
+            renderer.pushLayer();
+            _animatedScreen.draw(delta,  proj, _model, renderer);
+            renderer.popLayer();
+        }
+
         if (_modal != null) {
             Matrix.setIdentityM(_model, 0);
             Matrix.scaleM(_model, 0, _width, _height, 1);
@@ -64,14 +89,19 @@ public class ScreenNavigator implements IScreenNavigator {
 
     @Override
     public void push(@NonNull IScreen screen) {
+        changeState(OPENING_SCREEN_STATE(screen));
+    }
+
+    public void pushToNavigationStack(IScreen screen) {
         _commands.add(() -> {
-            screen.onResize(_width, _height);
             _navigationStack.push(screen);
+            _animatedScreen = null;
         });
     }
 
     @Override
     public void pop() {
+        // TODO: changestate closing
         _commands.add(() -> _navigationStack.pop().dispose());
     }
 
@@ -121,9 +151,7 @@ public class ScreenNavigator implements IScreenNavigator {
 
     @Override
     public void openModal(IModal modal) {
-        modal.onResize(_width, _height / 3);
         changeState(OPENING_MODAL_STATE(modal));
-        _modal = modal;
     }
 
     @Override
@@ -144,8 +172,16 @@ public class ScreenNavigator implements IScreenNavigator {
         return _modal;
     }
 
+    public void setModal(IModal modal) {
+        _modal = modal;
+    }
+
     public int getHeight() {
         return _height;
+    }
+
+    public int getWidth() {
+        return _width;
     }
 
     public IScreen getCurrentScreen() {

@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.graphics.drawable.ColorDrawable;
-import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Colors;
@@ -20,13 +19,11 @@ public class ColorPickerScreen implements IScreen {
 
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
-    private final float[] viewMatrix = new float[16];
     private final ListPage<AccentColor> _view;
     private final List<OnChangeListener<AccentColor>> _changeListeners = new ArrayList<>();
 
     public ColorPickerScreen(IScreenNavigator navigator) {
         _navigator = navigator;
-        Matrix.setIdentityM(viewMatrix, 0);
         _view = new ListPage<>();
         _view.addItems(createItems());
     }
@@ -49,8 +46,8 @@ public class ColorPickerScreen implements IScreen {
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
-        _view.draw(delta, projMatrix, viewMatrix, renderer);
+    public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
+        _view.draw(delta, projMatrix, view, renderer);
     }
 
     @Override

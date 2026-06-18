@@ -20,9 +20,11 @@ public class OpeningModalState extends BaseState {
     @Override
     public void enter() {
         super.enter();
+        _modal.onResize(_context.getWidth(), _context.getHeight() / 3);
         var modalHeight = _modal.getSize().height();
         _translationHeight = -modalHeight;
-        _modal.setModalTranslationHeight(_translationHeight);
+        _context.setModal(_modal);
+        _modal.setVerticalTranslation(_translationHeight);
     }
 
     @Override
@@ -31,12 +33,12 @@ public class OpeningModalState extends BaseState {
         _smoothDelta = _smoothDelta * 0.8f + delta * 0.2f;
         _elapsed += _smoothDelta;
         if (_elapsed >= DURATION) {
-            _modal.setModalTranslationHeight(0);
+            _modal.setVerticalTranslation(0);
             _context.changeState(_context.IDLE_STATE());
         } else {
             var t = _elapsed / DURATION;
             var factor = 1 - (1 - t) * (1 - t) * (1 - t);
-            _modal.setModalTranslationHeight(_translationHeight * (1 - factor));
+            _modal.setVerticalTranslation(_translationHeight * (1 - factor));
         }
     }
 

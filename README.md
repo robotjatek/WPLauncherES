@@ -185,7 +185,7 @@ Feature-creep!
 - [ ] Dropdown
 - [ ] Radiobutton
 - [ ] Animated tile resize
-- [ ] Animate internal app/subpage opening (clock hub, launcher settings)
+- [x] Animate internal app/subpage opening (clock hub, launcher settings)
 - [ ] Group apps by the first letter in the app list
 - [ ] Set background image for the start screen + transparency option for tiles
 - [ ] Re-ask for permissions from the launcher settings

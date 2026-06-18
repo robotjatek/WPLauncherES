@@ -19,6 +19,11 @@ A Windows Phone inspired launcher for Android written in OpenGL ES
 <img src="img/s2.png" alt="Screenshot" width="250">
 <img src="img/s1.png" alt="Screenshot" width="500">
 
+https://github.com/user-attachments/assets/f7e517bb-9137-413f-a910-b41aa54a9deb
+
+
+
+
 ## Milestones
 
 This is a living roadmap, all future milestones are refined as I go, and subject to change.

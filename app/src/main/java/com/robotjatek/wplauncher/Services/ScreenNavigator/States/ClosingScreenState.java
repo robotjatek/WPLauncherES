@@ -4,15 +4,14 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 
-public class OpeningScreenState extends BaseState {
+public class ClosingScreenState extends BaseState {
 
-    private final IScreen _screen;
-    private float _translation;
     private static final float DURATION = 200; // milliseconds
     private float _elapsed = 0f;
-    private float _smoothDelta = 0f;
+    private float _smoothDelta = 0;
+    private final IScreen _screen;
 
-    public OpeningScreenState(ScreenNavigator context, IScreen screen) {
+    public ClosingScreenState(ScreenNavigator context, IScreen screen) {
         super(context);
         _screen = screen;
     }
@@ -20,11 +19,8 @@ public class OpeningScreenState extends BaseState {
     @Override
     public void enter() {
         super.enter();
-        var width = _context.getWidth();
-        _screen.onResize(width, _context.getHeight());
-        _translation = width;
-        _context.setAnimatedScreenTranslation(_translation);
         _context.setAnimatedScreen(_screen);
+        _context.popFromNavigationStack();
     }
 
     @Override
@@ -33,22 +29,26 @@ public class OpeningScreenState extends BaseState {
         _smoothDelta = _smoothDelta * 0.8f + delta * 0.2f;
         _elapsed += _smoothDelta;
         if (_elapsed >= DURATION) {
-            _context.setAnimatedScreenTranslation(0);
+            // done with the animation: snap to position, pop from stack, return to idle
+            _context.setAnimatedScreenTranslation(-_context.getWidth());
             _context.changeState(_context.IDLE_STATE());
         } else {
+            // animation
             var t = _elapsed / DURATION;
             var factor = 1 - (1 - t) * (1 - t) * (1 - t);
-            _context.setAnimatedScreenTranslation(_translation * (1 - factor));
+            _context.setAnimatedScreenTranslation(_context.getWidth() * (factor));
         }
     }
 
     @Override
     public void exit() {
-        _context.pushToNavigationStack(_screen);
+        _context.setAnimatedScreenTranslation(0);
+        _context.setAnimatedScreen(null);
+        _screen.dispose();
     }
 
     @Override
     public boolean handleGesture(Gesture gesture) {
-        return false; // discard gestures while animating
+        return false; // dismiss gestures while animating
     }
 }

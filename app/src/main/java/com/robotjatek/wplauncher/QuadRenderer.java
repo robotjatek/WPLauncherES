@@ -181,6 +181,10 @@ public class QuadRenderer {
         GLES32.glDisable(GLES32.GL_DEPTH_TEST);
     }
 
+    public void clearDepthBuffer() {
+        GLES32.glClear(GLES32.GL_DEPTH_BUFFER_BIT);
+    }
+
     public void pushLayer() {
         pushLayers(1);
     }
@@ -205,7 +209,7 @@ public class QuadRenderer {
             GLES32.glDisable(GLES32.GL_POLYGON_OFFSET_FILL);
         } else {
             GLES32.glEnable(GLES32.GL_POLYGON_OFFSET_FILL);
-            GLES32.glPolygonOffset(-1f, _offsetLevel);
+            GLES32.glPolygonOffset(-3f, _offsetLevel);
         }
     }
 

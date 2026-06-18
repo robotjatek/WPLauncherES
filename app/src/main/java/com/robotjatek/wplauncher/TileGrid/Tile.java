@@ -87,8 +87,8 @@ public class Tile implements ITouchable {
             }
         }
 
-        buildTileMatrix(_frontViewMatrix, viewMatrix, correctedX, correctedY, width, height, -0.1f, 1f);
-        buildTileMatrix(_backViewMatrix, viewMatrix, correctedX, correctedY, width, height, 0.1f, -1f);
+        buildTileMatrix(_frontViewMatrix, viewMatrix, correctedX, correctedY, width, height, -1.0f, 1f);
+        buildTileMatrix(_backViewMatrix, viewMatrix, correctedX, correctedY, width, height, 1.0f, -1f);
 
         Matrix.setIdentityM(_clipMatrix, 0);
         Matrix.translateM(_clipMatrix, 0, correctedX, correctedY, 0f);

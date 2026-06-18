@@ -16,7 +16,7 @@ import com.robotjatek.wplauncher.Components.ListView.ListView;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
-import com.robotjatek.wplauncher.Services.IScreenNavigator;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.TextReaderPage;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;

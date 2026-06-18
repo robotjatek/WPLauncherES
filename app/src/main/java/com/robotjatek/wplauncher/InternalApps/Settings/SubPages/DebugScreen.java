@@ -11,7 +11,7 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.Spacer.Spacer;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
-import com.robotjatek.wplauncher.Services.IScreenNavigator;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
@@ -29,12 +29,11 @@ public class DebugScreen implements IScreen {
         // Title
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("debug", 160, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Spacer(0, 48));
 
         // Content
-        _layout.addChild(new Label("Crash application", 72, Typeface.NORMAL, Colors.WHITE, 0, -1,
+        _layout.addChild(new Label("crash application", 72, Typeface.NORMAL, Colors.WHITE, 0, -1,
                 this::showCrashAppMessageBox));
-        _layout.addChild(new Label("Reset StartPage state-machine", 72, Typeface.NORMAL, Colors.WHITE, 0, -1,
+        _layout.addChild(new Label("reset StartPage state-machine", 72, Typeface.NORMAL, Colors.WHITE, 0, -1,
                 this::resetStateMachine));
     }
 

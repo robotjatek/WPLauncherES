@@ -27,7 +27,9 @@ public class Modal implements IModal {
     private final TextBlock _messageBlock = new TextBlock("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, 0);
     private final Button _okButton = new Button("OK", null, new Size<>(-1, -1), null);
     private final Button _cancelButton = new Button("Cancel", null, new Size<>(-1, -1), null);
+    private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _model = new float[16];
+    private float _modalTranslationHeight = 0f;
 
     public Modal(String title, String message, Runnable onOk, Runnable onDismiss) {
         _okButton.setOnTap(onOk);
@@ -51,7 +53,7 @@ public class Modal implements IModal {
     @Override
     public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
         Matrix.setIdentityM(_model, 0);
-        Matrix.translateM(_model, 0, _model, 0, 0, -LauncherRenderer.SCREEN_DATA.topInset, 0);
+        Matrix.translateM(_model, 0, _model, 0, 0, -LauncherRenderer.SCREEN_DATA.topInset + _modalTranslationHeight, 0);
         _layout.draw(delta, projMatrix, _model, renderer, Position.ZERO, new Size<>(_layout.getWidth(), _layout.getHeight()));
     }
 
@@ -82,6 +84,16 @@ public class Modal implements IModal {
         var spacerHeight = Math.max(0, innerHeight - totalContentHeight - finalButtonHeight);
         _buttonTopSpacer.setSize(innerWidth, spacerHeight);
         _layout.onResize(width, height);
+        _size = new Size<>(width, height);
+    }
+
+    @Override
+    public Size<Integer> getSize() {
+        return _size;
+    }
+
+    public void setModalTranslationHeight(float height) {
+        _modalTranslationHeight = height;
     }
 
     @Override

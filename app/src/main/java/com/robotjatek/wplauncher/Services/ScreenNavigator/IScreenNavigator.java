@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.Services;
+package com.robotjatek.wplauncher.Services.ScreenNavigator;
 
 import androidx.annotation.NonNull;
 
@@ -20,7 +20,20 @@ public interface IScreenNavigator {
      */
     void pop();
 
+    /**
+     * Dismisses and disposes the opened modal if any.
+     * Pops the current screen from the stack. If there are no more screens, does nothing.
+     * Disposes the popped screen.
+     */
     void onBackPressed();
+
+    /**
+     * Opens the given modal on screen
+     */
     void openModal(IModal modal);
+
+    /**
+     * Dismisses and disposes the opened modal if any.
+     */
     void dismissModal();
 }

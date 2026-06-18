@@ -8,7 +8,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
-import com.robotjatek.wplauncher.Services.ScreenNavigator;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
 public class LauncherRenderer implements GLSurfaceView.Renderer {

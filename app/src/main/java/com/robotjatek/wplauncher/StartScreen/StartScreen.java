@@ -6,7 +6,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
-import com.robotjatek.wplauncher.Services.IScreenNavigator;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.LauncherSurfaceView;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;

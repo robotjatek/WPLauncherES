@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.InternalApps.Clock.Clock;
 import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
 import com.robotjatek.wplauncher.R;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 
 import java.util.Comparator;
 import java.util.HashMap;

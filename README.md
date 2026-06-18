@@ -166,7 +166,6 @@ Try it at your own risk
 - [x] Use stencil buffer to clip scroll view
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
 - [x] Viewport culling on tile-grid
-- [x] Extract ScreenNavigator into a separate component
 
 ### M4 - Beta
 
@@ -194,8 +193,12 @@ Feature-creep!
 - [ ] Cursor handle in the input box
 - [ ] Pin some default tiles to the start screen on first start
 - [x] Modal
+- [x] Animate modal open/close
+- [x] StackLayout horizontal orientation
+- [x] Extract ScreenNavigator into a separate component
 - [ ] Debug menu
   - [x] Crash app button
+  - [ ] Reset configuration button
   - [ ] Reset StartPage state machine button
 
 ### M5 - RC

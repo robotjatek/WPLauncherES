@@ -58,14 +58,14 @@ public class StackLayout implements ILayout {
         Matrix.scaleM(_model, 0, size.width(), size.height(), 1f);
         Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
         renderer.drawFlat(proj, _model, _bgColor);
-        renderer.popLayer();
 
-        renderer.pushLayer();
         Matrix.setIdentityM(_model, 0);
         Matrix.translateM(_model, 0, position.x(), position.y() + TOP_MARGIN_PX, 0f);
         Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
         for (var child : _children) {
+            renderer.pushLayer();
             child.draw(delta, proj, _model, _drawContext, renderer);
+            renderer.popLayer();
         }
         renderer.popLayer();
     }

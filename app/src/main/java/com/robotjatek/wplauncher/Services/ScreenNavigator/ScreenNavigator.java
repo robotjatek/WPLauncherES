@@ -83,22 +83,23 @@ public class ScreenNavigator implements IScreenNavigator {
         Matrix.setIdentityM(_model, 0);
         _navigationStack.getFirst().draw(delta, proj, _model, renderer);
 
-        Matrix.setIdentityM(_model, 0);
-        Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
         if (_animatedScreen != null) {
-            renderer.pushLayer();
+            Matrix.setIdentityM(_model, 0);
+            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
+
+            renderer.pushLayers(100);
             _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), new Size<>(_width, _height));
             _animatedScreen.draw(delta,  proj, _model, renderer);
-            renderer.popLayer();
+            renderer.popLayers(100);
         }
 
         if (_modal != null) {
             Matrix.setIdentityM(_model, 0);
             Matrix.scaleM(_model, 0, _width, _height, 1);
-            renderer.pushLayer();
+            renderer.pushLayers(200);
             renderer.drawFlat(proj, _model, 0x88050505);
             _modal.draw(delta, proj, renderer);
-            renderer.popLayer();
+            renderer.popLayers(200);
         }
     }
 

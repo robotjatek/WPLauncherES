@@ -182,12 +182,20 @@ public class QuadRenderer {
     }
 
     public void pushLayer() {
-        _offsetLevel -= 1f;
-        applyLayer();
+        pushLayers(1);
     }
 
     public void popLayer() {
-        _offsetLevel += 1f;
+        popLayers(1);
+    }
+
+    public void pushLayers(int count) {
+        _offsetLevel -= count;
+        applyLayer();
+    }
+
+    public void popLayers(int count) {
+        _offsetLevel += count;
         applyLayer();
     }
 

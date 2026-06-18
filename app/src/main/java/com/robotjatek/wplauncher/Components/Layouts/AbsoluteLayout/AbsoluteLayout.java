@@ -96,23 +96,24 @@ public class AbsoluteLayout implements ILayout {
             _dirty = true;
         }
 
-        // Draw background
         renderer.pushLayer();
+
+        // Draw background
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
         renderer.drawFlat(proj, _modelMatrix, _bgColor);
-        renderer.popLayer();
 
-        renderer.pushLayer();
         // Draw children with offset
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
 
         for (var child : _positionedElements) {
+            renderer.pushLayer();
             child._element.draw(delta, proj, _modelMatrix, _drawContext, renderer);
+            renderer.popLayer();
         }
         renderer.popLayer();
     }

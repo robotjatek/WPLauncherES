@@ -16,8 +16,13 @@ A Windows Phone inspired launcher for Android written in OpenGL ES
 - OpenGL ES3.2
 - API Level 34
 
-<img src="img/s2.png" alt="Description" width="250">
-<img src="img/s1.png" alt="Description" width="500">
+<img src="img/s2.png" alt="Screenshot" width="250">
+<img src="img/s1.png" alt="Screenshot" width="500">
+
+https://github.com/user-attachments/assets/f7e517bb-9137-413f-a910-b41aa54a9deb
+
+
+
 
 ## Milestones
 

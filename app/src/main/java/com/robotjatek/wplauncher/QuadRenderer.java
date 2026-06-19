@@ -209,13 +209,13 @@ public class QuadRenderer {
             GLES32.glDisable(GLES32.GL_POLYGON_OFFSET_FILL);
         } else {
             GLES32.glEnable(GLES32.GL_POLYGON_OFFSET_FILL);
-            GLES32.glPolygonOffset(-3f, _offsetLevel);
+            GLES32.glPolygonOffset(-3f, _offsetLevel * 50f);
         }
     }
 
     public void dispose() {
         if (!_disposed) {
-            GLES32.glDeleteVertexArrays(1, new int[]{_vaoId}, 0);
+            GLES32.glDeleteVertexArrays(1, new int[]{ _vaoId }, 0);
             GLES32.glDeleteBuffers(3, new int[] { _vboId, _iboId, _texCoordVBOId }, 0);
             _disposed = true;
         }

@@ -53,7 +53,7 @@ public class Icon implements UIElement {
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, w, h, 0);
+        Matrix.scaleM(_modelMatrix, 0, w, h, 1f);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
 
         if (_bgColor != Colors.TRANSPARENT) {

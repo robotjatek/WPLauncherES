@@ -66,7 +66,7 @@ public class TextBlock implements UIElement {
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, _cachedSize.width(), _cachedSize.height(), 0);
+        Matrix.scaleM(_modelMatrix, 0, _cachedSize.width(), _cachedSize.height(), 1f);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         renderer.draw(proj, _modelMatrix, _textureId);
     }

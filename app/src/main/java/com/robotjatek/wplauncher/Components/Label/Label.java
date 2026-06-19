@@ -89,7 +89,7 @@ public class Label implements UIElement, ITouchable {
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, correctedX, correctedY, 0);
-        Matrix.scaleM(_modelMatrix, 0, w, h, 0);
+        Matrix.scaleM(_modelMatrix, 0, w, h, 1f);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         renderer.draw(proj, _modelMatrix, _textureId);
     }

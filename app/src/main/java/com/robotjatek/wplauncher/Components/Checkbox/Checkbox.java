@@ -61,27 +61,27 @@ public class Checkbox implements UIElement {
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE, TOGGLE_SIZE, 0);
+        Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE, TOGGLE_SIZE, 1f);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         renderer.drawFlat(proj, _modelMatrix, Colors.WHITE);
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x + 4, y + 4, 0);
-        Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE - 8, TOGGLE_SIZE - 8, 0);
+        Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE - 8, TOGGLE_SIZE - 8, 1f);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         renderer.drawFlat(proj, _modelMatrix, Colors.BLACK);
 
         if (_state && _stateTexture > 0) {
             Matrix.setIdentityM(_modelMatrix, 0);
             Matrix.translateM(_modelMatrix, 0, x + 4, y + 4, 0);
-            Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE - 8, TOGGLE_SIZE - 8, 0);
+            Matrix.scaleM(_modelMatrix, 0, TOGGLE_SIZE - 8, TOGGLE_SIZE - 8, 1f);
             Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
             renderer.draw(proj, _modelMatrix, _stateTexture);
         }
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x + TOGGLE_SIZE + 16, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, w - TOGGLE_SIZE, h, 0);
+        Matrix.scaleM(_modelMatrix, 0, w - TOGGLE_SIZE, h, 1f);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         renderer.draw(proj, _modelMatrix, _labelTexture);
     }

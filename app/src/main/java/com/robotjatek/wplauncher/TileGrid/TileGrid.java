@@ -267,4 +267,9 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     public void onAppRemove(String packageName) {
         _tileService.queueUnpinAllTilesForPackage(packageName);
     }
+
+    @Override
+    public void onBackPressed() {
+        changeState(IDLE_STATE());
+    }
 }

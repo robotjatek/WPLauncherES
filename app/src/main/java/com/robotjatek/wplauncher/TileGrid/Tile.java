@@ -21,7 +21,7 @@ public class Tile implements ITouchable {
     private boolean _disposed = false;
     private Position<Integer> _position;
     private Size<Integer> _size;
-    private static final float RESIZE_DURATION = 250f; // ms
+    private static final float RESIZE_DURATION = 150f; // ms
     private float _resizeElapsed = 0f;
     private float _startWidth = -1;
     private float _startHeight = -1;

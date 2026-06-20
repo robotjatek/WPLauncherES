@@ -6,7 +6,6 @@ import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.TouchHandler;
-import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 public class Tile implements ITouchable {
@@ -22,6 +21,12 @@ public class Tile implements ITouchable {
     private boolean _disposed = false;
     private Position<Integer> _position;
     private Size<Integer> _size;
+    private static final float RESIZE_DURATION = 250f; // ms
+    private float _resizeElapsed = 0f;
+    private float _startWidth = -1;
+    private float _startHeight = -1;
+    private float _visualWidth = -1;
+    private float _visualHeight = -1;
     private App _app;
     public int bgColor;
     private final DragInfo _dragInfo = new DragInfo();
@@ -32,6 +37,14 @@ public class Tile implements ITouchable {
     private float _targetRot = 0f;
     private float _timeOnSide = 0f;
     private float _flipInterval;
+
+    public float getVisualWidth() {
+        return _visualWidth;
+    }
+
+    public float getVisualHeight() {
+        return _visualHeight;
+    }
 
     public Tile(Position<Integer> position, Size<Integer> size, App app, int bgColor, ITileContent content, ITileContent backContent) {
         _position = position;
@@ -48,16 +61,57 @@ public class Tile implements ITouchable {
      * Draw tile with an offset to its original position
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
-                               Position<Float> offset, IDrawContext<Tile> drawContext, QuadRenderer renderer) {
+                               Position<Float> offset, TileDrawContext drawContext, QuadRenderer renderer) {
         _touchHandler.update(delta);
-        var width = (int) (drawContext.widthOf(this) * _scale);
-        var height = (int) (drawContext.heightOf(this) * _scale);
-        var xDiff = (width - drawContext.widthOf(this)) / 2;
-        var yDiff = (height - drawContext.heightOf(this)) / 2;
 
-        var correctedX = drawContext.xOf(this) + offset.x() - xDiff;
-        var correctedY = drawContext.yOf(this) + offset.y() - yDiff;
+        var targetWidth = drawContext.calculateWidth(_size);
+        var targetHeight = drawContext.calculateHeight(_size);
 
+        if (_visualWidth < 0) {
+            _visualWidth = targetWidth;
+            _visualHeight = targetHeight;
+            _startWidth = targetWidth;
+            _startHeight = targetHeight;
+        }
+
+        if (_resizeElapsed < RESIZE_DURATION) {
+            _resizeElapsed += delta;
+            var t = _resizeElapsed / RESIZE_DURATION;
+            var factor = 1 - (1 - t) * (1 - t) * (1 - t);
+            _visualWidth = _startWidth + (targetWidth - _startWidth) * factor;
+            _visualHeight = _startHeight + (targetHeight - _startHeight) * factor;
+        } else {
+            _visualWidth = targetWidth;
+            _visualHeight = targetHeight;
+        }
+
+        var visualScaleX = _visualWidth / targetWidth;
+        var visualScaleY = _visualHeight / targetHeight;
+        var x = drawContext.xOf(this) + offset.x();
+        var y = drawContext.yOf(this) + offset.y();
+
+        updateFlip(delta);
+
+        buildTileMatrix(_frontViewMatrix, viewMatrix, x, y, (int)targetWidth, (int)targetHeight, visualScaleX, visualScaleY, -1.0f, 1f);
+        buildTileMatrix(_backViewMatrix, viewMatrix, x, y, (int)targetWidth, (int)targetHeight, visualScaleX, visualScaleY, 1.0f, -1f);
+
+        Matrix.setIdentityM(_clipMatrix, 0);
+        Matrix.translateM(_clipMatrix, 0, x, y, 0f);
+        Matrix.scaleM(_clipMatrix, 0, _visualWidth, _visualHeight, 1f);
+        Matrix.multiplyMM(_clipMatrix, 0, viewMatrix, 0, _clipMatrix, 0);
+
+        renderer.beginClip(projMatrix, _clipMatrix);
+
+        // Render with the new size while scaling it with the gradually smaller visual size
+        var logicalSize = new Size<>((int)targetWidth, (int)targetHeight);
+        _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, logicalSize);
+        if (_backContent != null) {
+            _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, logicalSize);
+        }
+        renderer.endClip();
+    }
+
+    private void updateFlip(float delta) {
         var backHasContent = _backContent != null && _backContent.hasContent() && !_size.equals(Tile.SMALL);
         if (backHasContent) {
             _timeOnSide += delta;
@@ -86,31 +140,18 @@ public class Tile implements ITouchable {
                 _rot += Math.signum(diff) * step;
             }
         }
-
-        buildTileMatrix(_frontViewMatrix, viewMatrix, correctedX, correctedY, width, height, -1.0f, 1f);
-        buildTileMatrix(_backViewMatrix, viewMatrix, correctedX, correctedY, width, height, 1.0f, -1f);
-
-        Matrix.setIdentityM(_clipMatrix, 0);
-        Matrix.translateM(_clipMatrix, 0, correctedX, correctedY, 0f);
-        Matrix.scaleM(_clipMatrix, 0, width, height, 1f);
-        Matrix.multiplyMM(_clipMatrix, 0, viewMatrix, 0, _clipMatrix, 0);
-
-        renderer.beginClip(projMatrix, _clipMatrix);
-        _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
-        if (_backContent != null) {
-            _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, new Size<>(width, height));
-        }
-        renderer.endClip();
     }
 
-    private void buildTileMatrix(float[] out, float[] viewMatrix, float correctedX, float correctedY,
-                                 int width, int height, float offsetZ, float scaleY) {
+    private void buildTileMatrix(float[] out, float[] viewMatrix, float x, float y,
+                                 int width, int height, float vScaleX, float vScaleY, float offsetZ, float sideScaleY) {
         Matrix.setIdentityM(out, 0);
-        Matrix.translateM(out, 0, correctedX + width / 2f, correctedY + height / 2f, 0f);
+        Matrix.translateM(out, 0, x + (width * vScaleX) / 2f, y + (height * vScaleY) / 2f, 0f);
         Matrix.rotateM(out, 0, _rot, -1f, 0f, 0f);
-        if (scaleY != 1f) {
-            Matrix.scaleM(out, 0, 1f, scaleY, 1f);
+
+        if (sideScaleY != 1f) {
+            Matrix.scaleM(out, 0, 1f, sideScaleY, 1f);
         }
+        Matrix.scaleM(out, 0, vScaleX * _scale, vScaleY * _scale, 1f);
         Matrix.translateM(out, 0, -width / 2f, -height / 2f, offsetZ);
         Matrix.multiplyMM(out, 0, viewMatrix, 0, out, 0);
     }
@@ -152,6 +193,9 @@ public class Tile implements ITouchable {
 
     public void setSize(Size<Integer> size) {
         _size = size;
+        _startWidth = _visualWidth;
+        _startHeight = _visualHeight;
+        _resizeElapsed = 0;
         _content.forceRedraw();
         if (_backContent != null) {
             _backContent.forceRedraw();

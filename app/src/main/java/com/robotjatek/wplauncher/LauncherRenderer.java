@@ -14,7 +14,7 @@ import com.robotjatek.wplauncher.StartScreen.StartScreen;
 public class LauncherRenderer implements GLSurfaceView.Renderer {
     public static ScreenData SCREEN_DATA = new ScreenData();
     private boolean _disposed = false;
-    private float lastTime = System.nanoTime();
+    private long lastTime = System.nanoTime();
     private int frameCount = 0;
     private long fpsTime = System.currentTimeMillis();
     private final Context _context;
@@ -70,7 +70,9 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         lastTime = now;
 
         frameCount++;
+//        Log.d("FPS", "delta: " + delta);
         if (System.currentTimeMillis() - fpsTime >= 1000) {
+         //   Log.d("FPS", "FPS: " + frameCount);
             frameCount = 0;
             fpsTime = System.currentTimeMillis();
         }

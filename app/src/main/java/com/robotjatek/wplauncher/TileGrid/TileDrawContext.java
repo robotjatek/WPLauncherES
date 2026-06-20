@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.TileGrid;
 
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.ScrollController;
@@ -34,12 +35,18 @@ public class TileDrawContext implements IDrawContext<Tile> {
 
     @Override
     public float widthOf(Tile t) {
-        return t.getSize().width() * _tileSizePx + (t.getSize().width() - 1) * TILE_GAP_PX;
+        if (t.getVisualWidth() > 0) {
+            return t.getVisualWidth();
+        }
+        return calculateWidth(t.getSize());
     }
 
     @Override
     public float heightOf(Tile t) {
-        return t.getSize().height() * _tileSizePx + (t.getSize().height() - 1) * TILE_GAP_PX;
+        if (t.getVisualHeight() > 0) {
+            return t.getVisualHeight();
+        }
+        return calculateHeight(t.getSize());
     }
 
     public boolean isVisible(Tile tile) {
@@ -53,5 +60,13 @@ public class TileDrawContext implements IDrawContext<Tile> {
 
     public ScrollController getScroll() {
         return _parent.getScroll();
+    }
+
+    public float calculateWidth(Size<Integer> size) {
+        return size.width() * _tileSizePx + (size.width() - 1) * TILE_GAP_PX;
+    }
+
+    public float calculateHeight(Size<Integer> size) {
+        return size.height() * _tileSizePx + (size.height() - 1) * TILE_GAP_PX;
     }
 }

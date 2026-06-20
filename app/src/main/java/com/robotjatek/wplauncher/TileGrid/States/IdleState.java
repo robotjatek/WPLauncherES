@@ -48,6 +48,7 @@ public class IdleState extends BaseState {
     public void enter() {
         super.enter();
         _state.enter();
+        _context.cancelSelection();
     }
 
     @Override

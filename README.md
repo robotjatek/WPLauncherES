@@ -189,7 +189,7 @@ Feature-creep!
 - [ ] Light mode/Dark mode support
 - [ ] Dropdown
 - [ ] Radiobutton
-- [ ] Animated tile resize
+- [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [ ] Group apps by the first letter in the app list
 - [ ] Set background image for the start screen + transparency option for tiles
@@ -205,6 +205,9 @@ Feature-creep!
   - [x] Crash app button
   - [ ] Reset configuration button
   - [ ] Reset StartPage state machine button
+- [ ] Don't recalculate matrices every frame
+- [ ] Fix: crash on modal close
+- [ ] Fix: null pointer exception in TileGrid.Tile.getDragInfo()
 
 ### M5 - RC
 

@@ -35,22 +35,16 @@ public class TileDrawContext implements IDrawContext<Tile> {
 
     @Override
     public float widthOf(Tile t) {
-        if (t.getVisualWidth() > 0) {
-            return t.getVisualWidth();
-        }
         return calculateWidth(t.getSize());
     }
 
     @Override
     public float heightOf(Tile t) {
-        if (t.getVisualHeight() > 0) {
-            return t.getVisualHeight();
-        }
         return calculateHeight(t.getSize());
     }
 
-    public float logicalHeightOf(Tile t) {
-        return calculateHeight(t.getSize());
+    public float visualHeightOf(Tile t) {
+        return t.getVisualHeight() > 0 ? t.getVisualHeight() : heightOf(t);
     }
 
     public boolean isVisible(Tile tile) {

@@ -38,10 +38,6 @@ public class Tile implements ITouchable {
     private float _timeOnSide = 0f;
     private float _flipInterval;
 
-    public float getVisualWidth() {
-        return _visualWidth;
-    }
-
     public float getVisualHeight() {
         return _visualHeight;
     }
@@ -62,6 +58,7 @@ public class Tile implements ITouchable {
      */
     public void drawWithOffset(float delta, float[] projMatrix, float[] viewMatrix,
                                Position<Float> offset, TileDrawContext drawContext, QuadRenderer renderer) {
+        // TODO: this method does way too much work. Flip and resize animations should be handled in a separate class
         _touchHandler.update(delta);
 
         var targetWidth = drawContext.calculateWidth(_size);

@@ -32,7 +32,7 @@ public class AdornerDrawContext<T extends IAdornedTileContainer> implements IDra
             throw new RuntimeException();
         }
         return _tileDrawContext.yOf(selectedTile) +
-                (_tileDrawContext.heightOf(selectedTile) * adorner.getRelativePosition().y())
+                (_tileDrawContext.visualHeightOf(selectedTile) * adorner.getRelativePosition().y())
                 - heightOf(adorner) / 2
                 + selectedTile.getDragInfo().totalY;
     }

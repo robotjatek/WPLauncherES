@@ -81,6 +81,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         _resizeButton = new Adorner(() -> {
             if (_selectedTile != null) {
                 _tileService.resizeTile(_selectedTile);
+                setScrollBounds();
             }
         }, resizeIcon, new Position<>(1f, 1f), adornerDrawContext);
         appChangeReceiver.subscribe(this);
@@ -170,7 +171,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private float getContentHeight() {
         var max = 0f;
         for (var t : _tiles) {
-            var bottom =  _tileDrawContext.yOf(t) + _tileDrawContext.heightOf(t) + PAGE_PADDING_PX;
+            var bottom =  _tileDrawContext.yOf(t) + _tileDrawContext.logicalHeightOf(t) + PAGE_PADDING_PX;
             if (bottom > max) max = bottom;
         }
         return max;

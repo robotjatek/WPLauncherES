@@ -49,6 +49,10 @@ public class TileDrawContext implements IDrawContext<Tile> {
         return calculateHeight(t.getSize());
     }
 
+    public float logicalHeightOf(Tile t) {
+        return calculateHeight(t.getSize());
+    }
+
     public boolean isVisible(Tile tile) {
         var scrollOffset = _parent.getScroll().getScrollOffset();
         var containerHeight = _parent.getPageHeight();

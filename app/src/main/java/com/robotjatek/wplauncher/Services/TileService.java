@@ -122,6 +122,7 @@ public class TileService implements OnChangeListener<AccentColor> {
         var nextIndex = (sizeIndex + 1) % tileSizes.size();
         var nextSize = tileSizes.get(nextIndex);
         tile.setSize(nextSize);
+        compactGrid();
         persistTiles();
     }
 

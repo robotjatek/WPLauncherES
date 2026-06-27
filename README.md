@@ -193,7 +193,7 @@ Feature-creep!
 - [x] Animate internal app/subpage navigation
 - [ ] Group apps by the first letter in the app list
 - [ ] Set background image for the start screen + transparency option for tiles
-- [ ] Re-ask for permissions from the launcher settings
+- [x] Re-ask for permissions from the launcher settings
 - [ ] Device resolution independent UI
 - [ ] Cursor handle in the input box
 - [ ] Pin some default tiles to the start screen on first start
@@ -206,8 +206,12 @@ Feature-creep!
   - [ ] Reset configuration button
   - [ ] Reset StartPage state machine button
 - [ ] Don't recalculate matrices every frame
+- [ ] Scroll in edit mode:
+  - [ ] Scroll instead of moving the tile when the scroll movement is not started on the tile
+  - [ ] Animated scroll when reaching the edge of the screen
 - [ ] Fix: crash on modal close
 - [ ] Fix: null pointer exception in TileGrid.Tile.getDragInfo()
+- [ ] Fix: tile keeps spinning indefinitely after dismissing a notification
 
 ### M5 - RC
 
@@ -222,6 +226,7 @@ Feature-creep!
 
 ### Bugs that need repro:
 
+- [ ] Fix: All pinned tiles got cleared from the start screen
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
 - [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware, needs repro)
 - [ ] Fix: Tile bg after resize is dark (needs repro)

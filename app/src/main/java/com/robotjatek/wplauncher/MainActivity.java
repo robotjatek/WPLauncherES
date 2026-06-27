@@ -3,21 +3,14 @@ package com.robotjatek.wplauncher;
 import static android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
 import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
 
-import android.Manifest;
-import android.app.NotificationManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
@@ -26,7 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
-import com.robotjatek.wplauncher.Services.NotificationListener;
+import com.robotjatek.wplauncher.Services.PermissionService;
 
 import java.util.List;
 
@@ -34,20 +27,17 @@ import java.util.List;
 public class MainActivity extends ComponentActivity {
 
     private LauncherSurfaceView _surface;
-    private ActivityResultLauncher<String> _locationPermission;
     private final LocationService _locationService = new LocationService(this);
     private final AppChangeReceiver _appChangeReceiver = new AppChangeReceiver();
+    private final PermissionService _permissionService = new PermissionService(this, _locationService);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(getApplicationContext()));
         EdgeToEdge.enable(this);
-        _locationPermission = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                _locationService::setHasPermission);
 
-        _surface = new LauncherSurfaceView(this, _locationService, _appChangeReceiver);
+        _surface = new LauncherSurfaceView(this, _locationService, _permissionService, _appChangeReceiver);
         _surface.setPreserveEGLContextOnPause(true);
 
         ViewCompat.setWindowInsetsAnimationCallback(getWindow().getDecorView(),
@@ -86,8 +76,8 @@ public class MainActivity extends ComponentActivity {
             }
         });
 
-        ensureLocationPermission();
-        ensureNotificationPermission();
+        _permissionService.ensureLocationPermission();
+        _permissionService.ensureNotificationPermission();
         setupAppChangeListener();
     }
 
@@ -98,29 +88,6 @@ public class MainActivity extends ComponentActivity {
         filter.addAction(Intent.ACTION_PACKAGE_REPLACED);
         filter.addDataScheme("package");
         registerReceiver(_appChangeReceiver, filter);
-    }
-
-    private void ensureNotificationPermission() {
-        if (!hasNotificationAccess()) {
-            startActivity(
-                    new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            );
-        }
-    }
-
-    private boolean hasNotificationAccess() {
-        NotificationManager nm =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        return nm != null && nm.isNotificationListenerAccessGranted(
-                new ComponentName(this, NotificationListener.class));
-    }
-
-    private void ensureLocationPermission() {
-        if (!_locationService.hasPermission()) {
-            _locationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION);
-        }
     }
 
     @Override

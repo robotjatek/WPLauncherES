@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenuDrawContext;
 import com.robotjatek.wplauncher.Components.ContextMenu.MenuOption;
@@ -37,6 +38,7 @@ public class CrashLogScreen implements IScreen {
     private Size<Integer> _size = new Size<>(-1, -1);
     private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
     private final Label _subTitleLabel = new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0);
+    private final Button _clearAllButton = new Button("clear", null, new Size<>(0, 100), this::clearAll);
     private final ContextMenuDrawContext<File> _contextMenuDrawContext;
 
     public CrashLogScreen(IScreenNavigator navigator, Context context) {
@@ -46,6 +48,7 @@ public class CrashLogScreen implements IScreen {
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_crashList);
         _layout.addChild(_titleLabel);
         _layout.addChild(_subTitleLabel);
+        _layout.addChild(_clearAllButton);
         _layout.addChild(_crashList);
         _crashList.addItems(createItems());
         _layout.setBgColor(Colors.BLACK);
@@ -65,7 +68,9 @@ public class CrashLogScreen implements IScreen {
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
         var itemsHeight = _titleLabel.measure().height() +
-                _subTitleLabel.measure().height() + StackLayout.TOP_MARGIN_PX;
+                _subTitleLabel.measure().height() +
+                _clearAllButton.measure().height() +
+                StackLayout.TOP_MARGIN_PX;
         var listHeight = height - itemsHeight;
         _crashList.setSize(new Size<>(width, listHeight));
         _crashList.setMargins(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset);
@@ -120,6 +125,11 @@ public class CrashLogScreen implements IScreen {
             Log.e(CrashLogScreen.class.getName(), "Failed to delete file: " + f.getName());
         }
         _crashList.removeItemByPayload(f);
+    }
+
+    private void clearAll() {
+        var files = listFiles();
+        files.forEach(this::deleteFile);
     }
 
     @Override

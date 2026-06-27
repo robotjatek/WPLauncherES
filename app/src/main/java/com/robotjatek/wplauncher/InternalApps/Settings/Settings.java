@@ -41,7 +41,7 @@ public class Settings implements IScreen {
         _layout.addChild(new Label("crash log", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
                 () -> navigator.push(new CrashLogScreen(navigator, context))));
         _layout.addChild(new Label("debug", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
-                () -> navigator.push(new DebugScreen(navigator))));
+                () -> navigator.push(new DebugScreen(navigator, settings, context))));
         _layout.addChild(new Label("about", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
                 () -> navigator.push(new AboutScreen(navigator, context, settings))));
     }

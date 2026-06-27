@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Services;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.robotjatek.wplauncher.Colors;
@@ -22,6 +23,12 @@ public class SettingsService {
     public SettingsService(Context context) {
         _context = context;
         _accentColor = loadPersistedAccentColor();
+    }
+
+    @SuppressLint("ApplySharedPref")
+    public void deleteSettings() {
+        var prefs = _context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        prefs.edit().clear().commit();
     }
 
     public AccentColor getAccentColor() {

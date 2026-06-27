@@ -201,10 +201,10 @@ Feature-creep!
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
 - [x] Extract ScreenNavigator into a separate component
-- [ ] Debug menu
+- [x] Debug menu
   - [x] Crash app button
-  - [ ] Reset configuration button
-  - [ ] Reset StartPage state machine button
+  - [x] Restart app button
+  - [x] Reset configuration button
 - [ ] Don't recalculate matrices every frame
 - [ ] Scroll in edit mode:
   - [ ] Scroll instead of moving the tile when the scroll movement is not started on the tile

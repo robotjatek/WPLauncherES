@@ -24,7 +24,7 @@ public class InternalAppsService {
     private final Map<String, Drawable> _appIcons = new HashMap<>();
     private final Map<String, App> _internalApps = new HashMap<>();
 
-    public InternalAppsService(Context context, SettingsService settings, IScreenNavigator navigator) {
+    public InternalAppsService(Context context, SettingsService settings, PermissionService permissionService, IScreenNavigator navigator) {
         _context = context;
         initAppIcons();
 
@@ -33,7 +33,7 @@ public class InternalAppsService {
                 SETTINGS_NAME,
                 null,
                 getAppIcon(SETTINGS_NAME),
-                () -> navigator.push(new Settings(navigator, settings, context)), true);
+                () -> navigator.push(new Settings(navigator, settings, permissionService, context)), true);
 
         var clock = new App(
                 "Clock HUB",

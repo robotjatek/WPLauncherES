@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
+import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.LauncherSurfaceView;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -77,10 +78,15 @@ public class StartScreen implements IPageNavigator, IScreen {
     private final float[] pageMatrix = new float[16]; // stores the page translation relative to each other
     private final LauncherSurfaceView _view;
 
-    public StartScreen(Context context, IScreenNavigator navigator, LocationService locationService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
+    public StartScreen(Context context,
+                       IScreenNavigator navigator,
+                       LocationService locationService,
+                       PermissionService permissionService,
+                       AppChangeReceiver appChangeReceiver,
+                       LauncherSurfaceView view) {
         _state = IDLE_STATE();
         _settingsService = new SettingsService(context);
-        _internalAppsService = new InternalAppsService(context, _settingsService, navigator);
+        _internalAppsService = new InternalAppsService(context, _settingsService, permissionService, navigator);
         _tileService = new TileService(context, _internalAppsService, _settingsService, locationService);
         _tileGrid = new TileGrid(_tileService, context, appChangeReceiver);
         _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService, appChangeReceiver);

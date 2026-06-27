@@ -97,6 +97,13 @@ public class Checkbox implements UIElement {
         return true;
     }
 
+    public void setState(boolean state) {
+        if (state != _state) {
+            _state = state;
+            _dirty = true;
+        }
+    }
+
     private void toggleState() {
         _state = !_state;
         _dirty = true;

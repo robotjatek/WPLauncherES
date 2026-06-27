@@ -8,6 +8,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
+import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
@@ -20,6 +21,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private final Context _context;
     private final float[] _projMatrix = new float[16];
     private final LocationService _locationService;
+    private final PermissionService _permissionService;
     private final AppChangeReceiver _appChangeReceiver;
     private Shader _shader;
     private QuadRenderer _renderer;
@@ -28,9 +30,10 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private final LauncherSurfaceView _view;
     private final ScreenNavigator _navigator = new ScreenNavigator();
 
-    public LauncherRenderer(Context context, LocationService locationService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
+    public LauncherRenderer(Context context, LocationService locationService, PermissionService permissionService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
         _context = context;
         _locationService = locationService;
+        _permissionService = permissionService;
         _appChangeReceiver = appChangeReceiver;
         _view = view;
     }
@@ -55,7 +58,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         }
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
-        _navigator.init(new StartScreen(_context, _navigator, _locationService, _appChangeReceiver, _view));
+        _navigator.init(new StartScreen(_context, _navigator, _locationService, _permissionService, _appChangeReceiver, _view));
     }
 
     @Override

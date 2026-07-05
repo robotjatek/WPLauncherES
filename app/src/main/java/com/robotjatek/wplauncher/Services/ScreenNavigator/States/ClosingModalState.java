@@ -21,7 +21,7 @@ public class ClosingModalState extends BaseState {
 
         var modal = _context.getModal();
         if (modal == null) {
-            _context.changeState(_context.IDLE_STATE();
+            _context.changeState(_context.IDLE_STATE());
             return;
         }
 

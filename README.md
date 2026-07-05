@@ -2,14 +2,14 @@
 
 A Windows Phone inspired launcher for Android written in OpenGL ES
 
-## Planned features
+## Features
 
-- WP7/8 style live tiles
+- WP7 style live tiles
 - App list
 - Pin apps to the screen
-- Installed apps and custom "widgets"
+- Installed apps
 - Resizable tiles
-- 4/6 column mode
+- Tile color
 
 ## Tech stack
 - Java 
@@ -20,9 +20,6 @@ A Windows Phone inspired launcher for Android written in OpenGL ES
 <img src="img/s1.png" alt="Screenshot" width="500">
 
 https://github.com/user-attachments/assets/f7e517bb-9137-413f-a910-b41aa54a9deb
-
-
-
 
 ## Milestones
 
@@ -183,16 +180,12 @@ Feature-creep!
   - [ ] Messenger
   - [ ] Messages
   - [ ] Contacts
-- [ ] Generic pivot view (tabbed view)
-  - [ ] Settings subpages use pivot view with one tab
-- [ ] Multi lang support
 - [ ] Light mode/Dark mode support
 - [ ] Dropdown
 - [ ] Radiobutton
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [ ] Group apps by the first letter in the app list
-- [ ] Set background image for the start screen + transparency option for tiles
 - [x] Re-ask for permissions from the launcher settings
 - [ ] Device resolution independent UI
 - [ ] Cursor handle in the input box
@@ -211,7 +204,7 @@ Feature-creep!
   - [ ] Animated scroll when reaching the edge of the screen
 - [ ] Fix: crash on modal close
 - [ ] Fix: null pointer exception in TileGrid.Tile.getDragInfo()
-- [ ] Fix: tile keeps spinning indefinitely after dismissing a notification
+- [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
 
 ### M5 - RC
 
@@ -223,6 +216,9 @@ Feature-creep!
 - [ ] Application icon
 - [ ] Privacy policy
 - [ ] License
+- [ ] Generic pivot view (tabbed view)
+  - [ ] Settings subpages use pivot view with one tab
+- [ ] Multi lang support
 
 ### Bugs that need repro:
 
@@ -242,7 +238,7 @@ Nice to have, but I feel no pressure to implement them for now
 
 M4 is in progress
 
-## Planned live custom tiles / "widgets"
+## Planned live custom tiles
 
 Widgets with live data
 
@@ -256,5 +252,3 @@ Widgets with live data
 - Calendar
 - Email
 - Hungarian name days
-
-*Information gathering via public API-s. When public API-s are not available extract information from system notifications if its possible*

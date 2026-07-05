@@ -13,6 +13,7 @@ import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.ListView.ListItem;
 import com.robotjatek.wplauncher.Components.ListView.ListView;
+import com.robotjatek.wplauncher.Components.Modal.Modal;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
@@ -38,7 +39,7 @@ public class CrashLogScreen implements IScreen {
     private Size<Integer> _size = new Size<>(-1, -1);
     private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
     private final Label _subTitleLabel = new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0);
-    private final Button _clearAllButton = new Button("clear", null, new Size<>(0, 100), this::clearAll);
+    private final Button _clearAllButton = new Button("clear", null, new Size<>(0, 100), this::showClearLogsModal);
     private final ContextMenuDrawContext<File> _contextMenuDrawContext;
 
     public CrashLogScreen(IScreenNavigator navigator, Context context) {
@@ -130,6 +131,14 @@ public class CrashLogScreen implements IScreen {
     private void clearAll() {
         var files = listFiles();
         files.forEach(this::deleteFile);
+    }
+
+    private void showClearLogsModal() {
+        var modal = new Modal("Are you sure?", "This will delete all crash logs" , () -> {
+            clearAll();
+            _navigator.dismissModal();
+        }, _navigator::dismissModal);
+        _navigator.openModal(modal);
     }
 
     @Override

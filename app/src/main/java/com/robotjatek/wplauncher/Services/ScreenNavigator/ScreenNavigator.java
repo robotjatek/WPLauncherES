@@ -177,16 +177,18 @@ public class ScreenNavigator implements IScreenNavigator {
 
     @Override
     public void dismissModal() {
+        if (_modal == null || _state instanceof ClosingModalState) {
+            return;
+        }
         changeState(CLOSING_MODAL_STATE());
     }
 
     public void disposeModal() {
-        _commands.add(() -> {
-            if (_modal != null) {
-                _modal.dispose();
-                _modal = null;
-            }
-        });
+        if (_modal != null) {
+            var toDispose = _modal;
+            _modal = null;
+            _commands.add(toDispose::dispose);
+        }
     }
 
     public IModal getModal() {

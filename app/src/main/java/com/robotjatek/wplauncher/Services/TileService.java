@@ -60,6 +60,7 @@ public class TileService implements OnChangeListener<AccentColor> {
      * Calls to this method can be off main-thread
      * To avoid crashes this method puts its calls into a queue.
      * Execution of these commands must be fired on the main thread using {@link #executeCommands()}
+     *
      * @param app The app to pin on the TileScreen
      */
     public void queuePinTile(App app) {
@@ -77,8 +78,9 @@ public class TileService implements OnChangeListener<AccentColor> {
      * Calls to this method can be off main-thread.
      * To avoid crashes this method puts its calls into a queue.
      * Execution of these commands must be fired on the main thread using {@link #executeCommands()}
-     *
+     * <p>
      * NOTE: this has to be put in the command queue because it disposes the unpinned tile
+     *
      * @param packageName The name of the package the tile corresponds to
      */
     public void queueUnpinTile(String packageName, String className) {
@@ -100,11 +102,11 @@ public class TileService implements OnChangeListener<AccentColor> {
                 .toList();
         for (var t : tiles) {
             _tileCommands.add(() -> {
-               _tiles.remove(t);
-               t.dispose();
-               notifySubscribers();
-               compactGrid();
-               persistTiles();
+                _tiles.remove(t);
+                t.dispose();
+                notifySubscribers();
+                compactGrid();
+                persistTiles();
             });
         }
     }
@@ -131,26 +133,29 @@ public class TileService implements OnChangeListener<AccentColor> {
     }
 
     public List<Tile> loadPersistedTiles() {
-
         var tiles = new ArrayList<Tile>();
-        try {
-            var prefs = _context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-            var tilesJson = prefs.getString(TILES, null);
-            if (tilesJson == null) {
-                return List.of();
-            }
+        var prefs = _context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        var tilesJson = prefs.getString(TILES, null);
+        if (tilesJson == null) {
+            return List.of();
+        }
 
+        try {
             var jsonArray = new JSONArray(tilesJson);
             for (var i = 0; i < jsonArray.length(); i++) {
-                var obj = jsonArray.getJSONObject(i);
-                var x = obj.getInt("x");
-                var y = obj.getInt("y");
-                var colSpan = obj.getInt("colSpan");
-                var rowSpan = obj.getInt("rowSpan");
-                var title = obj.getString("title");
-                final App app;
-                if (obj.has("packageName")) {
+                try {
+                    var obj = jsonArray.getJSONObject(i);
+                    if (!obj.has("packageName")) {
+                        Log.w("TileService", "Skipping tile due to missing packageName");
+                        continue;
+                    }
                     var packageName = obj.getString("packageName");
+                    var x = obj.getInt("x");
+                    var y = obj.getInt("y");
+                    var colSpan = obj.getInt("colSpan");
+                    var rowSpan = obj.getInt("rowSpan");
+                    var title = obj.getString("title");
+                    final App app;
                     if (packageName.startsWith("launcher:")) {
                         app = _internalAppsService.getInternalApp(packageName);
                     } else {
@@ -164,15 +169,18 @@ public class TileService implements OnChangeListener<AccentColor> {
                         var isSystemApp = (info.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
                         app = new App(title, packageName, className, icon, () -> _context.startActivity(intent), isSystemApp);
                     }
-                    tiles.add(createTile(new Position<>(x, y), new Size<>(colSpan, rowSpan), app));
+
+                    if (app != null) {
+                        tiles.add(createTile(new Position<>(x, y), new Size<>(colSpan, rowSpan), app));
+                    }
+                } catch (PackageManager.NameNotFoundException | JSONException e) {
+                    Log.w("TileService", "Skipping tile due to load failure: " + e.getMessage());
                 }
             }
-
-            return tiles;
-        } catch (JSONException | PackageManager.NameNotFoundException e) {
-            Log.e("loadPersistedTiles", Objects.requireNonNull(e.getMessage()));
-            return List.of();
+        } catch (JSONException e) {
+            Log.e("TileService", "Corrupt JSON", e);
         }
+        return tiles;
     }
 
     public void subscribe(ITileListChangedListener l) {
@@ -240,11 +248,12 @@ public class TileService implements OnChangeListener<AccentColor> {
     /**
      * Push down a given group of tiles with an offset.
      * The move will be relative to the tiles original position.
-     * @param tiles The group of tiles to move together
+     *
+     * @param tiles  The group of tiles to move together
      * @param offset The offset of the move
      */
     public void pushDownTiles(List<Tile> tiles, int offset) {
-        for (var tile: tiles) {
+        for (var tile : tiles) {
             var oldPos = tile.getPosition();
             tile.setPosition(new Position<>(oldPos.x(), oldPos.y() + offset));
         }

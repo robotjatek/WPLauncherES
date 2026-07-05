@@ -123,7 +123,9 @@ public class Tile implements ITouchable {
                         (float) (Math.random() * (TIME_BEFORE_FLIP_MAX - TIME_BEFORE_FLIP_MIN));
             }
         } else {
-            _targetRot = 0;
+            if (Math.round(_targetRot / 180f) % 2 != 0) {
+                _targetRot += 180f;
+            }
             _timeOnSide = 0;
         }
 
@@ -133,6 +135,10 @@ public class Tile implements ITouchable {
 
             if (Math.abs(diff) < step) {
                 _rot = _targetRot;
+                if (!backHasContent && Math.round(_rot / 180f) % 2 == 0)  {
+                    _rot %= 360f;
+                    _targetRot %= 360f;
+                }
             } else {
                 _rot += Math.signum(diff) * step;
             }

@@ -223,7 +223,7 @@ Feature-creep!
 
 ### Bugs that need repro:
 
-- [ ] Fix: All pinned tiles got cleared from the start screen
+- [ ] Fix: All pinned tiles got cleared from the start screen - May have been fixed in M4
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
 - [ ] Fix: sometimes tiles don't spin when there is a notification (detected on real hardware, needs repro)
 - [ ] Fix: Tile bg after resize is dark (needs repro)

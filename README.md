@@ -206,6 +206,7 @@ Feature-creep!
 - [x] Fix: crash on modal dismiss
 - [ ] Fix: null pointer exception in TileGrid.Tile.getDragInfo()
 - [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
+- [x] Fix: checkbox label is squashed
 
 ### M5 - RC
 

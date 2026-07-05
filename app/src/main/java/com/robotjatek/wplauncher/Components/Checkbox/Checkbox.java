@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher.Components.Checkbox;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.opengl.Matrix;
 
@@ -30,7 +31,7 @@ public class Checkbox implements UIElement {
     private boolean _dirty = true;
     private int _stateTexture = -1;
     private int _labelTexture = -1;
-
+    private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Context _context;
 
     public Checkbox(String label, boolean initialState, Consumer<Boolean> onChange, Context context) {
@@ -47,14 +48,15 @@ public class Checkbox implements UIElement {
         var y = drawContext.yOf(this);
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
+        var labelWidth = Math.max(1, w - TOGGLE_SIZE - 16);
 
         if (_dirty) {
             TileUtil.deleteTexture(_stateTexture);
             _stateTexture = _state ?
-                    BitmapUtil.createTextureFromDrawable(ContextCompat.getDrawable(_context, R.drawable.icon_tick), 100, 100) : -1;
+                    BitmapUtil.createTextureFromDrawable(ContextCompat.getDrawable(_context, R.drawable.icon_tick), TOGGLE_SIZE, TOGGLE_SIZE) : -1;
 
             TileUtil.deleteTexture(_labelTexture);
-            _labelTexture = TileUtil.createTextTexture(_label, w, h, 48, Typeface.NORMAL,
+            _labelTexture = TileUtil.createTextTexture(_label, labelWidth, h, 48, Typeface.NORMAL,
                     Colors.LIGHT_GRAY, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
             _dirty = false;
         }
@@ -81,14 +83,17 @@ public class Checkbox implements UIElement {
 
         Matrix.setIdentityM(_modelMatrix, 0);
         Matrix.translateM(_modelMatrix, 0, x + TOGGLE_SIZE + 16, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, w - TOGGLE_SIZE, h, 1f);
+        Matrix.scaleM(_modelMatrix, 0, labelWidth, h, 1f);
         Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
         renderer.draw(proj, _modelMatrix, _labelTexture);
     }
 
     @Override
     public Size<Integer> measure() {
-        return new Size<>(0, TOGGLE_SIZE);
+        _paint.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+        _paint.setTextSize(48);
+        var textWidth = _paint.measureText(_label);
+        return new Size<>((int)(TOGGLE_SIZE + 16 + textWidth), TOGGLE_SIZE);
     }
 
     @Override

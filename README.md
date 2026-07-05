@@ -4,7 +4,8 @@ A Windows Phone inspired launcher for Android written in OpenGL ES
 
 ## Features
 
-- WP7 style live tiles
+- WP7 style tiles
+- Notifications on tiles
 - App list
 - Pin apps to the screen
 - Installed apps

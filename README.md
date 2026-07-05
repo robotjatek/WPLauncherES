@@ -202,7 +202,7 @@ Feature-creep!
 - [ ] Scroll in edit mode:
   - [ ] Scroll instead of moving the tile when the scroll movement is not started on the tile
   - [ ] Animated scroll when reaching the edge of the screen
-- [ ] Fix: crash on modal close
+- [x] Fix: crash on modal dismiss
 - [ ] Fix: null pointer exception in TileGrid.Tile.getDragInfo()
 - [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
 

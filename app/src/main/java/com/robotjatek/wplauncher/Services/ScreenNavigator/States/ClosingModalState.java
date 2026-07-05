@@ -18,15 +18,22 @@ public class ClosingModalState extends BaseState {
         super.update(delta);
         _smoothDelta = _smoothDelta * 0.8f + delta * 0.2f;
         _elapsed += _smoothDelta;
+
+        var modal = _context.getModal();
+        if (modal == null) {
+            _context.changeState(_context.IDLE_STATE();
+            return;
+        }
+
         if (_elapsed >= DURATION) {
-            _context.getModal().setVerticalTranslation(-_context.getModal().getSize().height());
+            modal.setVerticalTranslation(-_context.getModal().getSize().height());
             _context.disposeModal();
             _context.changeState(_context.IDLE_STATE());
         } else {
             // animation
             var t = _elapsed / DURATION;
             var factor = 1 - (1 - t) * (1 - t) * (1 - t);
-            _context.getModal().setVerticalTranslation(_context.getModal().getSize().height() * (-factor));
+            modal.setVerticalTranslation(_context.getModal().getSize().height() * (-factor));
         }
     }
 

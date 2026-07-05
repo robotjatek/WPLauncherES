@@ -33,6 +33,11 @@ public class EditDragState extends EditBaseState {
     public void update(float delta) {
         super.update(delta);
         var selectedTile = _tilegrid.getSelectedTile();
+        if (selectedTile == null) {
+            _tilegrid.cancelSelection();
+            _tilegrid.changeState(_tilegrid.IDLE_STATE());
+            return;
+        }
         var drawContext = _tilegrid.getDrawContext();
         var screenPosY = drawContext.yOf(selectedTile)
                 + selectedTile.getDragInfo().totalY
@@ -47,12 +52,21 @@ public class EditDragState extends EditBaseState {
 
     @Override
     public boolean handleMove(MoveGesture gesture) {
+        if (_tilegrid.getSelectedTile() == null) {
+            _tilegrid.changeState(_tilegrid.IDLE_STATE());
+            return false;
+        }
         _tilegrid.getSelectedTile().getDragInfo().update(gesture.getX(), gesture.getY());
         return true;
     }
 
     @Override
     public boolean handleUp(UpGesture gesture) {
+        if (_tilegrid.getSelectedTile() == null) {
+            _tilegrid.changeState(_tilegrid.IDLE_STATE());
+            return false;
+        }
+
         // drop tile to its new location, recalculate new tile positions, remove empty lines from the grid
         var dragInfo = _tilegrid.getSelectedTile().getDragInfo();
         var newPosition = calculateNewPosition(dragInfo);

@@ -64,7 +64,7 @@ public class LocationService {
         }
 
         final var lm = (LocationManager) _context.getSystemService(Context.LOCATION_SERVICE);
-        lm.getCurrentLocation(LocationManager.GPS_PROVIDER, new CancellationSignal(), // TODO: change it to network provider
+        lm.getCurrentLocation(LocationManager.NETWORK_PROVIDER, new CancellationSignal(),
                 Executors.newSingleThreadExecutor(),
                 (location -> extractCityName(location, _context)));
 

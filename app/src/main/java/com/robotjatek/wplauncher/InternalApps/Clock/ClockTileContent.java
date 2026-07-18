@@ -37,8 +37,8 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
     private final LocationService _locationService;
     private final WeatherService _weatherService;
     private final AbsoluteLayout _layout = new AbsoluteLayout();
-    private final Label _clockLabel = new Label("", 160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);;
-    private final Label _locationLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);;
+    private final Label _clockLabel = new Label("", 160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    private final Label _locationLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     private final Label _temperatureLabel = new Label("", 60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     private final Label _weatherCodeLabel = new Label("", 60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
 
@@ -83,6 +83,8 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
                 var temperatureX = size.width() - temperatureSize.width() - padding; // Right aligned
                 var temperatureY  = locationPosition.y() + locationSize.height();
                 _layout.addChild(_temperatureLabel, new Position<>(temperatureX, temperatureY));
+
+                // TODO: show weather icon on large tile
 
                 // Weather code
                 _weatherCodeLabel.setMaxWidth(size.width() - padding * 2);
@@ -172,6 +174,7 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
     public void onWeatherUpdate(WeatherData data) {
         if (data.temperature() == null) {
             _temperatureLabel.setText("");
+            _weatherCodeLabel.setText("");
             _dirty = true;
             return;
         }
@@ -183,7 +186,7 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
         }
         if (data.weatherCode() != _weatherCode) {
             _weatherCode = data.weatherCode();
-            _weatherCodeLabel.setText("Sunny"); // TODO: w-code to string
+            _weatherCodeLabel.setText(data.getWeatherDescription());
             _dirty = true;
         }
     }

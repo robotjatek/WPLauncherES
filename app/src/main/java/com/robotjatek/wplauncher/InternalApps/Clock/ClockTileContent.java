@@ -9,6 +9,10 @@ import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayou
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.LocationService;
+import com.robotjatek.wplauncher.Services.WeatherService.IWeatherListener;
+import com.robotjatek.wplauncher.Services.WeatherService.TemperatureUnit;
+import com.robotjatek.wplauncher.Services.WeatherService.WeatherData;
+import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.Tile;
@@ -18,25 +22,31 @@ import org.json.JSONObject;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
-public class ClockTileContent implements ITileContent {
+public class ClockTileContent implements ITileContent, IWeatherListener {
     private boolean _disposed = false;
     private long _lastUpdate = System.currentTimeMillis();
     private int _lastHour = -1;
     private int _lastMinute = -1;
+    private int _temperature = -1;
+    private int _weatherCode = -1;
     private String _location = "";
     private boolean _dirty = true;
     private final Context _context;
     private final LocationService _locationService;
+    private final WeatherService _weatherService;
     private final AbsoluteLayout _layout = new AbsoluteLayout();
-    private final Label _clockLabel;
-    private final Label _locationLabel;
+    private final Label _clockLabel = new Label("", 160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);;
+    private final Label _locationLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);;
+    private final Label _temperatureLabel = new Label("", 60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    private final Label _weatherCodeLabel = new Label("", 60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
 
-    public ClockTileContent(Context context, LocationService locationService) {
+    public ClockTileContent(Context context, LocationService locationService, WeatherService weatherService) {
         _context = context;
         _locationService = locationService;
-        _clockLabel = new Label("", 160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
-        _locationLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+        _weatherService = weatherService;
+        _weatherService.subscribe(this);
     }
 
     @Override
@@ -55,15 +65,31 @@ public class ClockTileContent implements ITileContent {
             _layout.addChild(_clockLabel, clockPosition);
 
             _layout.removeChild(_locationLabel);
+            _layout.removeChild(_temperatureLabel);
+            _layout.removeChild(_weatherCodeLabel);
             if (isLocationEnabled() &&
                     !tile.getSize().equals(Tile.SMALL)) {
+                // Location
                 _locationLabel.setText(_location);
                 _locationLabel.setMaxWidth(size.width() - padding * 2);
                 var locationSize = _locationLabel.measure();
-                var x = locationSize.width() + padding < size.width() - padding ?
-                        (position.x() + size.width()) - locationSize.width() - padding : padding;
-                var locationPosition = new Position<>(x, position.y() + padding); // Right aligned
+                var locX = size.width() - locationSize.width() - padding; // Right aligned
+                var locationPosition = new Position<>(locX, position.y() + padding);
                 _layout.addChild(_locationLabel, locationPosition);
+
+                // Temperature
+                _temperatureLabel.setMaxWidth(size.width() - padding * 2);
+                var temperatureSize = _temperatureLabel.measure();
+                var temperatureX = size.width() - temperatureSize.width() - padding; // Right aligned
+                var temperatureY  = locationPosition.y() + locationSize.height();
+                _layout.addChild(_temperatureLabel, new Position<>(temperatureX, temperatureY));
+
+                // Weather code
+                _weatherCodeLabel.setMaxWidth(size.width() - padding * 2);
+                var codeSize = _weatherCodeLabel.measure();
+                var codeX = (float)size.width() - codeSize.width() - padding;
+                var codeY = size.height() - codeSize.height() - padding;
+                _layout.addChild(_weatherCodeLabel, new Position<>(codeX, codeY));
             }
 
             _dirty = false;
@@ -125,6 +151,9 @@ public class ClockTileContent implements ITileContent {
             // Make sure that the labels are disposed. The layout only disposes children that are on it in the time of the disposal
             _clockLabel.dispose();
             _locationLabel.dispose();
+            _temperatureLabel.dispose();
+            _weatherCodeLabel.dispose();
+            _weatherService.unsubscribe(this);
             _disposed = true;
         }
     }
@@ -137,5 +166,37 @@ public class ClockTileContent implements ITileContent {
     @Override
     public boolean hasContent() {
         return true;
+    }
+
+    @Override
+    public void onWeatherUpdate(WeatherData data) {
+        if (data.temperature() == null) {
+            _temperatureLabel.setText("");
+            _dirty = true;
+            return;
+        }
+
+        if (data.temperature() != _temperature) {
+            _temperature = data.temperature();
+            _temperatureLabel.setText(getTemperatureString(data));
+            _dirty = true;
+        }
+        if (data.weatherCode() != _weatherCode) {
+            _weatherCode = data.weatherCode();
+            _weatherCodeLabel.setText("Sunny"); // TODO: w-code to string
+            _dirty = true;
+        }
+    }
+
+    private String getTemperatureString(WeatherData data) {
+        if (data.temperature() == null) {
+            return "";
+        }
+
+        if (data.unit() == TemperatureUnit.CELSIUS) {
+            return String.format(Locale.US, "%d°C", data.temperature());
+        } else {
+            return String.format(Locale.US, "%d°F", data.temperature());
+        }
     }
 }

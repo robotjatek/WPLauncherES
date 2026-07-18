@@ -15,6 +15,7 @@ import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 import com.robotjatek.wplauncher.StartScreen.States.ChildControlState;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.StartScreen.States.IdleState;
@@ -82,12 +83,13 @@ public class StartScreen implements IPageNavigator, IScreen {
                        IScreenNavigator navigator,
                        LocationService locationService,
                        PermissionService permissionService,
+                       WeatherService weatherService,
                        AppChangeReceiver appChangeReceiver,
                        LauncherSurfaceView view) {
         _state = IDLE_STATE();
         _settingsService = new SettingsService(context);
         _internalAppsService = new InternalAppsService(context, _settingsService, permissionService, navigator);
-        _tileService = new TileService(context, _internalAppsService, _settingsService, locationService);
+        _tileService = new TileService(context, _internalAppsService, _settingsService, locationService, weatherService);
         _tileGrid = new TileGrid(_tileService, context, appChangeReceiver);
         _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService, appChangeReceiver);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));

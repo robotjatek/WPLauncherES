@@ -22,6 +22,7 @@ import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.PermissionService;
+import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 
 public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
 
@@ -31,9 +32,9 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     private final IUIContext _uiContext = this;
     private ITextInputHandler _focusedInputHandler = null;
 
-    public LauncherSurfaceView(Context context, LocationService locationService, PermissionService permissionService, AppChangeReceiver appChangeReceiver) {
+    public LauncherSurfaceView(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, AppChangeReceiver appChangeReceiver) {
         super(context);
-        _renderer = new LauncherRenderer(context, locationService, permissionService, appChangeReceiver, this);
+        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, appChangeReceiver, this);
         _gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
            @Override

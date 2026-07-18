@@ -13,6 +13,7 @@ public class LocationService {
     private boolean _hasPermission = false;
     private boolean _isPaused = false;
     private String _city = "";
+    private Location _location;
     private long _lastRequest = 0;
     private final Context _context;
 
@@ -35,7 +36,7 @@ public class LocationService {
 
         final var now = System.currentTimeMillis();
         if (now - _lastRequest > REFRESH_INTERVAL_MS) {
-            getLocation();
+            queryLocation();
         }
 
         return _city;
@@ -48,18 +49,22 @@ public class LocationService {
     public void setHasPermission(boolean value) {
         _hasPermission = value;
         if (_hasPermission) {
-            getLocation();
+            queryLocation();
         }
     }
 
-    private void getLocation() {
+    public Location getLocation() {
+        return _location;
+    }
+
+    private void queryLocation() {
         final var now = System.currentTimeMillis();
         if (!_hasPermission || now - _lastRequest < REFRESH_INTERVAL_MS || _isPaused) {
             return;
         }
 
         final var lm = (LocationManager) _context.getSystemService(Context.LOCATION_SERVICE);
-        lm.getCurrentLocation(LocationManager.NETWORK_PROVIDER, new CancellationSignal(),
+        lm.getCurrentLocation(LocationManager.GPS_PROVIDER, new CancellationSignal(), // TODO: change it to network provider
                 Executors.newSingleThreadExecutor(),
                 (location -> extractCityName(location, _context)));
 
@@ -70,7 +75,7 @@ public class LocationService {
         if (location == null) {
             return;
         }
-
+        _location = location;
         final var gc = new Geocoder(context);
         gc.getFromLocation(location.getLatitude(), location.getLongitude(), 1,
                 addresses -> {

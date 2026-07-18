@@ -20,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.PermissionService;
+import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class MainActivity extends ComponentActivity {
 
     private LauncherSurfaceView _surface;
     private final LocationService _locationService = new LocationService(this);
+    private WeatherService _weatherService = new WeatherService(_locationService);
     private final AppChangeReceiver _appChangeReceiver = new AppChangeReceiver();
     private final PermissionService _permissionService = new PermissionService(this, _locationService);
 
@@ -37,7 +39,7 @@ public class MainActivity extends ComponentActivity {
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(getApplicationContext()));
         EdgeToEdge.enable(this);
 
-        _surface = new LauncherSurfaceView(this, _locationService, _permissionService, _appChangeReceiver);
+        _surface = new LauncherSurfaceView(this, _locationService, _permissionService, _weatherService, _appChangeReceiver);
         _surface.setPreserveEGLContextOnPause(true);
 
         ViewCompat.setWindowInsetsAnimationCallback(getWindow().getDecorView(),
@@ -110,6 +112,7 @@ public class MainActivity extends ComponentActivity {
         Log.d(MainActivity.class.getName(), "onDestroy!!!!");
         super.onDestroy();
         _surface.dispose();
+        _weatherService.stop();
         if (_appChangeReceiver != null) {
             unregisterReceiver(_appChangeReceiver);
         }

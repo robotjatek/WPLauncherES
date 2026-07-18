@@ -177,7 +177,7 @@ Feature-creep!
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
   - [ ] Photos
-  - [ ] Weather
+  - [x] Weather
   - [ ] Messenger
   - [ ] Messages
   - [ ] Contacts
@@ -190,7 +190,6 @@ Feature-creep!
 - [x] Re-ask for permissions from the launcher settings
 - [ ] Device resolution independent UI
 - [ ] Cursor handle in the input box
-- [ ] Pin some default tiles to the start screen on first start
 - [x] Modal
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
@@ -221,6 +220,10 @@ Feature-creep!
 - [ ] Generic pivot view (tabbed view)
   - [ ] Settings subpages use pivot view with one tab
 - [ ] Multi lang support
+- [ ] Rebrand to something else than WPLauncher ES
+- [ ] First start experience
+  - [ ] Pin some default tiles to the start screen on first start
+  - [ ] Quick tutorial on first start
 
 ### Bugs that need repro:
 
@@ -235,6 +238,7 @@ Nice to have, but I feel no pressure to implement them for now
 
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
+- [ ] Make checkbox use higher level components
 
 ### Current progress
 

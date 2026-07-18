@@ -23,6 +23,7 @@ import java.util.function.Consumer;
 
 public class Checkbox implements UIElement {
     private static final int TOGGLE_SIZE = 100;
+    private static final int TEXT_SIZE = 48;
     private boolean _disposed = false;
     private final String _label;
     private boolean _state;
@@ -56,7 +57,7 @@ public class Checkbox implements UIElement {
                     BitmapUtil.createTextureFromDrawable(ContextCompat.getDrawable(_context, R.drawable.icon_tick), TOGGLE_SIZE, TOGGLE_SIZE) : -1;
 
             TileUtil.deleteTexture(_labelTexture);
-            _labelTexture = TileUtil.createTextTexture(_label, labelWidth, h, 48, Typeface.NORMAL,
+            _labelTexture = TileUtil.createTextTexture(_label, labelWidth, h, TEXT_SIZE, Typeface.NORMAL,
                     Colors.LIGHT_GRAY, Colors.TRANSPARENT, HorizontalAlign.LEFT, VerticalAlign.CENTER);
             _dirty = false;
         }
@@ -91,7 +92,7 @@ public class Checkbox implements UIElement {
     @Override
     public Size<Integer> measure() {
         _paint.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
-        _paint.setTextSize(48);
+        _paint.setTextSize(TEXT_SIZE);
         var textWidth = _paint.measureText(_label);
         return new Size<>((int)(TOGGLE_SIZE + 16 + textWidth), TOGGLE_SIZE);
     }

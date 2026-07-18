@@ -97,6 +97,7 @@ public class MainActivity extends ComponentActivity {
         super.onPause();
         _surface.onPause();
         _locationService.pause();
+        _weatherService.pause();
     }
 
     @Override
@@ -105,6 +106,7 @@ public class MainActivity extends ComponentActivity {
         _surface.onResume();
         _surface.onHomePressed();
         _locationService.resume();
+        _weatherService.resume();
     }
 
     @Override

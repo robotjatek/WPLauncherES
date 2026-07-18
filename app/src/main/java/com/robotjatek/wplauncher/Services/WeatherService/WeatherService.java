@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -23,6 +24,8 @@ public class WeatherService {
     private final LocationService _locationService;
     private final List<IWeatherListener> _listeners = new ArrayList<>();
     private boolean _started = false;
+    private boolean _paused = false;
+    private LocalDateTime _lastUpdate;
     private final ScheduledExecutorService _executorService = Executors.newSingleThreadScheduledExecutor();
     private static final String URL_TEMPLATE = "https://api.open-meteo.com/v1/forecast?latitude=%f&longitude=%f&current=is_day,temperature_2m,weather_code&temperature_unit=%s";
     public WeatherService(LocationService locationService) {
@@ -30,11 +33,25 @@ public class WeatherService {
     }
 
     public void start() {
-        _executorService.scheduleWithFixedDelay(this::queryTemperature, 1, 10, TimeUnit.MINUTES);
+        if (_started) {
+            _paused = false;
+            return;
+        }
+        _executorService.scheduleWithFixedDelay(this::queryTemperature, 0, 10, TimeUnit.MINUTES);
+        _started = true;
     }
 
     public void stop() {
         _executorService.shutdownNow();
+    }
+
+    public void pause() {
+        _paused = true;
+    }
+
+    public void resume() {
+        _paused = false;
+        queryTemperature();
     }
 
     public void subscribe(IWeatherListener listener) {
@@ -54,6 +71,10 @@ public class WeatherService {
     }
 
     private void queryTemperature() {
+        if (_paused || (_lastUpdate != null && LocalDateTime.now().isBefore(_lastUpdate.plusMinutes(5)))) {
+            return;
+        }
+
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         try {
@@ -83,6 +104,7 @@ public class WeatherService {
                 var temperature = (int) current.getDouble("temperature_2m");
                 var weatherCode = current.getInt("weather_code");
                 var unit = LocalePreferences.getTemperatureUnit().equals(LocalePreferences.TemperatureUnit.CELSIUS) ? TemperatureUnit.CELSIUS : TemperatureUnit.FAHRENHEIT;
+                _lastUpdate = LocalDateTime.now();
                 _listeners.forEach(_listener -> _listener.onWeatherUpdate(new WeatherData(temperature, weatherCode, unit, isDay)));
             }
         } catch (Exception e) {

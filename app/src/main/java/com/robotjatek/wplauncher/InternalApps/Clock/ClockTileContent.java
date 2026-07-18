@@ -85,6 +85,7 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
                 _layout.addChild(_temperatureLabel, new Position<>(temperatureX, temperatureY));
 
                 // TODO: show weather icon on large tile
+                // TODO: show weather setting
 
                 // Weather code
                 _weatherCodeLabel.setMaxWidth(size.width() - padding * 2);

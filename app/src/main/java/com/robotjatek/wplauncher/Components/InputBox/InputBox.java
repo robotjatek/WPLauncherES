@@ -199,6 +199,23 @@ public class InputBox implements UIElement, ITextInputHandler {
         return _cursorPosition;
     }
 
+    @Override
+    public void decrementCursorPosition() {
+        _cursorPosition--;
+        if (_cursorPosition < 0) {
+            _cursorPosition = 0;
+
+        }
+    }
+
+    @Override
+    public void incrementCursorPosition() {
+        _cursorPosition++;
+        if (_cursorPosition > _text.length()) {
+            _cursorPosition = _text.length();
+        }
+    }
+
     private String replaceComposing(String base, String composing) {
         int i = 0;
         while (i < base.length() &&

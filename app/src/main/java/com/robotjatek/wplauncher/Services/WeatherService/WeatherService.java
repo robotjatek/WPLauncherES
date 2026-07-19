@@ -13,16 +13,16 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class WeatherService {
     private final LocationService _locationService;
-    private final List<IWeatherListener> _listeners = new ArrayList<>();
+    private final Set<IWeatherListener> _listeners = new HashSet<>();
     private boolean _started = false;
     private boolean _paused = false;
     private LocalDateTime _lastUpdate;

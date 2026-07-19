@@ -36,6 +36,7 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
     private final Context _context;
     private final LocationService _locationService;
     private final WeatherService _weatherService;
+    private boolean _subscribedToWeatherService = false;
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _clockLabel = new Label("", 160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     private final Label _locationLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
@@ -46,11 +47,11 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
         _context = context;
         _locationService = locationService;
         _weatherService = weatherService;
-        _weatherService.subscribe(this);
     }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, Position<Float> position, Size<Integer> size) {
+        updateContent();
         if (_dirty) {
             _layout.setBgColor(tile.bgColor);
 
@@ -85,7 +86,6 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
                 _layout.addChild(_temperatureLabel, new Position<>(temperatureX, temperatureY));
 
                 // TODO: show weather icon on large tile
-                // TODO: show weather setting
 
                 // Weather code
                 _weatherCodeLabel.setMaxWidth(size.width() - padding * 2);
@@ -98,7 +98,6 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
             _dirty = false;
         }
 
-        updateContent();
         _layout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
     }
 
@@ -120,8 +119,16 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
                 if (!_location.equals(currentLocation)) {
                     setLocation(currentLocation);
                 }
+                if (!_subscribedToWeatherService) {
+                    _weatherService.subscribe(this);
+                    _subscribedToWeatherService = true;
+                }
             } else {
                 setLocation("");
+                if (_subscribedToWeatherService) {
+                    _weatherService.unsubscribe(this);
+                    _subscribedToWeatherService = false;
+                }
             }
 
             _lastUpdate = System.currentTimeMillis();

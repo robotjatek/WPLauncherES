@@ -51,7 +51,7 @@ public class WeatherService {
 
     public void resume() {
         _paused = false;
-        queryTemperature();
+        _executorService.execute(this::queryTemperature);
     }
 
     public void subscribe(IWeatherListener listener) {

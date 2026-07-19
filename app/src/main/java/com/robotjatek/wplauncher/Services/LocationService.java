@@ -58,6 +58,7 @@ public class LocationService {
     }
 
     public Location getLocation() {
+        queryLocation();
         return _location;
     }
 

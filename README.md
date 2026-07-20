@@ -211,6 +211,7 @@ Feature-creep!
 
 - [ ] Show weather icon on the HUB tile
 - [ ] Cache UI element size measurement results
+- [ ] Make NotificationSurface properly aligned
 
 ### M5 - RC
 
@@ -243,7 +244,7 @@ Nice to have, but I feel no pressure to implement them for now
 
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
-- [ ] Make checkbox use higher level components
+- [ ] Make checkbox use higher level components (then kill TileUtil.java)
 
 ### Current progress
 

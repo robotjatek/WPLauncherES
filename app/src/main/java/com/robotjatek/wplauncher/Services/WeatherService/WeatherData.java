@@ -5,7 +5,7 @@ public record WeatherData(Integer temperature, Integer weatherCode, TemperatureU
         // From: https://open-meteo.com/en/docs#weather_variable_documentation
         return switch (weatherCode) {
             case 0 -> isDay ? "Sunny" : "Clear Sky";
-            case 1 -> isDay ? "Mainly Sunny" : "Mainly Clear";
+            case 1 -> isDay ? "Mostly Sunny" : "Mostly Clear";
             case 2 -> "Partly Cloudy";
             case 3 -> "Overcast";
             case 45, 48 -> "Fog";

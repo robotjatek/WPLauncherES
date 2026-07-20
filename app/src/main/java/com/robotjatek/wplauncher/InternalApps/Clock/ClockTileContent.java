@@ -29,8 +29,7 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
     private long _lastUpdate = System.currentTimeMillis();
     private int _lastHour = -1;
     private int _lastMinute = -1;
-    private int _temperature = -1;
-    private int _weatherCode = -1;
+    private WeatherData _weatherData = new WeatherData(-1, -1, TemperatureUnit.CELSIUS, false);
     private String _location = "";
     private boolean _dirty = true;
     private final Context _context;
@@ -201,13 +200,9 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
             return;
         }
 
-        if (data.temperature() != _temperature) {
-            _temperature = data.temperature();
+        if (!_weatherData.equals(data)) {
+            _weatherData = data;
             _temperatureLabel.setText(getTemperatureString(data));
-            _dirty = true;
-        }
-        if (data.weatherCode() != _weatherCode) {
-            _weatherCode = data.weatherCode();
             _weatherCodeLabel.setText(data.getWeatherDescription());
             _dirty = true;
         }

@@ -5,8 +5,6 @@ import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Has only one set of vertex data, and call draw multiple times with different Model matrices
@@ -20,8 +18,6 @@ public class QuadRenderer {
     private final int _texCoordVBOId;
     private final Shader _shader;
     private float _offsetLevel = 0f;
-    private final Deque<Integer> _stencilStack = new ArrayDeque<>();
-    private int _nextStencilValue = 1;
     private static final int POSITION_LOCATION = 0;
     private static final int TEX_COORD_LOCATION = 1;
 
@@ -145,18 +141,10 @@ public class QuadRenderer {
         GLES32.glBindVertexArray(0);
     }
 
-    public void resetStencil() {
-        _nextStencilValue = 1;
-        _stencilStack.clear();
-    }
-
     public void beginClip(float[] projMatrix, float[] modelMatrix) {
-        var stencilValue = _nextStencilValue++;
-        _stencilStack.push(stencilValue);
-
         GLES32.glEnable(GLES32.GL_STENCIL_TEST);
         GLES32.glStencilMask(0xFF);
-        GLES32.glStencilFunc(GLES32.GL_ALWAYS, stencilValue, 0xFF);
+        GLES32.glStencilFunc(GLES32.GL_ALWAYS, 1, 0xFF);
         GLES32.glStencilOp(GLES32.GL_REPLACE, GLES32.GL_REPLACE, GLES32.GL_REPLACE);
 
         GLES32.glColorMask(false, false, false, false);
@@ -167,18 +155,13 @@ public class QuadRenderer {
         GLES32.glDepthMask(true);
         GLES32.glColorMask(true, true, true, true);
 
-        GLES32.glStencilFunc(GLES32.GL_EQUAL, stencilValue, 0xFF);
+        GLES32.glStencilFunc(GLES32.GL_EQUAL, 1, 0xFF);
         GLES32.glStencilOp(GLES32.GL_KEEP, GLES32.GL_KEEP, GLES32.GL_KEEP);
     }
 
     public void endClip() {
-        _stencilStack.pop();
-        var previousValue = _stencilStack.peek();
-        if (previousValue == null) {
-            GLES32.glDisable(GLES32.GL_STENCIL_TEST);
-        } else {
-            GLES32.glStencilFunc(GLES32.GL_EQUAL, previousValue, 0xFF);
-        }
+        GLES32.glClear(GLES32.GL_STENCIL_BUFFER_BIT);
+        GLES32.glDisable(GLES32.GL_STENCIL_TEST);
     }
 
     public void enableDepthTest() {

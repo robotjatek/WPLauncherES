@@ -66,7 +66,6 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
 
     @Override
     public void onDrawFrame(javax.microedition.khronos.opengles.GL10 glUnused) {
-        _renderer.resetStencil();
         if (_needsResize && _width > 0 && _height > 0) {
             updateLayout();
             _needsResize = false;

@@ -101,7 +101,7 @@ public class WeatherService {
                 var jsonObject = new JSONObject(resultJson.toString());
                 var current = jsonObject.getJSONObject("current");
                 var isDay = current.getInt("is_day") == 1;
-                var temperature = (int) current.getDouble("temperature_2m");
+                var temperature = (int)Math.round(current.getDouble("temperature_2m"));
                 var weatherCode = current.getInt("weather_code");
                 var unit = LocalePreferences.getTemperatureUnit().equals(LocalePreferences.TemperatureUnit.CELSIUS) ? TemperatureUnit.CELSIUS : TemperatureUnit.FAHRENHEIT;
                 _lastUpdate = LocalDateTime.now();

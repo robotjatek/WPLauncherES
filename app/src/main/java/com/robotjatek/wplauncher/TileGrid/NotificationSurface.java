@@ -33,6 +33,7 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Label _titleLabel = new Label("Should not be seen", 56, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
     private final TextBlock _textBox = new TextBlock("", 52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400);
+    private Tile _tile;
 
     public NotificationSurface(App app) {
         _packageName = app.packageName();
@@ -42,10 +43,15 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     }
 
     @Override
+    public void setParent(Tile tile) {
+        _tile = tile;
+    }
+
+    @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
-                     Tile tile, Position<Float> position, Size<Integer> size) {
+                     Position<Float> position, Size<Integer> size) {
         if (_dirty) {
-            _layout.setBgColor(tile.bgColor);
+            _layout.setBgColor(_tile.bgColor);
             if (!_notifications.isEmpty()) {
                 var currentNotification = _notifications.get(_currentNotificationId);
                 _titleLabel.setText(currentNotification.title());

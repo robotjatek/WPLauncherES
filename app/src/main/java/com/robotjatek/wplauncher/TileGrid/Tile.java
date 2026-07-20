@@ -51,6 +51,10 @@ public class Tile implements ITouchable {
         _backContent = backContent;
         _flipInterval = TIME_BEFORE_FLIP_MIN +
                 (float) (Math.random() * (TIME_BEFORE_FLIP_MAX - TIME_BEFORE_FLIP_MIN));
+        _content.setParent(this);
+        if (_backContent != null) {
+            _backContent.setParent(this);
+        }
     }
 
     /**
@@ -101,9 +105,9 @@ public class Tile implements ITouchable {
 
         // Render with the new size while scaling it with the gradually smaller visual size
         var logicalSize = new Size<>((int)targetWidth, (int)targetHeight);
-        _content.draw(delta, projMatrix, _frontViewMatrix, renderer, this, Position.ZERO, logicalSize);
+        _content.draw(delta, projMatrix, _frontViewMatrix, renderer, Position.ZERO, logicalSize);
         if (_backContent != null) {
-            _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, this, Position.ZERO, logicalSize);
+            _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, Position.ZERO, logicalSize);
         }
         renderer.endClip();
     }

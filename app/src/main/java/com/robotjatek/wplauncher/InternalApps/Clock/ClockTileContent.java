@@ -42,48 +42,52 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
     private final Label _locationLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     private final Label _temperatureLabel = new Label("", 60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     private final Label _weatherCodeLabel = new Label("", 60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    private boolean _locationLabelsPresent = false;
+    private Tile _tile;
 
     public ClockTileContent(Context context, LocationService locationService, WeatherService weatherService) {
         _context = context;
         _locationService = locationService;
         _weatherService = weatherService;
+        _layout.addChild(_clockLabel, Position.ZERO);
     }
 
     @Override
-    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Tile tile, Position<Float> position, Size<Integer> size) {
+    public void setParent(Tile parent) {
+        _tile = parent;
+    }
+
+    @Override
+    public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Position<Float> position, Size<Integer> size) {
         updateContent();
         if (_dirty) {
-            _layout.setBgColor(tile.bgColor);
+            _layout.setBgColor(_tile.bgColor);
 
-            _layout.removeChild(_clockLabel);
             var padding = size.height() * 0.035f;
             var time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH mm"));
-            var fontSize = tile.getSize().equals(Tile.SMALL) ? 80 : 160;
+            var fontSize = _tile.getSize().equals(Tile.SMALL) ? 80 : 160;
             _clockLabel.setText(time);
             _clockLabel.setTextSize(fontSize);
             _clockLabel.setMaxWidth(size.width() - padding * 2);
             var clockPosition = new Position<>(position.x() + padding, position.y() + size.height() / 3);
-            _layout.addChild(_clockLabel, clockPosition);
+            _layout.setChildPosition(_clockLabel, clockPosition);
 
-            _layout.removeChild(_locationLabel);
-            _layout.removeChild(_temperatureLabel);
-            _layout.removeChild(_weatherCodeLabel);
             if (isLocationEnabled() &&
-                    !tile.getSize().equals(Tile.SMALL)) {
+                    !_tile.getSize().equals(Tile.SMALL)) {
                 // Location
                 _locationLabel.setText(_location);
                 _locationLabel.setMaxWidth(size.width() - padding * 2);
                 var locationSize = _locationLabel.measure();
                 var locX = size.width() - locationSize.width() - padding; // Right aligned
                 var locationPosition = new Position<>(locX, position.y() + padding);
-                _layout.addChild(_locationLabel, locationPosition);
+                _layout.setChildPosition(_locationLabel, locationPosition);
 
                 // Temperature
                 _temperatureLabel.setMaxWidth(size.width() - padding * 2);
                 var temperatureSize = _temperatureLabel.measure();
                 var temperatureX = size.width() - temperatureSize.width() - padding; // Right aligned
                 var temperatureY  = locationPosition.y() + locationSize.height();
-                _layout.addChild(_temperatureLabel, new Position<>(temperatureX, temperatureY));
+                _layout.setChildPosition(_temperatureLabel, new Position<>(temperatureX, temperatureY));
 
                 // TODO: show weather icon on large tile
 
@@ -92,7 +96,7 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
                 var codeSize = _weatherCodeLabel.measure();
                 var codeX = (float)size.width() - codeSize.width() - padding;
                 var codeY = size.height() - codeSize.height() - padding;
-                _layout.addChild(_weatherCodeLabel, new Position<>(codeX, codeY));
+                _layout.setChildPosition(_weatherCodeLabel, new Position<>(codeX, codeY));
             }
 
             _dirty = false;
@@ -123,8 +127,18 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
                     _weatherService.subscribe(this);
                     _subscribedToWeatherService = true;
                 }
+                if (!_locationLabelsPresent) {
+                    _layout.addChild(_locationLabel, Position.ZERO);
+                    _layout.addChild(_temperatureLabel, Position.ZERO);
+                    _layout.addChild(_weatherCodeLabel, Position.ZERO);
+                    _locationLabelsPresent = true;
+                }
             } else {
                 setLocation("");
+                _layout.removeChild(_locationLabel);
+                _layout.removeChild(_temperatureLabel);
+                _layout.removeChild(_weatherCodeLabel);
+                _locationLabelsPresent = false;
                 if (_subscribedToWeatherService) {
                     _weatherService.unsubscribe(this);
                     _subscribedToWeatherService = false;
@@ -148,7 +162,7 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
         }
         try {
             var settings = new JSONObject(settingsJson);
-            return settings.getBoolean("locationEnabled");
+            return settings.getBoolean("locationEnabled") && !_tile.getSize().equals(Tile.SMALL);
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

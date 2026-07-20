@@ -207,6 +207,11 @@ Feature-creep!
 - [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
 - [x] Fix: checkbox label is squashed
 
+### M4.5
+
+- [ ] Show weather icon on the HUB tile
+- [ ] Cache UI element size measurement results
+
 ### M5 - RC
 
 - [ ] Landscape mode support

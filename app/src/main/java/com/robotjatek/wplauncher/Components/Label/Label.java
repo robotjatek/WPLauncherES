@@ -65,6 +65,7 @@ public class Label implements UIElement, ITouchable {
                 TileUtil.deleteTexture(_textureId);
             }
             if (w == 0 || h == 0) {
+                _dirty = false;
                 return; // Do not draw invisible element
             }
 
@@ -138,6 +139,7 @@ public class Label implements UIElement, ITouchable {
 
     @Override
     public Size<Integer> measure() {
+        // TODO: cache measurements
         _paint.setTextAlign(Paint.Align.LEFT);
         _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
         _paint.setTextSize(_textSize);

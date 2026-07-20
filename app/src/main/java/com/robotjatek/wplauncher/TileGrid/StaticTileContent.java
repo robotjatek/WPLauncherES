@@ -30,6 +30,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     private boolean _isNotificationLabelAdded = false;
     private final static Size<Integer> ICON_SIZE = new Size<>(256, 256);
     private App _lastApp;
+    private Tile _tile;
 
     public StaticTileContent(App app) {
         _packageName = app.packageName();
@@ -43,6 +44,11 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
         _layout.addChild(_titleLabel, Position.ZERO);
     }
 
+    @Override
+    public void setParent(Tile parent) {
+        _tile = parent;
+    }
+
     private void updateApp(App app) {
         if (_lastApp != app) {
             _icon.setIconDrawable(app.icon());
@@ -53,19 +59,19 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
-                     Tile tile, Position<Float> position, Size<Integer> size) {
+                     Position<Float> position, Size<Integer> size) {
         if (_dirty) {
             // TODO: move this to a command buffer and run before rendering a frame
-            updateApp(tile.getApp());
+            updateApp(_tile.getApp());
             var padding = size.height() * 0.035f;
             var iconSize = Math.min(size.width(), size.height()) / 2;
             _icon.setSize(new Size<>(iconSize, iconSize));
-            var titleText = tile.getSize().equals(Tile.SMALL) ? "" : tile.getApp().name();
+            var titleText = _tile.getSize().equals(Tile.SMALL) ? "" : _tile.getApp().name();
             if (!titleText.equals(_titleLabel.getText())) {
                 _titleLabel.setText(titleText);
             }
             _titleLabel.setMaxWidth(size.width() - padding * 2);
-            _layout.setBgColor(tile.bgColor);
+            _layout.setBgColor(_tile.bgColor);
 
             // Icon centered
             var iconX = (size.width() - iconSize) / 2f;
@@ -83,7 +89,7 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
             if (!_notifications.isEmpty()) {
                 // Notification badge
                 var offset = size.width() * 0.025f;
-                var notificationTextSize = tile.getSize().equals(Tile.SMALL) ? 48 : 144;
+                var notificationTextSize = _tile.getSize().equals(Tile.SMALL) ? 48 : 144;
                 if (_notificationLabel.getTextSize() != notificationTextSize) {
                     _notificationLabel.setTextSize(notificationTextSize);
                 }

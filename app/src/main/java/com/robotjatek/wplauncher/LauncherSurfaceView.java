@@ -186,7 +186,7 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
             cancelFocus();
             return;
         }
-        _renderer.onHomePressed();
+        queueEvent(_renderer::onHomePressed);
     }
 
     public ITextInputHandler getFocusedInputHandler() {

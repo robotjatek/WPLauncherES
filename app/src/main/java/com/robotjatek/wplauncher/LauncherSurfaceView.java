@@ -4,6 +4,7 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.text.InputType;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -22,6 +23,7 @@ import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.PermissionService;
+import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 
 public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
 
@@ -31,9 +33,9 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     private final IUIContext _uiContext = this;
     private ITextInputHandler _focusedInputHandler = null;
 
-    public LauncherSurfaceView(Context context, LocationService locationService, PermissionService permissionService, AppChangeReceiver appChangeReceiver) {
+    public LauncherSurfaceView(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, AppChangeReceiver appChangeReceiver) {
         super(context);
-        _renderer = new LauncherRenderer(context, locationService, permissionService, appChangeReceiver, this);
+        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, appChangeReceiver, this);
         _gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
            @Override
@@ -135,6 +137,42 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
         });
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        var handler = getFocusedInputHandler();
+        if (handler == null) {
+            return super.onKeyDown(keyCode, event);
+        }
+
+        if (keyCode == KeyEvent.KEYCODE_DEL) {
+            handler.onBackspace();
+            return true;
+        }
+
+        if (keyCode == KeyEvent.KEYCODE_ENTER) {
+            cancelFocus(); // TODO: this will not work for multiline inputs
+            return true;
+        }
+
+        if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) {
+            handler.decrementCursorPosition();
+            return true;
+        }
+
+        if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) {
+            handler.incrementCursorPosition();
+            return true;
+        }
+
+        var uniChar = event.getUnicodeChar();
+        if (uniChar != 0) {
+            handler.onTextInput(String.valueOf((char) uniChar));
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
     public void onBackPressed() {
         if (_focusedInputHandler != null) {
             cancelFocus();
@@ -148,7 +186,7 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
             cancelFocus();
             return;
         }
-        _renderer.onHomePressed();
+        queueEvent(_renderer::onHomePressed);
     }
 
     public ITextInputHandler getFocusedInputHandler() {

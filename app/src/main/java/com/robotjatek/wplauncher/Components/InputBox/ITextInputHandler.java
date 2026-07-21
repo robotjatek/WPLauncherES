@@ -9,4 +9,6 @@ public interface ITextInputHandler {
         void clearText();
         String getText();
         int getCursorPosition();
+        void decrementCursorPosition();
+        void incrementCursorPosition();
 }

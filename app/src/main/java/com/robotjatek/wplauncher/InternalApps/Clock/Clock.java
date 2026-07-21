@@ -37,7 +37,7 @@ public class Clock implements IScreen {
         _layout.setBgColor(Colors.BLACK);
         _layout.addChild(new Label("CLOCK HUB", 52, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("settings", 160, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Checkbox("Show location on tile when available", _locationEnabled, (b) -> {
+        _layout.addChild(new Checkbox("Show location based data when available", _locationEnabled, (b) -> {
             _locationEnabled = b;
             persistSettings();
         }, context));

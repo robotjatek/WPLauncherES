@@ -48,7 +48,7 @@ public class IdleState extends BaseState {
     public void enter() {
         super.enter();
         _state.enter();
-        _context.cancelSelection();
+        _context.cancelSelection(); // TODO: this causes a full tile redraw every time a scroll stops
     }
 
     @Override

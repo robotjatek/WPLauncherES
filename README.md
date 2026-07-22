@@ -176,7 +176,7 @@ Feature-creep!
 
 - [ ] More tiles & specific tiles for common apps
   - [ ] Tasks
-  - [ ] Photos
+  - [x] Photos
   - [x] Weather
   - [ ] Messenger
   - [ ] Messages
@@ -206,12 +206,14 @@ Feature-creep!
 - [ ] Fix: null pointer exception in TileGrid.Tile.getDragInfo()
 - [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
 - [x] Fix: checkbox label is squashed
+- [ ] Fix: Dirty flag is set on tiles on scroll stop
 
 ### M4.5
 
 - [ ] Show weather icon on the HUB tile
 - [ ] Cache UI element size measurement results
 - [ ] Make NotificationSurface properly aligned
+- [ ] Double call of createTile in tileService
 
 ### M5 - RC
 

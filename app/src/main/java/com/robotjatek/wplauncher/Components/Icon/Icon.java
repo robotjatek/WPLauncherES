@@ -11,6 +11,7 @@ import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 
+// TODO: the bitmap should be disposed after uploading it to the gpu
 public class Icon implements UIElement {
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
@@ -71,6 +72,7 @@ public class Icon implements UIElement {
     }
 
     public void setSize(Size<Integer> size) {
+        if (_size.equals(size)) return;
         _size = size;
         _dirty = true;
     }
@@ -81,6 +83,8 @@ public class Icon implements UIElement {
     }
 
     public void setBgColor(int bgColor) {
+        if (_bgColor == bgColor) return;
+
         _bgColor = bgColor;
         _dirty = true;
     }

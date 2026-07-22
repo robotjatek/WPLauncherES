@@ -162,11 +162,15 @@ public class Label implements UIElement, ITouchable {
     }
 
     public void setText(String text) {
+        if (_text.equals(text)) return;
+
         _text = text;
         _dirty = true;
     }
 
     public void setMaxWidth(float maxWidth) {
+        if (_maxWidth == maxWidth) return;
+
         _maxWidth = maxWidth;
         _dirty = true;
     }
@@ -180,6 +184,8 @@ public class Label implements UIElement, ITouchable {
     }
 
     public void setTextColor(int color) {
+        if (_textColor == color) return;
+
         _textColor = color;
         _dirty = true;
     }
@@ -189,6 +195,8 @@ public class Label implements UIElement, ITouchable {
     }
 
     public void setTextSize(int size) {
+        if (_textSize == size) return;
+
         _textSize = size;
         _dirty = true;
     }

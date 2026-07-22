@@ -8,6 +8,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
+import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
@@ -24,6 +25,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private final LocationService _locationService;
     private final PermissionService _permissionService;
     private final WeatherService _weatherService;
+    private final MediaService _mediaService;
     private final AppChangeReceiver _appChangeReceiver;
     private Shader _shader;
     private QuadRenderer _renderer;
@@ -32,11 +34,12 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private final LauncherSurfaceView _view;
     private final ScreenNavigator _navigator = new ScreenNavigator();
 
-    public LauncherRenderer(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
+    public LauncherRenderer(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, MediaService mediaService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
         _context = context;
         _locationService = locationService;
         _permissionService = permissionService;
         _weatherService = weatherService;
+        _mediaService = mediaService;
         _appChangeReceiver = appChangeReceiver;
         _view = view;
     }
@@ -61,7 +64,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         }
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
-        _navigator.init(new StartScreen(_context, _navigator, _locationService, _permissionService, _weatherService, _appChangeReceiver, _view));
+        _navigator.init(new StartScreen(_context, _navigator, _locationService, _permissionService, _weatherService, _mediaService, _appChangeReceiver, _view));
     }
 
     @Override

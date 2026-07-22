@@ -133,6 +133,8 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
     }
 
     public void setSize(Size<Integer> size) {
+        if (_size.equals(size)) return;
+
         _size = size;
         _itemDrawContext.onResize(size.width());
         setScrollBounds();

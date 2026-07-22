@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.AppList.AppList;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
+import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.LauncherSurfaceView;
@@ -84,12 +85,13 @@ public class StartScreen implements IPageNavigator, IScreen {
                        LocationService locationService,
                        PermissionService permissionService,
                        WeatherService weatherService,
+                       MediaService mediaService,
                        AppChangeReceiver appChangeReceiver,
                        LauncherSurfaceView view) {
         _state = IDLE_STATE();
         _settingsService = new SettingsService(context);
         _internalAppsService = new InternalAppsService(context, _settingsService, permissionService, navigator);
-        _tileService = new TileService(context, _internalAppsService, _settingsService, locationService, weatherService);
+        _tileService = new TileService(context, _internalAppsService, _settingsService, locationService, weatherService, mediaService);
         _tileGrid = new TileGrid(_tileService, context, appChangeReceiver);
         _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService, appChangeReceiver);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));

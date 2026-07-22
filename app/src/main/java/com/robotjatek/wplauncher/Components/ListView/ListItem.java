@@ -120,6 +120,8 @@ public class ListItem<T> implements ITouchable {
     }
 
     public void setScale(float scale) {
+        if (scale == _scale) return;
+
         _scale = scale;
         _dirty = true;
     }

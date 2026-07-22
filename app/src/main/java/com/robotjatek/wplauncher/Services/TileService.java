@@ -227,7 +227,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                     size,
                     app,
                     _settingsService.getAccentColor().color(),
-                    new PhotosTileContent(_mediaService, _context),
+                    new PhotosTileContent(_mediaService),
                     null);
         }
 

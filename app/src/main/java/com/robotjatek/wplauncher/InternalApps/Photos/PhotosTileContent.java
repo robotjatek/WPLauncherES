@@ -1,8 +1,5 @@
 package com.robotjatek.wplauncher.InternalApps.Photos;
 
-import android.content.Context;
-import android.graphics.drawable.BitmapDrawable;
-
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
@@ -22,11 +19,9 @@ public class PhotosTileContent implements ITileContent {
     private float _baseOffsetX = 0f;
     private float _baseOffsetY = 0f;
     private final MediaService _mediaService;
-    private final Context _context;
 
-    public PhotosTileContent(MediaService mediaService, Context context) {
+    public PhotosTileContent(MediaService mediaService) {
         _mediaService = mediaService;
-        _context = context;
         _layout.addChild(_picture, Position.ZERO);
     }
 
@@ -41,7 +36,10 @@ public class PhotosTileContent implements ITileContent {
             if (!uris.isEmpty()) {
                 // TODO: handle more than one image
                 // TODO: periodically change the drawn photo
-                var bitmap = _mediaService.loadThumbnail(uris.get(5), size.width() * 2, size.height() * 2);
+                var targetW = Math.max(1, size.width() * 2);
+                var targetH = Math.max(1, size.height() * 2);
+                
+                var bitmap = _mediaService.loadThumbnail(uris.get(5), targetW, targetH);
                 if (bitmap != null && size.width() > 0 && size.height() > 0) {
                     // little zoomed in, centered
                     var scale = Math.max((float)size.width() / bitmap.getWidth(), (float)size.height() / bitmap.getHeight()) * 1.3f;
@@ -50,7 +48,7 @@ public class PhotosTileContent implements ITileContent {
                     _baseOffsetX = (size.width() - w) / 2f;
                     _baseOffsetY = (size.height() - h) / 2f;
                     _picture.setSize(new Size<>((int)w, (int)h));
-                    _picture.setIconDrawable(new BitmapDrawable(_context.getResources(), bitmap));
+                    _picture.setBitmap(bitmap);
                 }
             }
 

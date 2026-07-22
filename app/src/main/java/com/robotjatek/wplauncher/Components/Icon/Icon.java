@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Components.Icon;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.opengl.Matrix;
 
@@ -11,11 +12,11 @@ import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.TileUtil;
 
-// TODO: the bitmap should be disposed after uploading it to the gpu
 public class Icon implements UIElement {
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private Drawable _iconDrawable;
+    private Bitmap _pendingBitmap;
     private int _textureId = -1;
     private int _bgColor;
     private boolean _dirty = true;
@@ -45,8 +46,13 @@ public class Icon implements UIElement {
         if (_dirty) {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
+                _textureId = -1;
             }
-            if (_iconDrawable != null) {
+
+            if (_pendingBitmap != null) {
+                _textureId = BitmapUtil.createTextureFromBitmap(_pendingBitmap);
+                _pendingBitmap = null; // BitmapUtil.createTextureFromBitmap already recycles it
+            } else if (_iconDrawable != null) {
                 _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
             }
             _dirty = false;
@@ -78,7 +84,20 @@ public class Icon implements UIElement {
     }
 
     public void setIconDrawable(Drawable icon) {
+        if (_pendingBitmap != null) {
+            _pendingBitmap.recycle();
+            _pendingBitmap = null;
+        }
         _iconDrawable = icon;
+        _dirty = true;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        if (_pendingBitmap != null && _pendingBitmap != bitmap) {
+            _pendingBitmap.recycle();
+        }
+        _pendingBitmap = bitmap;
+        _iconDrawable = null;
         _dirty = true;
     }
 

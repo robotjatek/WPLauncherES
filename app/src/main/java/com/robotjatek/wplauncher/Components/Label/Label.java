@@ -63,8 +63,9 @@ public class Label implements UIElement, ITouchable {
         if (_dirty) {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
+                _textureId = -1;
             }
-            if (w == 0 || h == 0) {
+            if (w <= 0 || h <= 0) {
                 _dirty = false;
                 return; // Do not draw invisible element
             }
@@ -251,7 +252,10 @@ public class Label implements UIElement, ITouchable {
     @Override
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_textureId);
+            if (_textureId > 0) {
+                TileUtil.deleteTexture(_textureId);
+                _textureId = -1;
+            }
             _disposed = true;
         }
     }

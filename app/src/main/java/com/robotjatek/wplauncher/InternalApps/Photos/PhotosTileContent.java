@@ -1,8 +1,12 @@
 package com.robotjatek.wplauncher.InternalApps.Photos;
 
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 
+import com.robotjatek.wplauncher.AppList.App;
+import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
+import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.QuadRenderer;
@@ -37,10 +41,13 @@ public class PhotosTileContent implements ITileContent {
     private final Random _rand = new Random();
     private int _currentPicId = -1;
     private Size<Integer> _prevSize = new Size<>(-1, -1);
+    private Label _titleLabel;
 
-    public PhotosTileContent(MediaService mediaService) {
+    public PhotosTileContent(MediaService mediaService, App app) {
         _mediaService = mediaService;
         _layout.addChild(_picture, Position.ZERO);
+        _titleLabel = new Label(app.name(), 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+        _layout.addChild(_titleLabel, Position.ZERO);
         _exec.execute(this::loadPicturesInBackground);
     }
 
@@ -98,13 +105,18 @@ public class PhotosTileContent implements ITileContent {
                 resizeCurrentPicture(_pictures.get(_currentPicId), size);
                 _prevSize = size;
             }
-            // TODO: free the old resources when the loading is done
-            // TODO: discard old resources on resize and load new ones
 
+            var titleText = _tile.getSize().equals(Tile.SMALL) ? "" : _tile.getApp().name();
+            if (!titleText.equals(_titleLabel.getText())) {
+                _titleLabel.setText(titleText);
+            }
+            var padding = size.height() * 0.035f;
+            _titleLabel.setMaxWidth(size.width() - padding);
+            var labelHeight = _titleLabel.measure().height();
+            _layout.setChildPosition(_titleLabel, new Position<>(padding, size.height() - labelHeight - padding / 2));
 
             // TODO: small tile should just show the application icon as StaticTileContent would do
             // TODO: downscaled size should be around the tile resolution
-            // TODO: load and downscale images asynchronously
             // TODO: show normal app icon while the images are loading/decoding
             _dirty = false;
         }
@@ -117,8 +129,6 @@ public class PhotosTileContent implements ITileContent {
         _layout.setChildPosition(_picture, new Position<>(_baseOffsetX + driftX, _baseOffsetY + driftY));
 
         _layout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
-
-        // TODO: show app name like on other tiles
     }
 
     @Override
@@ -142,18 +152,15 @@ public class PhotosTileContent implements ITileContent {
             _disposed = true;
             _exec.shutdownNow();
             _layout.dispose();
-            synchronized (_pictures) {
-                for (Bitmap bmp : _pictures) {
-                    bmp.recycle();
-                }
-                _pictures.clear();
+            _titleLabel.dispose();
+            for (var bmp : _pictures) {
+                bmp.recycle();
             }
-            synchronized (_bgPictures) {
-                for (Bitmap bmp : _bgPictures) {
-                    bmp.recycle();
-                }
-                _bgPictures.clear();
+            _pictures.clear();
+            for (var bmp : _bgPictures) {
+                bmp.recycle();
             }
+            _bgPictures.clear();
         }
     }
 }

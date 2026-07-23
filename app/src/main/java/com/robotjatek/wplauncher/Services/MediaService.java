@@ -4,6 +4,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Size;
 
@@ -35,12 +36,14 @@ public class MediaService {
         }
 
         String[] projection = {MediaStore.Images.Media._ID};
-        var sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
+        var sortOrder = MediaStore.Images.Media.DATE_TAKEN + " DESC";
+        var selection = MediaStore.Images.Media.RELATIVE_PATH + " LIKE ?";
+        String[] selectionArgs = { Environment.DIRECTORY_DCIM + "/Camera/%" };
         var uris = new ArrayList<Uri>();
 
         try (var cursor = _context.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                projection, null, null, sortOrder)) {
+                projection, selection, selectionArgs, sortOrder)) {
             if (cursor != null) {
                 var idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
                 while (cursor.moveToNext() && uris.size() < LAST_PHOTOS_COUNT) {

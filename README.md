@@ -206,7 +206,7 @@ Feature-creep!
 - [ ] Fix: null pointer exception in TileGrid.Tile.getDragInfo()
 - [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
 - [x] Fix: checkbox label is squashed
-- [ ] Fix: Dirty flag is set on tiles on scroll stop
+- [x] Fix: Dirty flag is set on tiles on scroll stop
 
 ### M4.5
 

@@ -41,13 +41,13 @@ public class PhotosTileContent implements ITileContent {
     private final Random _rand = new Random();
     private int _currentPicId = -1;
     private Size<Integer> _prevSize = new Size<>(-1, -1);
-    private Label _titleLabel;
+    private final Label _titleLabel;
+    private final Icon _icon;
 
     public PhotosTileContent(MediaService mediaService, App app) {
         _mediaService = mediaService;
-        _layout.addChild(_picture, Position.ZERO);
         _titleLabel = new Label(app.name(), 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-        _layout.addChild(_titleLabel, Position.ZERO);
+        _icon = new Icon(app.icon(), new Size<>(256, 256));
         _exec.execute(this::loadPicturesInBackground);
     }
 
@@ -73,7 +73,7 @@ public class PhotosTileContent implements ITileContent {
     }
 
     private void resizeCurrentPicture(Bitmap bitmap, Size<Integer> size) {
-        var scale = Math.max((float)size.width() / bitmap.getWidth(), (float)size.height() / bitmap.getHeight()) * 1.3f;
+        var scale = Math.max((float)size.width() / bitmap.getWidth(), (float)size.height() / bitmap.getHeight()) * 1.2f;
         var w = bitmap.getWidth() * scale;
         var h = bitmap.getHeight() * scale;
         _baseOffsetX = (size.width() - w) / 2f;
@@ -96,7 +96,7 @@ public class PhotosTileContent implements ITileContent {
 
         if (_pictureTime < 0 && _picturesReady.get()) {
             selectARandomPicture(size);
-            _pictureTime = 5000;
+            _pictureTime = 10000;
         }
 
         if (_dirty) {
@@ -106,6 +106,22 @@ public class PhotosTileContent implements ITileContent {
                 _prevSize = size;
             }
 
+            _layout.removeChild(_picture);
+            _layout.removeChild(_icon);
+            _layout.removeChild(_titleLabel);
+
+            // Add the background layer (Photo or Icon)
+            if (_tile.getSize().equals(Tile.SMALL)) {
+                var iconSize = size.width() / 2;
+                _icon.setSize(new Size<>(iconSize, iconSize));
+                var iconX = (size.width() - iconSize) / 2f;
+                var iconY = (size.height() - iconSize) / 2f;
+                _layout.addChild(_icon, new Position<>(iconX, iconY));
+            } else {
+                _layout.addChild(_picture, new Position<>(_baseOffsetX, _baseOffsetY));
+            }
+
+            // Always add the Title Label LAST so it's on top
             var titleText = _tile.getSize().equals(Tile.SMALL) ? "" : _tile.getApp().name();
             if (!titleText.equals(_titleLabel.getText())) {
                 _titleLabel.setText(titleText);
@@ -113,20 +129,22 @@ public class PhotosTileContent implements ITileContent {
             var padding = size.height() * 0.035f;
             _titleLabel.setMaxWidth(size.width() - padding);
             var labelHeight = _titleLabel.measure().height();
-            _layout.setChildPosition(_titleLabel, new Position<>(padding, size.height() - labelHeight - padding / 2));
+            _layout.addChild(_titleLabel, new Position<>(padding, size.height() - labelHeight - padding / 2));
 
-            // TODO: small tile should just show the application icon as StaticTileContent would do
+            // TODO: listen for new pictures and add them to the list
             // TODO: downscaled size should be around the tile resolution
-            // TODO: show normal app icon while the images are loading/decoding
+            // TODO: smooth picture change
             _dirty = false;
         }
 
-        // Apply float effect
-        var xAmplitude = _baseOffsetX * 0.9f;
-        var yAmplitude = _baseOffsetY * 0.9f;
-        var driftX = (float) Math.sin(_totalTime / 4500f) * xAmplitude; // TODO: make float effect slower on the medium sized tile
-        var driftY = (float) Math.cos(_totalTime / 4700f) * yAmplitude;
-        _layout.setChildPosition(_picture, new Position<>(_baseOffsetX + driftX, _baseOffsetY + driftY));
+        // Apply float effect for the photo if it's visible
+        if (!_tile.getSize().equals(Tile.SMALL)) {
+            var xAmplitude = _baseOffsetX * 0.9f;
+            var yAmplitude = _baseOffsetY * 0.9f;
+            var driftX = (float) Math.sin(_totalTime / 4500f) * xAmplitude;
+            var driftY = (float) Math.cos(_totalTime / 4700f) * yAmplitude;
+            _layout.setChildPosition(_picture, new Position<>(_baseOffsetX + driftX, _baseOffsetY + driftY));
+        }
 
         _layout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
     }
@@ -153,6 +171,7 @@ public class PhotosTileContent implements ITileContent {
             _exec.shutdownNow();
             _layout.dispose();
             _titleLabel.dispose();
+            _icon.dispose();
             for (var bmp : _pictures) {
                 bmp.recycle();
             }

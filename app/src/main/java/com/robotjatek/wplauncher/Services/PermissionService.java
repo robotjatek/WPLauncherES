@@ -65,7 +65,7 @@ public class PermissionService {
         }
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(_activity, Manifest.permission.READ_MEDIA_IMAGES)) {
-            _locationPermission.launch(Manifest.permission.READ_MEDIA_IMAGES);
+            _mediaPermission.launch(Manifest.permission.READ_MEDIA_IMAGES);
         } else {
             openAppSettings();
         }

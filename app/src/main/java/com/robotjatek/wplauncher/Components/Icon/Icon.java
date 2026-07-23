@@ -44,16 +44,19 @@ public class Icon implements UIElement {
         var h = (int)drawContext.heightOf(this);
 
         if (_dirty) {
-            if (_textureId > 0) {
-                TileUtil.deleteTexture(_textureId);
-                _textureId = -1;
-            }
+            // Only recreate texture if we have a NEW source waiting
+            if (_pendingBitmap != null || _iconDrawable != null) {
+                if (_textureId > 0) {
+                    TileUtil.deleteTexture(_textureId);
+                    _textureId = -1;
+                }
 
-            if (_pendingBitmap != null) {
-                _textureId = BitmapUtil.createTextureFromBitmap(_pendingBitmap);
-                _pendingBitmap = null; // BitmapUtil.createTextureFromBitmap already recycles it
-            } else if (_iconDrawable != null) {
-                _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
+                if (_pendingBitmap != null) {
+                    _textureId = BitmapUtil.createTextureFromBitmap(_pendingBitmap);
+                    _pendingBitmap = null;
+                } else if (_iconDrawable != null) {
+                    _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
+                }
             }
             _dirty = false;
         }
@@ -114,6 +117,10 @@ public class Icon implements UIElement {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
                 _textureId = -1;
+            }
+            if (_pendingBitmap != null) {
+                _pendingBitmap.recycle();
+                _pendingBitmap = null;
             }
             _disposed = true;
         }

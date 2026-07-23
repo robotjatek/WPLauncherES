@@ -25,7 +25,9 @@ public class BitmapUtil {
      */
     public static int createTextureFromDrawable(Drawable drawable, int width, int height) {
         var bitmap = toBitmap(drawable, width, height);
-        return createTextureFromBitmap(bitmap);
+        var id = createTextureFromBitmap(bitmap);
+        bitmap.recycle();
+        return id;
     }
 
     public static Bitmap createRect(int width, int height, int padding, int color) {
@@ -99,8 +101,7 @@ public class BitmapUtil {
         GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_WRAP_S, GLES32.GL_CLAMP_TO_EDGE);
         GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_WRAP_T, GLES32.GL_CLAMP_TO_EDGE);
         GLUtils.texImage2D(GLES32.GL_TEXTURE_2D, 0, bitmap, 0);
-
-        bitmap.recycle();
+        
         return ids[0];
     }
 }

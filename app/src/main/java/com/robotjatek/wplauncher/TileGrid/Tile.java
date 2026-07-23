@@ -105,9 +105,11 @@ public class Tile implements ITouchable {
 
         // Render with the new size while scaling it with the gradually smaller visual size
         var logicalSize = new Size<>((int)targetWidth, (int)targetHeight);
-        _content.draw(delta, projMatrix, _frontViewMatrix, renderer, Position.ZERO, logicalSize);
-        if (_backContent != null) {
-            _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, Position.ZERO, logicalSize);
+        if (logicalSize.width() > 0 && logicalSize.height() > 0) {
+            _content.draw(delta, projMatrix, _frontViewMatrix, renderer, Position.ZERO, logicalSize);
+            if (_backContent != null) {
+                _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, Position.ZERO, logicalSize);
+            }
         }
         renderer.endClip();
     }

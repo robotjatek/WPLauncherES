@@ -29,8 +29,6 @@ public class MediaService {
         _hasPermission = value;
     }
 
-    // TODO: cache results
-    // TODO: listen to media changes and update the cache (ContentObserver)
     public List<Uri> loadLatestPhotoUris() {
         if (!hasPermission()) {
             return Collections.emptyList();
@@ -38,7 +36,7 @@ public class MediaService {
 
         String[] projection = {MediaStore.Images.Media._ID};
         var sortOrder = MediaStore.Images.Media.DATE_ADDED + " DESC";
-        List<Uri> uris = new ArrayList<>();
+        var uris = new ArrayList<Uri>();
 
         try (var cursor = _context.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,

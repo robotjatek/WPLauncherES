@@ -1,5 +1,7 @@
 package com.robotjatek.wplauncher.InternalApps.Photos;
 
+import android.graphics.Bitmap;
+
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
@@ -9,61 +11,101 @@ import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class PhotosTileContent implements ITileContent {
     private Tile _tile;
     private final AbsoluteLayout _layout = new AbsoluteLayout();
-    private final Icon _picture = new Icon(null, new Size<>(-1, -1)); // TODO: create a custom Image component
+    private final Icon _picture = new Icon(null, new Size<>(-1, -1));
     private boolean _dirty = true;
     private boolean _disposed = false;
     private float _totalTime = (float) (Math.random() * 10000);
     private float _baseOffsetX = 0f;
     private float _baseOffsetY = 0f;
     private final MediaService _mediaService;
+    private final ExecutorService _exec = Executors.newSingleThreadExecutor();
+    private final List<Bitmap> _bgPictures = new ArrayList<>();
+    private final List<Bitmap> _pictures = new ArrayList<>();
+    private final AtomicBoolean _loading = new AtomicBoolean(false);
+    private final AtomicBoolean _picturesReady = new AtomicBoolean(false);
+    private float _pictureTime = 0f;
+    private final Random _rand = new Random();
+    private int _currentPicId = -1;
+    private Size<Integer> _prevSize = new Size<>(-1, -1);
 
     public PhotosTileContent(MediaService mediaService) {
         _mediaService = mediaService;
         _layout.addChild(_picture, Position.ZERO);
+        _exec.execute(this::loadPicturesInBackground);
+    }
+
+    private void loadPicturesInBackground() {
+        _loading.set(true);
+        var ids = _mediaService.loadLatestPhotoUris();
+        for (var id : ids) {
+            var pic = _mediaService.loadThumbnail(id, 512, 512);
+            if (pic != null) {
+                _bgPictures.add(pic);
+            }
+        }
+        _loading.set(false);
+    }
+
+    private void selectARandomPicture(Size<Integer> size) {
+        if (_picturesReady.get() && !_pictures.isEmpty()) {
+            _currentPicId = _rand.nextInt(_pictures.size());
+            var bitmap = _pictures.get(_currentPicId);
+            resizeCurrentPicture(bitmap, size);
+            _picture.setBitmap(bitmap);
+        }
+    }
+
+    private void resizeCurrentPicture(Bitmap bitmap, Size<Integer> size) {
+        var scale = Math.max((float)size.width() / bitmap.getWidth(), (float)size.height() / bitmap.getHeight()) * 1.3f;
+        var w = bitmap.getWidth() * scale;
+        var h = bitmap.getHeight() * scale;
+        _baseOffsetX = (size.width() - w) / 2f;
+        _baseOffsetY = (size.height() - h) / 2f;
+        _picture.setSize(new Size<>((int)w, (int)h));
+        _picture.setBitmap(bitmap);
     }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Position<Float> position, Size<Integer> size) {
         _totalTime += delta;
-        if (_dirty) {
-            // TODO: BUG: tiles getting dirty flag set on scroll stop (forceredraw <- tile.Setscale <- TileGrid.cancelSelection!!! (valószínűleg a tilegrid.IdleState.enter a baj)
-            _layout.setBgColor(_tile.bgColor);
-
-            var uris = _mediaService.loadLatestPhotoUris();
-            if (!uris.isEmpty()) {
-                // TODO: handle more than one image
-                // TODO: periodically change the drawn photo
-                var targetW = Math.max(1, size.width() * 2);
-                var targetH = Math.max(1, size.height() * 2);
-                
-                var bitmap = _mediaService.loadThumbnail(uris.get(5), targetW, targetH);
-                if (bitmap != null && size.width() > 0 && size.height() > 0) {
-                    // little zoomed in, centered
-                    var scale = Math.max((float)size.width() / bitmap.getWidth(), (float)size.height() / bitmap.getHeight()) * 1.3f;
-                    var w = bitmap.getWidth() * scale;
-                    var h = bitmap.getHeight() * scale;
-                    _baseOffsetX = (size.width() - w) / 2f;
-                    _baseOffsetY = (size.height() - h) / 2f;
-                    _picture.setSize(new Size<>((int)w, (int)h));
-                    _picture.setBitmap(bitmap);
-                }
+        _pictureTime -= delta;
+        if (!_loading.get()) {
+            if (!_bgPictures.isEmpty()) {
+                _pictures.addAll(_bgPictures);
+                _bgPictures.clear();
+                _picturesReady.set(true);
             }
+        }
 
-            // TODO: start async load of thumbnails when _dirty = true
+        if (_pictureTime < 0 && _picturesReady.get()) {
+            selectARandomPicture(size);
+            _pictureTime = 5000;
+        }
+
+        if (_dirty) {
+            _layout.setBgColor(_tile.bgColor);
+            if (!_prevSize.equals(size) && _currentPicId != -1) {
+                resizeCurrentPicture(_pictures.get(_currentPicId), size);
+                _prevSize = size;
+            }
             // TODO: free the old resources when the loading is done
             // TODO: discard old resources on resize and load new ones
 
 
             // TODO: small tile should just show the application icon as StaticTileContent would do
-            // TODO: downscale images to a reasonable resolution
             // TODO: downscaled size should be around the tile resolution
             // TODO: load and downscale images asynchronously
             // TODO: show normal app icon while the images are loading/decoding
-            // TODO: cycle images
-            // TODO: random zoom and UV for the loaded images => slowly move the images around
             _dirty = false;
         }
 
@@ -97,8 +139,21 @@ public class PhotosTileContent implements ITileContent {
     @Override
     public void dispose() {
         if (!_disposed) {
-            _layout.dispose();
             _disposed = true;
+            _exec.shutdownNow();
+            _layout.dispose();
+            synchronized (_pictures) {
+                for (Bitmap bmp : _pictures) {
+                    bmp.recycle();
+                }
+                _pictures.clear();
+            }
+            synchronized (_bgPictures) {
+                for (Bitmap bmp : _bgPictures) {
+                    bmp.recycle();
+                }
+                _bgPictures.clear();
+            }
         }
     }
 }

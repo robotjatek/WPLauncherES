@@ -9,6 +9,8 @@ import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.IState;
+import com.robotjatek.wplauncher.InternalApps.Photos.States.IdleState;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
@@ -26,6 +28,7 @@ public class PhotosTileContent implements ITileContent {
     private Tile _tile;
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Icon _picture = new Icon(null, new Size<>(-1, -1));
+    private final Icon _nextPicture = new Icon(null, new Size<>(-1, -1));
     private boolean _dirty = true;
     private boolean _disposed = false;
     private float _totalTime = (float) (Math.random() * 10000);
@@ -40,9 +43,22 @@ public class PhotosTileContent implements ITileContent {
     private float _pictureTime = 0f;
     private final Random _rand = new Random();
     private int _currentPicId = -1;
+    private int _nextPictureId = -1;
     private Size<Integer> _prevSize = new Size<>(-1, -1);
     private final Label _titleLabel;
     private final Icon _icon;
+
+    public IState IDLE_STATE() {
+        return new IdleState(this);
+    }
+
+    private IState _state = IDLE_STATE();
+
+    public void changeState(IState state) {
+        _state.exit();
+        _state = state;
+        _state.enter();
+    }
 
     public PhotosTileContent(MediaService mediaService, App app) {
         _mediaService = mediaService;
@@ -68,7 +84,6 @@ public class PhotosTileContent implements ITileContent {
             _currentPicId = _rand.nextInt(_pictures.size());
             var bitmap = _pictures.get(_currentPicId);
             resizeCurrentPicture(bitmap, size);
-            _picture.setBitmap(bitmap);
         }
     }
 
@@ -82,10 +97,14 @@ public class PhotosTileContent implements ITileContent {
         _picture.setBitmap(bitmap);
     }
 
+    // TODO: move all these logic into states
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Position<Float> position, Size<Integer> size) {
         _totalTime += delta;
         _pictureTime -= delta;
+
+        _state.update(delta);
+
         if (!_loading.get()) {
             if (!_bgPictures.isEmpty()) {
                 _pictures.addAll(_bgPictures);
@@ -95,13 +114,15 @@ public class PhotosTileContent implements ITileContent {
         }
 
         if (_pictureTime < 0 && _picturesReady.get()) {
-            selectARandomPicture(size);
+            // TODO: animate picture change: draw both the current and the next -> the next is right next to the current -> Move both to the left -> make next current -> generate a new id fore the next
+            selectARandomPicture(size); // This is a NO-OP when the pictures are not loaded yet
             _pictureTime = 10000;
         }
 
         if (_dirty) {
             _layout.setBgColor(_tile.bgColor);
             if (!_prevSize.equals(size) && _currentPicId != -1) {
+                _layout.onResize(size.width(), size.height());
                 resizeCurrentPicture(_pictures.get(_currentPicId), size);
                 _prevSize = size;
             }
@@ -110,7 +131,6 @@ public class PhotosTileContent implements ITileContent {
             _layout.removeChild(_icon);
             _layout.removeChild(_titleLabel);
 
-            // Add the background layer (Photo or Icon)
             if (_tile.getSize().equals(Tile.SMALL)) {
                 var iconSize = size.width() / 2;
                 _icon.setSize(new Size<>(iconSize, iconSize));
@@ -132,6 +152,7 @@ public class PhotosTileContent implements ITileContent {
             _layout.addChild(_titleLabel, new Position<>(padding, size.height() - labelHeight - padding / 2));
 
             // TODO: listen for new pictures and add them to the list
+            // TODO: occasional bitmap is recycled exception crash
             // TODO: downscaled size should be around the tile resolution
             // TODO: smooth picture change
             _dirty = false;

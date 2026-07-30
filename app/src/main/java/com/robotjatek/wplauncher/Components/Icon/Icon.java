@@ -87,18 +87,12 @@ public class Icon implements UIElement {
     }
 
     public void setIconDrawable(Drawable icon) {
-        if (_pendingBitmap != null) {
-            _pendingBitmap.recycle();
-            _pendingBitmap = null;
-        }
         _iconDrawable = icon;
+        _pendingBitmap = null;
         _dirty = true;
     }
 
     public void setBitmap(Bitmap bitmap) {
-        if (_pendingBitmap != null && _pendingBitmap != bitmap) {
-            _pendingBitmap.recycle();
-        }
         _pendingBitmap = bitmap;
         _iconDrawable = null;
         _dirty = true;

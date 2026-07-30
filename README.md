@@ -181,6 +181,7 @@ Feature-creep!
   - [ ] Messenger
   - [ ] Messages
   - [ ] Contacts
+  - [ ] Step counter
 - [ ] Light mode/Dark mode support
 - [ ] Dropdown
 - [ ] Radiobutton
@@ -214,6 +215,8 @@ Feature-creep!
 - [ ] Cache UI element size measurement results
 - [ ] Make NotificationSurface properly aligned
 - [ ] Double call of createTile in tileService
+- [ ] Add stencil clipping to layouts
+- [ ] Make Notification surface layout more symmetric
 
 ### M5 - RC
 

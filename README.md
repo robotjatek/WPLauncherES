@@ -195,11 +195,11 @@ Feature-creep!
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
 - [x] Extract ScreenNavigator into a separate component
+- [ ] Cycling between notifications should be animated
 - [x] Debug menu
   - [x] Crash app button
   - [x] Restart app button
   - [x] Reset configuration button
-- [ ] Don't recalculate matrices every frame
 - [ ] Scroll in edit mode:
   - [ ] Scroll instead of moving the tile when the scroll movement is not started on the tile
   - [ ] Animated scroll when reaching the edge of the screen
@@ -213,13 +213,14 @@ Feature-creep!
 
 - [ ] Show weather icon on the HUB tile
 - [ ] Cache UI element size measurement results
-- [ ] Make NotificationSurface properly aligned
 - [ ] Double call of createTile in tileService
 - [ ] Add stencil clipping to layouts
 - [ ] Make Notification surface layout more symmetric
+- [ ] Don't recalculate matrices every frame
 
 ### M5 - RC
 
+- [ ] Animate context menu
 - [ ] Landscape mode support
 - [ ] Background image with transparent tiles
 - [ ] 6 column mode setting

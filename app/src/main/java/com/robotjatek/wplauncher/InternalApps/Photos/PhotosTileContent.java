@@ -11,6 +11,7 @@ import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayou
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.InternalApps.Photos.States.IdleState;
+import com.robotjatek.wplauncher.InternalApps.Photos.States.SwapState;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
@@ -19,7 +20,7 @@ import com.robotjatek.wplauncher.TileGrid.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -27,6 +28,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class PhotosTileContent implements ITileContent {
     private Tile _tile;
     private final AbsoluteLayout _layout = new AbsoluteLayout();
+    // These icons are always instantiated, only the underlying bitmap is changed. This is to avoid creating new Icon objects every time a picture is swapped in, which would be inefficient.
     private final Icon _picture = new Icon(null, new Size<>(-1, -1));
     private final Icon _nextPicture = new Icon(null, new Size<>(-1, -1));
     private boolean _dirty = true;
@@ -36,20 +38,21 @@ public class PhotosTileContent implements ITileContent {
     private float _baseOffsetY = 0f;
     private final MediaService _mediaService;
     private final ExecutorService _exec = Executors.newSingleThreadExecutor();
-    private final List<Bitmap> _bgPictures = new ArrayList<>();
+    private final ConcurrentLinkedQueue<Bitmap> _bgPictures = new ConcurrentLinkedQueue<>();
     private final List<Bitmap> _pictures = new ArrayList<>();
     private final AtomicBoolean _loading = new AtomicBoolean(false);
     private final AtomicBoolean _picturesReady = new AtomicBoolean(false);
-    private float _pictureTime = 0f;
-    private final Random _rand = new Random();
     private int _currentPicId = -1;
-    private int _nextPictureId = -1;
-    private Size<Integer> _prevSize = new Size<>(-1, -1);
+    private Size<Integer> _lastSize = new Size<>(0, 0);
     private final Label _titleLabel;
     private final Icon _icon;
+    private final IState _idleState = new IdleState(this);
 
     public IState IDLE_STATE() {
-        return new IdleState(this);
+        return _idleState;
+    }
+    public IState SWAP_STATE() {
+        return new SwapState(this);
     }
 
     private IState _state = IDLE_STATE();
@@ -73,100 +76,38 @@ public class PhotosTileContent implements ITileContent {
         for (var id : ids) {
             var pic = _mediaService.loadThumbnail(id, 512, 512);
             if (pic != null) {
-                _bgPictures.add(pic);
+                _bgPictures.offer(pic);
             }
         }
         _loading.set(false);
     }
 
-    private void selectARandomPicture(Size<Integer> size) {
-        if (_picturesReady.get() && !_pictures.isEmpty()) {
-            _currentPicId = _rand.nextInt(_pictures.size());
-            var bitmap = _pictures.get(_currentPicId);
-            resizeCurrentPicture(bitmap, size);
-        }
-    }
+    public Tile getTile() { return _tile; }
+    public AbsoluteLayout getLayout() { return _layout; }
+    public Icon getPicture() { return _picture; }
+    public Icon getNextPicture() { return _nextPicture; }
+    public Label getTitleLabel() { return _titleLabel; }
+    public Icon getIcon() { return _icon; }
+    public boolean isDirty() { return _dirty; }
+    public void setDirty(boolean dirty) { _dirty = dirty; }
+    public float getTotalTime() { return _totalTime; }
+    public float getBaseOffsetX() { return _baseOffsetX; }
+    public void setBaseOffsetX(float baseOffsetX) { _baseOffsetX = baseOffsetX; }
+    public float getBaseOffsetY() { return _baseOffsetY; }
+    public void setBaseOffsetY(float baseOffsetY) { _baseOffsetY = baseOffsetY; }
+    public ConcurrentLinkedQueue<Bitmap> getBgPictures() { return _bgPictures; }
+    public List<Bitmap> getPictures() { return _pictures; }
+    public AtomicBoolean getLoading() { return _loading; }
+    public AtomicBoolean getPicturesReady() { return _picturesReady; }
+    public int getCurrentPicId() { return _currentPicId; }
+    public void setCurrentPicId(int currentPicId) { _currentPicId = currentPicId; }
+    public Size<Integer> getLastSize() { return _lastSize; }
 
-    private void resizeCurrentPicture(Bitmap bitmap, Size<Integer> size) {
-        var scale = Math.max((float)size.width() / bitmap.getWidth(), (float)size.height() / bitmap.getHeight()) * 1.2f;
-        var w = bitmap.getWidth() * scale;
-        var h = bitmap.getHeight() * scale;
-        _baseOffsetX = (size.width() - w) / 2f;
-        _baseOffsetY = (size.height() - h) / 2f;
-        _picture.setSize(new Size<>((int)w, (int)h));
-        _picture.setBitmap(bitmap);
-    }
-
-    // TODO: move all these logic into states
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer, Position<Float> position, Size<Integer> size) {
         _totalTime += delta;
-        _pictureTime -= delta;
-
+        _lastSize = size;
         _state.update(delta);
-
-        if (!_loading.get()) {
-            if (!_bgPictures.isEmpty()) {
-                _pictures.addAll(_bgPictures);
-                _bgPictures.clear();
-                _picturesReady.set(true);
-            }
-        }
-
-        if (_pictureTime < 0 && _picturesReady.get()) {
-            // TODO: animate picture change: draw both the current and the next -> the next is right next to the current -> Move both to the left -> make next current -> generate a new id fore the next
-            selectARandomPicture(size); // This is a NO-OP when the pictures are not loaded yet
-            _pictureTime = 10000;
-        }
-
-        if (_dirty) {
-            _layout.setBgColor(_tile.bgColor);
-            if (!_prevSize.equals(size) && _currentPicId != -1) {
-                _layout.onResize(size.width(), size.height());
-                resizeCurrentPicture(_pictures.get(_currentPicId), size);
-                _prevSize = size;
-            }
-
-            _layout.removeChild(_picture);
-            _layout.removeChild(_icon);
-            _layout.removeChild(_titleLabel);
-
-            if (_tile.getSize().equals(Tile.SMALL)) {
-                var iconSize = size.width() / 2;
-                _icon.setSize(new Size<>(iconSize, iconSize));
-                var iconX = (size.width() - iconSize) / 2f;
-                var iconY = (size.height() - iconSize) / 2f;
-                _layout.addChild(_icon, new Position<>(iconX, iconY));
-            } else {
-                _layout.addChild(_picture, new Position<>(_baseOffsetX, _baseOffsetY));
-            }
-
-            // Always add the Title Label LAST so it's on top
-            var titleText = _tile.getSize().equals(Tile.SMALL) ? "" : _tile.getApp().name();
-            if (!titleText.equals(_titleLabel.getText())) {
-                _titleLabel.setText(titleText);
-            }
-            var padding = size.height() * 0.035f;
-            _titleLabel.setMaxWidth(size.width() - padding);
-            var labelHeight = _titleLabel.measure().height();
-            _layout.addChild(_titleLabel, new Position<>(padding, size.height() - labelHeight - padding / 2));
-
-            // TODO: listen for new pictures and add them to the list
-            // TODO: occasional bitmap is recycled exception crash
-            // TODO: downscaled size should be around the tile resolution
-            // TODO: smooth picture change
-            _dirty = false;
-        }
-
-        // Apply float effect for the photo if it's visible
-        if (!_tile.getSize().equals(Tile.SMALL)) {
-            var xAmplitude = _baseOffsetX * 0.9f;
-            var yAmplitude = _baseOffsetY * 0.9f;
-            var driftX = (float) Math.sin(_totalTime / 4500f) * xAmplitude;
-            var driftY = (float) Math.cos(_totalTime / 4700f) * yAmplitude;
-            _layout.setChildPosition(_picture, new Position<>(_baseOffsetX + driftX, _baseOffsetY + driftY));
-        }
-
         _layout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
     }
 
@@ -193,14 +134,16 @@ public class PhotosTileContent implements ITileContent {
             _layout.dispose();
             _titleLabel.dispose();
             _icon.dispose();
+            _picture.dispose();
+            _nextPicture.dispose();
             for (var bmp : _pictures) {
                 bmp.recycle();
             }
             _pictures.clear();
-            for (var bmp : _bgPictures) {
-                bmp.recycle();
+            Bitmap bgBmp;
+            while ((bgBmp = _bgPictures.poll()) != null) {
+                bgBmp.recycle();
             }
-            _bgPictures.clear();
         }
     }
 }

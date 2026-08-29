@@ -13,6 +13,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Helper service to load bitmap images from the device's photo gallery.
+ */
 public class MediaService {
     private static final int LAST_PHOTOS_COUNT = 20;
     private boolean _hasPermission = false;
@@ -30,6 +33,10 @@ public class MediaService {
         _hasPermission = value;
     }
 
+    /**
+     * Loads the last 20 photos from the device's photo gallery.
+     * @return A list of uris of the last 20 photos
+     */
     public List<Uri> loadLatestPhotoUris() {
         if (!hasPermission()) {
             return Collections.emptyList();
@@ -57,6 +64,13 @@ public class MediaService {
         return uris;
     }
 
+    /**
+     * Loads a thumbnail from the device's photo gallery.
+     * @param uri the uri of the image
+     * @param width Target width
+     * @param height Target height
+     * @return The thumbnail in the target size
+     */
     public Bitmap loadThumbnail(Uri uri, int width, int height) {
         try {
             return _context.getContentResolver().loadThumbnail(uri, new Size(width, height), null);

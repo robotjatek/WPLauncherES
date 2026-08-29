@@ -72,7 +72,11 @@ public class EditIdleState extends EditBaseState {
         var deltaY = gesture.getY() - _startY;
         var distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         if (distance > 40) {
-            _context.changeState(_context.EDIT_DRAG(gesture.getX(), gesture.getY()));
+            if (_tilegrid.getSelectedTile() != null) {
+                _context.changeState(_context.EDIT_DRAG(gesture.getX(), gesture.getY()));
+            } else {
+                _tilegrid.changeState(_tilegrid.IDLE_STATE());
+            }
         }
 
         return true;

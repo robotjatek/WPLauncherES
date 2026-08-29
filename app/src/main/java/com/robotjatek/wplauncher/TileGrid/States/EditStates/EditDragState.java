@@ -21,7 +21,12 @@ public class EditDragState extends EditBaseState {
     @Override
     public void enter() {
         super.enter();
-        _tilegrid.getSelectedTile().getDragInfo().start(_x, _y);
+        var selectedTile = _tilegrid.getSelectedTile();
+        if (selectedTile != null) {
+            selectedTile.getDragInfo().start(_x, _y);
+        } else {
+            _tilegrid.changeState(_tilegrid.IDLE_STATE());
+        }
     }
 
     @Override

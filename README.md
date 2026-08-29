@@ -26,7 +26,7 @@ https://github.com/user-attachments/assets/f7e517bb-9137-413f-a910-b41aa54a9deb
 
 ## Milestones
 
-This is a living roadmap, all future milestones are refined as I go, and subject to change.
+This is a living roadmap, all future milestones are refined as I go, and subject to change. [M4](README.md#m4---beta) is in progress
 
 ### M1 - POC / pre-alpha
 
@@ -182,8 +182,7 @@ Feature-creep!
   - [x] Weather
   - [ ] Step counter
 - [ ] Light mode/Dark mode support
-- [ ] Dropdown
-- [ ] Radiobutton
+  - [ ] Dropdown
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
@@ -200,9 +199,9 @@ Feature-creep!
   - [x] Reset configuration button
 - [ ] Scroll in edit mode:
   - [ ] Scroll instead of moving the tile when the scroll movement is not started on the tile
-  - [ ] Animated scroll when reaching the edge of the screen
+  - [ ] Automatic animated scroll when reaching the edge of the screen with the moved tile (instead of an instant jump)
 - [x] Fix: crash on modal dismiss
-- [ ] Fix: null pointer exception in TileGrid.Tile.getDragInfo()
+- [x] Fix: null pointer exception in TileGrid.Tile.getDragInfo() - maybe fixed by #85
 - [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
 - [x] Fix: checkbox label is squashed
 - [x] Fix: Dirty flag is set on tiles on scroll stop
@@ -231,6 +230,7 @@ Feature-creep!
 - [ ] Generic pivot view (tabbed view)
   - [ ] Settings subpages use pivot view with one tab
 - [ ] Multi lang support
+- [ ] Show a transparent tile on the drop-target
 - [ ] Rebrand to something else than WPLauncher ES
 - [ ] First start experience
   - [ ] Pin some default tiles to the start screen on first start
@@ -250,7 +250,3 @@ Nice to have, but I feel no pressure to implement them for now
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
 - [ ] Make checkbox use higher level components (then kill TileUtil.java)
-
-### Current progress
-
-M4 is in progress

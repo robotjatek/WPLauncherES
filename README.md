@@ -11,6 +11,8 @@ A Windows Phone inspired launcher for Android written in OpenGL ES
 - Installed apps
 - Resizable tiles
 - Tile color
+- Photos live tile
+- Weather live tile
 
 ## Tech stack
 - Java 
@@ -174,20 +176,16 @@ Try it at your own risk
 
 Feature-creep!
 
-- [ ] More tiles & specific tiles for common apps
+- [ ] More live-tiles
   - [ ] Tasks
   - [x] Photos
   - [x] Weather
-  - [ ] Messenger
-  - [ ] Messages
-  - [ ] Contacts
   - [ ] Step counter
 - [ ] Light mode/Dark mode support
 - [ ] Dropdown
 - [ ] Radiobutton
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
-- [ ] Group apps by the first letter in the app list
 - [x] Re-ask for permissions from the launcher settings
 - [ ] Device resolution independent UI
 - [ ] Cursor handle in the input box
@@ -226,6 +224,7 @@ Feature-creep!
 - [ ] 6 column mode setting
 - [ ] WP7/7.8 start screen setting
 - [ ] Custom tile color
+- [ ] Group apps by the first letter in the app list
 - [ ] Application icon
 - [ ] Privacy policy
 - [ ] License
@@ -255,18 +254,3 @@ Nice to have, but I feel no pressure to implement them for now
 ### Current progress
 
 M4 is in progress
-
-## Planned live custom tiles
-
-Widgets with live data
-
-- Me (Timeline / notifications / tasks / slideshows / weather info / travel info / clock / twitter / fb / etc.)
-- Photos slideshow
-- Messages
-- Weather
-- Clock / Time
-- News feed
-- Tasks
-- Calendar
-- Email
-- Hungarian name days

@@ -127,6 +127,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     }
 
     private void updateLayout() {
+        // TODO: for resolution independent UI:
+        //  var density = _context.getResources().getDisplayMetrics().density;
         if (_width <= 0 || _height <= 0) {
             return;
         }

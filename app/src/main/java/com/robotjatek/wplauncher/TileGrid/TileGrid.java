@@ -70,17 +70,21 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         _tileDrawContext = new TileDrawContext(PAGE_PADDING_PX, TILE_GAP_PX, tileSizePx, this);
         var adornerDrawContext = new AdornerDrawContext<>(_tileDrawContext, this);
         var icon = ContextCompat.getDrawable(context, R.drawable.close_circle);
-        _unpinButton = new Adorner(() -> _commands.add(() -> {
-            if (_selectedTile != null) {
-                _tileService.queueUnpinTile(_selectedTile.getPackageName(), _selectedTile.getApp().className());
-                cancelSelection();
+        _unpinButton = new Adorner(() -> {
+            final Tile tileToUnpin = _selectedTile;
+            if (tileToUnpin != null) {
+                _commands.add(() -> {
+                    _tileService.queueUnpinTile(tileToUnpin.getPackageName(), tileToUnpin.getApp().className());
+                    cancelSelection();
+                });
             }
-        }), icon, new Position<>(1f, 0f), adornerDrawContext);
+        }, icon, new Position<>(1f, 0f), adornerDrawContext);
 
         var resizeIcon = ContextCompat.getDrawable(context, R.drawable.resize);
         _resizeButton = new Adorner(() -> {
-            if (_selectedTile != null) {
-                _tileService.resizeTile(_selectedTile);
+            final Tile tileToResize = _selectedTile;
+            if (tileToResize != null) {
+                _tileService.resizeTile(tileToResize);
                 setScrollBounds();
             }
         }, resizeIcon, new Position<>(1f, 1f), adornerDrawContext);
@@ -198,28 +202,27 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     public void selectTile(Tile tile) {
+        _selectedTile = tile;
         _commands.add(() -> {
             for (var t : _tiles) {
                 t.setScale(0.95f);
             }
-
-            _selectedTile = tile;
-            _selectedTile.setScale(1f);
-            _selectedTile.getDragInfo().reset();
+            if (_selectedTile != null) {
+                _selectedTile.setScale(1f);
+                _selectedTile.getDragInfo().reset();
+            }
         });
     }
 
     public void cancelSelection() {
+        var tile = _selectedTile;
+        _selectedTile = null;
         _commands.add(() -> {
-            if (_selectedTile == null) {
-                return;
+            for (var t : _tiles) {
+                t.setScale(1f);
             }
-            for (var tile : _tiles) {
-                tile.setScale(1f);
-            }
-            if (_selectedTile != null) {
-                _selectedTile.getDragInfo().reset();
-                _selectedTile = null;
+            if (tile != null) {
+                tile.getDragInfo().reset();
             }
         });
     }

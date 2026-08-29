@@ -40,7 +40,6 @@ public class PhotosTileContent implements ITileContent {
     private final ExecutorService _exec = Executors.newSingleThreadExecutor();
     private final ConcurrentLinkedQueue<Bitmap> _bgPictures = new ConcurrentLinkedQueue<>();
     private final List<Bitmap> _pictures = new ArrayList<>();
-    private final AtomicBoolean _loading = new AtomicBoolean(false);
     private final AtomicBoolean _picturesReady = new AtomicBoolean(false);
     private int _currentPicId = -1;
     private Size<Integer> _lastSize = new Size<>(0, 0);
@@ -71,7 +70,6 @@ public class PhotosTileContent implements ITileContent {
     }
 
     private void loadPicturesInBackground() {
-        _loading.set(true);
         var ids = _mediaService.loadLatestPhotoUris();
         for (var id : ids) {
             var pic = _mediaService.loadThumbnail(id, 512, 512);
@@ -79,7 +77,6 @@ public class PhotosTileContent implements ITileContent {
                 _bgPictures.offer(pic);
             }
         }
-        _loading.set(false);
     }
 
     public Tile getTile() { return _tile; }
@@ -97,7 +94,6 @@ public class PhotosTileContent implements ITileContent {
     public void setBaseOffsetY(float baseOffsetY) { _baseOffsetY = baseOffsetY; }
     public ConcurrentLinkedQueue<Bitmap> getBgPictures() { return _bgPictures; }
     public List<Bitmap> getPictures() { return _pictures; }
-    public AtomicBoolean getLoading() { return _loading; }
     public AtomicBoolean getPicturesReady() { return _picturesReady; }
     public int getCurrentPicId() { return _currentPicId; }
     public void setCurrentPicId(int currentPicId) { _currentPicId = currentPicId; }

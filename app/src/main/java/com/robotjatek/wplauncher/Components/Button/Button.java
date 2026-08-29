@@ -123,6 +123,7 @@ public class Button implements UIElement, ITouchable {
     }
 
     public void setSize(Size<Integer> size) {
+        if (_size.equals(size)) return;
         _size = size;
         _isDirty = true;
     }

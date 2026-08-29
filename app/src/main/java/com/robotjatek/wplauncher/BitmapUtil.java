@@ -25,7 +25,9 @@ public class BitmapUtil {
      */
     public static int createTextureFromDrawable(Drawable drawable, int width, int height) {
         var bitmap = toBitmap(drawable, width, height);
-        return createTextureFromBitmap(bitmap);
+        var id = createTextureFromBitmap(bitmap);
+        bitmap.recycle();
+        return id;
     }
 
     public static Bitmap createRect(int width, int height, int padding, int color) {
@@ -43,9 +45,13 @@ public class BitmapUtil {
     }
 
     private static Bitmap toBitmap(Drawable drawable, int width, int height) {
+        if (width <= 0 || height <= 0) {
+            return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        }
+
         if (drawable instanceof BitmapDrawable bitmapDrawable) {
             var bitmap = bitmapDrawable.getBitmap();
-            if (bitmapDrawable.getBitmap() != null) {
+            if (bitmap != null) {
                 var scaled = Bitmap.createScaledBitmap(bitmap, width, height, true);
                 if (scaled == bitmap) {
                     return bitmap.copy(Objects.requireNonNull(bitmap.getConfig()), false);
@@ -95,8 +101,7 @@ public class BitmapUtil {
         GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_WRAP_S, GLES32.GL_CLAMP_TO_EDGE);
         GLES32.glTexParameteri(GLES32.GL_TEXTURE_2D, GLES32.GL_TEXTURE_WRAP_T, GLES32.GL_CLAMP_TO_EDGE);
         GLUtils.texImage2D(GLES32.GL_TEXTURE_2D, 0, bitmap, 0);
-
-        bitmap.recycle();
+        
         return ids[0];
     }
 }

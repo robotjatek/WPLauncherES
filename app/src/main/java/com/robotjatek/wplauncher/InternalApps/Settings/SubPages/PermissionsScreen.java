@@ -27,6 +27,7 @@ public class PermissionsScreen implements IScreen {
     private final TextBlock _description = new TextBlock("You can re-ask for missing permissions from this screen.", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, -1);
     private final Checkbox _locationCheckbox;
     private final Checkbox _notificationCheckbox;
+    private final Checkbox _mediaCheckbox;
 
     public PermissionsScreen(IScreenNavigator navigator, PermissionService permissionService, Context context) {
         _navigator = navigator;
@@ -51,16 +52,27 @@ public class PermissionsScreen implements IScreen {
             }
         }, context);
         _layout.addChild(_notificationCheckbox);
+        _layout.addChild(new Spacer(0, 32));
+        _mediaCheckbox = new Checkbox("photos", _permissionService.hasMediaPermission(),(Boolean state) -> {
+            if (state) {
+                _permissionService.requestMediaPermission();
+            }
+        }, context);
+        _layout.addChild(_mediaCheckbox);
     }
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
         if (_locationCheckbox != null) {
-            _locationCheckbox.setState(_permissionService.hasLocationPermission());;
+            _locationCheckbox.setState(_permissionService.hasLocationPermission());
         }
         if (_notificationCheckbox != null) {
             _notificationCheckbox.setState(_permissionService.hasNotificationAccess());
         }
+        if (_mediaCheckbox != null) {
+            _mediaCheckbox.setState(_permissionService.hasMediaPermission());
+        }
+
         _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 

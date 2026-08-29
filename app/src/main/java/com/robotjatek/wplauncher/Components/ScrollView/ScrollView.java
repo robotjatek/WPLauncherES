@@ -79,6 +79,8 @@ public class ScrollView implements UIElement {
     }
 
     public void setSize(Size<Integer> size) {
+        if (_size != null && _size.equals(size)) return;
+
         _size = size;
         _dirty = true;
     }

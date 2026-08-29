@@ -10,6 +10,7 @@ import android.util.Log;
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.InternalApps.Clock.ClockTileContent;
+import com.robotjatek.wplauncher.InternalApps.Photos.PhotosTileContent;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 import com.robotjatek.wplauncher.TileGrid.NotificationSurface;
@@ -43,18 +44,21 @@ public class TileService implements OnChangeListener<AccentColor> {
     private final SettingsService _settingsService;
     private final LocationService _locationService;
     private final WeatherService _weatherService;
+    private final MediaService _mediaService;
 
     public TileService(Context context,
                        InternalAppsService internalAppsService,
                        SettingsService settingsService,
                        LocationService locationService,
-                       WeatherService weatherService) {
+                       WeatherService weatherService,
+                       MediaService mediaService) {
         _context = context;
         _internalAppsService = internalAppsService;
         _settingsService = settingsService;
         _settingsService.subscribe(this);
         _locationService = locationService;
         _weatherService = weatherService;
+        _mediaService = mediaService;
         _tiles.addAll(loadPersistedTiles());
     }
 
@@ -214,6 +218,16 @@ public class TileService implements OnChangeListener<AccentColor> {
                     app,
                     _settingsService.getAccentColor().color(),
                     new ClockTileContent(_context, _locationService, _weatherService),
+                    null);
+        }
+
+        // TODO: probable double call of createTile? maybe its the onSurfaceCreated what runs multiple times
+        if (app.packageName().equalsIgnoreCase("com.google.android.apps.photos")) {
+            return new Tile(position,
+                    size,
+                    app,
+                    _settingsService.getAccentColor().color(),
+                    new PhotosTileContent(_mediaService, app),
                     null);
         }
 

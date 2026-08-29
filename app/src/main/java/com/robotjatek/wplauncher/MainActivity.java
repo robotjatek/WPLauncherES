@@ -19,6 +19,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
+import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 
@@ -29,9 +30,10 @@ public class MainActivity extends ComponentActivity {
 
     private LauncherSurfaceView _surface;
     private final LocationService _locationService = new LocationService(this);
-    private WeatherService _weatherService = new WeatherService(_locationService);
+    private final WeatherService _weatherService = new WeatherService(_locationService);
+    private final MediaService _mediaService = new MediaService(this);
     private final AppChangeReceiver _appChangeReceiver = new AppChangeReceiver();
-    private final PermissionService _permissionService = new PermissionService(this, _locationService);
+    private final PermissionService _permissionService = new PermissionService(this, _locationService, _mediaService);
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -39,7 +41,7 @@ public class MainActivity extends ComponentActivity {
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(getApplicationContext()));
         EdgeToEdge.enable(this);
 
-        _surface = new LauncherSurfaceView(this, _locationService, _permissionService, _weatherService, _appChangeReceiver);
+        _surface = new LauncherSurfaceView(this, _locationService, _permissionService, _weatherService, _mediaService, _appChangeReceiver);
         _surface.setPreserveEGLContextOnPause(true);
 
         ViewCompat.setWindowInsetsAnimationCallback(getWindow().getDecorView(),
@@ -80,6 +82,7 @@ public class MainActivity extends ComponentActivity {
 
         _permissionService.ensureLocationPermission();
         _permissionService.ensureNotificationPermission();
+        _permissionService.ensureMediaPermission();
         setupAppChangeListener();
     }
 

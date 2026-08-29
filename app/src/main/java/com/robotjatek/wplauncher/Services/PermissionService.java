@@ -18,14 +18,19 @@ import androidx.core.content.ContextCompat;
 public class PermissionService {
 
     private final LocationService _locationService;
+    private final MediaService _mediaService;
     private final ActivityResultLauncher<String> _locationPermission;
+    private final ActivityResultLauncher<String> _mediaPermission;
     private final ComponentActivity _activity;
 
-    public PermissionService(ComponentActivity activity, LocationService locationService) {
+    public PermissionService(ComponentActivity activity, LocationService locationService, MediaService mediaService) {
         _locationService = locationService;
+        _mediaService = mediaService;
         _activity = activity;
         _locationPermission = activity.registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(), _locationService::setHasPermission);
+        _mediaPermission = activity.registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(), _mediaService::setHasPermission);
     }
 
     public void ensureLocationPermission() {
@@ -44,6 +49,30 @@ public class PermissionService {
         } else {
             openAppSettings();
         }
+    }
+
+    public void ensureMediaPermission() {
+        if (!hasMediaPermission()) {
+            _mediaPermission.launch(Manifest.permission.READ_MEDIA_IMAGES);
+        } else {
+            _mediaService.setHasPermission(true);
+        }
+    }
+
+    public void requestMediaPermission() {
+        if (hasMediaPermission()) {
+            return;
+        }
+
+        if (ActivityCompat.shouldShowRequestPermissionRationale(_activity, Manifest.permission.READ_MEDIA_IMAGES)) {
+            _mediaPermission.launch(Manifest.permission.READ_MEDIA_IMAGES);
+        } else {
+            openAppSettings();
+        }
+    }
+
+    public boolean hasMediaPermission() {
+        return ContextCompat.checkSelfPermission(_activity, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED;
     }
 
     public void openAppSettings() {

@@ -211,6 +211,9 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
 
     public void cancelSelection() {
         _commands.add(() -> {
+            if (_selectedTile == null) {
+                return;
+            }
             for (var tile : _tiles) {
                 tile.setScale(1f);
             }

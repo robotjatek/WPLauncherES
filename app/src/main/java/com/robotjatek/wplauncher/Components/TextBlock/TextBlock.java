@@ -164,6 +164,8 @@ public class TextBlock implements UIElement {
     }
 
     public void setText(String text) {
+        if (_text.equals(text)) return;
+
         _text = text;
         invalidate();
     }

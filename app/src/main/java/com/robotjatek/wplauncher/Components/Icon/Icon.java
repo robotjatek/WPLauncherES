@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Components.Icon;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.opengl.Matrix;
 
@@ -15,6 +16,7 @@ public class Icon implements UIElement {
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private Drawable _iconDrawable;
+    private Bitmap _pendingBitmap;
     private int _textureId = -1;
     private int _bgColor;
     private boolean _dirty = true;
@@ -42,11 +44,19 @@ public class Icon implements UIElement {
         var h = (int)drawContext.heightOf(this);
 
         if (_dirty) {
-            if (_textureId > 0) {
-                TileUtil.deleteTexture(_textureId);
-            }
-            if (_iconDrawable != null) {
-                _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
+            // Only recreate texture if we have a NEW source waiting
+            if (_pendingBitmap != null || _iconDrawable != null) {
+                if (_textureId > 0) {
+                    TileUtil.deleteTexture(_textureId);
+                    _textureId = -1;
+                }
+
+                if (_pendingBitmap != null) {
+                    _textureId = BitmapUtil.createTextureFromBitmap(_pendingBitmap);
+                    _pendingBitmap = null;
+                } else if (_iconDrawable != null) {
+                    _textureId = BitmapUtil.createTextureFromDrawable(_iconDrawable, _size.width(), _size.height());
+                }
             }
             _dirty = false;
         }
@@ -71,16 +81,26 @@ public class Icon implements UIElement {
     }
 
     public void setSize(Size<Integer> size) {
+        if (_size.equals(size)) return;
         _size = size;
         _dirty = true;
     }
 
     public void setIconDrawable(Drawable icon) {
         _iconDrawable = icon;
+        _pendingBitmap = null;
+        _dirty = true;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        _pendingBitmap = bitmap;
+        _iconDrawable = null;
         _dirty = true;
     }
 
     public void setBgColor(int bgColor) {
+        if (_bgColor == bgColor) return;
+
         _bgColor = bgColor;
         _dirty = true;
     }
@@ -91,6 +111,10 @@ public class Icon implements UIElement {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
                 _textureId = -1;
+            }
+            if (_pendingBitmap != null) {
+                _pendingBitmap.recycle();
+                _pendingBitmap = null;
             }
             _disposed = true;
         }

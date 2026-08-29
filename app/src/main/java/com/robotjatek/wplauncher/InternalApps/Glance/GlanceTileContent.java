@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.InternalApps.Clock;
+package com.robotjatek.wplauncher.InternalApps.Glance;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -24,7 +24,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class ClockTileContent implements ITileContent, IWeatherListener {
+public class GlanceTileContent implements ITileContent, IWeatherListener {
     private boolean _disposed = false;
     private long _lastUpdate = System.currentTimeMillis();
     private int _lastHour = -1;
@@ -44,7 +44,7 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
     private boolean _locationLabelsPresent = false;
     private Tile _tile;
 
-    public ClockTileContent(Context context, LocationService locationService, WeatherService weatherService) {
+    public GlanceTileContent(Context context, LocationService locationService, WeatherService weatherService) {
         _context = context;
         _locationService = locationService;
         _weatherService = weatherService;
@@ -154,8 +154,8 @@ public class ClockTileContent implements ITileContent, IWeatherListener {
     }
 
     private boolean isLocationEnabled() {
-        var prefs = _context.getSharedPreferences(Clock.PREF_NAME, Context.MODE_PRIVATE);
-        var settingsJson = prefs.getString(Clock.SETTINGS, null);
+        var prefs = _context.getSharedPreferences(Glance.PREF_NAME, Context.MODE_PRIVATE);
+        var settingsJson = prefs.getString(Glance.SETTINGS, null);
         if (settingsJson == null) {
             return false;
         }

@@ -1,4 +1,4 @@
-package com.robotjatek.wplauncher.InternalApps.Clock;
+package com.robotjatek.wplauncher.InternalApps.Glance;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -18,9 +18,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 // TODO: lots of duplicated boilerplate in internal apps
-public class Clock implements IScreen {
+public class Glance implements IScreen {
     public static final String PREF_NAME = "WPLAUNCHER";
-    public static final String SETTINGS = "CLOCK";
+    public static final String SETTINGS = "GLANCE";
+    public static final String PACKAGE_NAME = "launcher:glance";
 
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
@@ -28,14 +29,14 @@ public class Clock implements IScreen {
     private boolean _locationEnabled;
     private Size<Integer> _size = new Size<>(-1, -1);
 
-    public Clock(IScreenNavigator navigator, Context context) {
+    public Glance(IScreenNavigator navigator, Context context) {
         _navigator = navigator;
         _context = context;
         loadSettings();
 
         _layout = new StackLayout();
         _layout.setBgColor(Colors.BLACK);
-        _layout.addChild(new Label("CLOCK HUB", 52, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout.addChild(new Label("GLANCE", 52, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("settings", 160, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Checkbox("Show location based data when available", _locationEnabled, (b) -> {
             _locationEnabled = b;

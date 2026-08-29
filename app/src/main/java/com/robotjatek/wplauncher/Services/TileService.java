@@ -9,7 +9,8 @@ import android.util.Log;
 
 import com.robotjatek.wplauncher.AppList.App;
 import com.robotjatek.wplauncher.Components.Size;
-import com.robotjatek.wplauncher.InternalApps.Clock.ClockTileContent;
+import com.robotjatek.wplauncher.InternalApps.Glance.Glance;
+import com.robotjatek.wplauncher.InternalApps.Glance.GlanceTileContent;
 import com.robotjatek.wplauncher.InternalApps.Photos.PhotosTileContent;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
@@ -212,12 +213,12 @@ public class TileService implements OnChangeListener<AccentColor> {
     }
 
     private Tile createTile(Position<Integer> position, Size<Integer> size, App app) {
-        if (app.packageName().equalsIgnoreCase("launcher:clock")) {
+        if (app.packageName().equalsIgnoreCase(Glance.PACKAGE_NAME)) {
             return new Tile(position,
                     size,
                     app,
                     _settingsService.getAccentColor().color(),
-                    new ClockTileContent(_context, _locationService, _weatherService),
+                    new GlanceTileContent(_context, _locationService, _weatherService),
                     null);
         }
 

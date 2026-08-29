@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.InternalApps.Clock.Clock;
+import com.robotjatek.wplauncher.InternalApps.Glance.Glance;
 import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
@@ -18,7 +18,6 @@ import java.util.Map;
 
 public class InternalAppsService {
     private static final String SETTINGS_NAME = "launcher:settings";
-    private static final String CLOCK_NAME = "launcher:clock";
     private boolean _disposed = false;
     private final Context _context;
     private final Map<String, Drawable> _appIcons = new HashMap<>();
@@ -36,14 +35,14 @@ public class InternalAppsService {
                 () -> navigator.push(new Settings(navigator, settings, permissionService, context)), true);
 
         var clock = new App(
-                "Clock HUB",
-                CLOCK_NAME,
+                "Glance",
+                Glance.PACKAGE_NAME,
                 null,
-                getAppIcon(CLOCK_NAME),
-                () -> navigator.push(new Clock(navigator, context)), true);
+                getAppIcon(Glance.PACKAGE_NAME),
+                () -> navigator.push(new Glance(navigator, context)), true);
 
         _internalApps.put(SETTINGS_NAME, setting);
-        _internalApps.put(CLOCK_NAME, clock);
+        _internalApps.put(Glance.PACKAGE_NAME, clock);
     }
 
     public List<App> getInternalApps() {
@@ -63,7 +62,7 @@ public class InternalAppsService {
 
     private void initAppIcons() {
         _appIcons.put(SETTINGS_NAME, ContextCompat.getDrawable(_context, R.drawable.settings));
-        _appIcons.put(CLOCK_NAME, ContextCompat.getDrawable(_context, R.drawable.clock));
+        _appIcons.put(Glance.PACKAGE_NAME, ContextCompat.getDrawable(_context, R.drawable.clock));
     }
 
     public void dispose() {

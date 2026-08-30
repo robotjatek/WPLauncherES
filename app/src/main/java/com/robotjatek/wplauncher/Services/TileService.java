@@ -14,7 +14,7 @@ import com.robotjatek.wplauncher.InternalApps.Glance.GlanceTileContent;
 import com.robotjatek.wplauncher.InternalApps.Photos.PhotosTileContent;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
-import com.robotjatek.wplauncher.TileGrid.NotificationSurface;
+import com.robotjatek.wplauncher.TileGrid.NotificationSurface.NotificationSurface;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.StaticTileContent;
 import com.robotjatek.wplauncher.TileGrid.Tile;

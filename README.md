@@ -192,7 +192,7 @@ Feature-creep!
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
 - [x] Extract ScreenNavigator into a separate component
-- [ ] Cycling between notifications should be animated
+- [x] Cycling between notifications should be animated
 - [x] Debug menu
   - [x] Crash app button
   - [x] Restart app button

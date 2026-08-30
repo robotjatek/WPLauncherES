@@ -192,7 +192,7 @@ Feature-creep!
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
 - [x] Extract ScreenNavigator into a separate component
-- [ ] Cycling between notifications should be animated
+- [x] Cycling between notifications should be animated
 - [x] Debug menu
   - [x] Crash app button
   - [x] Restart app button
@@ -212,7 +212,7 @@ Feature-creep!
 - [ ] Cache UI element size measurement results
 - [ ] Double call of createTile in tileService
 - [ ] Add stencil clipping to layouts
-- [ ] Make Notification surface layout more symmetric
+- [x] Make Notification surface layout more symmetric
 - [ ] Don't recalculate matrices every frame
 
 ### M5 - RC

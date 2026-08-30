@@ -1,23 +1,23 @@
-package com.robotjatek.wplauncher.TileGrid;
+package com.robotjatek.wplauncher.TileGrid.NotificationSurface;
 
 import android.app.Notification;
-import android.graphics.Typeface;
 
 import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.Colors;
-import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Size;
-import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
+import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.INotificationChangedListener;
 import com.robotjatek.wplauncher.Services.NotificationListener;
+import com.robotjatek.wplauncher.TileGrid.ITileContent;
+import com.robotjatek.wplauncher.TileGrid.NotificationSurface.States.IdleState;
+import com.robotjatek.wplauncher.TileGrid.NotificationSurface.States.SwapState;
+import com.robotjatek.wplauncher.TileGrid.Position;
+import com.robotjatek.wplauncher.TileGrid.Tile;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-record InternalNotification(String title, String message) { }
 
 /**
  * Generic notification surface for tiles that don't have dedicated back content
@@ -26,20 +26,40 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
 
     private boolean _disposed = false;
     private boolean _dirty = true;
-    private long _timeOnNotification = 0;
-    private int _currentNotificationId = 0;
     private final String _packageName;
     private final List<InternalNotification> _notifications = Collections.synchronizedList(new ArrayList<>());
+    private IState _state = IDLE_STATE();
+    public IState IDLE_STATE() {
+        return new IdleState(this);
+    }
+
+    public IState SWAP_STATE() {
+        return new SwapState(this);
+    }
+
+    public void changeState(IState state) {
+        _state.exit();
+        _state = state;
+        _state.enter();
+    }
+
     private final AbsoluteLayout _layout = new AbsoluteLayout();
-    private final Label _titleLabel = new Label("Should not be seen", 56, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-    private final TextBlock _textBox = new TextBlock("", 52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400);
+    private NotificationElement _currentNotification = new NotificationElement();
+    private NotificationElement _nextNotification = new NotificationElement();
+
+    public void swapElements() {
+        var temp = _currentNotification;
+        _currentNotification = _nextNotification;
+        _nextNotification = temp;
+    }
+    private int _currentNotificationId = 0;
     private Tile _tile;
+    private Size<Integer> _lastSize = new Size<>(0, 0);
 
     public NotificationSurface(App app) {
         _packageName = app.packageName();
         NotificationListener.subscribe(_packageName, this);
-        _layout.addChild(_titleLabel, Position.ZERO);
-        _layout.addChild(_textBox, Position.ZERO);
+        _layout.addChild(_currentNotification, Position.ZERO);
     }
 
     @Override
@@ -50,35 +70,28 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     @Override
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
                      Position<Float> position, Size<Integer> size) {
-        if (_dirty) {
-            _layout.setBgColor(_tile.bgColor);
-            if (!_notifications.isEmpty()) {
-                var currentNotification = _notifications.get(_currentNotificationId);
-                _titleLabel.setText(currentNotification.title());
-                _textBox.setText(currentNotification.message());
-                var titleX = position.x() + 50;
-                var titleY = position.y() + 100;
-                var titleHeight = _titleLabel.measure().height();
-                _layout.setChildPosition(_titleLabel, new Position<>(titleX, titleY));
-                _layout.setChildPosition(_textBox, new Position<>(titleX, titleY + titleHeight));
-                var messageMaxWidth = (int)(size.width() - titleX);
-                var messageMaxHeight = (int)(size.height() - titleY - titleHeight);
-                _titleLabel.setMaxWidth(messageMaxWidth);
-                _textBox.setMaxWidth(messageMaxWidth);
-                _textBox.setMaxHeight(messageMaxHeight);
+        _lastSize = size;
 
+        if (_dirty) {
+            if (_notifications.isEmpty()) {
+                return;
             }
+
+            var padding = (int)(size.width() * 0.05f);
+            _currentNotification.setPadding(padding);
+            _currentNotification.setBgColor(_tile.bgColor);
+            _currentNotification.setSize(size);
+            var currentNotificationContent = _notifications.get(_currentNotificationId);
+            _currentNotification.setContent(currentNotificationContent.title(), currentNotificationContent.message());
+
+            _nextNotification.setPadding(padding);
+            _nextNotification.setBgColor(_tile.bgColor);
+            _nextNotification.setSize(size);
             _dirty = false;
         }
 
-        if (_timeOnNotification > 4000 && !_notifications.isEmpty()) {
-            _timeOnNotification = 0;
-            _currentNotificationId = (_currentNotificationId + 1) % _notifications.size();
-            _dirty = true;
-        }
-
+        _state.update(delta);
         _layout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
-        _timeOnNotification += (long) delta;
     }
 
     @Override
@@ -111,15 +124,49 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
                                 text != null ? text.toString() : ""));
             }
         }
+        changeState(IDLE_STATE());
         _dirty = true;
+    }
+
+    public void setDirty(boolean dirty) {
+        _dirty = dirty;
+    }
+
+    public NotificationElement getCurrentNotification() {
+        return _currentNotification;
+    }
+
+    public NotificationElement getNextNotification() {
+        return _nextNotification;
+    }
+
+    public int getCurrentNotificationId() {
+        return _currentNotificationId;
+    }
+
+    public void setCurrentNotificationId(int id) {
+        _currentNotificationId = id;
+    }
+
+    public List<InternalNotification> getNotifications() {
+        return _notifications;
+    }
+
+    public Size<Integer> getLastSize() {
+        return _lastSize;
+    }
+
+    public AbsoluteLayout getLayout() {
+        return _layout;
     }
 
     @Override
     public void dispose() {
         if (!_disposed) {
             NotificationListener.unsubscribe(_packageName, this);
-            _titleLabel.dispose();
-            _textBox.dispose();
+            _layout.dispose();
+            _currentNotification.dispose();
+            _nextNotification.dispose();
             _disposed = true;
         }
     }

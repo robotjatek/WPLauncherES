@@ -208,12 +208,14 @@ Feature-creep!
 
 ### M4.5
 
-- [ ] Show weather icon on the HUB tile
+- [ ] Show weather icon on the Glance tile
 - [ ] Cache UI element size measurement results
 - [ ] Double call of createTile in tileService
 - [ ] Add stencil clipping to layouts
 - [x] Make Notification surface layout more symmetric
 - [ ] Don't recalculate matrices every frame
+- [ ] Open settings page from launcher settings
+- [ ] TextBlock wrapping: never start a new line with space
 
 ### M5 - RC
 

@@ -64,13 +64,14 @@ public class NotificationElement implements UIElement {
 
     public void setSize(Size<Integer> size) {
         if (_size.equals(size)) return;
+        _layout.onResize(size.width(), size.height());
         _size = size;
         _dirty = true;
     }
 
     @Override
     public Size<Integer> measure() {
-        return _layout.measure();
+        return _size;
     }
 
     @Override

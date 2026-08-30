@@ -11,6 +11,7 @@ import com.robotjatek.wplauncher.Services.INotificationChangedListener;
 import com.robotjatek.wplauncher.Services.NotificationListener;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.NotificationSurface.States.IdleState;
+import com.robotjatek.wplauncher.TileGrid.NotificationSurface.States.SwapState;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.Tile;
 
@@ -32,6 +33,10 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
         return new IdleState(this);
     }
 
+    public IState SWAP_STATE() {
+        return new SwapState(this);
+    }
+
     public void changeState(IState state) {
         _state.exit();
         _state = state;
@@ -40,6 +45,13 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
 
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private NotificationElement _currentNotification = new NotificationElement();
+    private NotificationElement _nextNotification = new NotificationElement();
+
+    public void swapElements() {
+        var temp = _currentNotification;
+        _currentNotification = _nextNotification;
+        _nextNotification = temp;
+    }
     private int _currentNotificationId = 0;
     private Tile _tile;
     private Size<Integer> _lastSize = new Size<>(0, 0);
@@ -48,10 +60,6 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
         _packageName = app.packageName();
         NotificationListener.subscribe(_packageName, this);
         _layout.addChild(_currentNotification, Position.ZERO);
-    }
-
-    public Tile getParent() {
-        return _tile;
     }
 
     @Override
@@ -63,6 +71,25 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer,
                      Position<Float> position, Size<Integer> size) {
         _lastSize = size;
+
+        if (_dirty) {
+            if (_notifications.isEmpty()) {
+                return;
+            }
+
+            var padding = (int)(size.width() * 0.05f);
+            _currentNotification.setPadding(padding);
+            _currentNotification.setBgColor(_tile.bgColor);
+            _currentNotification.setSize(size);
+            var currentNotificationContent = _notifications.get(_currentNotificationId);
+            _currentNotification.setContent(currentNotificationContent.title(), currentNotificationContent.message());
+
+            _nextNotification.setPadding(padding);
+            _nextNotification.setBgColor(_tile.bgColor);
+            _nextNotification.setSize(size);
+            _dirty = false;
+        }
+
         _state.update(delta);
         _layout.draw(delta, projMatrix, viewMatrix, renderer, position, size);
     }
@@ -101,16 +128,16 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
         _dirty = true;
     }
 
-    public boolean isDirty() {
-        return _dirty;
-    }
-
     public void setDirty(boolean dirty) {
         _dirty = dirty;
     }
 
     public NotificationElement getCurrentNotification() {
         return _currentNotification;
+    }
+
+    public NotificationElement getNextNotification() {
+        return _nextNotification;
     }
 
     public int getCurrentNotificationId() {
@@ -129,12 +156,17 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
         return _lastSize;
     }
 
+    public AbsoluteLayout getLayout() {
+        return _layout;
+    }
+
     @Override
     public void dispose() {
         if (!_disposed) {
             NotificationListener.unsubscribe(_packageName, this);
             _layout.dispose();
             _currentNotification.dispose();
+            _nextNotification.dispose();
             _disposed = true;
         }
     }

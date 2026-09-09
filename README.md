@@ -166,7 +166,7 @@ Try it at your own risk
   - [x] Insert text at cursor position
   - [x] Delete text at cursor position
 - [x] Try perspective projection instead of orthographic
-- [x] Use stencil buffer instead of scissor test for drawing tiles (2 pass rendering)
+- [x] Use stencil buffer instead of scissor test for drawing tiles
 - [x] Use stencil buffer to clip list view
 - [x] Use stencil buffer to clip scroll view
 - [x] Fix: Uninstalling applications with multiple intents: Only one intent is removed from the applist
@@ -198,7 +198,7 @@ Feature-creep!
   - [x] Restart app button
   - [x] Reset configuration button
 - [ ] Scroll in edit mode:
-  - [ ] Scroll instead of moving the tile when the scroll movement is not started on the tile
+  - [x] Scroll instead of moving the tile when the scroll movement is not started on the tile
   - [ ] Automatic animated scroll when reaching the edge of the screen with the moved tile (instead of an instant jump)
 - [x] Fix: crash on modal dismiss
 - [x] Fix: null pointer exception in TileGrid.Tile.getDragInfo() - maybe fixed by #85
@@ -216,12 +216,15 @@ Feature-creep!
 - [ ] Don't recalculate matrices every frame
 - [ ] Open settings page from launcher settings
 - [ ] TextBlock wrapping: never start a new line with space
+- [ ] Discard keyboard on tapping outside the input box
+- [ ] Fix: Scroll/drag lags behind finger movement
 
 ### M5 - RC
 
 - [ ] Animate context menu
 - [ ] Landscape mode support
 - [ ] Background image with transparent tiles
+- [ ] Reduce memory footprint by not keeping bitmaps in memory (see the TODO App.java)
 - [ ] 6 column mode setting
 - [ ] WP7/7.8 start screen setting
 - [ ] Custom tile color

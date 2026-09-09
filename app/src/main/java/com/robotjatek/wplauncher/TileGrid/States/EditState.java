@@ -4,6 +4,7 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.TileGrid.States.EditStates.EditDragState;
 import com.robotjatek.wplauncher.TileGrid.States.EditStates.EditIdleState;
+import com.robotjatek.wplauncher.TileGrid.States.EditStates.EditScrollState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 /**
@@ -20,6 +21,10 @@ public class EditState extends BaseState {
 
     public IState EDIT_DRAG(float x, float y) {
         return new EditDragState(this, _context, x, y);
+    }
+
+    public IState EDIT_SCROLL(float x, float y) {
+        return new EditScrollState(this, _context, x, y);
     }
 
     public void changeState(IState state) {

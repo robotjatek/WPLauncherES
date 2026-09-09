@@ -27,7 +27,7 @@ public class EditIdleState extends EditBaseState {
 
     @Override
     public boolean handleTap(TapGesture gesture) {
-        // tap adorner
+        // tap unpin adorner
         if (_tilegrid.getUnpinButton().isTapped(
                 gesture.getX(),
                 gesture.getY() - _tilegrid.getScroll().getScrollOffset() - TileGrid.TOP_MARGIN_PX)) {
@@ -36,6 +36,7 @@ public class EditIdleState extends EditBaseState {
             return true;
         }
 
+        // tap resize adorner
         if (_tilegrid.getResizeButton().isTapped(
                 gesture.getX(),
                 gesture.getY() - _tilegrid.getScroll().getScrollOffset() - TileGrid.TOP_MARGIN_PX)) {
@@ -72,8 +73,16 @@ public class EditIdleState extends EditBaseState {
         var deltaY = gesture.getY() - _startY;
         var distance = (float) Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         if (distance > 40) {
+            var touched = _context.getTileAt(gesture.getX(), gesture.getY());
             if (_tilegrid.getSelectedTile() != null) {
-                _context.changeState(_context.EDIT_DRAG(gesture.getX(), gesture.getY()));
+                // identify if the finger is on the tile => drag, it's outside => move to scroll state
+                if (touched.isPresent() && touched.get() == _tilegrid.getSelectedTile()) {
+                    // movement started while touching the selected tile => drag
+                    _context.changeState(_context.EDIT_DRAG(gesture.getX(), gesture.getY()));
+                } else {
+                    // movement started but not on the selected tile => scroll
+                    _context.changeState(_context.EDIT_SCROLL(gesture.getX(), gesture.getY()));
+                }
             } else {
                 _tilegrid.changeState(_tilegrid.IDLE_STATE());
             }

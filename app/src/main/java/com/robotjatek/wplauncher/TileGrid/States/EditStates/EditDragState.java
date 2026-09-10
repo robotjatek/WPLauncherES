@@ -8,10 +8,10 @@ import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.TileGrid;
 
 public class EditDragState extends EditBaseState {
+    public static final int SCROLL_BOUND_PX = 200;
     private final float _x;
     private final float _y;
-
-
+    
     public EditDragState(EditState context, TileGrid tilegrid, float x, float y) {
         super(context, tilegrid);
         _x = x;
@@ -47,11 +47,17 @@ public class EditDragState extends EditBaseState {
         var screenPosY = drawContext.yOf(selectedTile)
                 + selectedTile.getDragInfo().totalY
                 + _tilegrid.getScroll().getScrollOffset();
-        var scrollSpeed = 2 * delta;
-        if (screenPosY + drawContext.heightOf(selectedTile) > _tilegrid.getPageHeight() - 200) { // reached bottom while dragging
-            _tilegrid.getScroll().adjustOffset(-scrollSpeed);
-        } else if (screenPosY < 200) { // reached top while dragging
-            _tilegrid.getScroll().adjustOffset(scrollSpeed);
+        var scrollSpeed = 2 * delta; // TODO: make this resolution independent and density aware
+        var scrollDelta = 0f;
+        if (screenPosY + drawContext.heightOf(selectedTile) > _tilegrid.getPageHeight() - SCROLL_BOUND_PX) { // reached bottom while dragging
+            scrollDelta = _tilegrid.getScroll().adjustOffset(-scrollSpeed);
+        } else if (screenPosY < SCROLL_BOUND_PX) { // reached top while dragging
+            scrollDelta = _tilegrid.getScroll().adjustOffset(scrollSpeed);
+        }
+
+        if (scrollDelta != 0) {
+            selectedTile.getDragInfo().startY += scrollDelta;
+            selectedTile.getDragInfo().totalY -= scrollDelta;
         }
     }
 

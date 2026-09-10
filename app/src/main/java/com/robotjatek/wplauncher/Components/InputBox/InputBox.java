@@ -19,12 +19,14 @@ import java.util.function.Consumer;
 
 public class InputBox implements UIElement, ITextInputHandler {
 
-    private static final int BORDER_SIZE_PX = 4;
+    private static final int BORDER_SIZE_PX = 4; // TODO: make this density aware
+    private static final float TEXT_OFFSET = 16f; // Offset from the border of the input box // TODO: this is a hard-coded offset. Make it density aware
     private boolean _disposed = false;
     private boolean _isDirty = true;
     private boolean _focused = false;
     private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
     private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final Cursor _cursor = new Cursor();
     private final Label _label;
     private String _text = "";
     private int _cursorPosition = 0;
@@ -35,14 +37,19 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final String _placeholder;
     private final Consumer<String> _onTextChanged;
     private final Size<Integer> _size = new Size<>(0, 100); // TODO: configurable size
+    private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     public InputBox(String placeholder, Consumer<String> onTextChanged) {
         _placeholder = placeholder;
         _onTextChanged = onTextChanged;
 
         _label = new Label(_placeholder, 48, Typeface.BOLD, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
+        _paint.setTypeface(_label.getTypeFace());
+        _paint.setTextSize(_label.getTextSize());
         _borderLayout.setBgColor(Colors.WHITE);
         _layout.setBgColor(Colors.BLACK);
+        _layout.addChild(_cursor, new Position<>(0f, 0f));
+        _cursor.setSize(new Size<>(6, _label.measure().height())); // TODO: density aware: Math.max(2, Math.round(2f * density)); // 2dp wide
     }
 
     @Override
@@ -58,19 +65,20 @@ public class InputBox implements UIElement, ITextInputHandler {
             _borderLayout.removeChild(_layout);
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
             _borderLayout.addChild(_layout, new Position<>((float) BORDER_SIZE_PX, (float) BORDER_SIZE_PX));
-            var textOffset = 16f;
-            _textStartX = x + BORDER_SIZE_PX + textOffset;
+            _textStartX = x + BORDER_SIZE_PX + TEXT_OFFSET;
             _layout.removeChild(_label);
-            _layout.addChild(_label, new Position<>(textOffset, (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
+            _layout.addChild(_label, new Position<>(TEXT_OFFSET, (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
 
             if (_text.isEmpty() && !_focused) {
                 _label.setText(_placeholder);
                 _label.setTextColor(Colors.LIGHT_GRAY);
+                _cursor.setVisible(false);
             } else {
-                var cursor = _cursorVisible ? "|" : " "; // TODO: do not integrate the cursor into the text, but draw an "adorner" above instead
-                _cursorPosition = Math.max(0, Math.min(_cursorPosition, _text.length()));
-                var textWithCursor = _text.substring(0, _cursorPosition) + cursor + _text.substring(_cursorPosition);
-                _label.setText(textWithCursor);
+                _layout.setChildPosition(
+                        _cursor,
+                        new Position<>(TEXT_OFFSET + measureTextAtCursorPosition(_text),
+                                (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
+                _label.setText(_text);
                 _label.setTextColor(Colors.WHITE);
             }
             _isDirty = false;
@@ -85,7 +93,7 @@ public class InputBox implements UIElement, ITextInputHandler {
             if (_blinkTimer > BLINK_TIMEOUT) {
                 _cursorVisible = !_cursorVisible;
                 _blinkTimer = 0f;
-                _isDirty = true;
+                _cursor.setVisible(_cursorVisible);
             }
         }
     }
@@ -129,13 +137,10 @@ public class InputBox implements UIElement, ITextInputHandler {
             return;
         }
 
-        var paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setTypeface(_label.getTypeFace());
-        paint.setTextSize(_label.getTextSize());
         for (var i = 0; i < _text.length(); i++) {
-            var measured = paint.measureText(_text, 0, i);
+            var measured = _paint.measureText(_text, 0, i);
             if (measured >= insideX) {
-                var prev = i > 0 ? paint.measureText(_text, 0, i - 1) : 0;
+                var prev = i > 0 ? _paint.measureText(_text, 0, i - 1) : 0;
                 _cursorPosition = (insideX - prev < measured - insideX) ? i - 1 : i;
                 _isDirty = true;
                 return;
@@ -145,6 +150,10 @@ public class InputBox implements UIElement, ITextInputHandler {
         // text is shorter than the tap position
         _cursorPosition = _text.length();
         _isDirty = true;
+    }
+
+    private float measureTextAtCursorPosition(String text) {
+        return _paint.measureText(text, 0, _cursorPosition);
     }
 
     @Override
@@ -204,7 +213,6 @@ public class InputBox implements UIElement, ITextInputHandler {
         _cursorPosition--;
         if (_cursorPosition < 0) {
             _cursorPosition = 0;
-
         }
     }
 
@@ -228,6 +236,8 @@ public class InputBox implements UIElement, ITextInputHandler {
 
     private void apply() {
         _onTextChanged.accept(_text);
+        _blinkTimer = 0;
+        _cursorVisible = true;
         _isDirty = true;
     }
 

@@ -26,7 +26,7 @@ https://github.com/user-attachments/assets/f7e517bb-9137-413f-a910-b41aa54a9deb
 
 ## Milestones
 
-This is a living roadmap, all future milestones are refined as I go, and subject to change. [M4](README.md#m4---beta) is in progress
+This is a living roadmap, all future milestones are refined as I go, and subject to change. [M4](WPLauncherES#m4---beta) is in progress
 
 ### M1 - POC / pre-alpha
 
@@ -186,8 +186,9 @@ Feature-creep!
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
-- [ ] Device resolution independent UI
-- [ ] Cursor handle in the input box
+- [ ] Input box cursor
+  - [ ] Cursor adorner
+  - [ ] Draggable cursor
 - [x] Modal
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
@@ -197,9 +198,9 @@ Feature-creep!
   - [x] Crash app button
   - [x] Restart app button
   - [x] Reset configuration button
-- [ ] Scroll in edit mode:
+- [x] Scroll in edit mode:
   - [x] Scroll instead of moving the tile when the scroll movement is not started on the tile
-  - [ ] Automatic animated scroll when reaching the edge of the screen with the moved tile (instead of an instant jump)
+  - [x] Adjust dragged tile position while auto-scrolling when reaching the boundaries
 - [x] Fix: crash on modal dismiss
 - [x] Fix: null pointer exception in TileGrid.Tile.getDragInfo() - maybe fixed by #85
 - [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
@@ -208,7 +209,8 @@ Feature-creep!
 
 ### M4.5
 
-- [ ] Show weather icon on the Glance tile
+Cleaning up the accumulated mess
+
 - [ ] Cache UI element size measurement results
 - [ ] Double call of createTile in tileService
 - [ ] Add stencil clipping to layouts
@@ -219,15 +221,34 @@ Feature-creep!
 - [ ] Discard keyboard on tapping outside the input box
 - [ ] Fix: Scroll/drag lags behind finger movement
 
-### M5 - RC
+### M5 - Beta 2
 
+Creep got too big
+
+- [ ] Device resolution independent UI
+  - [ ] Make dragging in edit mode density aware
 - [ ] Animate context menu
+- [ ] Custom tile color
+- [ ] Show a transparent tile on the drop-target
+- [ ] Reduce memory footprint by not keeping bitmaps in memory (see the TODO App.java)
+- [ ] Floating tiles in edit-mode
+- [ ] 6 column mode setting
+- [ ] Make checkbox use higher level components (then kill TileUtil.java)
+- [ ] Show weather icon on the Glance tile
+
+### M5.5
+
+Janitor for hire
+
+- [ ] TBD - this won't be empty for long
+
+### M6 - RC
+
+Can we release now, pls?
+
 - [ ] Landscape mode support
 - [ ] Background image with transparent tiles
-- [ ] Reduce memory footprint by not keeping bitmaps in memory (see the TODO App.java)
-- [ ] 6 column mode setting
 - [ ] WP7/7.8 start screen setting
-- [ ] Custom tile color
 - [ ] Group apps by the first letter in the app list
 - [ ] Application icon
 - [ ] Privacy policy
@@ -235,13 +256,14 @@ Feature-creep!
 - [ ] Generic pivot view (tabbed view)
   - [ ] Settings subpages use pivot view with one tab
 - [ ] Multi lang support
-- [ ] Show a transparent tile on the drop-target
 - [ ] Rebrand to something else than WPLauncher ES
 - [ ] First start experience
   - [ ] Pin some default tiles to the start screen on first start
   - [ ] Quick tutorial on first start
 
 ### Bugs that need repro:
+
+Haven't seen these for a while
 
 - [ ] Fix: All pinned tiles got cleared from the start screen - May have been fixed in M4
 - [ ] Fix: black bar in the place of the notification count when all previous notifications were dismissed (on real hardware, needs repro)
@@ -254,4 +276,3 @@ Nice to have, but I feel no pressure to implement them for now
 
 - [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
-- [ ] Make checkbox use higher level components (then kill TileUtil.java)

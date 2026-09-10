@@ -107,9 +107,11 @@ public class ScrollController {
         return Math.max(_minOffset, Math.min(_maxOffset, value));
     }
 
-    public void adjustOffset(float amount) {
+    public float adjustOffset(float amount) {
+        var oldOffset = _scrollOffset;
         _scrollOffset += amount;
         _scrollOffset = clampOffset(_scrollOffset);
+        return _scrollOffset - oldOffset;
     }
 
     public void setScrollOffset(float value) {

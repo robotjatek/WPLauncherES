@@ -22,9 +22,9 @@ public class Label implements UIElement, ITouchable {
     private final float[] _modelMatrix = new float[16];
     private String _text;
     private int _textSize;
-    private int _typeFace;
+    private final int _typeFace;
     private int _textColor;
-    private int _bgColor;
+    private final int _bgColor;
     private float _scale = 1f;
     private float _maxWidth; // -1 means no limit
     private boolean _dirty = true;
@@ -45,6 +45,8 @@ public class Label implements UIElement, ITouchable {
         _bgColor = bgColor;
         _maxWidth = maxWidth;
         _onTap = onTap;
+        _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
+        _paint.setTextAlign(Paint.Align.LEFT);
     }
 
     @Override
@@ -97,8 +99,6 @@ public class Label implements UIElement, ITouchable {
     }
 
     private String truncateText(String text, float maxWidth) {
-        _paint.setTextAlign(Paint.Align.LEFT);
-        _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
         _paint.setTextSize(_textSize);
 
         var textWidth = _paint.measureText(text);
@@ -141,8 +141,6 @@ public class Label implements UIElement, ITouchable {
     @Override
     public Size<Integer> measure() {
         // TODO: cache measurements
-        _paint.setTextAlign(Paint.Align.LEFT);
-        _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
         _paint.setTextSize(_textSize);
 
         var displayText = _maxWidth > 0 ? truncateText(_text, _maxWidth) : _text;

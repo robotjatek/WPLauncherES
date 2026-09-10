@@ -187,7 +187,7 @@ Feature-creep!
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
 - [ ] Input box cursor
-  - [ ] Cursor adorner
+  - [x] Proper cursor in the textbox
   - [ ] Draggable cursor
 - [x] Modal
 - [x] Animate modal open/close
@@ -216,7 +216,7 @@ Cleaning up the accumulated mess
 - [ ] Add stencil clipping to layouts
 - [x] Make Notification surface layout more symmetric
 - [ ] Don't recalculate matrices every frame
-- [ ] Open settings page from launcher settings
+- [ ] Open system settings from launcher settings
 - [ ] TextBlock wrapping: never start a new line with space
 - [ ] Discard keyboard on tapping outside the input box
 - [ ] Fix: Scroll/drag lags behind finger movement
@@ -225,7 +225,7 @@ Cleaning up the accumulated mess
 
 Creep got too big
 
-- [ ] Device resolution independent UI
+- [ ] Device resolution independent UI (https://developer.android.com/training/multiscreen/screendensities)
   - [ ] Make dragging in edit mode density aware
 - [ ] Animate context menu
 - [ ] Custom tile color

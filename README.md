@@ -26,7 +26,7 @@ https://github.com/user-attachments/assets/f7e517bb-9137-413f-a910-b41aa54a9deb
 
 ## Milestones
 
-This is a living roadmap, all future milestones are refined as I go, and subject to change. [M4](WPLauncherES#m4---beta) is in progress
+This is a living roadmap, all future milestones are refined as I go, and subject to change. [M4](README.md#m4---beta) is in progress
 
 ### M1 - POC / pre-alpha
 

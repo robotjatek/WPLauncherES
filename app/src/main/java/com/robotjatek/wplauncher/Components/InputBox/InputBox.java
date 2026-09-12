@@ -129,7 +129,7 @@ public class InputBox implements UIElement, ITextInputHandler {
         return false;
     }
 
-    private void setCursorPosition(float x) {
+    public void setCursorPosition(float x) {
         var insideX = x - _textStartX;
         if (insideX <= 0) {
             _cursorPosition = 0;

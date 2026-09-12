@@ -13,12 +13,14 @@ public class StackLayoutDrawContext implements IDrawContext<UIElement> {
 
     @Override
     public float xOf(UIElement element) {
-        return _layout.getLayoutInfo(element).x();
+        var info = _layout.getLayoutInfo(element);
+        return info != null ? info.x() : 0;
     }
 
     @Override
     public float yOf(UIElement element) {
-        return _layout.getLayoutInfo(element).y();
+        var info = _layout.getLayoutInfo(element);
+        return info != null ? info.y() + StackLayout.TOP_MARGIN_PX : 0;
     }
 
     @Override

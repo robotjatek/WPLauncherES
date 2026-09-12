@@ -186,9 +186,9 @@ Feature-creep!
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
-- [ ] Input box cursor
+- [x] Input box cursor
   - [x] Proper cursor in the textbox
-  - [ ] Draggable cursor
+  - [x] Draggable cursor
 - [x] Modal
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
@@ -252,6 +252,7 @@ Can we release now, pls?
 - [ ] Group apps by the first letter in the app list
 - [ ] Application icon
 - [ ] Privacy policy
+- [ ] Lower min API level / raise target API level
 - [ ] License
 - [ ] Generic pivot view (tabbed view)
   - [ ] Settings subpages use pivot view with one tab

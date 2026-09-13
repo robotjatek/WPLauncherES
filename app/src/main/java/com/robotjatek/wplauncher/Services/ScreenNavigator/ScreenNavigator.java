@@ -83,20 +83,15 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
         executeCommands();
         _state.update(delta);
 
-        Matrix.setIdentityM(_model, 0);
-        renderer.pushLayers(100);
-        _navigationStack.getFirst().draw(delta, proj, _model, renderer);
-
         var size = new Size<>(_width, _height);
-        if (_overlay.hasContent()) {
-            _overlay.draw(delta, proj, _model, renderer, Position.ZERO, size);
+        if (!_navigationStack.isEmpty()) {
+            Matrix.setIdentityM(_model, 0);
+            _navigationStack.getFirst().draw(delta, proj, _model, renderer);
         }
-        renderer.popLayer();
 
-        renderer.clearDepthBuffer(); // clearing the depth buffer, so the animated screen stays on top of everything else
         if (_animatedScreen != null) {
             Matrix.setIdentityM(_model, 0);
-            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, -1f);
+            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
 
             renderer.pushLayers(100);
             _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), size);
@@ -111,6 +106,13 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
             renderer.drawFlat(proj, _model, 0x88050505);
             _modal.draw(delta, proj, renderer);
             renderer.popLayers(200);
+        }
+
+        if (_overlay.hasContent()) {
+            Matrix.setIdentityM(_model, 0);
+            renderer.pushLayers(300);
+            _overlay.draw(delta, proj, _model, renderer, Position.ZERO, size);
+            renderer.popLayers(300);
         }
     }
 

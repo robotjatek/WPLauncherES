@@ -194,6 +194,11 @@ public class QuadRenderer {
         applyLayer();
     }
 
+    public void resetOffset() {
+        _offsetLevel = 0f;
+        applyLayer();
+    }
+
     private void applyLayer() {
 
         if (_offsetLevel == 0) {

@@ -85,7 +85,7 @@ public class InputBox implements UIElement, ITextInputHandler {
                 _label.setText(_text);
                 _label.setTextColor(Colors.WHITE);
 
-                var p = new Position<>(cursorPosition.x(), y + h);
+                var p = new Position<>(x + BORDER_SIZE_PX + cursorPosition.x() - _handle.measure().width() / 2f, y + h);
                 if (_overlay != null) {
                     _overlay.setAdornerAt(_handle, p);
                 }

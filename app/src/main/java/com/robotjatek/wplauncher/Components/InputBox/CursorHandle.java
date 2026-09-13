@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher.Components.InputBox;
 
 import android.opengl.Matrix;
-import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
@@ -12,15 +11,14 @@ import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 // TODO: move handler? States?
-//  set cursor position when moving the handle
 // TODO: only show when....
 // TODO: make the gesture boundaries larger than the visual boundaries
 // TODO: align its center to the cursor
-//  add tile adorners too later
+// TODO: add tile adorners to the new overlay later too
 public class CursorHandle implements UIElement {
     private final float[] _modelMatrix = new float[16];
     private final InputBox _parent;
-    private Size<Integer> _size = new Size<>(500, 100); // TODO: size
+    private Size<Integer> _size = new Size<>(250, 100); // TODO: size
     private boolean _visible = true;
     private float _startX;
 

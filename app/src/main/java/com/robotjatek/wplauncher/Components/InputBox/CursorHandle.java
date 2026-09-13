@@ -1,28 +1,28 @@
 package com.robotjatek.wplauncher.Components.InputBox;
 
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
+import com.robotjatek.wplauncher.Gestures.DownGesture;
 import com.robotjatek.wplauncher.Gestures.MoveGesture;
-import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 // TODO: move handler? States?
 //  set cursor position when moving the handle
 // TODO: only show when....
+// TODO: make the gesture boundaries larger than the visual boundaries
 // TODO: align its center to the cursor
-// TODO: IGestureOverlay for cursor adorner
-//  gesture overlay is the top level gesture receiver, if no hit it passes the gesture down
-//  How do i add a leaf to the top-level layer?
 //  add tile adorners too later
 public class CursorHandle implements UIElement {
     private final float[] _modelMatrix = new float[16];
     private final InputBox _parent;
-    private Size<Integer> _size = new Size<>(20, 20); // TODO: size
+    private Size<Integer> _size = new Size<>(500, 100); // TODO: size
     private boolean _visible = true;
+    private float _startX;
 
     public CursorHandle(InputBox parent) {
         _parent = parent;
@@ -50,25 +50,23 @@ public class CursorHandle implements UIElement {
         return _size;
     }
 
-    public void setSize(Size<Integer> size) {
-        if (_size == size) return;
-
-        _size = size;
-    }
-
     public void setVisible(boolean visible) {
         _visible = visible;
     }
 
-
     @Override
-    public boolean handleMove(MoveGesture gesture) {
-        _parent.setCursorPosition(gesture.getX());
+    public boolean handleDown(DownGesture gesture) {
+        _startX = gesture.getX();
         return true;
     }
 
     @Override
-    public boolean handleTap(TapGesture gesture) {
+    public boolean handleMove(MoveGesture gesture) {
+        var dx = gesture.getX() - _startX;
+        var newPosition = _parent.getCursorPosition() + dx;
+        if (newPosition != _parent.getCursorPosition()) {
+            _parent.setCursorPosition(newPosition);
+        }
         return true;
     }
 

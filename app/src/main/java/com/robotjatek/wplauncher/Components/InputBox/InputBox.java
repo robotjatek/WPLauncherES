@@ -13,6 +13,7 @@ import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.IOverlay;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.function.Consumer;
@@ -27,6 +28,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Cursor _cursor = new Cursor();
+    private final CursorHandle _handle = new CursorHandle(this);
     private final Label _label;
     private String _text = "";
     private int _cursorPosition = 0;
@@ -38,10 +40,12 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final Consumer<String> _onTextChanged;
     private final Size<Integer> _size = new Size<>(0, 100); // TODO: configurable size
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final IOverlay _overlay;
 
-    public InputBox(String placeholder, Consumer<String> onTextChanged) {
+    public InputBox(String placeholder, Consumer<String> onTextChanged, IOverlay overlay) {
         _placeholder = placeholder;
         _onTextChanged = onTextChanged;
+        _overlay = overlay;
 
         _label = new Label(_placeholder, 48, Typeface.BOLD, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
         _paint.setTypeface(_label.getTypeFace());
@@ -63,8 +67,9 @@ public class InputBox implements UIElement, ITextInputHandler {
 
         if (_isDirty) {
             _borderLayout.removeChild(_layout);
+            var borderPosition = new Position<>((float) BORDER_SIZE_PX, (float) BORDER_SIZE_PX);
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
-            _borderLayout.addChild(_layout, new Position<>((float) BORDER_SIZE_PX, (float) BORDER_SIZE_PX));
+            _borderLayout.addChild(_layout, borderPosition);
             _textStartX = x + BORDER_SIZE_PX + TEXT_OFFSET;
             _layout.removeChild(_label);
             _layout.addChild(_label, new Position<>(TEXT_OFFSET, (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
@@ -74,12 +79,16 @@ public class InputBox implements UIElement, ITextInputHandler {
                 _label.setTextColor(Colors.LIGHT_GRAY);
                 _cursor.setVisible(false);
             } else {
-                _layout.setChildPosition(
-                        _cursor,
-                        new Position<>(TEXT_OFFSET + measureTextAtCursorPosition(_text),
-                                (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
+                var cursorPosition = new Position<>(TEXT_OFFSET + measureTextAtCursorPosition(_text),
+                        (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f);
+                _layout.setChildPosition(_cursor, cursorPosition);
                 _label.setText(_text);
                 _label.setTextColor(Colors.WHITE);
+
+                var p = new Position<>(cursorPosition.x(), y + h);
+                if (_overlay != null) {
+                    _overlay.setAdornerAt(_handle, p);
+                }
             }
             _isDirty = false;
         }
@@ -106,6 +115,8 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public boolean handleTap(TapGesture gesture) {
         if (!_focused) {
+            // TODO: register cursor handle here?
+            // TODO: show the handle on second tap only
             gesture.getUIContext().requestFocus(this);
         }
         return true;
@@ -238,6 +249,7 @@ public class InputBox implements UIElement, ITextInputHandler {
         _onTextChanged.accept(_text);
         _blinkTimer = 0;
         _cursorVisible = true;
+        _cursor.setVisible(true);
         _isDirty = true;
     }
 

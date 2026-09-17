@@ -28,7 +28,7 @@ public class ActiveState extends BaseState {
         if (_blinkTimer > BLINK_TIMEOUT) {
             _cursorVisible = !_cursorVisible;
             _blinkTimer = 0;
-            _context.getCursor().setVisible(_cursorVisible);
+            _context.showCursor(_cursorVisible);
         }
     }
 
@@ -36,20 +36,14 @@ public class ActiveState extends BaseState {
     public void enter() {
         super.enter();
         _uiContext.requestFocus(_context);
-        _context.getCursor().setVisible(true);
         _context.showCursor(true);
-        _context.getHandle().setVisible(true);
-        _context.showHandle(true);
     }
 
     @Override
     public void exit() {
         super.exit();
-        _context.getCursor().setVisible(false);
         _context.showCursor(false);
         _context.showHandle(false);
-        _context.getHandle().setVisible(false);
-        _context.getOverlay().removeAdorner(_context.getHandle());
     }
 
     @Override
@@ -73,17 +67,19 @@ public class ActiveState extends BaseState {
     protected void onTextModified() {
         super.onTextModified();
         resetBlink();
+        _context.showHandle(false);
     }
 
     private void resetBlink() {
         _blinkTimer = 0;
         _cursorVisible = true;
-        _context.getCursor().setVisible(true);
+        _context.showCursor(true);
     }
 
     @Override
     public boolean handleDown(DownGesture gesture) {
         _context.setCursorPositionWithXPosition(gesture.getX());
+        _context.showHandle(true);
         resetBlink();
         return true;
     }

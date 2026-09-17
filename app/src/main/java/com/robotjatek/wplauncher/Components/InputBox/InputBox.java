@@ -105,16 +105,17 @@ public class InputBox implements UIElement, ITextInputHandler {
 
     public void showCursor(boolean show) {
         _showCursor = show;
+        _cursor.setVisible(show);
         _isDirty = true;
     }
 
     public void showHandle(boolean show) {
         _showHandle = show;
+        _handle.setVisible(show);
+        if (!show){
+            _overlay.removeAdorner(_handle);
+        }
         _isDirty = true;
-    }
-
-    public Cursor getCursor() {
-        return _cursor;
     }
 
     @Override
@@ -230,10 +231,6 @@ public class InputBox implements UIElement, ITextInputHandler {
         updateLabel();
         _onTextChanged.accept(_text);
         _isDirty = true;
-    }
-
-    public CursorHandle getHandle() {
-        return _handle;
     }
 
     public IOverlay getOverlay() {

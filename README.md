@@ -222,6 +222,7 @@ Cleaning up the accumulated mess
 - [ ] TextBlock wrapping: never start a new line with space
 - [ ] Discard keyboard on tapping outside the input box
 - [ ] Fix: Scroll/drag lags behind finger movement
+- [ ] Fix: Pressed state stuck when a swipe starts while being pressed
 
 ### M5 - Beta 2
 

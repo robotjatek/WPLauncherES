@@ -33,7 +33,7 @@ public class CursorHandle implements UIElement {
             var w = drawContext.widthOf(this);
             var h = drawContext.heightOf(this);
 
-            var handleW = w / 10f;
+            var handleW = w / 15f;
             var handleH = h / 2f;
             var handleX = x + (w / 2f) - (handleW / 2f);
 

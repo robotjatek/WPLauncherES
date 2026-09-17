@@ -11,7 +11,6 @@ import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 
 // TODO: States?
-// TODO: only show after double tap
 // TODO: make the gesture boundaries larger than the visual boundaries
 // TODO: add tile adorners to the new overlay later too
 // TODO: add the ability for UIElements or layouts to completely consume all touch events

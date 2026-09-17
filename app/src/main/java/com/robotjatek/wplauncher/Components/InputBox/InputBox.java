@@ -30,6 +30,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private final Cursor _cursor = new Cursor();
     private final CursorHandle _handle = new CursorHandle(this);
+    private boolean _showHandle = false;
     private final Label _label;
     private String _text = "";
     private int _cursorPosition = 0;
@@ -86,8 +87,8 @@ public class InputBox implements UIElement, ITextInputHandler {
                 _label.setText(_text);
                 _label.setTextColor(Colors.WHITE);
 
-                var p = new Position<>(x + BORDER_SIZE_PX + cursorPosition.x() - _handle.measure().width() / 2f, y + h);
-                if (_overlay != null) {
+                if (_overlay != null && _showHandle) {
+                    var p = new Position<>(x + BORDER_SIZE_PX + cursorPosition.x() - _handle.measure().width() / 2f, y + h);
                     _overlay.setAdornerAt(_handle, p);
                 }
             }
@@ -116,8 +117,6 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public boolean handleTap(TapGesture gesture) {
         if (!_focused) {
-            // TODO: register cursor handle here?
-            // TODO: show the handle on second tap only
             gesture.getUIContext().requestFocus(this);
         }
         return true;
@@ -127,6 +126,8 @@ public class InputBox implements UIElement, ITextInputHandler {
     public boolean handleDown(DownGesture gesture) {
         if (_focused) {
             setCursorPositionWithXPosition(gesture.getX());
+            _showHandle = true;
+            _handle.setVisible(true);
             return true;
         }
         return false;
@@ -198,12 +199,16 @@ public class InputBox implements UIElement, ITextInputHandler {
     public void onFocus() {
         _focused = true;
         _isDirty = true;
+        _showHandle = false;
     }
 
     @Override
     public void onFocusLost() {
         _focused = false;
         _isDirty = true;
+        _handle.setVisible(false);
+        _showHandle = false;
+        _overlay.removeAdorner(_handle);
     }
 
     @Override

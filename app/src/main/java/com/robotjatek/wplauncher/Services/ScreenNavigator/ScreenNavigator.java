@@ -232,6 +232,11 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
         _overlay.setChildPosition(element, position);
     }
 
+    @Override
+    public void removeAdorner(UIElement element) {
+        _overlay.removeChild(element);
+    }
+
     private void executeCommands() {
         Runnable command;
         while ((command = _commands.poll()) != null) {

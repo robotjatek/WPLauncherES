@@ -177,10 +177,8 @@ Try it at your own risk
 Feature-creep!
 
 - [ ] More live-tiles
-  - [ ] Tasks
   - [x] Photos
   - [x] Weather
-  - [ ] Step counter
 - [ ] Light mode/Dark mode support
   - [ ] Dropdown
 - [x] Animated tile resize
@@ -190,7 +188,7 @@ Feature-creep!
   - [x] Proper cursor in the textbox
   - [x] Draggable cursor
   - [x] Top level overlay for adorners
-  - [ ] Fix: InputBox cursor behavior is different on the emulator then on real hardware (onComposingText etc...)
+  - [x] Fix: InputBox cursor behavior is different on the emulator then on real hardware (onComposingText etc...)
 - [x] Modal
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
@@ -228,6 +226,9 @@ Cleaning up the accumulated mess
 
 Creep got too big
 
+- [ ] More live tiles
+  - [ ] Tasks
+  - [ ] Step Counter
 - [ ] Device resolution independent UI (https://developer.android.com/training/multiscreen/screendensities)
   - [ ] Make dragging in edit mode density aware
 - [ ] Animate context menu

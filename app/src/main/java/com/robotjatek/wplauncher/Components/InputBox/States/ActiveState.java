@@ -55,12 +55,14 @@ public class ActiveState extends BaseState {
     public void decrementCursorPosition() {
         super.decrementCursorPosition();
         resetBlink();
+        _uiContext.onSelectionChanged(_context);
     }
 
     @Override
     public void incrementCursorPosition() {
         super.incrementCursorPosition();
         resetBlink();
+        _uiContext.onSelectionChanged(_context);
     }
 
     @Override
@@ -68,6 +70,7 @@ public class ActiveState extends BaseState {
         super.onTextModified();
         resetBlink();
         _context.showHandle(false);
+        _uiContext.onSelectionChanged(_context);
     }
 
     private void resetBlink() {
@@ -81,6 +84,7 @@ public class ActiveState extends BaseState {
         _context.setCursorPositionWithXPosition(gesture.getX());
         _context.showHandle(true);
         resetBlink();
+        _uiContext.onSelectionChanged(_context);
         return true;
     }
 
@@ -88,6 +92,7 @@ public class ActiveState extends BaseState {
     public boolean handleMove(MoveGesture gesture) {
         _context.setCursorPositionWithXPosition(gesture.getX());
         resetBlink();
+        _uiContext.onSelectionChanged(_context);
         return true;
     }
 }

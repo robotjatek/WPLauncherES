@@ -21,18 +21,9 @@ public class BaseState implements IState {
     public void update(float delta) {}
 
     public void onTextInput(String input) {
-        var text = _context.getText();
         var pos = _context.getCursorPosition();
-        _context.setText(text.substring(0, pos) + input + text.substring(pos));
+        replaceText(pos, pos, input);
         _context.setCursorPosition(pos + input.length());
-        onTextModified();
-    }
-
-    public void onComposingText(String text) {
-        var base = _context.getText();
-        _context.setText(_context.replaceComposing(base, text));
-        _context.setCursorPosition(Math.min(_context.getText().length(), text.length()));
-        onTextModified();
     }
 
     public void onBackspace() {
@@ -43,6 +34,19 @@ public class BaseState implements IState {
             _context.setCursorPosition(pos - 1);
             onTextModified();
         }
+    }
+
+    public void replaceText(int start, int end, String text) {
+        var base = _context.getText();
+        var safeStart = Math.clamp(start, 0, base.length());
+        var safeEnd = Math.clamp(end, 0, base.length());
+        if (safeStart > safeEnd) {
+            var tmp = safeStart;
+            safeStart = safeEnd;
+            safeEnd = tmp;
+        }
+        _context.setText(base.substring(0, safeStart) + text + base.substring(safeEnd));
+        onTextModified();
     }
 
     public void clearText() {
@@ -68,8 +72,6 @@ public class BaseState implements IState {
     protected void onTextModified() {
         _context.apply();
     }
-
-    public void onFocus() {}
 
     public void onFocusLost() {}
 }

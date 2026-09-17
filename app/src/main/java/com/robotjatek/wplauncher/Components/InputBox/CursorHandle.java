@@ -14,7 +14,7 @@ import com.robotjatek.wplauncher.QuadRenderer;
 public class CursorHandle implements UIElement {
     private final float[] _modelMatrix = new float[16];
     private final InputBox _parent;
-    private final Size<Integer> _size = new Size<>(200, 100); // TODO: size
+    private final Size<Integer> _size = new Size<>(200, 100);
     private boolean _visible = true;
     private float _initialFingerX;
     private float _initialCursorX;

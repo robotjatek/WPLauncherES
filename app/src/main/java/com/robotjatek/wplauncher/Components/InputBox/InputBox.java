@@ -163,18 +163,13 @@ public class InputBox implements UIElement, ITextInputHandler {
     }
 
     @Override
-    public void onComposingText(String text) {
-        _state.onComposingText(text);
-    }
-
-    @Override
     public void onBackspace() {
         _state.onBackspace();
     }
 
     @Override
-    public void onFocus() {
-        _state.onFocus();
+    public void replaceText(int start, int end, String text) {
+        _state.replaceText(start, end, text);
     }
 
     @Override
@@ -202,6 +197,7 @@ public class InputBox implements UIElement, ITextInputHandler {
         return _cursorPosition;
     }
 
+    @Override
     public void setCursorPosition(int position) {
         _cursorPosition = position;
         _isDirty = true;
@@ -215,16 +211,6 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public void incrementCursorPosition() {
         _state.incrementCursorPosition();
-    }
-
-    public String replaceComposing(String base, String composing) {
-        int i = 0;
-        while (i < base.length() &&
-                i < composing.length() &&
-                base.charAt(i) == composing.charAt(i)) {
-            i++;
-        }
-        return base.substring(0, i) + composing.substring(i);
     }
 
     public void apply() {
@@ -252,6 +238,7 @@ public class InputBox implements UIElement, ITextInputHandler {
         if (!_disposed) {
             _borderLayout.dispose();
             _handle.dispose();
+            _cursor.dispose();
             _disposed = true;
         }
     }

@@ -34,11 +34,12 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     private final GestureDetector _gestureDetector;
     private final IUIContext _uiContext = this;
     private ITextInputHandler _focusedInputHandler = null;
-    private final ScreenNavigator _navigator = new ScreenNavigator();
+    private CustomInputConnection _currentInputConnection = null;
 
     public LauncherSurfaceView(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, MediaService mediaService, AppChangeReceiver appChangeReceiver) {
         super(context);
-        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, mediaService, appChangeReceiver, _navigator, this);
+        var navigator = new ScreenNavigator();
+        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, mediaService, appChangeReceiver, navigator, this);
         _gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
            @Override
@@ -157,13 +158,13 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     public InputConnection onCreateInputConnection(@NonNull EditorInfo outAttrs) {
         outAttrs.inputType = InputType.TYPE_CLASS_TEXT;
         outAttrs.imeOptions = EditorInfo.IME_ACTION_DONE;
-        return new CustomInputConnection(this);
+        _currentInputConnection = new CustomInputConnection(this);
+        return _currentInputConnection;
     }
 
     @Override
     public void requestFocus(ITextInputHandler element) {
         _focusedInputHandler = element;
-        element.onFocus();
         post(() -> {
             requestFocus();
             var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -183,6 +184,20 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
             var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getWindowToken(), 0);
         });
+    }
+
+    @Override
+    public void onSelectionChanged(ITextInputHandler element) {
+        if (_focusedInputHandler == element) {
+            var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            var pos = element.getCursorPosition();
+            int cStart = -1, cEnd = -1;
+            if (_currentInputConnection != null) {
+                cStart = _currentInputConnection.getComposingStart();
+                cEnd = _currentInputConnection.getComposingEnd();
+            }
+            imm.updateSelection(this, pos, pos, cStart, cEnd);
+        }
     }
 
     @Override

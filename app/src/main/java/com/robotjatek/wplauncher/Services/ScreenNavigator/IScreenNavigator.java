@@ -3,9 +3,7 @@ package com.robotjatek.wplauncher.Services.ScreenNavigator;
 import androidx.annotation.NonNull;
 
 import com.robotjatek.wplauncher.Components.Modal.IModal;
-import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IScreen;
-import com.robotjatek.wplauncher.TileGrid.Position;
 
 public interface IScreenNavigator {
 

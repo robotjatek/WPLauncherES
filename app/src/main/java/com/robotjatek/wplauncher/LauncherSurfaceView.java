@@ -89,17 +89,62 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
 
+    private int _activePointerId = -1;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        var x = event.getX();
-        var y = event.getY();
+        _gestureDetector.onTouchEvent(event);
 
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_UP -> queueEvent(() -> _renderer.handleGesture(new UpGesture(x, y, this)));
-            case MotionEvent.ACTION_MOVE -> queueEvent(() -> _renderer.handleGesture(new MoveGesture(x, y, this)));
+        var action = event.getActionMasked();
+        var index = event.getActionIndex();
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN -> {
+                _activePointerId = event.getPointerId(0);
+                var x = event.getX(0);
+                var y = event.getY(0);
+                queueEvent(() -> _renderer.handleGesture(new DownGesture(x, y, this)));
+            }
+            case MotionEvent.ACTION_POINTER_DOWN -> {
+            }
+            case MotionEvent.ACTION_MOVE -> {
+                if (_activePointerId != -1) {
+                    var pointerIndex = event.findPointerIndex(_activePointerId);
+                    if (pointerIndex != -1) {
+                        var x = event.getX(pointerIndex);
+                        var y = event.getY(pointerIndex);
+                        queueEvent(() -> _renderer.handleGesture(new MoveGesture(x, y, this)));
+                    }
+                }
+            }
+            case MotionEvent.ACTION_POINTER_UP -> {
+                var upId = event.getPointerId(index);
+                // send UpGesture for the lifted pointer so targets receive onUp
+                var upX = event.getX(index);
+                var upY = event.getY(index);
+                queueEvent(() -> _renderer.handleGesture(new UpGesture(upX, upY, this)));
+
+                if (upId == _activePointerId) {
+                    if (event.getPointerCount() > 1) {
+                        var newIndex = index == 0 ? 1 : 0;
+                        _activePointerId = event.getPointerId(newIndex);
+                        var x = event.getX(newIndex);
+                        var y = event.getY(newIndex);
+                        queueEvent(() -> _renderer.handleGesture(new MoveGesture(x, y, this)));
+                    } else {
+                        _activePointerId = -1;
+                    }
+                }
+            }
+            case MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                var pointerIndex = event.findPointerIndex(_activePointerId);
+                var x = (pointerIndex != -1) ? event.getX(pointerIndex) : event.getX();
+                var y = (pointerIndex != -1) ? event.getY(pointerIndex) : event.getY();
+                queueEvent(() -> _renderer.handleGesture(new UpGesture(x, y, this)));
+                _activePointerId = -1;
+            }
         }
 
-        _gestureDetector.onTouchEvent(event);
         return true;
     }
 

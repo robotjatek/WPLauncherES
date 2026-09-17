@@ -27,6 +27,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+// TODO: add tile adorners to the new overlay later too
 public class ScreenNavigator implements IScreenNavigator, IOverlay {
 
     public IState IDLE_STATE() {
@@ -91,7 +92,7 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
 
         if (_animatedScreen != null) {
             Matrix.setIdentityM(_model, 0);
-            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
+            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, -1);
 
             renderer.pushLayers(100);
             _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), size);
@@ -146,10 +147,27 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
     }
 
     public void handleGesture(Gesture gesture) {
+        if (_locked != null) {
+            _locked.handleGesture(gesture);
+            return;
+        }
+
         if (_overlay.handleGesture(gesture)) {
             return;
         }
         _state.handleGesture(gesture);
+    }
+
+    private UIElement _locked;
+
+    @Override
+    public void lockGestures(UIElement element) {
+        _locked = element;
+    }
+
+    @Override
+    public void unlockGestures() {
+        _locked = null;
     }
 
     @Override

@@ -13,4 +13,6 @@ public interface IOverlay {
      * Removes an adorner. If not present, nothing happens.
      */
     void removeAdorner(UIElement element);
+    void lockGestures(UIElement element);
+    void unlockGestures();
 }

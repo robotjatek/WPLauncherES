@@ -20,7 +20,6 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.function.Consumer;
 
-// TODO: make inputbox to route all gestures to it
 public class InputBox implements UIElement, ITextInputHandler {
 
     private static final int BORDER_SIZE_PX = 4; // TODO: make this density aware
@@ -46,7 +45,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     public BaseState IDLE_STATE() {
         return new IdleState(this);
     }
-    public BaseState ACTIVE_STATE(IUIContext iuiContext) { return new ActiveState(this, iuiContext); }
+    public BaseState ACTIVE_STATE(IUIContext uiContext) { return new ActiveState(this, uiContext); }
     private BaseState _state = IDLE_STATE();
 
     public InputBox(String placeholder, Consumer<String> onTextChanged, IOverlay overlay) {

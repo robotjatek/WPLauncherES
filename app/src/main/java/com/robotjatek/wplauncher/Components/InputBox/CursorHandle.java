@@ -10,11 +10,11 @@ import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 
-// TODO: move handler? States?
-// TODO: only show when....
+// TODO: States?
+// TODO: only show after double tap
 // TODO: make the gesture boundaries larger than the visual boundaries
-// TODO: align its center to the cursor
 // TODO: add tile adorners to the new overlay later too
+// TODO: add the ability for UIElements or layouts to completely consume all touch events
 public class CursorHandle implements UIElement {
     private final float[] _modelMatrix = new float[16];
     private final InputBox _parent;
@@ -31,8 +31,8 @@ public class CursorHandle implements UIElement {
         if (_visible) {
             var x = drawContext.xOf(this);
             var y = drawContext.yOf(this);
-            var w = (int) drawContext.widthOf(this);
-            var h = (int) drawContext.heightOf(this);
+            var w = drawContext.widthOf(this);
+            var h = drawContext.heightOf(this);
 
             Matrix.setIdentityM(_modelMatrix, 0);
             Matrix.translateM(_modelMatrix, 0, x, y, 0f);
@@ -61,11 +61,27 @@ public class CursorHandle implements UIElement {
     @Override
     public boolean handleMove(MoveGesture gesture) {
         var dx = gesture.getX() - _startX;
-        var newPosition = _parent.getCursorPosition() + dx;
-        if (newPosition != _parent.getCursorPosition()) {
-            _parent.setCursorPosition(newPosition);
-        }
+        applyMovementToCursorPosition(dx);
         return true;
+    }
+
+    /**
+     * Apply the gesture to the cursor position:
+     * - get the current cursor X
+     * - add dx to currentX
+     * - calculate the new cursor position based on the newX
+     * - compare new cursor position with the current cursor position
+     * - if they are different, set the new cursor position
+     */
+    private void applyMovementToCursorPosition(float dx) {
+        var currentX = _parent.getCursorXOnCurrentPosition();
+        if (Math.abs(dx) > 0) {
+            var newX = currentX + dx;
+            var newCursorPosition = _parent.calculateCursorPositionOnX(newX);
+            if (newCursorPosition != _parent.getCursorPosition()) {
+                _parent.setCursorPositionWithXPosition(newX);
+            }
+        }
     }
 
     @Override

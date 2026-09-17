@@ -189,6 +189,8 @@ Feature-creep!
 - [x] Input box cursor
   - [x] Proper cursor in the textbox
   - [x] Draggable cursor
+  - [x] Top level overlay for adorners
+  - [ ] Fix: InputBox cursor behavior is different on the emulator then on real hardware (onComposingText etc...)
 - [x] Modal
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
@@ -235,6 +237,7 @@ Creep got too big
 - [ ] 6 column mode setting
 - [ ] Make checkbox use higher level components (then kill TileUtil.java)
 - [ ] Show weather icon on the Glance tile
+- [ ] Add tile adorners to the top level overlay
 
 ### M5.5
 

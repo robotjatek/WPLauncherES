@@ -18,6 +18,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.function.Consumer;
 
+// TODO: make inputbox to route all gestures to it
 public class InputBox implements UIElement, ITextInputHandler {
 
     private static final int BORDER_SIZE_PX = 4; // TODO: make this density aware
@@ -125,7 +126,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public boolean handleDown(DownGesture gesture) {
         if (_focused) {
-            setCursorPosition(gesture.getX());
+            setCursorPositionWithXPosition(gesture.getX());
             return true;
         }
         return false;
@@ -134,33 +135,36 @@ public class InputBox implements UIElement, ITextInputHandler {
     @Override
     public boolean handleMove(MoveGesture gesture) {
         if (_focused) {
-            setCursorPosition(gesture.getX());
+            setCursorPositionWithXPosition(gesture.getX());
             return true;
         }
         return false;
     }
 
-    public void setCursorPosition(float x) {
+    public void setCursorPositionWithXPosition(float x) {
+        _cursorPosition = calculateCursorPositionOnX(x);
+        _isDirty = true;
+    }
+
+    public int calculateCursorPositionOnX(float x) {
         var insideX = x - _textStartX;
         if (insideX <= 0) {
-            _cursorPosition = 0;
-            _isDirty = true;
-            return;
+            return 0;
         }
 
         for (var i = 0; i < _text.length(); i++) {
             var measured = _paint.measureText(_text, 0, i);
             if (measured >= insideX) {
                 var prev = i > 0 ? _paint.measureText(_text, 0, i - 1) : 0;
-                _cursorPosition = (insideX - prev < measured - insideX) ? i - 1 : i;
-                _isDirty = true;
-                return;
+                return (insideX - prev < measured - insideX) ? i - 1 : i;
             }
         }
 
-        // text is shorter than the tap position
-        _cursorPosition = _text.length();
-        _isDirty = true;
+        return _text.length(); // text is shorter than the tap position
+    }
+
+    public float getCursorXOnCurrentPosition() {
+        return _textStartX + measureTextAtCursorPosition(_text);
     }
 
     private float measureTextAtCursorPosition(String text) {

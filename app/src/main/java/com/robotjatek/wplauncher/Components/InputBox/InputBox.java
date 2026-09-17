@@ -31,6 +31,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final AbsoluteLayout _layout = new AbsoluteLayout();
     private int _cursorPosition = 0;
     private boolean _showCursor = false;
+    private boolean _showHandle = false;
     private final Cursor _cursor = new Cursor();
     private final CursorHandle _handle = new CursorHandle(this);
     private final Label _label;
@@ -87,10 +88,15 @@ public class InputBox implements UIElement, ITextInputHandler {
             _layout.removeChild(_label);
             _layout.addChild(_label, new Position<>(TEXT_OFFSET, (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f));
 
+            var cursorPosition = new Position<>(TEXT_OFFSET + measureTextAtCursorPosition(_text),
+                    (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f);
             if (_showCursor) {
-                var cursorPosition = new Position<>(TEXT_OFFSET + measureTextAtCursorPosition(_text),
-                        (h-BORDER_SIZE_PX*2f)/2f - _label.measure().height() / 2f);
                 _layout.setChildPosition(_cursor, cursorPosition);
+            }
+
+            if (_overlay != null && _showHandle) {
+                var p = new Position<>(x + BORDER_SIZE_PX + cursorPosition.x() - _handle.measure().width() / 2f, y + h);
+                _overlay.setAdornerAt(_handle, p);
             }
 
             _isDirty = false;
@@ -100,6 +106,12 @@ public class InputBox implements UIElement, ITextInputHandler {
 
     public void showCursor(boolean show) {
         _showCursor = show;
+        _isDirty = true;
+    }
+
+    public void showHandle(boolean show) {
+        _showHandle = show;
+        _isDirty = true;
     }
 
     public Cursor getCursor() {
@@ -243,6 +255,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     public void dispose() {
         if (!_disposed) {
             _borderLayout.dispose();
+            _handle.dispose();
             _disposed = true;
         }
     }

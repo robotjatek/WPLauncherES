@@ -38,6 +38,8 @@ public class ActiveState extends BaseState {
         _uiContext.requestFocus(_context);
         _context.getCursor().setVisible(true);
         _context.showCursor(true);
+        _context.getHandle().setVisible(true);
+        _context.showHandle(true);
     }
 
     @Override
@@ -45,6 +47,7 @@ public class ActiveState extends BaseState {
         super.exit();
         _context.getCursor().setVisible(false);
         _context.showCursor(false);
+        _context.showHandle(false);
         _context.getHandle().setVisible(false);
         _context.getOverlay().removeAdorner(_context.getHandle());
     }

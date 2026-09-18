@@ -19,7 +19,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class Button implements UIElement, ITouchable {
 
-    private static final int BORDER_SIZE_PX = 4;
+    private static final int BORDER_SIZE_PX = 4; // TODO: make this DP aware
     private final TouchHandler _touchHandler = new TouchHandler(this);
     private boolean _disposed = false;
     private Runnable _onTap;
@@ -53,7 +53,7 @@ public class Button implements UIElement, ITouchable {
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
             _borderLayout.addChild(_layout, new Position<>((float)BORDER_SIZE_PX, (float)BORDER_SIZE_PX));
 
-            var textOffset = 16f;
+            var textOffset = 16f; // TODO: DP aware
             _layout.removeChild(_label);
 
             if (_icon != null) {

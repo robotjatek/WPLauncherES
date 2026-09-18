@@ -176,10 +176,10 @@ Try it at your own risk
 
 Feature-creep!
 
-- [ ] More live-tiles
+- [x] More live-tiles
   - [x] Photos
   - [x] Weather
-- [ ] Light mode/Dark mode support
+- [x] Light mode/Dark mode support
   - [ ] Dropdown
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation

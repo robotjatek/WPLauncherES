@@ -4,10 +4,12 @@ import android.graphics.Typeface;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
+import com.robotjatek.wplauncher.Components.Dropdown.Dropdown;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.Spacer.Spacer;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
@@ -23,6 +25,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
     private final Button _colorPickerBtn;
+    private final Dropdown _backgroundDropDown;
     private Icon _icon;
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
@@ -48,8 +51,11 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
                     navigator.push(colorPickerScreen);
                 });
         _layout.addChild(_colorPickerBtn);
+        _layout.addChild(new Spacer(0, 48));
 
-        // TODO: Light/Dark mode selector
+        _layout.addChild(new Label("Background color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
+        _backgroundDropDown = new Dropdown(new Size<>(0, 100));
+        _layout.addChild(_backgroundDropDown);
     }
 
     @Override

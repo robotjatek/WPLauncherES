@@ -1,8 +1,9 @@
 package com.robotjatek.wplauncher.Components.InputBox;
 
+import android.graphics.drawable.Drawable;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.DownGesture;
@@ -10,19 +11,22 @@ import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.TileUtil;
 
 public class CursorHandle implements UIElement {
     private final float[] _modelMatrix = new float[16];
     private final InputBox _parent;
-    private final Size<Integer> _size = new Size<>(200, 100);
+    private final Size<Integer> _size = new Size<>(200, 100); // Bounding box of the handle
     private boolean _visible = true;
     private float _initialFingerX;
     private float _initialCursorX;
     private boolean _draggingStarted = false;
     private static final float TOUCH_DELAY = 20f;
+    private final int _textureId;
 
-    public CursorHandle(InputBox parent) {
+    public CursorHandle(InputBox parent, Drawable icon) {
         _parent = parent;
+        _textureId = BitmapUtil.createTextureFromDrawable(icon, 96, 96);
     }
 
     @Override
@@ -31,18 +35,17 @@ public class CursorHandle implements UIElement {
             var x = drawContext.xOf(this);
             var y = drawContext.yOf(this);
             var w = drawContext.widthOf(this);
-            var h = drawContext.heightOf(this);
 
-            var handleW = w / 15f;
-            var handleH = h / 2f;
-            var handleX = x + (w / 2f) - (handleW / 2f);
+            // Visual size of the handle
+            var handleSize = w / 4f;
+            var handleX = x + (w / 2f) - (handleSize / 2f); // positioned in the center of the bounding area
 
             Matrix.setIdentityM(_modelMatrix, 0);
-            Matrix.translateM(_modelMatrix, 0, handleX, y, 0f);
-            Matrix.scaleM(_modelMatrix, 0, handleW, handleH, 1f);
+            Matrix.translateM(_modelMatrix, 0, handleX, y - handleSize / 2f, 0f);
+            Matrix.scaleM(_modelMatrix, 0, handleSize, handleSize, 1f);
             Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
 
-            renderer.drawFlat(proj, _modelMatrix, Colors.WHITE); // TODO: something textured;
+            renderer.draw(proj, _modelMatrix, _textureId);
         }
     }
 
@@ -86,5 +89,8 @@ public class CursorHandle implements UIElement {
 
     @Override
     public void dispose() {
+        if (_textureId > 0) {
+            TileUtil.deleteTexture(_textureId);
+        }
     }
 }

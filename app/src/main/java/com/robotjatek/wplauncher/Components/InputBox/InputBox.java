@@ -1,7 +1,10 @@
 package com.robotjatek.wplauncher.Components.InputBox;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Typeface;
+
+import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.InputBox.States.ActiveState;
@@ -15,6 +18,7 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.IUIContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IOverlay;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
@@ -32,7 +36,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     private boolean _showCursor = false;
     private boolean _showHandle = false;
     private final Cursor _cursor = new Cursor();
-    private final CursorHandle _handle = new CursorHandle(this);
+    private final CursorHandle _handle;
     private final Label _label;
     private String _text = "";
     private float _textStartX = 0;
@@ -48,10 +52,12 @@ public class InputBox implements UIElement, ITextInputHandler {
     public BaseState ACTIVE_STATE(IUIContext uiContext) { return new ActiveState(this, uiContext); }
     private BaseState _state = IDLE_STATE();
 
-    public InputBox(String placeholder, Consumer<String> onTextChanged, IOverlay overlay) {
+    public InputBox(String placeholder, Consumer<String> onTextChanged, IOverlay overlay, Context context) {
         _placeholder = placeholder;
         _onTextChanged = onTextChanged;
         _overlay = overlay;
+        var handleIcon = ContextCompat.getDrawable(context, R.drawable.ic_cursor_handle);
+        _handle = new CursorHandle(this, handleIcon);
 
         _label = new Label(_placeholder, 48, Typeface.BOLD, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
         _paint.setTypeface(_label.getTypeFace());

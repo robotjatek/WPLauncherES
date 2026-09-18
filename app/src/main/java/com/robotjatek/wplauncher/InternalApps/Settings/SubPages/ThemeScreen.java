@@ -25,7 +25,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
     private final Button _colorPickerBtn;
-    private final Dropdown _backgroundDropDown;
+    private final Dropdown _backgroundDropdown;
     private Icon _icon;
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
@@ -54,8 +54,8 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         _layout.addChild(new Spacer(0, 48));
 
         _layout.addChild(new Label("Background color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
-        _backgroundDropDown = new Dropdown(new Size<>(0, 100));
-        _layout.addChild(_backgroundDropDown);
+        _backgroundDropdown = new Dropdown(new Size<>(0, 100));
+        _layout.addChild(_backgroundDropdown);
     }
 
     @Override

@@ -52,7 +52,7 @@ public class Dropdown implements UIElement, ITouchable {
             var textOffset = 16f; // TODO: DP aware
             _layout.removeChild(_layout);
             _layout.addChild(_label,
-                    new Position<>(textOffset, (h - BORDER_SIZE_PX * 2f) /2f - _label.measure().height() / 2f));
+                    new Position<>(textOffset, (h - BORDER_SIZE_PX * 2f) / 2f - _label.measure().height() / 2f));
             _isDirty = false;
         }
 
@@ -84,13 +84,11 @@ public class Dropdown implements UIElement, ITouchable {
 
     @Override
     public void onPress() {
-        // press anim
         _layout.setBgColor(Colors.WHITE);
     }
 
     @Override
     public void onRelease() {
-        // release anim
         _layout.setBgColor(Colors.BLACK);
     }
 

@@ -44,6 +44,10 @@ public class AbsoluteLayout implements ILayout {
     }
 
     public void setChildPosition(UIElement element, Position<Float> position) {
+        if (!isPresent(element)) {
+            addChild(element, position);
+        }
+
         for (var child : _positionedElements) {
             if (child._element == element) {
                 child._position = position;
@@ -51,6 +55,14 @@ public class AbsoluteLayout implements ILayout {
                 return;
             }
         }
+    }
+
+    private boolean isPresent(UIElement element) {
+        return _positionedElements.stream().anyMatch(x -> x._element == element);
+    }
+
+    public boolean hasContent() {
+        return !_positionedElements.isEmpty();
     }
 
     public void setBgColor(int bgColor) {

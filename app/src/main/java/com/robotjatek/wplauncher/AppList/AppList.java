@@ -22,6 +22,7 @@ import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.StartScreen.IPageNavigator;
 import com.robotjatek.wplauncher.TileGrid.Position;
@@ -48,7 +49,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     public AppList(Context context, IPageNavigator navigator, TileService tileService,
                    InternalAppsService internalAppsService, SettingsService settingsService,
-                   AppChangeReceiver appChangeReceiver) {
+                   AppChangeReceiver appChangeReceiver, ScreenNavigator screenNavigator) {
         _context = context;
         _navigator = navigator;
         _tileService = tileService;
@@ -56,7 +57,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _settingsService.subscribe(this);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_list);
 
-        _searchBox = new InputBox("Search", this::onSearchTextChanged);
+        _searchBox = new InputBox("Search", this::onSearchTextChanged, screenNavigator, context);
         _layout.addChild(_searchBox);
         _layout.addChild(_list);
 

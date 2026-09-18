@@ -5,9 +5,11 @@ import android.opengl.Matrix;
 import androidx.annotation.NonNull;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Modal.IModal;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.IState;
@@ -25,7 +27,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class ScreenNavigator implements IScreenNavigator {
+// TODO: add tile adorners to the new overlay later too
+public class ScreenNavigator implements IScreenNavigator, IOverlay {
 
     public IState IDLE_STATE() {
         return new IdleState(this);
@@ -57,6 +60,7 @@ public class ScreenNavigator implements IScreenNavigator {
     private int _height = -1;
     private final float[] _model = new float[16];
     private final StackLayout _fullscreen = new StackLayout();
+    private final AbsoluteLayout _overlay = new AbsoluteLayout();
 
     public ScreenNavigator() {
         _fullscreen.setBgColor(Colors.BLACK);
@@ -80,17 +84,19 @@ public class ScreenNavigator implements IScreenNavigator {
         executeCommands();
         _state.update(delta);
 
-        Matrix.setIdentityM(_model, 0);
-        _navigationStack.getFirst().draw(delta, proj, _model, renderer);
-        renderer.clearDepthBuffer(); // clearing the depth buffer, so the animated screen stays on top of everything else
+        var size = new Size<>(_width, _height);
+        if (!_navigationStack.isEmpty()) {
+            Matrix.setIdentityM(_model, 0);
+            _navigationStack.getFirst().draw(delta, proj, _model, renderer);
+        }
 
         if (_animatedScreen != null) {
             Matrix.setIdentityM(_model, 0);
-            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, -1f);
+            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, -1);
 
             renderer.pushLayers(100);
-            _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), new Size<>(_width, _height));
-            _animatedScreen.draw(delta,  proj, _model, renderer);
+            _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), size);
+            _animatedScreen.draw(delta, proj, _model, renderer);
             renderer.popLayers(100);
         }
 
@@ -101,6 +107,13 @@ public class ScreenNavigator implements IScreenNavigator {
             renderer.drawFlat(proj, _model, 0x88050505);
             _modal.draw(delta, proj, renderer);
             renderer.popLayers(200);
+        }
+
+        if (_overlay.hasContent()) {
+            Matrix.setIdentityM(_model, 0);
+            renderer.pushLayers(300);
+            _overlay.draw(delta, proj, _model, renderer, Position.ZERO, size);
+            renderer.popLayers(300);
         }
     }
 
@@ -134,7 +147,27 @@ public class ScreenNavigator implements IScreenNavigator {
     }
 
     public void handleGesture(Gesture gesture) {
+        if (_locked != null) {
+            _locked.handleGesture(gesture);
+            return;
+        }
+
+        if (_overlay.handleGesture(gesture)) {
+            return;
+        }
         _state.handleGesture(gesture);
+    }
+
+    private UIElement _locked;
+
+    @Override
+    public void lockGestures(UIElement element) {
+        _locked = element;
+    }
+
+    @Override
+    public void unlockGestures() {
+        _locked = null;
     }
 
     @Override
@@ -168,6 +201,7 @@ public class ScreenNavigator implements IScreenNavigator {
         _width = width;
         _height = height;
         _navigationStack.forEach(s -> s.onResize(width, height));
+        _overlay.onResize(width, height);
     }
 
     @Override
@@ -211,6 +245,16 @@ public class ScreenNavigator implements IScreenNavigator {
         return _navigationStack.getFirst();
     }
 
+    @Override
+    public void setAdornerAt(UIElement element, Position<Float> position) {
+        _overlay.setChildPosition(element, position);
+    }
+
+    @Override
+    public void removeAdorner(UIElement element) {
+        _overlay.removeChild(element);
+    }
+
     private void executeCommands() {
         Runnable command;
         while ((command = _commands.poll()) != null) {
@@ -225,6 +269,7 @@ public class ScreenNavigator implements IScreenNavigator {
             _modal = null;
             _fullscreen.dispose();
         }
+        _overlay.dispose();
         _navigationStack.clear();
     }
 }

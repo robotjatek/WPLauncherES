@@ -8,13 +8,13 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
-import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.LauncherSurfaceView;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.InternalAppsService;
 import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.Services.LocationService;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 import com.robotjatek.wplauncher.StartScreen.States.ChildControlState;
@@ -81,7 +81,7 @@ public class StartScreen implements IPageNavigator, IScreen {
     private final LauncherSurfaceView _view;
 
     public StartScreen(Context context,
-                       IScreenNavigator navigator,
+                       ScreenNavigator navigator,
                        LocationService locationService,
                        PermissionService permissionService,
                        WeatherService weatherService,
@@ -93,7 +93,7 @@ public class StartScreen implements IPageNavigator, IScreen {
         _internalAppsService = new InternalAppsService(context, _settingsService, permissionService, navigator);
         _tileService = new TileService(context, _internalAppsService, _settingsService, locationService, weatherService, mediaService);
         _tileGrid = new TileGrid(_tileService, context, appChangeReceiver);
-        _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService, appChangeReceiver);
+        _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService, appChangeReceiver, navigator);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
         _view = view;
     }

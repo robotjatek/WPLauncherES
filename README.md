@@ -177,18 +177,18 @@ Try it at your own risk
 Feature-creep!
 
 - [ ] More live-tiles
-  - [ ] Tasks
   - [x] Photos
   - [x] Weather
-  - [ ] Step counter
 - [ ] Light mode/Dark mode support
   - [ ] Dropdown
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
-- [ ] Input box cursor
+- [x] Input box cursor
   - [x] Proper cursor in the textbox
-  - [ ] Draggable cursor
+  - [x] Draggable cursor
+  - [x] Top level overlay for adorners
+  - [x] Fix: InputBox cursor behavior is different on the emulator then on real hardware (onComposingText etc...)
 - [x] Modal
 - [x] Animate modal open/close
 - [x] StackLayout horizontal orientation
@@ -220,11 +220,15 @@ Cleaning up the accumulated mess
 - [ ] TextBlock wrapping: never start a new line with space
 - [ ] Discard keyboard on tapping outside the input box
 - [ ] Fix: Scroll/drag lags behind finger movement
+- [ ] Fix: Pressed state stuck when a swipe starts while being pressed
 
 ### M5 - Beta 2
 
 Creep got too big
 
+- [ ] More live tiles
+  - [ ] Tasks
+  - [ ] Step Counter
 - [ ] Device resolution independent UI (https://developer.android.com/training/multiscreen/screendensities)
   - [ ] Make dragging in edit mode density aware
 - [ ] Animate context menu
@@ -235,6 +239,7 @@ Creep got too big
 - [ ] 6 column mode setting
 - [ ] Make checkbox use higher level components (then kill TileUtil.java)
 - [ ] Show weather icon on the Glance tile
+- [ ] Add tile adorners to the top level overlay
 
 ### M5.5
 
@@ -252,6 +257,7 @@ Can we release now, pls?
 - [ ] Group apps by the first letter in the app list
 - [ ] Application icon
 - [ ] Privacy policy
+- [ ] Lower min API level / raise target API level
 - [ ] License
 - [ ] Generic pivot view (tabbed view)
   - [ ] Settings subpages use pivot view with one tab

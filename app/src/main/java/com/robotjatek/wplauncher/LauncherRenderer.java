@@ -32,15 +32,18 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private int _width, _height;
     private boolean _needsResize = false;
     private final LauncherSurfaceView _view;
-    private final ScreenNavigator _navigator = new ScreenNavigator();
+    private final ScreenNavigator _navigator;
 
-    public LauncherRenderer(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, MediaService mediaService, AppChangeReceiver appChangeReceiver, LauncherSurfaceView view) {
+    public LauncherRenderer(Context context, LocationService locationService, PermissionService permissionService,
+                            WeatherService weatherService, MediaService mediaService, AppChangeReceiver appChangeReceiver,
+                            ScreenNavigator navigator, LauncherSurfaceView view) {
         _context = context;
         _locationService = locationService;
         _permissionService = permissionService;
         _weatherService = weatherService;
         _mediaService = mediaService;
         _appChangeReceiver = appChangeReceiver;
+        _navigator = navigator;
         _view = view;
     }
 
@@ -87,6 +90,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         }
         GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT | GLES32.GL_STENCIL_BUFFER_BIT);
         GLES32.glDisable(GLES32.GL_STENCIL_TEST);
+        _renderer.resetOffset();
         _navigator.draw(delta, _projMatrix, _renderer);
     }
 

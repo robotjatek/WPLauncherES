@@ -24,6 +24,7 @@ import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 
 public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
@@ -33,10 +34,12 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     private final GestureDetector _gestureDetector;
     private final IUIContext _uiContext = this;
     private ITextInputHandler _focusedInputHandler = null;
+    private CustomInputConnection _currentInputConnection = null;
 
     public LauncherSurfaceView(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, MediaService mediaService, AppChangeReceiver appChangeReceiver) {
         super(context);
-        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, mediaService, appChangeReceiver, this);
+        var navigator = new ScreenNavigator();
+        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, mediaService, appChangeReceiver, navigator, this);
         _gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
            @Override
@@ -87,17 +90,62 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
         setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
 
+    private int _activePointerId = -1;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        var x = event.getX();
-        var y = event.getY();
+        _gestureDetector.onTouchEvent(event);
 
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_UP -> queueEvent(() -> _renderer.handleGesture(new UpGesture(x, y, this)));
-            case MotionEvent.ACTION_MOVE -> queueEvent(() -> _renderer.handleGesture(new MoveGesture(x, y, this)));
+        var action = event.getActionMasked();
+        var index = event.getActionIndex();
+
+        switch (action) {
+            case MotionEvent.ACTION_DOWN -> {
+                _activePointerId = event.getPointerId(0);
+                var x = event.getX(0);
+                var y = event.getY(0);
+                queueEvent(() -> _renderer.handleGesture(new DownGesture(x, y, this)));
+            }
+            case MotionEvent.ACTION_POINTER_DOWN -> {
+            }
+            case MotionEvent.ACTION_MOVE -> {
+                if (_activePointerId != -1) {
+                    var pointerIndex = event.findPointerIndex(_activePointerId);
+                    if (pointerIndex != -1) {
+                        var x = event.getX(pointerIndex);
+                        var y = event.getY(pointerIndex);
+                        queueEvent(() -> _renderer.handleGesture(new MoveGesture(x, y, this)));
+                    }
+                }
+            }
+            case MotionEvent.ACTION_POINTER_UP -> {
+                var upId = event.getPointerId(index);
+                // send UpGesture for the lifted pointer so targets receive onUp
+                var upX = event.getX(index);
+                var upY = event.getY(index);
+                queueEvent(() -> _renderer.handleGesture(new UpGesture(upX, upY, this)));
+
+                if (upId == _activePointerId) {
+                    if (event.getPointerCount() > 1) {
+                        var newIndex = index == 0 ? 1 : 0;
+                        _activePointerId = event.getPointerId(newIndex);
+                        var x = event.getX(newIndex);
+                        var y = event.getY(newIndex);
+                        queueEvent(() -> _renderer.handleGesture(new MoveGesture(x, y, this)));
+                    } else {
+                        _activePointerId = -1;
+                    }
+                }
+            }
+            case MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                var pointerIndex = event.findPointerIndex(_activePointerId);
+                var x = (pointerIndex != -1) ? event.getX(pointerIndex) : event.getX();
+                var y = (pointerIndex != -1) ? event.getY(pointerIndex) : event.getY();
+                queueEvent(() -> _renderer.handleGesture(new UpGesture(x, y, this)));
+                _activePointerId = -1;
+            }
         }
 
-        _gestureDetector.onTouchEvent(event);
         return true;
     }
 
@@ -110,13 +158,13 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     public InputConnection onCreateInputConnection(@NonNull EditorInfo outAttrs) {
         outAttrs.inputType = InputType.TYPE_CLASS_TEXT;
         outAttrs.imeOptions = EditorInfo.IME_ACTION_DONE;
-        return new CustomInputConnection(this);
+        _currentInputConnection = new CustomInputConnection(this);
+        return _currentInputConnection;
     }
 
     @Override
     public void requestFocus(ITextInputHandler element) {
         _focusedInputHandler = element;
-        element.onFocus();
         post(() -> {
             requestFocus();
             var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -136,6 +184,20 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
             var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(getWindowToken(), 0);
         });
+    }
+
+    @Override
+    public void onSelectionChanged(ITextInputHandler element) {
+        if (_focusedInputHandler == element) {
+            var imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            var pos = element.getCursorPosition();
+            int cStart = -1, cEnd = -1;
+            if (_currentInputConnection != null) {
+                cStart = _currentInputConnection.getComposingStart();
+                cEnd = _currentInputConnection.getComposingEnd();
+            }
+            imm.updateSelection(this, pos, pos, cStart, cEnd);
+        }
     }
 
     @Override

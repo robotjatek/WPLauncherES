@@ -10,12 +10,14 @@ import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.Spacer.Spacer;
+import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
@@ -29,16 +31,30 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     private Icon _icon;
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
+    private final TextBlock _description = new TextBlock("You can change your phone's background" +
+            " and accent color to match you mood today, this week, or all month",
+            48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT, -1);
 
-    public ThemeScreen(IScreenNavigator navigator, SettingsService settings) {
+    public ThemeScreen(ScreenNavigator navigator, SettingsService settings) {
         _navigator = navigator;
         _settings = settings;
         _layout = new StackLayout();
         _layout.setBgColor(Colors.BLACK);
+
         _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
         _layout.addChild(new Label("theme", 160, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
 
+        _layout.addChild(new Spacer(0, 64));
+        _layout.addChild(_description);
+        _layout.addChild(new Spacer(0, 48));
+
+        _layout.addChild(new Label("Background color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
+        _backgroundDropdown = new Dropdown(new Size<>(0, 100), navigator, (selected) -> {});
+        _layout.addChild(_backgroundDropdown);
+
+        _layout.addChild(new Spacer(0, 48));
+
+        _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
         var color = settings.getAccentColor();
         _icon = new Icon(color.color(), new Size<>(64, 64));
         _colorPickerBtn = new Button(
@@ -51,11 +67,6 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
                     navigator.push(colorPickerScreen);
                 });
         _layout.addChild(_colorPickerBtn);
-        _layout.addChild(new Spacer(0, 48));
-
-        _layout.addChild(new Label("Background color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
-        _backgroundDropdown = new Dropdown(new Size<>(0, 100));
-        _layout.addChild(_backgroundDropdown);
     }
 
     @Override
@@ -71,6 +82,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     @Override
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
+        _description.setMaxWidth(width - StackLayout.DEFAULT_PADDING);
         _layout.onResize(width, height);
     }
 
@@ -93,6 +105,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         if (!_disposed) {
             _layout.dispose();
             _icon.dispose();
+            _description.dispose();
             _disposed = true;
         }
     }

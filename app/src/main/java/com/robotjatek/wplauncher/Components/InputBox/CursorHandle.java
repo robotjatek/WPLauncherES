@@ -4,6 +4,7 @@ import android.graphics.drawable.Drawable;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.DownGesture;
@@ -23,6 +24,7 @@ public class CursorHandle implements UIElement {
     private boolean _draggingStarted = false;
     private static final float TOUCH_DELAY = 20f;
     private final int _textureId;
+    private ILayout _parentLayout;
 
     public CursorHandle(InputBox parent, Drawable icon) {
         _parent = parent;
@@ -85,6 +87,11 @@ public class CursorHandle implements UIElement {
         }
         _parent.setCursorPositionWithXPosition(_initialCursorX + dx);
         return true;
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parentLayout = parent;
     }
 
     @Override

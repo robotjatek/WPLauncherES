@@ -180,7 +180,7 @@ Feature-creep!
   - [x] Photos
   - [x] Weather
 - [x] Light mode/Dark mode support
-  - [ ] Dropdown
+  - [x] Dropdown component
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
@@ -206,6 +206,7 @@ Feature-creep!
 - [x] Fix: tile keeps spinning indefinitely after dismissing the last notification
 - [x] Fix: checkbox label is squashed
 - [x] Fix: Dirty flag is set on tiles on scroll stop
+- [x] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 
 ### M4.5
 
@@ -221,6 +222,9 @@ Cleaning up the accumulated mess
 - [ ] Discard keyboard on tapping outside the input box
 - [ ] Fix: Scroll/drag lags behind finger movement
 - [ ] Fix: Pressed state stuck when a swipe starts while being pressed
+- [ ] Gesture handling is a hot garbage
+- [ ] Show the context menu in the new overlay system
+- [ ] Opening a large crash-log crashes the launcher on texture creation 
 
 ### M5 - Beta 2
 
@@ -280,5 +284,4 @@ Haven't seen these for a while
 
 Nice to have, but I feel no pressure to implement them for now 
 
-- [ ] Layout invalidation when child size changes (call layout() in the parent layout on a component resize)
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)

@@ -5,6 +5,7 @@ import android.graphics.Typeface;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Components.ITouchable;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.Components.UIElement;
@@ -32,6 +33,8 @@ public class Label implements UIElement, ITouchable {
     private final Runnable _onTap;
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final TouchHandler _touchHandler = new TouchHandler(this);
+    private ILayout _parent;
+    private Size<Integer> _size = new Size<>(-1, -1);
 
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
         this(text, textSize, typeFace, textColor, bgColor, -1, null);
@@ -47,6 +50,11 @@ public class Label implements UIElement, ITouchable {
         _onTap = onTap;
         _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
         _paint.setTextAlign(Paint.Align.LEFT);
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     @Override
@@ -153,7 +161,14 @@ public class Label implements UIElement, ITouchable {
 
         var fm = _paint.getFontMetrics();
         var textHeight = fm.descent - fm.ascent;
-        return new Size<>((int)textWidth, (int)textHeight);
+        var size = new Size<>((int)textWidth, (int)textHeight);
+        if (!size.equals(_size)) {
+            _size = size;
+            if (_parent != null) {
+                _parent.layout();
+            }
+        }
+        return size;
     }
 
     public String getText() {

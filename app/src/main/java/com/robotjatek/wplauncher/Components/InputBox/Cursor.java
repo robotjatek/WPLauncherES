@@ -3,6 +3,7 @@ package com.robotjatek.wplauncher.Components.InputBox;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
@@ -13,6 +14,7 @@ public class Cursor implements UIElement {
     private final float[] _modelMatrix = new float[16];
     private Size<Integer> _size = new Size<>(-1, -1);
     private boolean _visible = false;
+    private ILayout _parent;
 
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
@@ -41,7 +43,18 @@ public class Cursor implements UIElement {
     }
 
     public void setSize(Size<Integer> size) {
+        if (_size.equals(size)) {
+            return;
+        }
         _size = size;
+        if (_parent != null) {
+            _parent.layout();
+        }
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     @Override

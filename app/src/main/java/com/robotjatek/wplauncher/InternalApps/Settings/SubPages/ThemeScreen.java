@@ -32,7 +32,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
     private final TextBlock _description = new TextBlock("You can change your phone's background" +
-            " and accent color to match you mood today, this week, or all month",
+            " and accent color to match your mood today, this week, or all month",
             48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT, -1);
 
     public ThemeScreen(ScreenNavigator navigator, SettingsService settings) {

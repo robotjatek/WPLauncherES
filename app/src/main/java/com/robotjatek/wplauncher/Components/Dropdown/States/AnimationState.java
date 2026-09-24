@@ -4,12 +4,12 @@ import com.robotjatek.wplauncher.Components.Dropdown.Dropdown;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IState;
 
-public class AnimationState implements IState {
+public class AnimationState<T> implements IState {
 
-    private final Dropdown _context;
+    private final Dropdown<T> _context;
     private final Size<Integer> _targetSize;
 
-    public AnimationState(Dropdown context, Size<Integer> targetSize) {
+    public AnimationState(Dropdown<T> context, Size<Integer> targetSize) {
         _context = context;
         _targetSize = targetSize;
     }
@@ -19,7 +19,7 @@ public class AnimationState implements IState {
 
     @Override
     public void exit() {
-        _context.setOpen(!_context.getOpen());
+        _context.setOpen(_context.iClosed());
     }
 
     @Override

@@ -51,6 +51,11 @@ public class AbsoluteLayout implements ILayout {
         element.setParent(null);
     }
 
+    public void removeAll() {
+        _positionedElements.forEach(e -> e._element.setParent(null));
+        _positionedElements.clear();
+    }
+
     public void setChildPosition(UIElement element, Position<Float> position) {
         if (!isPresent(element)) {
             addChild(element, position);
@@ -184,11 +189,6 @@ public class AbsoluteLayout implements ILayout {
             }
         }
         return null;
-    }
-
-    public void clear() {
-        _positionedElements.forEach(c -> c._element.dispose());
-        _positionedElements.clear();
     }
 
     @Override

@@ -6,11 +6,11 @@ import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.IState;
 
-public class IdleState implements IState {
+public class IdleState<T> implements IState {
 
-    private final Dropdown _context;
+    private final Dropdown<T> _context;
 
-    public IdleState(Dropdown context) {
+    public IdleState(Dropdown<T> context) {
         _context = context;
     }
 
@@ -27,7 +27,11 @@ public class IdleState implements IState {
 
     @Override
     public boolean handleDown(DownGesture gesture) {
-        _context.getTouchhandler().onDown(gesture.getX(), gesture.getY());
+        if (_context.iClosed()) {
+            _context.getTouchhandler().onDown(gesture.getX(), gesture.getY());
+        } else {
+            _context.getContentLayout().handleGesture(gesture);
+        }
         return true;
     }
 
@@ -39,7 +43,11 @@ public class IdleState implements IState {
 
     @Override
     public boolean handleUp(UpGesture gesture) {
-        _context.getTouchhandler().onUp();
+        if (_context.iClosed()) {
+            _context.getTouchhandler().onUp();
+        } else {
+            _context.getContentLayout().handleGesture(gesture);
+        }
         return true;
     }
 }

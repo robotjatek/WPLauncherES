@@ -21,19 +21,24 @@ import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
+import java.util.Collections;
+import java.util.List;
+
 public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
 
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
     private final Button _colorPickerBtn;
-    private final Dropdown _backgroundDropdown;
+    private final Dropdown<PayloadPlaceholder> _backgroundDropdown; // TODO: make this a Dropdown<Theme>
     private Icon _icon;
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
     private final TextBlock _description = new TextBlock("You can change your phone's background" +
             " and accent color to match your mood today, this week, or all month",
             48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT, -1);
+
+    public record PayloadPlaceholder(String name, List<Integer> something) { } // TODO: remove when theme change is implemented
 
     public ThemeScreen(ScreenNavigator navigator, SettingsService settings) {
         _navigator = navigator;
@@ -48,8 +53,17 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         _layout.addChild(_description);
         _layout.addChild(new Spacer(0, 48));
 
+        var selectedContent = new Label("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0); // TODO: remove when theme change is implemented
+        _layout.addChild(selectedContent);
+
         _layout.addChild(new Label("Background color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
-        _backgroundDropdown = new Dropdown(new Size<>(0, 100), navigator, (selected) -> {});
+        var options = List.of( // TODO: replace with real choices
+                new PayloadPlaceholder("first", Collections.emptyList()),
+                new PayloadPlaceholder("second", Collections.emptyList()),
+                new PayloadPlaceholder("third", Collections.emptyList()));
+        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, PayloadPlaceholder::name, navigator, (selected) -> {
+            selectedContent.setText(selected.name());
+        });
         _layout.addChild(_backgroundDropdown);
 
         _layout.addChild(new Spacer(0, 48));

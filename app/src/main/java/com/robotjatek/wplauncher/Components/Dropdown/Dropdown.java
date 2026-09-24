@@ -60,10 +60,9 @@ public class Dropdown<T> implements UIElement, ITouchable {
         _state.enter();
     }
 
-    // TODO: show the selected element
     // TODO: its time to implement layout clipping?
     // TODO: what to do on focus loss
-    // TODO: the selected label should be in the accent color
+    // TODO: the selected label should be in the accent color when the box is opened
     public Dropdown(Size<Integer> size, List<T> items, Function<T, String> labelSelector, IOverlay overlay, Consumer<T> onChange) {
         _model = items;
         _overlay = overlay;
@@ -86,6 +85,7 @@ public class Dropdown<T> implements UIElement, ITouchable {
         _borderLayout.setBgColor(Colors.WHITE);
         _layout.setBgColor(Colors.BLACK);
         if (!_model.isEmpty()) {
+            _selected = _model.get(0);
             _onChange.accept(_model.get(0));
         }
         _state.enter();
@@ -101,19 +101,19 @@ public class Dropdown<T> implements UIElement, ITouchable {
         var h = (int) drawContext.heightOf(this);
 
         if(_isDirty) {
-            _isDirty = false;
             _borderLayout.removeChild(_layout);
             var contentSize = new Size<>(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
             var itemHeight = _closedSize.height();
             var firstLineCenter = itemHeight / 2f;
             _layout.onResize(contentSize.width(), contentSize.height());
-            _borderLayout.addChild(_layout, new Position<>((float)BORDER_SIZE_PX, (float)BORDER_SIZE_PX));
 
             var textOffset = 16f; // TODO: DP aware
             _layout.removeAll();
             for (var i = 0; i < _labels.size(); i++) {
                 var label = _labels.get(i);
-                var labelY = (i * itemHeight) + firstLineCenter - label.measure().height() / 2f;
+                var closedOffset = _model.isEmpty() ? 0 : _model.indexOf(_selected) * _closedSize.height();
+                var offset = !_open ? 0 : closedOffset;
+                var labelY = (i * itemHeight) + firstLineCenter - label.measure().height() / 2f - offset;
                 _layout.addChild(label, new Position<>(textOffset, labelY));
             }
             _borderLayout.addChild(_layout, new Position<>((float)BORDER_SIZE_PX, (float)BORDER_SIZE_PX));
@@ -162,7 +162,7 @@ public class Dropdown<T> implements UIElement, ITouchable {
         _open = open;
     }
 
-    public boolean iClosed() {
+    public boolean isClosed() {
         return !_open;
     }
 

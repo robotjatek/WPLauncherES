@@ -19,7 +19,7 @@ public class AnimationState<T> implements IState {
 
     @Override
     public void exit() {
-        _context.setOpen(_context.iClosed());
+        _context.setOpen(_context.isClosed());
     }
 
     @Override

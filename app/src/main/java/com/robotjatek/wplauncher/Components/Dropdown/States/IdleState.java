@@ -27,7 +27,7 @@ public class IdleState<T> implements IState {
 
     @Override
     public boolean handleDown(DownGesture gesture) {
-        if (_context.iClosed()) {
+        if (_context.isClosed()) {
             _context.getTouchhandler().onDown(gesture.getX(), gesture.getY());
         } else {
             _context.getContentLayout().handleGesture(gesture);
@@ -43,7 +43,7 @@ public class IdleState<T> implements IState {
 
     @Override
     public boolean handleUp(UpGesture gesture) {
-        if (_context.iClosed()) {
+        if (_context.isClosed()) {
             _context.getTouchhandler().onUp();
         } else {
             _context.getContentLayout().handleGesture(gesture);

@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher.Components.Dropdown;
 
 import android.graphics.Typeface;
+import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Dropdown.States.IdleState;
@@ -40,6 +41,7 @@ public class Dropdown<T> implements UIElement, ITouchable {
     private final IOverlay _overlay; // TODO: this may not be needed at all
     private final Consumer<T> _onChange;
     private boolean _open = false;
+    private final float[] _modelMatrix = new float[16];
     private ILayout _parent;
 
     public IState IDLE_STATE() {
@@ -118,7 +120,12 @@ public class Dropdown<T> implements UIElement, ITouchable {
             _isDirty = false;
         }
 
+        Matrix.setIdentityM(_modelMatrix, 0);
+        Matrix.translateM(_modelMatrix, 0, x, y, 0);
+        Matrix.scaleM(_modelMatrix, 0, w, h, 1);
+        renderer.beginClip(proj, _modelMatrix);
         _borderLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
+        renderer.endClip();
     }
 
     @Override

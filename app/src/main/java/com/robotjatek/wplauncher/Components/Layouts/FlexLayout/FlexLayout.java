@@ -62,6 +62,7 @@ public class FlexLayout implements ILayout {
     private final IDrawContext<UIElement> _itemDrawContext;
     private boolean _dirty = true;
     private int _bgColor = Colors.TRANSPARENT;
+    private ILayout _parent;
 
     public FlexLayout(
             JustifyContent justify,
@@ -71,6 +72,10 @@ public class FlexLayout implements ILayout {
         _align = align;
         _direction = direction;
         _itemDrawContext = new FlexLayoutItemDrawContext(this);
+    }
+
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     public AlignItems getAlign() {
@@ -92,6 +97,7 @@ public class FlexLayout implements ILayout {
 
     public void addChild(UIElement element) {
         _children.add(element);
+        element.setParent(this);
         _dirty = true;
         layout();
     }
@@ -101,10 +107,14 @@ public class FlexLayout implements ILayout {
         _dirty = true;
     }
 
-    private void layout() {
+    @Override
+    public void layout() {
         switch (_direction) {
             case ROW -> layoutRow();
             case COLUMN -> layoutColumn();
+        }
+        if (_parent != null) {
+            _parent.layout();
         }
     }
 
@@ -321,13 +331,24 @@ public class FlexLayout implements ILayout {
         // If we've been explicitly sized, return that
         if (_size.width() != -1 && _size.height() != -1) {
             var s = new Size<>(_size.width(), _size.height());
-            _size = s;
+            if (!s.equals(_size)) {
+                _size = s;
+                if (_parent != null) {
+                    _parent.layout();
+                }
+            }
             return s;
         }
 
         // Otherwise, calculate intrinsic size based on children and direction
         if (_children.isEmpty()) {
-            _size = new Size<>(0, 0);
+            var size = new Size<>(0, 0);
+            if (!size.equals(_size)) {
+                _size = new Size<>(0, 0);
+                if (_parent != null) {
+                    _parent.layout();
+                }
+            }
             return _size;
         }
 
@@ -339,7 +360,13 @@ public class FlexLayout implements ILayout {
                 totalHeight += childSize.height();
                 maxWidth = Math.max(maxWidth, childSize.width());
             }
-            _size = new Size<>(maxWidth, totalHeight);
+            var size = new Size<>(maxWidth, totalHeight);
+            if (! _size.equals(size)) {
+                _size = size;
+                if (_parent != null) {
+                    _parent.layout();
+                }
+            }
             return _size;
         } else { // ROW
             var totalWidth = 0;
@@ -349,7 +376,13 @@ public class FlexLayout implements ILayout {
                 totalWidth += childSize.width();
                 maxHeight = Math.max(maxHeight, childSize.height());
             }
-            _size = new Size<>(totalWidth, maxHeight);
+            var size = new Size<>(totalWidth, maxHeight);
+            if (!_size.equals(size)) {
+                _size = size;
+                if (_parent != null) {
+                    _parent.layout();
+                }
+            }
             return _size;
         }
     }

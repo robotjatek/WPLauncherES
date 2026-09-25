@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.IContextMenuParent;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.ListView.States.ContextMenuState;
 import com.robotjatek.wplauncher.Components.ListView.States.IdleState;
@@ -48,6 +49,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
     private int _topMargin;
     private int _bottomMargin;
     private ContextMenu<T> _contextMenu;
+    private ILayout _parent;
 
     public IState IDLE_STATE() {
         return new IdleState<>(this);
@@ -67,6 +69,11 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         _padding = padding;
         _itemDrawContext = new ListItemDrawContext<>(padding, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
         _bgLayout.setBgColor(Colors.BLACK);
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     public int getPadding() {
@@ -138,6 +145,9 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         _size = size;
         _itemDrawContext.onResize(size.width());
         setScrollBounds();
+        if (_parent != null) {
+            _parent.layout();
+        }
         _dirty = true;
     }
 
@@ -209,7 +219,13 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         // Items are fixed sized as of now
         var height = (ITEM_HEIGHT_PX + ITEM_GAP_PX) * _allItems.size();
         var width = -1; // TODO: how to measure width? ask the parent? measure the elements?
-        _size = new Size<>(width, height);
+        var size = new Size<>(width, height);
+        if (!_size.equals(size)) {
+            _size = size;
+            if (_parent != null) {
+                _parent.layout();
+            }
+        }
         setScrollBounds();
         return _size;
     }

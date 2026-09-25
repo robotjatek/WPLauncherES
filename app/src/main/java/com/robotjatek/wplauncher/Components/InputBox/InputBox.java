@@ -12,6 +12,7 @@ import com.robotjatek.wplauncher.Components.InputBox.States.BaseState;
 import com.robotjatek.wplauncher.Components.InputBox.States.IdleState;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.Gesture;
@@ -45,6 +46,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final Size<Integer> _size = new Size<>(0, 100); // TODO: configurable size
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final IOverlay _overlay;
+    private ILayout _parent;
 
     public BaseState IDLE_STATE() {
         return new IdleState(this);
@@ -237,6 +239,11 @@ public class InputBox implements UIElement, ITextInputHandler {
             _label.setText(_text);
             _label.setTextColor(Colors.WHITE);
         }
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     @Override

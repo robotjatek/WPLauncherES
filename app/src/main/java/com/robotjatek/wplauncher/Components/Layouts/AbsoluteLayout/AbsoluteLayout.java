@@ -23,6 +23,7 @@ public class AbsoluteLayout implements ILayout {
     private int _bgColor = Colors.TRANSPARENT;
     private boolean _dirty = true;
     private final IDrawContext<UIElement> _drawContext = new AbsoluteLayoutDrawContext(this);
+    private ILayout _parent;
 
     public static class PositionedElement {
         UIElement _element;
@@ -34,13 +35,25 @@ public class AbsoluteLayout implements ILayout {
         }
     }
 
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
+    }
+
     public void addChild(UIElement element, Position<Float> position) {
         _positionedElements.add(new PositionedElement(element, position));
+        element.setParent(this);
         _dirty = true;
     }
 
     public void removeChild(UIElement element) {
         _positionedElements.removeIf(layout -> layout._element.equals(element));
+        element.setParent(null);
+    }
+
+    public void removeAll() {
+        _positionedElements.forEach(e -> e._element.setParent(null));
+        _positionedElements.clear();
     }
 
     public void setChildPosition(UIElement element, Position<Float> position) {
@@ -153,7 +166,15 @@ public class AbsoluteLayout implements ILayout {
             maxX = Math.max(maxX, pe._position.x() + size.width());
             maxY = Math.max(maxY, pe._position.y() + size.height());
         }
-        return new Size<>((int) maxX, (int) maxY);
+        var size = new Size<>((int) maxX, (int) maxY);
+        if (!_size.equals(size)) {
+            _size = size;
+            if (_parent != null) {
+                _parent.layout();
+            }
+        }
+
+        return _size;
     }
 
     @Override
@@ -170,9 +191,11 @@ public class AbsoluteLayout implements ILayout {
         return null;
     }
 
-    public void clear() {
-        _positionedElements.forEach(c -> c._element.dispose());
-        _positionedElements.clear();
+    @Override
+    public void layout() {
+        if (_parent != null) {
+            _parent.layout();
+        }
     }
 
     @Override

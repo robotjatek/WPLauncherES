@@ -18,6 +18,7 @@ import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.CrashLogScreen;
 import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.DebugScreen;
 import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.ThemeScreen;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
@@ -28,7 +29,7 @@ public class Settings implements IScreen {
     private final StackLayout _layout;
     private Size<Integer> _size = new Size<>(-1, -1);
 
-    public Settings(IScreenNavigator navigator, SettingsService settings, PermissionService permissionService, Context context) {
+    public Settings(ScreenNavigator navigator, SettingsService settings, PermissionService permissionService, Context context) {
         _navigator = navigator;
         _layout = new StackLayout();
         _layout.setBgColor(Colors.BLACK);

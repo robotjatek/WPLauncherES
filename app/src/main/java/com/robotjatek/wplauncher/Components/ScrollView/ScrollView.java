@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.Components.ScrollView;
 
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.ScrollView.States.IdleState;
 import com.robotjatek.wplauncher.Components.ScrollView.States.ScrollState;
 import com.robotjatek.wplauncher.Components.Size;
@@ -15,6 +16,7 @@ import com.robotjatek.wplauncher.ScrollController;
 public class ScrollView implements UIElement {
 
     private final UIElement _child;
+    private ILayout _parent;
     private final ScrollController _scroll = new ScrollController();
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
@@ -94,7 +96,16 @@ public class ScrollView implements UIElement {
         if (_child == null) {
             throw new RuntimeException("No child was set to the scroll view");
         }
-        return _child.measure();
+        var childSize = _child.measure();
+        if (_parent != null) {
+            _parent.layout();
+        }
+        return childSize;
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     private void updateScrollBounds(float viewportHeight) {

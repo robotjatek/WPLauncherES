@@ -1,13 +1,11 @@
 package com.robotjatek.wplauncher.Components.Dropdown;
 
-import android.graphics.Typeface;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Dropdown.States.IdleState;
 import com.robotjatek.wplauncher.Components.Dropdown.States.AnimationState;
 import com.robotjatek.wplauncher.Components.ITouchable;
-import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
@@ -17,7 +15,6 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.Services.ScreenNavigator.IOverlay;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
@@ -25,21 +22,20 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Dropdown<T> implements UIElement, ITouchable {
-    private final List<T> _model;
-    private T _selected;
+public class Dropdown<TPayload> implements UIElement, ITouchable {
+    private final List<TPayload> _model;
+    private TPayload _selected;
     private static final int BORDER_SIZE_PX = 4; // TODO: make this DP aware
     private boolean _disposed = false;
     private final TouchHandler _touchHandler = new TouchHandler(this);
     private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
     private final AbsoluteLayout _layout = new AbsoluteLayout();
-    private final List<Label> _labels = new ArrayList<>();
+    private final List<DropdownContent<TPayload>> _contents = new ArrayList<>();
     private final Size<Integer> _closedSize;
     private final Size<Integer> _openSize;
     private Size<Integer> _currentSize;
     private boolean _isDirty = true;
-    private final IOverlay _overlay; // TODO: this may not be needed at all
-    private final Consumer<T> _onChange;
+    private final Consumer<TPayload> _onChange;
     private boolean _open = false;
     private final float[] _modelMatrix = new float[16];
     private ILayout _parent;
@@ -60,33 +56,30 @@ public class Dropdown<T> implements UIElement, ITouchable {
         _state.enter();
     }
 
-    // TODO: its time to implement layout clipping?
     // TODO: what to do on focus loss
     // TODO: the selected label should be in the accent color when the box is opened
-    public Dropdown(Size<Integer> size, List<T> items, Function<T, String> labelSelector, IOverlay overlay, Consumer<T> onChange) {
+    public Dropdown(Size<Integer> size, List<TPayload> items, Function<TPayload, String> labelSelector, Consumer<TPayload> onChange) {
         _model = items;
-        _overlay = overlay;
         _onChange = onChange;
         _closedSize = size;
         _currentSize = size;
 
-        _openSize = new Size<>(_closedSize.width(), _closedSize.height() * items.size()); // TODO: calculate dynamically based on the size of the content
+        var itemHeight = _closedSize.height() - BORDER_SIZE_PX * 2;
+        _openSize = new Size<>(_closedSize.width(), itemHeight * items.size() + BORDER_SIZE_PX * 2);
 
-        for(T item : _model) {
+        for (TPayload item : _model) {
             var labelString = labelSelector != null ? labelSelector.apply(item) : item.toString();
-            var label = new Label(labelString, 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT, -1, () -> {
-                _selected = item;
-                _onChange.accept(item);
-                changeState(ANIMATION_STATE(_closedSize));
-            });
-            _labels.add(label);
+            var content = new DropdownContent<>(this, item, labelString);
+            _contents.add(content);
         }
 
         _borderLayout.setBgColor(Colors.WHITE);
         _layout.setBgColor(Colors.BLACK);
         if (!_model.isEmpty()) {
             _selected = _model.get(0);
-            _onChange.accept(_model.get(0));
+            if (_onChange != null) {
+                _onChange.accept(_model.get(0));
+            }
         }
         _state.enter();
     }
@@ -100,32 +93,39 @@ public class Dropdown<T> implements UIElement, ITouchable {
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
-        if(_isDirty) {
-            _borderLayout.removeChild(_layout);
-            var contentSize = new Size<>(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
-            var itemHeight = _closedSize.height();
-            var firstLineCenter = itemHeight / 2f;
-            _layout.onResize(contentSize.width(), contentSize.height());
+        if (_isDirty) {
+            var contentWidth = w - BORDER_SIZE_PX * 2;
+            var contentHeight = h - BORDER_SIZE_PX * 2;
+            var itemHeight = _closedSize.height() - BORDER_SIZE_PX * 2;
+            _layout.onResize(contentWidth, contentHeight);
 
-            var textOffset = 16f; // TODO: DP aware
             _layout.removeAll();
-            for (var i = 0; i < _labels.size(); i++) {
-                var label = _labels.get(i);
-                var closedOffset = _model.isEmpty() ? 0 : _model.indexOf(_selected) * _closedSize.height();
-                var offset = !_open ? 0 : closedOffset;
-                var labelY = (i * itemHeight) + firstLineCenter - label.measure().height() / 2f - offset;
-                _layout.addChild(label, new Position<>(textOffset, labelY));
+
+            var selectedIndex = _model.isEmpty() ? 0 : Math.max(0, _model.indexOf(_selected));
+            var offset = !_open ? selectedIndex * itemHeight : 0f;
+
+            for (var i = 0; i < _contents.size(); i++) {
+                var content = _contents.get(i);
+                content.setSize(new Size<>(contentWidth, itemHeight));
+                var itemY = (i * itemHeight) - offset;
+                _layout.addChild(content, new Position<>(0f, itemY));
             }
-            _borderLayout.addChild(_layout, new Position<>((float)BORDER_SIZE_PX, (float)BORDER_SIZE_PX));
             _isDirty = false;
         }
 
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, w, h, 1);
-        renderer.beginClip(proj, _modelMatrix);
         _borderLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
-        renderer.endClip();
+
+        var innerWidth = w - BORDER_SIZE_PX * 2;
+        var innerHeight = h - BORDER_SIZE_PX * 2;
+        if (innerWidth > 0 && innerHeight > 0) {
+            Matrix.setIdentityM(_modelMatrix, 0);
+            Matrix.translateM(_modelMatrix, 0, x + BORDER_SIZE_PX, y + BORDER_SIZE_PX, 0);
+            Matrix.scaleM(_modelMatrix, 0, innerWidth, innerHeight, 1);
+            Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
+            renderer.beginClip(proj, _modelMatrix);
+            _layout.draw(delta, proj, view, renderer, new Position<>(x + BORDER_SIZE_PX, y + BORDER_SIZE_PX), new Size<>(innerWidth, innerHeight));
+            renderer.endClip();
+        }
     }
 
     @Override
@@ -141,11 +141,19 @@ public class Dropdown<T> implements UIElement, ITouchable {
     @Override
     public void onPress() {
         _layout.setBgColor(Colors.WHITE);
+        var selectedIndex = _model.isEmpty() ? -1 : _model.indexOf(_selected);
+        if (selectedIndex >= 0 && selectedIndex < _contents.size()) {
+            _contents.get(selectedIndex).onPress();
+        }
     }
 
     @Override
     public void onRelease() {
         _layout.setBgColor(Colors.BLACK);
+        var selectedIndex = _model.isEmpty() ? -1 : _model.indexOf(_selected);
+        if (selectedIndex >= 0 && selectedIndex < _contents.size()) {
+            _contents.get(selectedIndex).onRelease();
+        }
     }
 
     @Override
@@ -159,11 +167,40 @@ public class Dropdown<T> implements UIElement, ITouchable {
     }
 
     public void setOpen(boolean open) {
-        _open = open;
+        if (_open != open) {
+            _open = open;
+            _isDirty = true;
+        }
     }
 
     public boolean isClosed() {
         return !_open;
+    }
+
+    public void setSelected(TPayload item) {
+        if (_selected != item) {
+            _selected = item;
+            if (_onChange != null) {
+                _onChange.accept(item);
+            }
+            _isDirty = true;
+        }
+    }
+
+    public TPayload getSelected() {
+        return _selected;
+    }
+
+    public void close() {
+        changeState(ANIMATION_STATE(_closedSize));
+    }
+
+    public Size<Integer> getClosedSize() {
+        return _closedSize;
+    }
+
+    public Size<Integer> getOpenSize() {
+        return _openSize;
     }
 
     public ILayout getContentLayout() {
@@ -189,14 +226,15 @@ public class Dropdown<T> implements UIElement, ITouchable {
         return _touchHandler;
     }
 
-    public T getSelected() {
-        return _selected;
-    }
-
     @Override
     public void dispose() {
         if (!_disposed) {
             _borderLayout.dispose();
+            _layout.dispose();
+            for (var content : _contents) {
+                content.dispose();
+            }
+            _contents.clear();
             _disposed = true;
         }
     }

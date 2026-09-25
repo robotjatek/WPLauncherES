@@ -60,9 +60,8 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         var options = List.of( // TODO: replace with real choices
                 new PayloadPlaceholder("light", Collections.emptyList()),
                 new PayloadPlaceholder("dark", Collections.emptyList()));
-        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, PayloadPlaceholder::name, navigator, (selected) -> {
-            selectedContent.setText(selected.name());
-        });
+        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, PayloadPlaceholder::name,
+                (selected) -> selectedContent.setText(selected.name()));
         _layout.addChild(_backgroundDropdown);
 
         _layout.addChild(new Spacer(0, 48));

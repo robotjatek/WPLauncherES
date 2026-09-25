@@ -15,11 +15,17 @@ public class AnimationState<T> implements IState {
     }
 
     @Override
-    public void enter() {}
+    public void enter() {
+        if (_targetSize.equals(_context.getOpenSize())) {
+            _context.setOpen(true);
+        }
+    }
 
     @Override
     public void exit() {
-        _context.setOpen(_context.isClosed());
+        if (_targetSize.equals(_context.getClosedSize())) {
+            _context.setOpen(false);
+        }
     }
 
     @Override

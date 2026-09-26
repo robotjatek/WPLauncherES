@@ -226,6 +226,7 @@ Cleaning up the accumulated mess
 - [ ] Show the context menu in the new overlay system
 - [ ] Opening a large crash-log crashes the launcher on texture creation 
 - [ ] Fix: Adjust the layer offset of the opened pages so spinning tiles won't overlap with the animated page
+- [ ] Relayout on child size change should be implicit
 
 ### M5 - Beta 2
 

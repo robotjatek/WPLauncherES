@@ -6,6 +6,7 @@ import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
@@ -21,6 +22,7 @@ public class Icon implements UIElement {
     private int _bgColor;
     private boolean _dirty = true;
     private Size<Integer> _size;
+    private ILayout _parent;
 
     public Icon(Drawable iconDrawable, int bgColor, Size<Integer> size) {
         _iconDrawable = iconDrawable;
@@ -83,7 +85,17 @@ public class Icon implements UIElement {
     public void setSize(Size<Integer> size) {
         if (_size.equals(size)) return;
         _size = size;
+
+        if (_parent != null) {
+            _parent.layout();
+        }
+
         _dirty = true;
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     public void setIconDrawable(Drawable icon) {

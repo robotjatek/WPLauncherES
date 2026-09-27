@@ -7,6 +7,7 @@ import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
@@ -19,7 +20,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class Button implements UIElement, ITouchable {
 
-    private static final int BORDER_SIZE_PX = 4;
+    private static final int BORDER_SIZE_PX = 4; // TODO: make this DP aware
     private final TouchHandler _touchHandler = new TouchHandler(this);
     private boolean _disposed = false;
     private Runnable _onTap;
@@ -29,6 +30,7 @@ public class Button implements UIElement, ITouchable {
     private final Label _label;
     private Icon _icon;
     private Size<Integer> _size;
+    private ILayout _parent;
 
     public Button(String text, Icon icon, Size<Integer> size, Runnable onTap) {
         _label = new Label(text, 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
@@ -53,7 +55,7 @@ public class Button implements UIElement, ITouchable {
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
             _borderLayout.addChild(_layout, new Position<>((float)BORDER_SIZE_PX, (float)BORDER_SIZE_PX));
 
-            var textOffset = 16f;
+            var textOffset = 16f; // TODO: DP aware
             _layout.removeChild(_label);
 
             if (_icon != null) {
@@ -125,7 +127,16 @@ public class Button implements UIElement, ITouchable {
     public void setSize(Size<Integer> size) {
         if (_size.equals(size)) return;
         _size = size;
+
+        if (_parent != null) {
+            _parent.layout();
+        }
         _isDirty = true;
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     public void setOnTap(Runnable onTap) {

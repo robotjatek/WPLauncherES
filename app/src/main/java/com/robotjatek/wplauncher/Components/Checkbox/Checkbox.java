@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.BitmapUtil;
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Gestures.TapGesture;
@@ -34,6 +35,8 @@ public class Checkbox implements UIElement {
     private int _labelTexture = -1;
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Context _context;
+    private ILayout _parent;
+    private Size<Integer> _size = new Size<>(-1, -1);
 
     public Checkbox(String label, boolean initialState, Consumer<Boolean> onChange, Context context) {
         _label = label;
@@ -94,7 +97,19 @@ public class Checkbox implements UIElement {
         _paint.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
         _paint.setTextSize(TEXT_SIZE);
         var textWidth = _paint.measureText(_label);
-        return new Size<>((int)(TOGGLE_SIZE + 16 + textWidth), TOGGLE_SIZE);
+        var size = new Size<>((int)(TOGGLE_SIZE + 16 + textWidth), TOGGLE_SIZE);
+        if (!_size.equals(size)) {
+            _size = size;
+            if (_parent != null) {
+                _parent.layout();
+            }
+        }
+        return _size;
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     @Override

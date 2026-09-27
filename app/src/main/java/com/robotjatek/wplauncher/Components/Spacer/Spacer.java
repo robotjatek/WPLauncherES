@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Components.Spacer;
 
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
@@ -11,6 +12,7 @@ import com.robotjatek.wplauncher.QuadRenderer;
  */
 public class Spacer implements UIElement {
 
+    private ILayout _parent;
     private Size<Integer> _size;
 
     public Spacer(int width, int height) {
@@ -29,6 +31,14 @@ public class Spacer implements UIElement {
 
     public void setSize(int width, int height) {
         _size = new Size<>(width, height);
+        if (_parent != null) {
+            _parent.layout();
+        }
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     @Override

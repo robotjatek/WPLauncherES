@@ -7,6 +7,7 @@ import android.graphics.Typeface;
 import android.opengl.Matrix;
 
 import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
@@ -32,6 +33,7 @@ public class TextBlock implements UIElement {
     private Size<Integer> _cachedSize = new Size<>(0, 0);
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private List<String> _wrappedLines = null; // Cache for wrapped lines
+    private ILayout _parent;
 
     public TextBlock(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
         this(text, textSize, typeFace, textColor, bgColor, maxWidth, -1);
@@ -144,7 +146,13 @@ public class TextBlock implements UIElement {
                 }
             }
 
-            _cachedSize = new Size<>(Math.max(0, _maxWidth), totalHeight);
+            var size = new Size<>(Math.max(0, _maxWidth), totalHeight);
+            if (!_cachedSize.equals(size)) {
+                _cachedSize = size;
+                if (_parent != null) {
+                    _parent.layout();
+                }
+            }
             _dirty = false;
         }
         return _cachedSize;
@@ -205,6 +213,11 @@ public class TextBlock implements UIElement {
 
     public int getTypeFace() {
         return _typeFace;
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     @Override

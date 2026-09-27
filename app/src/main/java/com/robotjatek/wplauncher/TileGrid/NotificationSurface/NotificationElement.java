@@ -4,6 +4,7 @@ import android.graphics.Typeface;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
@@ -21,6 +22,7 @@ public class NotificationElement implements UIElement {
     private final TextBlock _textBlock = new TextBlock("", 52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400);
     private Size<Integer> _size = new Size<>(0, 0);
     private int _padding = 0;
+    private ILayout _parent;
 
     public NotificationElement() {
         _layout.addChild(_titleLabel);
@@ -66,12 +68,20 @@ public class NotificationElement implements UIElement {
         if (_size.equals(size)) return;
         _layout.onResize(size.width(), size.height());
         _size = size;
+        if (_parent != null) {
+            _layout.layout();
+        }
         _dirty = true;
     }
 
     @Override
     public Size<Integer> measure() {
         return _size;
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     @Override

@@ -28,5 +28,6 @@ public interface ILayout extends UIElement {
 
         return gesture.dispatch(this);
     }
+    void layout();
     void dispose();
 }

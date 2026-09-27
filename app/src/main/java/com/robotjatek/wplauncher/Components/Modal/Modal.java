@@ -20,7 +20,7 @@ public class Modal implements IModal {
     private boolean _disposed = false;
     private final StackLayout _layout = new StackLayout();
     private final StackLayout _contentLayout = new StackLayout();
-    private final StackLayout _buttonLayout = new StackLayout(StackLayout.Orientation.HORIZONTAL);
+    private final StackLayout _buttonLayout = new StackLayout(StackLayout.Orientation.HORIZONTAL, 0);
     private final Spacer _buttonTopSpacer = new Spacer(-1, -1);
     private final Spacer _buttonSpacer = new Spacer(-1, -1);
     private final Label _titleLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, 0);
@@ -38,6 +38,7 @@ public class Modal implements IModal {
         _layout.setBgColor(Colors.CONTEXT_MENU_GRAY);
         _layout.setPadding(16);
         _layout.addChild(_contentLayout);
+        _contentLayout.setPadding(0);
         _contentLayout.addChild(new Spacer(0, LauncherRenderer.SCREEN_DATA.topInset));
         _titleLabel.setText(title);
         _contentLayout.addChild(_titleLabel);

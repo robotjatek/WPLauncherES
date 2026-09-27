@@ -1,5 +1,6 @@
 package com.robotjatek.wplauncher.Components;
 
+import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Gestures.IGestureHandler;
 import com.robotjatek.wplauncher.IDrawContext;
@@ -11,5 +12,6 @@ public interface UIElement extends IGestureHandler {
      default boolean handleGesture(Gesture gesture) {
           return gesture.dispatch(this);
      }
+     void setParent(ILayout parent);
      void dispose();
 }

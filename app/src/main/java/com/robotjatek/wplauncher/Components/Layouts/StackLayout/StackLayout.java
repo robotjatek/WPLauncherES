@@ -17,11 +17,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class StackLayout implements ILayout {
+    public static  final int DEFAULT_PADDING = 32;
     public enum Orientation {
         VERTICAL,
         HORIZONTAL
     }
 
+    private ILayout _parent;
     private boolean _disposed = false;
     private int _bgColor = Colors.TRANSPARENT;
     private int _padding = 0;
@@ -33,14 +35,25 @@ public class StackLayout implements ILayout {
     private int _width;
     private int _height;
     private final float[] _model = new float[16];
+    private Size<Integer> _size = new Size<>(-1, -1);
 
     public StackLayout() {
-        this(Orientation.VERTICAL);
+        this(Orientation.VERTICAL, DEFAULT_PADDING);
     }
 
     public StackLayout(Orientation orientation) {
+        this(orientation, DEFAULT_PADDING);
+    }
+
+    public StackLayout(Orientation orientation, int padding) {
         _orientation = orientation;
+        setPadding(padding);
         _drawContext = new StackLayoutDrawContext(this);
+    }
+
+    @Override
+    public void setParent(ILayout parent) {
+        _parent = parent;
     }
 
     @Override
@@ -72,6 +85,7 @@ public class StackLayout implements ILayout {
 
     public void addChild(UIElement element) {
         _children.add(element);
+        element.setParent(this);
         layout();
     }
 
@@ -110,6 +124,10 @@ public class StackLayout implements ILayout {
                 offset += size.width();
             }
         }
+
+        if (_parent != null) {
+            _parent.layout();
+        }
     }
 
     @Override
@@ -139,9 +157,17 @@ public class StackLayout implements ILayout {
             }
 
         }
-        return _orientation == Orientation.VERTICAL ?
+        var size = _orientation == Orientation.VERTICAL ?
                 new Size<>(maxChildWidth + _padding * 2, totalHeight + _padding * 2) :
                 new Size<>(totalWidth + _padding * 2, maxChildHeight + _padding * 2);
+        if (!_size.equals(size)) {
+            _size = size;
+            if (_parent != null) {
+                _parent.layout();
+            }
+        }
+
+        return size;
     }
 
     public Orientation getOrientation() {

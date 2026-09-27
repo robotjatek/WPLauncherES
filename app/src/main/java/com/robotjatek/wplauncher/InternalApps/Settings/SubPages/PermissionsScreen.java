@@ -84,7 +84,7 @@ public class PermissionsScreen implements IScreen {
     @Override
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
-        _description.setMaxWidth(width);
+        _description.setMaxWidth(width - StackLayout.DEFAULT_PADDING);
         _layout.onResize(width, height);
     }
 

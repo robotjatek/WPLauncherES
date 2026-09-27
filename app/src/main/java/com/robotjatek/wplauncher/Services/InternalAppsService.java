@@ -10,7 +10,6 @@ import com.robotjatek.wplauncher.InternalApps.Glance.Glance;
 import com.robotjatek.wplauncher.InternalApps.Settings.Settings;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
-import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,7 +23,7 @@ public class InternalAppsService {
     private final Map<String, Drawable> _appIcons = new HashMap<>();
     private final Map<String, App> _internalApps = new HashMap<>();
 
-    public InternalAppsService(Context context, SettingsService settings, PermissionService permissionService, ScreenNavigator navigator) {
+    public InternalAppsService(Context context, SettingsService settings, PermissionService permissionService, IScreenNavigator navigator) {
         _context = context;
         initAppIcons();
 

@@ -3,7 +3,6 @@ package com.robotjatek.wplauncher.Components.Dropdown.States;
 import com.robotjatek.wplauncher.Components.Dropdown.Dropdown;
 import com.robotjatek.wplauncher.Gestures.DownGesture;
 import com.robotjatek.wplauncher.Gestures.MoveGesture;
-import com.robotjatek.wplauncher.Gestures.TapGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.IState;
 

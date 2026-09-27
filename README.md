@@ -252,6 +252,7 @@ Creep got too big
 Janitor for hire
 
 - [ ] Fix: TouchHandler: Force state reset on focus loss. Pressed state can stick when a touch moves out of bounds before hitting Move threshold
+- [ ] Close dropdown on focus loss
 
 ### M6 - RC
 

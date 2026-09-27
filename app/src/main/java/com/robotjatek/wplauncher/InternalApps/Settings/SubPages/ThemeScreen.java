@@ -17,7 +17,6 @@ import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
-import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
@@ -40,7 +39,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
 
     public record PayloadPlaceholder(String name, List<Integer> something) { } // TODO: remove when theme change is implemented
 
-    public ThemeScreen(ScreenNavigator navigator, SettingsService settings) {
+    public ThemeScreen(IScreenNavigator navigator, SettingsService settings) {
         _navigator = navigator;
         _settings = settings;
         _layout = new StackLayout();

@@ -54,7 +54,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _navigator = navigator;
         _tileService = tileService;
         _settingsService = settingsService;
-        _settingsService.subscribe(this);
+        _settingsService.subscribeToAccentColorChange(this);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_list);
 
         _searchBox = new InputBox("Search", this::onSearchTextChanged, screenNavigator, context);
@@ -172,6 +172,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     public void dispose() {
         if (!_disposed) {
             _layout.dispose();
+            _settingsService.unsubscribeFromAccentColorChange(this);
             _disposed = true;
         }
     }

@@ -246,6 +246,7 @@ Creep got too big
 - [ ] Make checkbox use higher level components (then kill TileUtil.java)
 - [ ] Show weather icon on the Glance tile
 - [ ] Add tile adorners to the top level overlay
+- [ ] Apps can pin their shortcuts to the home screen
 
 ### M5.5
 

@@ -5,6 +5,9 @@ import android.content.Context;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
+import com.robotjatek.wplauncher.Theme.DarkTheme;
+import com.robotjatek.wplauncher.Theme.ITheme;
+import com.robotjatek.wplauncher.Theme.LightTheme;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,8 +19,10 @@ public class SettingsService {
     public static final String PREF_NAME = "WPLAUNCHER";
     public static final String SETTINGS = "SETTINGS";
     private boolean _disposed = false;
-    private final List<OnChangeListener<AccentColor>> _listeners = new ArrayList<>();
+    private final List<OnChangeListener<AccentColor>> _accentChangeListeners = new ArrayList<>();
+    private final List<OnChangeListener<ITheme>> _themeChangeListeners = new ArrayList<>();
     private AccentColor _accentColor = Colors.ACCENT_COLORS.get(0);
+    private ITheme _theme = new DarkTheme();
     private final Context _context;
 
     public SettingsService(Context context) {
@@ -37,12 +42,37 @@ public class SettingsService {
 
     public void setAccentColor(AccentColor color) {
         _accentColor = color;
-        _listeners.forEach(l -> l.changed(color));
+        _accentChangeListeners.forEach(l -> l.changed(color));
         persistSettings();
     }
 
-    public void subscribe(OnChangeListener<AccentColor> listener) {
-        _listeners.add(listener);
+    public void subscribeToAccentColorChange(OnChangeListener<AccentColor> listener) {
+        _accentChangeListeners.add(listener);
+    }
+
+    public void unsubscribeFromAccentColorChange(OnChangeListener<AccentColor> listener) {
+        _accentChangeListeners.remove(listener);
+    }
+
+    public void subscribeToThemeChange(OnChangeListener<ITheme> listener) {
+        _themeChangeListeners.add(listener);
+    }
+
+    public void unsubscribeFromThemeChange(OnChangeListener<ITheme> listener) {
+     _themeChangeListeners.remove(listener);
+    }
+
+    public List<ITheme> getThemes() {
+        return List.of(new DarkTheme(), new LightTheme());
+    }
+
+    public void setCurrentTheme(ITheme theme) {
+        _theme = theme;
+        _themeChangeListeners.forEach(l -> l.changed(_theme));
+    }
+
+    public ITheme getCurrentTheme() {
+        return _theme;
     }
 
     private void persistSettings() {

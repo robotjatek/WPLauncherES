@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.graphics.Typeface;
+import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
@@ -18,18 +19,18 @@ import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
 import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
-import java.util.Collections;
-import java.util.List;
+public class ThemeScreen implements IScreen {
 
-public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
-
+    private final OnChangeListener<AccentColor> _accentColorListener = this::accentChanged;
+    private final OnChangeListener<ITheme> _themeListener = this::themeChanged;
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
     private final Button _colorPickerBtn;
-    private final Dropdown<PayloadPlaceholder> _backgroundDropdown; // TODO: make this a Dropdown<Theme>
+    private final Dropdown<ITheme> _backgroundDropdown;
     private Icon _icon;
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
@@ -37,11 +38,11 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
             " and accent color to match your mood today, this week, or all month",
             48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT, -1);
 
-    public record PayloadPlaceholder(String name, List<Integer> something) { } // TODO: remove when theme change is implemented
-
     public ThemeScreen(IScreenNavigator navigator, SettingsService settings) {
         _navigator = navigator;
         _settings = settings;
+        _settings.subscribeToAccentColorChange(_accentColorListener);
+        _settings.subscribeToThemeChange(_themeListener);
         _layout = new StackLayout();
         _layout.setBgColor(Colors.BLACK);
 
@@ -56,11 +57,12 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         _layout.addChild(selectedContent);
 
         _layout.addChild(new Label("Background color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
-        var options = List.of( // TODO: replace with real choices
-                new PayloadPlaceholder("light", Collections.emptyList()),
-                new PayloadPlaceholder("dark", Collections.emptyList()));
-        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, PayloadPlaceholder::name,
-                (selected) -> selectedContent.setText(selected.name()));
+        var options = _settings.getThemes();
+        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, ITheme::name,
+                (selected) -> {
+                    selectedContent.setText(selected.name());
+                    _settings.setCurrentTheme(selected);
+                });
         _layout.addChild(_backgroundDropdown);
 
         _layout.addChild(new Spacer(0, 48));
@@ -74,7 +76,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
                 new Size<>(0, 100),
                 () -> {
                     var colorPickerScreen = new ColorPickerScreen(navigator);
-                    colorPickerScreen.subscribe(this);
+                    colorPickerScreen.subscribe(_accentColorListener);
                     navigator.push(colorPickerScreen);
                 });
         _layout.addChild(_colorPickerBtn);
@@ -97,13 +99,16 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         _layout.onResize(width, height);
     }
 
-    @Override
-    public void changed(AccentColor changed) {
+    private void accentChanged(AccentColor changed) {
         _settings.setAccentColor(changed);
         _icon.dispose();
         _colorPickerBtn.setText(changed.name());
         _icon = new Icon(changed.color(), new Size<>(64, 64));
         _colorPickerBtn.setIcon(_icon);
+    }
+
+    private void themeChanged(ITheme theme) {
+        Log.d("", theme.name());
     }
 
     @Override
@@ -117,6 +122,8 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
             _layout.dispose();
             _icon.dispose();
             _description.dispose();
+            _settings.unsubscribeFromThemeChange(_themeListener);
+            _settings.unsubscribeFromAccentColorChange(_accentColorListener);
             _disposed = true;
         }
     }

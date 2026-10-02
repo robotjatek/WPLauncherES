@@ -60,12 +60,6 @@ public class Checkbox implements UIElement {
         _checkboxBackground = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.bgColor()));
     }
 
-    // TODO: remove this deprecated constructor after glance screen is updated with theme support
-    public Checkbox(String label, boolean initialState, Consumer<Boolean> onChange, Context context) {
-        this(label, initialState, onChange, context,
-                () -> new ITheme.CheckboxStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.NORMAL, Colors.WHITE));
-    }
-
     private void syncStyle() {
         var s = _styleSupplier.get();
         if (!s.equals(_currentStyle)) {

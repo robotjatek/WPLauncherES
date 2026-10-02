@@ -197,7 +197,7 @@ Feature-creep!
       - [x] ListPage is style aware
       - [ ] Modal is style aware
     - [ ] Screens
-      - [ ] StartScreen is style aware
+      - [ ] TileGrid is style aware
       - [ ] AppListScreen is style aware
       - [x] SettingsScreen is style aware
         - [x] ThemeScreen is style aware
@@ -206,7 +206,7 @@ Feature-creep!
         - [x] DebugScreen is style aware
         - [x] TextReaderScreen is style aware
         - [x] AboutScreen is style aware
-      - [ ] GlanceScreen is style aware
+      - [x] GlanceScreen is style aware
   - [ ] Persist theme setting
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation

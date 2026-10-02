@@ -39,7 +39,7 @@ public class InternalAppsService {
                 Glance.PACKAGE_NAME,
                 null,
                 getAppIcon(Glance.PACKAGE_NAME),
-                () -> navigator.push(new Glance(navigator, context)), true);
+                () -> navigator.push(new Glance(navigator, settings, context)), true);
 
         _internalApps.put(SETTINGS_NAME, setting);
         _internalApps.put(Glance.PACKAGE_NAME, clock);

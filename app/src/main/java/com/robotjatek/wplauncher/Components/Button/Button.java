@@ -29,7 +29,7 @@ public class Button implements UIElement, ITouchable {
     private Runnable _onTap;
     private boolean _isDirty = true;
     private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
-    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final AbsoluteLayout _layout = new AbsoluteLayout(); // TODO: make abs layout theme aware
     private final Label _label;
     private Icon _icon;
     private Size<Integer> _size;

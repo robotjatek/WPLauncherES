@@ -1,7 +1,5 @@
 package com.robotjatek.wplauncher.Components.Dropdown;
 
-import android.graphics.Typeface;
-
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Label.Label;
@@ -15,25 +13,47 @@ import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
+
+import java.util.function.Supplier;
 
 public class DropdownContent<T> implements UIElement, ITouchable {
 
     private final Dropdown<T> _parent;
     private final T _item;
-    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final AbsoluteLayout _layout = new AbsoluteLayout(); // TODO: make abs layout theme aware
     private final Label _label;
     private final TouchHandler _touchHandler = new TouchHandler(this);
     private Size<Integer> _size = new Size<>(-1, -1);
     private ILayout _parentLayout;
     private boolean _disposed = false;
     private boolean _isDirty = true;
+    private final Supplier<ITheme.DropdownStyle> _styleSupplier;
+    private ITheme.DropdownStyle _currentStyle;
 
-    public DropdownContent(Dropdown<T> parent, T item, String label) {
+    public DropdownContent(Dropdown<T> parent, T item, String label, Supplier<ITheme.DropdownStyle> style) {
         _parent = parent;
         _item = item;
-        _label = new Label(label, 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-        _layout.setBgColor(Colors.BLACK);
+        _styleSupplier = style;
+        _currentStyle = style.get();
+
+        _label = new Label(label,
+                () -> new ITheme.LabelStyle(
+                        _currentStyle.textSize(),
+                        _currentStyle.typeface(),
+                        _currentStyle.textColor(),
+                        Colors.TRANSPARENT));
+        _layout.setBgColor(_currentStyle.bgColor());
+    }
+
+    private void syncTheme() {
+        var style = _styleSupplier.get();
+        if (!style.equals(_currentStyle)) {
+            _currentStyle = style;
+            _layout.setBgColor(_currentStyle.bgColor());
+            _isDirty = true;
+        }
     }
 
     @Override
@@ -45,6 +65,7 @@ public class DropdownContent<T> implements UIElement, ITouchable {
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
+        syncTheme();
         if (_isDirty) {
             _layout.removeChild(_label);
             _layout.onResize(w, h);
@@ -87,16 +108,14 @@ public class DropdownContent<T> implements UIElement, ITouchable {
 
     @Override
     public void onPress() {
-        _layout.setBgColor(Colors.WHITE);
-        _label.setTextColor(Colors.BLACK);
-        _isDirty = true;
+        _layout.setBgColor(_currentStyle.borderColor());
+        _label.setTextColor(_currentStyle.bgColor());
     }
 
     @Override
     public void onRelease() {
-        _layout.setBgColor(Colors.BLACK);
-        _label.setTextColor(Colors.WHITE);
-        _isDirty = true;
+        _layout.setBgColor(_currentStyle.bgColor());
+        _label.setTextColor(null);
     }
 
     @Override

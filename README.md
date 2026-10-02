@@ -182,6 +182,28 @@ Feature-creep!
 - [ ] Light mode/Dark mode support
   - [x] Dropdown component
   - [ ] Theming support
+    - [ ] Components
+      - [x] StackLayout is style aware
+      - [ ] AbsoluteLayout is style aware
+      - [ ] FlexLayout is style aware
+      - [x] Label is style aware
+      - [x] Button is style awa
+      - [x] TextBlock is style aware
+      - [x] Dropdown is style aware
+      - [ ] InputBox is style aware
+      - [ ] ContextMenu is style aware
+      - [ ] Checkbox is style aware
+      - [ ] ListView is style aware
+      - [ ] ListPage is style aware
+      - [ ] Modal is style aware
+    - [ ] Screens
+      - [ ] StartScreen is style aware
+      - [ ] AppListScreen is style aware
+      - [ ] SettingsScreen is style aware
+      - [x] ThemeScreen is style aware
+      - [ ] TextReaderScreen is style aware
+      - [ ] CrashLogScreen is style aware
+      - [ ] AboutScreen is style aware
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings

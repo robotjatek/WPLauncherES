@@ -20,7 +20,6 @@ public class SettingsService {
     public static final String SETTINGS = "SETTINGS";
     private boolean _disposed = false;
     private final List<OnChangeListener<AccentColor>> _accentChangeListeners = new ArrayList<>();
-    private final List<OnChangeListener<ITheme>> _themeChangeListeners = new ArrayList<>();
     private AccentColor _accentColor = Colors.ACCENT_COLORS.get(0);
     private final List<ITheme> _themes = List.of(new DarkTheme(), new LightTheme());
     private ITheme _theme = _themes.get(0); // TODO: persist theme, load persisted theme
@@ -55,21 +54,12 @@ public class SettingsService {
         _accentChangeListeners.remove(listener);
     }
 
-    public void subscribeToThemeChange(OnChangeListener<ITheme> listener) {
-        _themeChangeListeners.add(listener);
-    }
-
-    public void unsubscribeFromThemeChange(OnChangeListener<ITheme> listener) {
-     _themeChangeListeners.remove(listener);
-    }
-
     public List<ITheme> getThemes() {
         return _themes;
     }
 
     public void setCurrentTheme(ITheme theme) {
         _theme = theme;
-        _themeChangeListeners.forEach(l -> l.changed(_theme));
     }
 
     public ITheme getCurrentTheme() {

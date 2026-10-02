@@ -40,4 +40,9 @@ public class DarkTheme implements ITheme {
     public LayoutStyle layout() {
         return new LayoutStyle(Colors.BLACK);
     }
+
+    @Override
+    public DropdownStyle dropdown() {
+        return new DropdownStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.BOLD, Colors.WHITE);
+    }
 }

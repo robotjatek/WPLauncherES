@@ -21,16 +21,13 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 public class ThemeScreen implements IScreen {
 
     private final OnChangeListener<AccentColor> _accentColorListener = this::accentChanged;
-    private final OnChangeListener<ITheme> _themeListener = this::themeChanged;
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
     private final Button _colorPickerBtn;
-    private final Dropdown<ITheme> _backgroundDropdown;
     private Icon _icon;
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
-
     private final TextBlock _description;
 
     public ThemeScreen(IScreenNavigator navigator, SettingsService settings) {
@@ -55,7 +52,7 @@ public class ThemeScreen implements IScreen {
         var backgroundLabel = new Label("Background color", () -> settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL));
         _layout.addChild(backgroundLabel);
         var options = _settings.getThemes();
-        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, ITheme::name, _settings::setCurrentTheme);
+        var _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, ITheme::name, _settings::setCurrentTheme, () -> settings.getCurrentTheme().dropdown());
         _backgroundDropdown.setSelected(theme);
         _layout.addChild(_backgroundDropdown);
 
@@ -79,7 +76,6 @@ public class ThemeScreen implements IScreen {
         _layout.addChild(_colorPickerBtn);
 
         _settings.subscribeToAccentColorChange(_accentColorListener);
-        _settings.subscribeToThemeChange(_themeListener);
     }
 
     @Override
@@ -107,12 +103,6 @@ public class ThemeScreen implements IScreen {
         _colorPickerBtn.setIcon(_icon);
     }
 
-    private void themeChanged(ITheme theme) {
-//        _backgroundDropdown.setBorderColor(theme.getBorderColor());
-//        _backgroundDropdown.setBgColor(theme.getBgColor());
-//        _backgroundDropdown.setTextColor(theme.getTitleColor());
-    }
-
     @Override
     public boolean handleGesture(Gesture gesture) {
         return _layout.handleGesture(gesture);
@@ -124,7 +114,6 @@ public class ThemeScreen implements IScreen {
             _layout.dispose();
             _icon.dispose();
             _description.dispose();
-            _settings.unsubscribeFromThemeChange(_themeListener);
             _settings.unsubscribeFromAccentColorChange(_accentColorListener);
             _disposed = true;
         }

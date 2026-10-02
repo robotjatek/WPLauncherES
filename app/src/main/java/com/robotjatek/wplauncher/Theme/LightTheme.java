@@ -40,4 +40,9 @@ public class LightTheme implements ITheme {
     public LayoutStyle layout() {
         return new LayoutStyle(Colors.WHITE);
     }
+
+    @Override
+    public DropdownStyle dropdown() {
+        return new DropdownStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.BOLD, Colors.BLACK);
+    }
 }

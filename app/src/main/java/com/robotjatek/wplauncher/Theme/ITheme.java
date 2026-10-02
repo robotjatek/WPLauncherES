@@ -19,6 +19,8 @@ public interface ITheme {
 
     record LayoutStyle(int bgColor)  {}
 
+    record DropdownStyle(int bgColor, int borderColor, int textSize, int typeface, int textColor) {}
+
     enum TextRole {
         TITLE,
         SUBTITLE,
@@ -36,4 +38,6 @@ public interface ITheme {
     ButtonStyle button();
 
     LayoutStyle layout();
+
+    DropdownStyle dropdown();
 }

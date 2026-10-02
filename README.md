@@ -199,11 +199,15 @@ Feature-creep!
     - [ ] Screens
       - [ ] StartScreen is style aware
       - [ ] AppListScreen is style aware
-      - [ ] SettingsScreen is style aware
-      - [x] ThemeScreen is style aware
-      - [ ] TextReaderScreen is style aware
-      - [ ] CrashLogScreen is style aware
-      - [ ] AboutScreen is style aware
+      - [x] SettingsScreen is style aware
+        - [x] ThemeScreen is style aware
+        - [ ] PermissionsScreen is style aware
+        - [ ] CrashLogScreen is style aware
+        - [ ] DebugScreen is style aware
+        - [ ] TextReaderScreen is style aware
+        - [ ] CrashLogScreen is style aware
+        - [ ] AboutScreen is style aware
+      - [ ] GlanceScreen is style aware
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings

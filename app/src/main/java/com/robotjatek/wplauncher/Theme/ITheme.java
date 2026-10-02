@@ -26,7 +26,8 @@ public interface ITheme {
         SUBTITLE,
         TEXT,
         DROPDOWN_LABEL,
-        LIST_ITEM
+        LIST_ITEM,
+        PAGE_LINK
     }
 
     String name();

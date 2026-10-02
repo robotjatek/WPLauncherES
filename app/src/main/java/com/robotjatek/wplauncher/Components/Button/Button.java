@@ -28,8 +28,8 @@ public class Button implements UIElement, ITouchable {
     private boolean _disposed = false;
     private Runnable _onTap;
     private boolean _isDirty = true;
-    private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
-    private final AbsoluteLayout _layout = new AbsoluteLayout(); // TODO: make abs layout theme aware
+    private final AbsoluteLayout _borderLayout;
+    private final AbsoluteLayout _layout;
     private final Label _label;
     private Icon _icon;
     private Size<Integer> _size;
@@ -50,8 +50,8 @@ public class Button implements UIElement, ITouchable {
                         _currentStyle.typeface(),
                         _currentStyle.textColor(),
                         Colors.TRANSPARENT), -1, null);
-        _borderLayout.setBgColor(_currentStyle.borderColor());
-        _layout.setBgColor(_currentStyle.bgColor());
+        _borderLayout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.borderColor()));
+        _layout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.bgColor()));
     }
 
     // TODO: remove legacy constructor?
@@ -60,13 +60,10 @@ public class Button implements UIElement, ITouchable {
                 () -> new ITheme.ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE), onTap);
     }
 
-
     private void syncTheme() {
         var style = _styleSupplier.get();
         if (!style.equals(_currentStyle)) {
             _currentStyle = style;
-            _borderLayout.setBgColor(_currentStyle.borderColor());
-            _layout.setBgColor(_currentStyle.bgColor());
             _isDirty = true;
         }
     }
@@ -112,8 +109,8 @@ public class Button implements UIElement, ITouchable {
 
     @Override
     public void onRelease() {
-        _layout.setBgColor(_currentStyle.bgColor());
-        _label.setTextColor(null); // re-enable original styling
+        _layout.setBgColor(null); // re-enable original styling
+        _label.setTextColor(null);
     }
 
     @Override

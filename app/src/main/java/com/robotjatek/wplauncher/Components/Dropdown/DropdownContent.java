@@ -22,7 +22,7 @@ public class DropdownContent<T> implements UIElement, ITouchable {
 
     private final Dropdown<T> _parent;
     private final T _item;
-    private final AbsoluteLayout _layout = new AbsoluteLayout(); // TODO: make abs layout theme aware
+    private final AbsoluteLayout _layout;
     private final Label _label;
     private final TouchHandler _touchHandler = new TouchHandler(this);
     private Size<Integer> _size = new Size<>(-1, -1);
@@ -44,14 +44,13 @@ public class DropdownContent<T> implements UIElement, ITouchable {
                         _currentStyle.typeface(),
                         _currentStyle.textColor(),
                         Colors.TRANSPARENT));
-        _layout.setBgColor(_currentStyle.bgColor());
+        _layout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.bgColor()));
     }
 
     private void syncTheme() {
         var style = _styleSupplier.get();
         if (!style.equals(_currentStyle)) {
             _currentStyle = style;
-            _layout.setBgColor(_currentStyle.bgColor());
             _isDirty = true;
         }
     }
@@ -114,7 +113,7 @@ public class DropdownContent<T> implements UIElement, ITouchable {
 
     @Override
     public void onRelease() {
-        _layout.setBgColor(_currentStyle.bgColor());
+        _layout.setBgColor(null);
         _label.setTextColor(null);
     }
 

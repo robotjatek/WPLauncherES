@@ -184,7 +184,7 @@ Feature-creep!
   - [ ] Theming support
     - [ ] Components
       - [x] StackLayout is style aware
-      - [ ] AbsoluteLayout is style aware
+      - [x] AbsoluteLayout is style aware
       - [ ] FlexLayout is style aware
       - [x] Label is style aware
       - [x] Button is style awa

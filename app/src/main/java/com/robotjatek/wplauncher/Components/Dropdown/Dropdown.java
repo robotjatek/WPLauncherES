@@ -30,8 +30,8 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
     public static final int BORDER_SIZE_PX = 4; // TODO: make this DP aware
     private boolean _disposed = false;
     private final TouchHandler _touchHandler = new TouchHandler(this);
-    private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
-    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final AbsoluteLayout _borderLayout;
+    private final AbsoluteLayout _layout;
     private final List<DropdownContent<TPayload>> _contents = new ArrayList<>();
     private final Size<Integer> _closedSize;
     private final Size<Integer> _openSize;
@@ -90,8 +90,8 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
             _contents.add(content);
         }
 
-        _borderLayout.setBgColor(_currentStyle.borderColor());
-        _layout.setBgColor(_currentStyle.bgColor());
+        _borderLayout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.borderColor()));
+        _layout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.bgColor()));
         if (!_model.isEmpty()) {
             _selected = _model.get(0);
             if (_onChange != null) {
@@ -105,8 +105,6 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
         var style = _styleSupplier.get();
         if (!style.equals(_currentStyle)) {
             _currentStyle = style;
-            _borderLayout.setBgColor(_currentStyle.borderColor());
-            _layout.setBgColor(_currentStyle.bgColor());
             _isDirty = true;
         }
     }

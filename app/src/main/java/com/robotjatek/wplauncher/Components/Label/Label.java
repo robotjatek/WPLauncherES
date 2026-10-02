@@ -19,6 +19,7 @@ import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class Label implements UIElement, ITouchable {
@@ -34,8 +35,9 @@ public class Label implements UIElement, ITouchable {
     private final TouchHandler _touchHandler = new TouchHandler(this);
     private ILayout _parent;
     private Size<Integer> _size = new Size<>(-1, -1);
-
-    Supplier<ITheme.LabelStyle> _styleSupplier;
+    private Integer _textColor = null; // style override
+    private Integer _textSize = null; // style override
+    private final Supplier<ITheme.LabelStyle> _styleSupplier;
     private ITheme.LabelStyle _currentStyle;
 
     public Label(String text, Supplier<ITheme.LabelStyle> style) {
@@ -56,6 +58,7 @@ public class Label implements UIElement, ITouchable {
         this(text, textSize, typeFace, textColor, bgColor, -1, null);
     }
 
+    // TODO: remove legacy constructor?
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, Runnable onTap) {
         this(text, () -> new ITheme.LabelStyle(textSize, typeFace, textColor, bgColor), maxWidth, onTap);
     }
@@ -100,12 +103,13 @@ public class Label implements UIElement, ITouchable {
             // Truncate text if it exceeds max width
             var displayText = _maxWidth > 0 ? truncateText(_text, _maxWidth) : _text;
 
+            var appliedTextSize = _textSize == null ? _currentStyle.textSize() : _textSize;
             _textureId = TileUtil.createTextTexture(displayText,
                     (int) w,
                     (int) h,
-                    (int) (_currentStyle.textSize() * _scale),
+                    (int) (appliedTextSize * _scale),
                     _currentStyle.typeface(),
-                    _currentStyle.textColor(),
+                    _textColor == null ? _currentStyle.textColor() : _textColor,
                     _currentStyle.bgColor(),
                     HorizontalAlign.LEFT,
                     VerticalAlign.CENTER);
@@ -206,22 +210,21 @@ public class Label implements UIElement, ITouchable {
         _dirty = true;
     }
 
-    public void setTextColor(int color) {
-//        if (_textColor == color) return;
-//
-//        _textColor = color;
-//        _dirty = true;
+    public void setTextColor(Integer color) {
+        if (Objects.equals(_textColor, color)) return;
+
+        _textColor = color;
+        _dirty = true;
     }
 
     public int getTextSize() {
-        return _currentStyle.textSize();
+        return _textSize == null ? _currentStyle.textSize() : _textSize;
     }
 
-    public void setTextSize(int size) {
-//        if (_textSize == size) return;
-//
-//        _textSize = size;
-//        _dirty = true;
+    public void setTextSize(Integer size) {
+        if (Objects.equals(_textSize, size)) return;
+        _textSize = size;
+        _dirty = true;
     }
 
     public Typeface getTypeFace() {

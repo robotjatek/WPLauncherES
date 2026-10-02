@@ -71,6 +71,7 @@ public class ThemeScreen implements IScreen {
                 color.name(),
                 _icon,
                 new Size<>(0, 100),
+                () -> settings.getCurrentTheme().button(),
                 () -> {
                     var colorPickerScreen = new ColorPickerScreen(navigator);
                     colorPickerScreen.subscribe(_accentColorListener);
@@ -110,10 +111,7 @@ public class ThemeScreen implements IScreen {
     private void themeChanged(ITheme theme) {
         // TODO: components now are either fully themed or fully custom, no in-between
         _layout.setTheme(theme);
-
-        // TODO: per component themeing?
-        // TODO: color provider?
-        // TODO: theme provider?
+        
 //        _backgroundDropdown.setBorderColor(theme.getBorderColor());
 //        _backgroundDropdown.setBgColor(theme.getBgColor());
 //        _backgroundDropdown.setTextColor(theme.getTitleColor());

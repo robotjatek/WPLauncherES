@@ -14,6 +14,9 @@ public interface ITheme {
         }
     }
 
+    record ButtonStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor) {
+    }
+
     enum TextRole {
         TITLE,
         SUBTITLE,
@@ -27,4 +30,6 @@ public interface ITheme {
     LabelStyle label(TextRole role);
 
     TextBlockStyle textBlock();
+
+    ButtonStyle button();
 }

@@ -30,4 +30,9 @@ public class LightTheme implements ITheme {
     public TextBlockStyle textBlock() {
         return new TextBlockStyle(48, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
     }
+
+    @Override
+    public ButtonStyle button() {
+        return new ButtonStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK);
+    }
 }

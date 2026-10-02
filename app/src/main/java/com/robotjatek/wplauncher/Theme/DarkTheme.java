@@ -30,4 +30,9 @@ public class DarkTheme implements ITheme {
     public TextBlockStyle textBlock() {
         return new TextBlockStyle(48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
     }
+
+    @Override
+    public ButtonStyle button() {
+        return new ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE);
+    }
 }

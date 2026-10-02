@@ -16,7 +16,10 @@ import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
+
+import java.util.function.Supplier;
 
 public class Button implements UIElement, ITouchable {
 
@@ -31,14 +34,41 @@ public class Button implements UIElement, ITouchable {
     private Icon _icon;
     private Size<Integer> _size;
     private ILayout _parent;
+    private final Supplier<ITheme.ButtonStyle> _styleSupplier;
+    private ITheme.ButtonStyle _currentStyle;
 
-    public Button(String text, Icon icon, Size<Integer> size, Runnable onTap) {
-        _label = new Label(text, 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-        _size = size;
-        _icon = icon;
+    public Button(String text, Icon icon, Size<Integer> size, Supplier<ITheme.ButtonStyle> style, Runnable onTap) {
+        _styleSupplier = style;
+        _currentStyle = style.get();
         _onTap = onTap;
-        _borderLayout.setBgColor(Colors.WHITE);
-        _layout.setBgColor(Colors.BLACK);
+        _icon = icon;
+        _size = size;
+
+        _label = new Label(text,
+                () -> new ITheme.LabelStyle(
+                        _currentStyle.textSize(),
+                        _currentStyle.typeface(),
+                        _currentStyle.textColor(),
+                        Colors.TRANSPARENT), -1, null);
+        _borderLayout.setBgColor(_currentStyle.borderColor());
+        _layout.setBgColor(_currentStyle.bgColor());
+    }
+
+    // TODO: remove legacy constructor?
+    public Button(String text, Icon icon, Size<Integer> size, Runnable onTap) {
+        this(text, icon, size,
+                () -> new ITheme.ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE), onTap);
+    }
+
+
+    private void syncTheme() {
+        var style = _styleSupplier.get();
+        if (!style.equals(_currentStyle)) {
+            _currentStyle = style;
+            _borderLayout.setBgColor(_currentStyle.borderColor());
+            _layout.setBgColor(_currentStyle.bgColor());
+            _isDirty = true;
+        }
     }
 
     @Override
@@ -50,6 +80,7 @@ public class Button implements UIElement, ITouchable {
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
+        syncTheme();
         if (_isDirty) {
             _borderLayout.removeChild(_layout);
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
@@ -74,12 +105,15 @@ public class Button implements UIElement, ITouchable {
 
     @Override
     public void onPress() {
-        _layout.setBgColor(Colors.WHITE);
+        // swap background and border color on press
+        _layout.setBgColor(_currentStyle.borderColor());
+        _label.setTextColor(_currentStyle.bgColor());
     }
 
     @Override
     public void onRelease() {
-        _layout.setBgColor(Colors.BLACK);
+        _layout.setBgColor(_currentStyle.bgColor());
+        _label.setTextColor(null); // re-enable original styling
     }
 
     @Override

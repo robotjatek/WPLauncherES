@@ -20,7 +20,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class ThemeScreen implements IScreen {
 
-    private final OnChangeListener<AccentColor> _accentColorListener = this::accentChanged;
+    private final OnChangeListener<AccentColor> _accentColorListener = this::accentChanged; // TODO: make the accent color a property of the theme
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
@@ -36,9 +36,9 @@ public class ThemeScreen implements IScreen {
         var theme = _settings.getCurrentTheme();
         _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
 
-        Label _title = new Label("LAUNCHER SETTINGS", () -> _settings.getCurrentTheme().label(ITheme.TextRole.TITLE));
+        var _title = new Label("LAUNCHER SETTINGS", () -> _settings.getCurrentTheme().label(ITheme.TextRole.TITLE));
         _layout.addChild(_title);
-        Label _subtitle = new Label("theme", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE));
+        var _subtitle = new Label("theme", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE));
         _layout.addChild(_subtitle);
 
         _layout.addChild(new Spacer(0, 64));
@@ -60,7 +60,6 @@ public class ThemeScreen implements IScreen {
 
         var accentLabel = new Label("Accent color", () -> settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL));
         _layout.addChild(accentLabel);
-
         var color = settings.getAccentColor();
         _icon = new Icon(color.color(), new Size<>(64, 64));
         _colorPickerBtn = new Button(
@@ -69,7 +68,7 @@ public class ThemeScreen implements IScreen {
                 new Size<>(0, 100),
                 () -> settings.getCurrentTheme().button(),
                 () -> {
-                    var colorPickerScreen = new ColorPickerScreen(navigator);
+                    var colorPickerScreen = new ColorPickerScreen(navigator, settings::getCurrentTheme);
                     colorPickerScreen.subscribe(_accentColorListener);
                     navigator.push(colorPickerScreen);
                 });

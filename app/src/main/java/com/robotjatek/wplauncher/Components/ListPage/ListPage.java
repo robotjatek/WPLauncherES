@@ -8,10 +8,12 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Wraps the ListView into a full screen list component
@@ -21,10 +23,12 @@ public class ListPage<T> {
     private boolean _disposed = false;
     private static final int PAGE_PADDING_PX = 60;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final StackLayout _layout = new StackLayout();
-    private final ListView<T> _appList = new ListView<>(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset, PAGE_PADDING_PX);
+    private final StackLayout _layout;
+    private final ListView<T> _appList;
 
-    public ListPage() {
+    public ListPage(Supplier<ITheme> themeSupplier) {
+        _layout = new StackLayout(themeSupplier.get()::layout);
+        _appList = new ListView<>(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset, PAGE_PADDING_PX, themeSupplier);
         _layout.addChild(_appList);
     }
 

@@ -23,6 +23,7 @@ public class DarkTheme implements ITheme {
             case TITLE -> new LabelStyle(48, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
             case SUBTITLE -> new LabelStyle(160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
             case DROPDOWN_LABEL -> new LabelStyle(48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
+            case LIST_ITEM -> new LabelStyle(60, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
         };
     }
 

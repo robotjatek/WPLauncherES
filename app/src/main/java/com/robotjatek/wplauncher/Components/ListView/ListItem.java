@@ -1,9 +1,7 @@
 package com.robotjatek.wplauncher.Components.ListView;
 
-import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
@@ -12,7 +10,11 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.DarkTheme;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
+
+import java.util.function.Supplier;
 
 public class ListItem<T> implements ITouchable {
     private final TouchHandler _touchHandler = new TouchHandler(this);
@@ -27,13 +29,30 @@ public class ListItem<T> implements ITouchable {
     private Icon _icon;
     private float _scale = 1.0f;
     private static final Size<Integer> DEFAULT_SIZE = new Size<>(96, 96);
+    private final Supplier<ITheme> _themeSupplier;
+    private ITheme _currentTheme;
 
-    public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
+    public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload, Supplier<ITheme> themeSupplier) {
+        _themeSupplier = themeSupplier;
+        _currentTheme = themeSupplier.get();
         _onTap = onTap;
         _payload = payload;
-        _textLabel = new Label(label, 60, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
+        _textLabel = new Label(label, () -> _currentTheme.label(ITheme.TextRole.LIST_ITEM));
         if (icon != null) {
             _icon = new Icon(icon, iconBgColor, DEFAULT_SIZE);
+        }
+    }
+
+    // TODO: remove this deprecated constructor when theme support is complete across the application
+    public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
+       this(label, icon, iconBgColor, onTap, payload, DarkTheme::new);
+    }
+
+    private void syncTheme() {
+        var s = _themeSupplier.get();
+        if (!s.equals(_currentTheme)) {
+            _currentTheme = s;
+            _dirty = true;
         }
     }
 
@@ -75,6 +94,7 @@ public class ListItem<T> implements ITouchable {
 
     public void update(float delta, IDrawContext<ListItem<T>> context) {
         _touchHandler.update(delta);
+        syncTheme();
         if (_dirty) {
             var w = (int) (context.widthOf(this) * _scale);
             var h = (int) (context.heightOf(this) * _scale);

@@ -187,14 +187,14 @@ Feature-creep!
       - [x] AbsoluteLayout is style aware
       - [ ] FlexLayout is style aware
       - [x] Label is style aware
-      - [x] Button is style awa
+      - [x] Button is style aware
       - [x] TextBlock is style aware
       - [x] Dropdown is style aware
       - [ ] InputBox is style aware
       - [ ] ContextMenu is style aware
       - [ ] Checkbox is style aware
-      - [ ] ListView is style aware
-      - [ ] ListPage is style aware
+      - [x] ListView is style aware
+      - [x] ListPage is style aware
       - [ ] Modal is style aware
     - [ ] Screens
       - [ ] StartScreen is style aware

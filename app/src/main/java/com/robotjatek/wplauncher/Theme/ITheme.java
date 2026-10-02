@@ -25,7 +25,8 @@ public interface ITheme {
         TITLE,
         SUBTITLE,
         TEXT,
-        DROPDOWN_LABEL
+        DROPDOWN_LABEL,
+        LIST_ITEM
     }
 
     String name();
@@ -40,4 +41,5 @@ public interface ITheme {
     LayoutStyle layout();
 
     DropdownStyle dropdown();
+    // TODO: separate listview and listpage styles?
 }

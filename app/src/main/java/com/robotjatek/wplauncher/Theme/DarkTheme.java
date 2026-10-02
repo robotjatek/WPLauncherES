@@ -35,4 +35,9 @@ public class DarkTheme implements ITheme {
     public ButtonStyle button() {
         return new ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE);
     }
+
+    @Override
+    public LayoutStyle layout() {
+        return new LayoutStyle(Colors.BLACK);
+    }
 }

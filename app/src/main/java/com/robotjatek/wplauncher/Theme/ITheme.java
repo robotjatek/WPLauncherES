@@ -17,6 +17,8 @@ public interface ITheme {
     record ButtonStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor) {
     }
 
+    record LayoutStyle(int bgColor)  {}
+
     enum TextRole {
         TITLE,
         SUBTITLE,
@@ -32,4 +34,6 @@ public interface ITheme {
     TextBlockStyle textBlock();
 
     ButtonStyle button();
+
+    LayoutStyle layout();
 }

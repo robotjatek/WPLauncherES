@@ -37,8 +37,7 @@ public class ThemeScreen implements IScreen {
         _navigator = navigator;
         _settings = settings;
         var theme = _settings.getCurrentTheme();
-        _layout = new StackLayout();
-        _layout.setBgColor(theme.getBgColor());
+        _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
 
         Label _title = new Label("LAUNCHER SETTINGS", () -> _settings.getCurrentTheme().label(ITheme.TextRole.TITLE));
         _layout.addChild(_title);
@@ -109,9 +108,6 @@ public class ThemeScreen implements IScreen {
     }
 
     private void themeChanged(ITheme theme) {
-        // TODO: components now are either fully themed or fully custom, no in-between
-        _layout.setTheme(theme);
-        
 //        _backgroundDropdown.setBorderColor(theme.getBorderColor());
 //        _backgroundDropdown.setBgColor(theme.getBgColor());
 //        _backgroundDropdown.setTextColor(theme.getTitleColor());

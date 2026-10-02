@@ -35,4 +35,9 @@ public class LightTheme implements ITheme {
     public ButtonStyle button() {
         return new ButtonStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK);
     }
+
+    @Override
+    public LayoutStyle layout() {
+        return new LayoutStyle(Colors.WHITE);
+    }
 }

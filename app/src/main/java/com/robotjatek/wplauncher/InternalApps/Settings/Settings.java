@@ -34,12 +34,16 @@ public class Settings implements IScreen {
         _layout.addChild(new Spacer(0, 160));
         _layout.addChild(new Label("theme", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 () -> navigator.push(new ThemeScreen(navigator, settings))));
+
         _layout.addChild(new Label("permissions", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 () -> navigator.push(new PermissionsScreen(navigator, permissionService, context))));
+
         _layout.addChild(new Label("crash log", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
-                () -> navigator.push(new CrashLogScreen(navigator, context))));
+                () -> navigator.push(new CrashLogScreen(navigator, context, settings))));
+
         _layout.addChild(new Label("debug", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 () -> navigator.push(new DebugScreen(navigator, settings, context))));
+
         _layout.addChild(new Label("about", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 () -> navigator.push(new AboutScreen(navigator, context, settings))));
     }

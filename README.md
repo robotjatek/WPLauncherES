@@ -202,10 +202,9 @@ Feature-creep!
       - [x] SettingsScreen is style aware
         - [x] ThemeScreen is style aware
         - [ ] PermissionsScreen is style aware
-        - [ ] CrashLogScreen is style aware
+        - [x] CrashLogScreen is style aware
         - [ ] DebugScreen is style aware
         - [ ] TextReaderScreen is style aware
-        - [ ] CrashLogScreen is style aware
         - [x] AboutScreen is style aware
       - [ ] GlanceScreen is style aware
 - [x] Animated tile resize

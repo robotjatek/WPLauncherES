@@ -70,7 +70,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         _bottomMargin = bottomMargin;
         _padding = padding;
         _itemDrawContext = new ListItemDrawContext<>(padding, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
-        _bgLayout = new StackLayout(themeSupplier.get()::layout);
+        _bgLayout = new StackLayout(() -> themeSupplier.get().layout());
     }
 
     // TODO: remove this deprecated constructor when theme support is complete across the application

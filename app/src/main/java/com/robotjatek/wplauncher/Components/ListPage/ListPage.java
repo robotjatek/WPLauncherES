@@ -27,7 +27,7 @@ public class ListPage<T> {
     private final ListView<T> _appList;
 
     public ListPage(Supplier<ITheme> themeSupplier) {
-        _layout = new StackLayout(themeSupplier.get()::layout);
+        _layout = new StackLayout(() -> themeSupplier.get().layout());
         _appList = new ListView<>(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset, PAGE_PADDING_PX, themeSupplier);
         _layout.addChild(_appList);
     }

@@ -37,7 +37,7 @@ public class ListItem<T> implements ITouchable {
         _currentTheme = themeSupplier.get();
         _onTap = onTap;
         _payload = payload;
-        _textLabel = new Label(label, () -> _currentTheme.label(ITheme.TextRole.LIST_ITEM));
+        _textLabel = new Label(label, () -> _themeSupplier.get().label(ITheme.TextRole.LIST_ITEM));
         if (icon != null) {
             _icon = new Icon(icon, iconBgColor, DEFAULT_SIZE);
         }

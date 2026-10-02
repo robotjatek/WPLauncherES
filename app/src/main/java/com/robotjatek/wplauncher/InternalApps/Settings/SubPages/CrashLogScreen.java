@@ -115,7 +115,7 @@ public class CrashLogScreen implements IScreen {
             if (payload != null) {
                 _crashList.removeItemByPayload(file);
             }
-        });
+        }, _settings);
         _navigator.push(page);
     }
 

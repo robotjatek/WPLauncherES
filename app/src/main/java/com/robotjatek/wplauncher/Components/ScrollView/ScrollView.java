@@ -23,6 +23,7 @@ public class ScrollView implements UIElement {
     private final float[] _clipMatrix = new float[16];
     private final ScrollViewDrawContext _drawContext = new ScrollViewDrawContext();
     private Size<Integer> _size;
+    private Size<Integer> _measuredChildSize = new Size<>(-1, -1);
     private boolean _dirty = true;
     private final float _topPadding;
     private final float _bottomPadding;
@@ -97,8 +98,11 @@ public class ScrollView implements UIElement {
             throw new RuntimeException("No child was set to the scroll view");
         }
         var childSize = _child.measure();
-        if (_parent != null) {
-            _parent.layout();
+        if (!childSize.equals(_measuredChildSize)) {
+            _measuredChildSize = childSize;
+            if (_parent != null) {
+                _parent.layout();
+            }
         }
         return childSize;
     }

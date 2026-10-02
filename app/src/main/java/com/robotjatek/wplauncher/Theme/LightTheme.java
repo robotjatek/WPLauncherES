@@ -20,7 +20,7 @@ public class LightTheme implements ITheme {
     public LabelStyle label(TextRole role) {
         return switch (role) {
             case TEXT -> new LabelStyle(64, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
-            case TITLE -> new LabelStyle(48, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);
+            case TITLE -> new LabelStyle(64, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);
             case SUBTITLE -> new LabelStyle(160, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);
             case DROPDOWN_LABEL -> new LabelStyle(48, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
             case LIST_ITEM -> new LabelStyle(60, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);

@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Size;
@@ -17,6 +16,7 @@ import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class AboutScreen implements IScreen {
@@ -25,32 +25,37 @@ public class AboutScreen implements IScreen {
     private final Context _context;
     private final IScreenNavigator _navigator;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final StackLayout _layout = new StackLayout();
-    private final Label _versionLabel = new Label("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0);
+    private final StackLayout _layout;
+    private final Label _versionLabel;
     private final String _githubURL = "https://github.com/robotjatek/WPLauncherES";
     private final String _siteURL = "https://robotjatek.github.io/";
-    private final TextBlock _description = new TextBlock("A Windows Phone inspired launcher for Android built from scratch in OpenGL ES",
-            48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, -1);
-    private final TextBlock _free = new TextBlock("Free forever. No ads. No paywalls. No data collected. No telemetry.",
-            48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, -1);
+    private final TextBlock _description;
+    private final TextBlock _free;
 
     public AboutScreen(IScreenNavigator navigator, Context context, SettingsService settings) {
         _navigator = navigator;
         _context = context;
-        _layout.setBgColor(Colors.BLACK);
+        _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
 
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("about", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout.addChild(new Label("LAUNCHER SETTINGS", () -> settings.getCurrentTheme().label(ITheme.TextRole.TITLE)));
+        _layout.addChild(new Label("about", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE)));
         _layout.addChild(new Spacer(0, 48));
-        _layout.addChild(new Label("WP Launcher ES Beta", 60, Typeface.BOLD, Colors.LIGHT_GRAY, 0));
+        var appLabelStyle = settings.getCurrentTheme().label(ITheme.TextRole.TEXT).withTypeFace(Typeface.BOLD).withTextSize(60);
+        _layout.addChild(new Label("WP Launcher ES Beta", () -> appLabelStyle));
+        _versionLabel = new Label("", () -> settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL));
         _layout.addChild(_versionLabel);
         _layout.addChild(new Spacer(0, 48));
+        _description = new TextBlock("A Windows Phone inspired launcher for Android built from scratch in OpenGL ES",
+                () -> settings.getCurrentTheme().textBlock(), -1);
         _layout.addChild(_description);
         _layout.addChild(new Spacer(0, 48));
+        _free = new TextBlock("Free forever. No ads. No paywalls. No data collected. No telemetry.",
+                () -> settings.getCurrentTheme().textBlock(), -1);
         _layout.addChild(_free);
         _layout.addChild(new Spacer(0, 48));
-        _layout.addChild(new Label(_githubURL, 48, Typeface.NORMAL, settings.getAccentColor().color(), 0, -1, () -> launchBrowser(_githubURL)));
-        _layout.addChild(new Label(_siteURL, 48, Typeface.NORMAL, settings.getAccentColor().color(), 0, -1, () -> launchBrowser(_siteURL)));
+        var urlStyle = settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL).withTextColor(settings.getAccentColor().color());
+        _layout.addChild(new Label(_githubURL, () -> urlStyle, -1, () -> launchBrowser(_githubURL)));
+        _layout.addChild(new Label(_siteURL, () -> urlStyle, -1, () -> launchBrowser(_siteURL)));
     }
 
     @Override

@@ -206,7 +206,7 @@ Feature-creep!
         - [ ] DebugScreen is style aware
         - [ ] TextReaderScreen is style aware
         - [ ] CrashLogScreen is style aware
-        - [ ] AboutScreen is style aware
+        - [x] AboutScreen is style aware
       - [ ] GlanceScreen is style aware
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation

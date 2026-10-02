@@ -1,10 +1,20 @@
 package com.robotjatek.wplauncher.Theme;
 
+import android.graphics.Typeface;
+
 public interface ITheme {
 
     record LabelStyle(int textSize, int typeface, int textColor, int bgColor) {
         public LabelStyle withTextColor(int color) {
             return new LabelStyle(textSize, typeface, color, bgColor);
+        }
+
+        public LabelStyle withTypeFace(int typeface) {
+            return new LabelStyle(textSize, typeface, textColor, bgColor);
+        }
+
+        public LabelStyle withTextSize(int textSize) {
+            return new LabelStyle(textSize, typeface, textColor, bgColor);
         }
     }
 

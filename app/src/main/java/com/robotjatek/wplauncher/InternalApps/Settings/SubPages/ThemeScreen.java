@@ -20,7 +20,7 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class ThemeScreen implements IScreen {
 
-    private final OnChangeListener<AccentColor> _accentColorListener = this::accentChanged; // TODO: make the accent color a property of the theme
+    private final OnChangeListener<AccentColor> _accentColorListener = this::accentChanged;
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
@@ -73,8 +73,6 @@ public class ThemeScreen implements IScreen {
                     navigator.push(colorPickerScreen);
                 });
         _layout.addChild(_colorPickerBtn);
-
-        _settings.subscribeToAccentColorChange(_accentColorListener);
     }
 
     @Override
@@ -113,7 +111,6 @@ public class ThemeScreen implements IScreen {
             _layout.dispose();
             _icon.dispose();
             _description.dispose();
-            _settings.unsubscribeFromAccentColorChange(_accentColorListener);
             _disposed = true;
         }
     }

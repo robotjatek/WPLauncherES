@@ -179,7 +179,7 @@ Feature-creep!
 - [x] More live-tiles
   - [x] Photos
   - [x] Weather
-- [ ] Light mode/Dark mode support
+- [x] Light mode/Dark mode support
   - [x] Dropdown component
   - [ ] Theming support
     - [ ] Components
@@ -203,10 +203,11 @@ Feature-creep!
         - [x] ThemeScreen is style aware
         - [ ] PermissionsScreen is style aware
         - [x] CrashLogScreen is style aware
-        - [ ] DebugScreen is style aware
+        - [x] DebugScreen is style aware
         - [x] TextReaderScreen is style aware
         - [x] AboutScreen is style aware
       - [ ] GlanceScreen is style aware
+  - [ ] Persist theme setting
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings

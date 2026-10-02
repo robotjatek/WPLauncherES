@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.List;
@@ -26,6 +27,7 @@ public class StackLayout implements ILayout {
     private ILayout _parent;
     private boolean _disposed = false;
     private int _bgColor = Colors.TRANSPARENT;
+    private ITheme _theme = null;
     private int _padding = 0;
     public static final int TOP_MARGIN_PX = 0;
     private final List<UIElement> _children = new CopyOnWriteArrayList<>();
@@ -70,7 +72,8 @@ public class StackLayout implements ILayout {
         Matrix.translateM(_model, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_model, 0, size.width(), size.height(), 1f);
         Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
-        renderer.drawFlat(proj, _model, _bgColor);
+        var bgColor = _theme != null ? _theme.getBgColor() : _bgColor;
+        renderer.drawFlat(proj, _model, bgColor);
 
         Matrix.setIdentityM(_model, 0);
         Matrix.translateM(_model, 0, position.x(), position.y() + TOP_MARGIN_PX, 0f);
@@ -190,6 +193,7 @@ public class StackLayout implements ILayout {
 
     public void setBgColor(int color) {
         _bgColor = color;
+        _theme = null;
     }
 
     public void setPadding(int padding) {
@@ -199,6 +203,11 @@ public class StackLayout implements ILayout {
 
     public int getPadding() {
         return _padding;
+    }
+
+    // TODO: Override from UIElement
+    public void setTheme(ITheme theme) {
+        _theme = theme;
     }
 
     public void dispose() {

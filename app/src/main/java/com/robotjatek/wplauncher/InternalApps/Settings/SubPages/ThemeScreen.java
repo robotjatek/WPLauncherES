@@ -1,9 +1,5 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
-import android.graphics.Typeface;
-import android.util.Log;
-
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Dropdown.Dropdown;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
@@ -34,40 +30,41 @@ public class ThemeScreen implements IScreen {
     private Icon _icon;
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final TextBlock _description = new TextBlock("You can change your phone's background" +
-            " and accent color to match your mood today, this week, or all month",
-            48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT, -1);
+
+    private final TextBlock _description;
 
     public ThemeScreen(IScreenNavigator navigator, SettingsService settings) {
         _navigator = navigator;
         _settings = settings;
-        _settings.subscribeToAccentColorChange(_accentColorListener);
-        _settings.subscribeToThemeChange(_themeListener);
+        var theme = _settings.getCurrentTheme();
         _layout = new StackLayout();
-        _layout.setBgColor(Colors.BLACK);
+        _layout.setBgColor(theme.getBgColor());
 
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("theme", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        Label _title = new Label("LAUNCHER SETTINGS", () -> _settings.getCurrentTheme().label(ITheme.TextRole.TITLE));
+        _layout.addChild(_title);
+        Label _subtitle = new Label("theme", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE));
+        _layout.addChild(_subtitle);
 
         _layout.addChild(new Spacer(0, 64));
+
+        _description = new TextBlock("You can change your phone's background" +
+                " and accent color to match your mood today, this week, or all month",
+                () -> _settings.getCurrentTheme().textBlock(), -1);
         _layout.addChild(_description);
         _layout.addChild(new Spacer(0, 48));
 
-        var selectedContent = new Label("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0); // TODO: remove when theme change is implemented
-        _layout.addChild(selectedContent);
-
-        _layout.addChild(new Label("Background color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
+        var backgroundLabel = new Label("Background color", () -> settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL));
+        _layout.addChild(backgroundLabel);
         var options = _settings.getThemes();
-        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, ITheme::name,
-                (selected) -> {
-                    selectedContent.setText(selected.name());
-                    _settings.setCurrentTheme(selected);
-                });
+        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, ITheme::name, _settings::setCurrentTheme);
+        _backgroundDropdown.setSelected(theme);
         _layout.addChild(_backgroundDropdown);
 
         _layout.addChild(new Spacer(0, 48));
 
-        _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
+        var accentLabel = new Label("Accent color", () -> settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL));
+        _layout.addChild(accentLabel);
+
         var color = settings.getAccentColor();
         _icon = new Icon(color.color(), new Size<>(64, 64));
         _colorPickerBtn = new Button(
@@ -80,6 +77,9 @@ public class ThemeScreen implements IScreen {
                     navigator.push(colorPickerScreen);
                 });
         _layout.addChild(_colorPickerBtn);
+
+        _settings.subscribeToAccentColorChange(_accentColorListener);
+        _settings.subscribeToThemeChange(_themeListener);
     }
 
     @Override
@@ -108,7 +108,15 @@ public class ThemeScreen implements IScreen {
     }
 
     private void themeChanged(ITheme theme) {
-        Log.d("", theme.name());
+        // TODO: components now are either fully themed or fully custom, no in-between
+        _layout.setTheme(theme);
+
+        // TODO: per component themeing?
+        // TODO: color provider?
+        // TODO: theme provider?
+//        _backgroundDropdown.setBorderColor(theme.getBorderColor());
+//        _backgroundDropdown.setBgColor(theme.getBgColor());
+//        _backgroundDropdown.setTextColor(theme.getTitleColor());
     }
 
     @Override

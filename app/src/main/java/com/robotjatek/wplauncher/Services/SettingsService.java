@@ -22,7 +22,8 @@ public class SettingsService {
     private final List<OnChangeListener<AccentColor>> _accentChangeListeners = new ArrayList<>();
     private final List<OnChangeListener<ITheme>> _themeChangeListeners = new ArrayList<>();
     private AccentColor _accentColor = Colors.ACCENT_COLORS.get(0);
-    private ITheme _theme = new DarkTheme();
+    private final List<ITheme> _themes = List.of(new DarkTheme(), new LightTheme());
+    private ITheme _theme = _themes.get(0); // TODO: persist theme, load persisted theme
     private final Context _context;
 
     public SettingsService(Context context) {
@@ -63,7 +64,7 @@ public class SettingsService {
     }
 
     public List<ITheme> getThemes() {
-        return List.of(new DarkTheme(), new LightTheme());
+        return _themes;
     }
 
     public void setCurrentTheme(ITheme theme) {

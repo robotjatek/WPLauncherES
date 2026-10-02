@@ -15,17 +15,16 @@ import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.HorizontalAlign;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileUtil;
 import com.robotjatek.wplauncher.VerticalAlign;
+
+import java.util.function.Supplier;
 
 public class Label implements UIElement, ITouchable {
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private String _text;
-    private int _textSize;
-    private final int _typeFace;
-    private int _textColor;
-    private final int _bgColor;
     private float _scale = 1f;
     private float _maxWidth; // -1 means no limit
     private boolean _dirty = true;
@@ -36,20 +35,37 @@ public class Label implements UIElement, ITouchable {
     private ILayout _parent;
     private Size<Integer> _size = new Size<>(-1, -1);
 
+    Supplier<ITheme.LabelStyle> _styleSupplier;
+    private ITheme.LabelStyle _currentStyle;
+
+    public Label(String text, Supplier<ITheme.LabelStyle> style) {
+        this(text, style, -1, null);
+    }
+
+    public Label(String text, Supplier<ITheme.LabelStyle> style, int maxWidth, Runnable onTap) {
+        _text = text;
+        _styleSupplier = style;
+        _currentStyle = style.get();
+        _maxWidth = maxWidth;
+        _onTap = onTap;
+        _paint.setTypeface(Typeface.create("sans-serif-light", _currentStyle.typeface()));
+        _paint.setTextAlign(Paint.Align.LEFT);
+    }
+
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
         this(text, textSize, typeFace, textColor, bgColor, -1, null);
     }
 
     public Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, Runnable onTap) {
-        _text = text;
-        _textSize = textSize;
-        _typeFace = typeFace;
-        _textColor = textColor;
-        _bgColor = bgColor;
-        _maxWidth = maxWidth;
-        _onTap = onTap;
-        _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
-        _paint.setTextAlign(Paint.Align.LEFT);
+        this(text, () -> new ITheme.LabelStyle(textSize, typeFace, textColor, bgColor), maxWidth, onTap);
+    }
+
+    private void syncStyle() {
+        var s = _styleSupplier.get();
+        if (!s.equals(_currentStyle)) {
+            _currentStyle = s;
+            _dirty = true;
+        }
     }
 
     @Override
@@ -70,6 +86,7 @@ public class Label implements UIElement, ITouchable {
         var correctedX = x - xDiff;
         var correctedY = y - yDiff;
 
+        syncStyle();
         if (_dirty) {
             if (_textureId > 0) {
                 TileUtil.deleteTexture(_textureId);
@@ -86,10 +103,10 @@ public class Label implements UIElement, ITouchable {
             _textureId = TileUtil.createTextTexture(displayText,
                     (int) w,
                     (int) h,
-                    (int) (_textSize * _scale),
-                    _typeFace,
-                    _textColor,
-                    _bgColor,
+                    (int) (_currentStyle.textSize() * _scale),
+                    _currentStyle.typeface(),
+                    _currentStyle.textColor(),
+                    _currentStyle.bgColor(),
                     HorizontalAlign.LEFT,
                     VerticalAlign.CENTER);
             _dirty = false;
@@ -107,7 +124,7 @@ public class Label implements UIElement, ITouchable {
     }
 
     private String truncateText(String text, float maxWidth) {
-        _paint.setTextSize(_textSize);
+        _paint.setTextSize(_currentStyle.textSize());
 
         var textWidth = _paint.measureText(text);
 
@@ -149,7 +166,7 @@ public class Label implements UIElement, ITouchable {
     @Override
     public Size<Integer> measure() {
         // TODO: cache measurements
-        _paint.setTextSize(_textSize);
+        _paint.setTextSize(_currentStyle.textSize());
 
         var displayText = _maxWidth > 0 ? truncateText(_text, _maxWidth) : _text;
         var textWidth = _paint.measureText(displayText);
@@ -189,30 +206,22 @@ public class Label implements UIElement, ITouchable {
         _dirty = true;
     }
 
-    public int getBgColor() {
-        return _bgColor;
-    }
-
-    public int getTextColor() {
-        return _textColor;
-    }
-
     public void setTextColor(int color) {
-        if (_textColor == color) return;
-
-        _textColor = color;
-        _dirty = true;
+//        if (_textColor == color) return;
+//
+//        _textColor = color;
+//        _dirty = true;
     }
 
     public int getTextSize() {
-        return _textSize;
+        return _currentStyle.textSize();
     }
 
     public void setTextSize(int size) {
-        if (_textSize == size) return;
-
-        _textSize = size;
-        _dirty = true;
+//        if (_textSize == size) return;
+//
+//        _textSize = size;
+//        _dirty = true;
     }
 
     public Typeface getTypeFace() {

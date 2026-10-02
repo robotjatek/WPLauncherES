@@ -59,14 +59,19 @@ public class Label implements UIElement, ITouchable {
         this(text, textSize, typeFace, textColor, bgColor, -1, null);
     }
 
-    public Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, Runnable onTap) {
-        this(text, () -> new ITheme.LabelStyle(textSize, typeFace, textColor, bgColor), maxWidth, onTap);
+    private Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, Runnable onTap) {
+        this(text, constant(new ITheme.LabelStyle(textSize, typeFace, textColor, bgColor)), maxWidth, onTap);
+    }
+
+    private static Supplier<ITheme.LabelStyle> constant(ITheme.LabelStyle style) {
+        return () -> style;
     }
 
     private void syncStyle() {
         var s = _styleSupplier.get();
         if (!s.equals(_currentStyle)) {
             _currentStyle = s;
+            _paint.setTypeface(Typeface.create("sans-serif-light", _currentStyle.typeface()));
             _dirty = true;
         }
     }
@@ -128,7 +133,7 @@ public class Label implements UIElement, ITouchable {
     }
 
     private String truncateText(String text, float maxWidth) {
-        _paint.setTextSize(_currentStyle.textSize());
+        _paint.setTextSize(getTextSize());
 
         var textWidth = _paint.measureText(text);
 
@@ -170,7 +175,7 @@ public class Label implements UIElement, ITouchable {
     @Override
     public Size<Integer> measure() {
         // TODO: cache measurements
-        _paint.setTextSize(_currentStyle.textSize());
+        _paint.setTextSize(getTextSize());
 
         var displayText = _maxWidth > 0 ? truncateText(_text, _maxWidth) : _text;
         var textWidth = _paint.measureText(displayText);

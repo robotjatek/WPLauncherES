@@ -73,7 +73,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         _bgLayout = new StackLayout(() -> themeSupplier.get().layout());
     }
 
-    // TODO: remove this deprecated constructor when theme support is complete across the application
+    // TODO: remove this deprecated constructor when theme support is complete across the application (used in applist only)
     public ListView(int topMargin, int bottomMargin, int padding) {
         this(topMargin, bottomMargin, padding, DarkTheme::new);
     }

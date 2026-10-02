@@ -49,7 +49,7 @@ public class ThemeScreen implements IScreen {
         _layout.addChild(_description);
         _layout.addChild(new Spacer(0, 48));
 
-        var backgroundLabel = new Label("Background color", () -> settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL));
+        var backgroundLabel = new Label("Background color", () -> settings.getCurrentTheme().label(ITheme.TextRole.CAPTION));
         _layout.addChild(backgroundLabel);
         var options = _settings.getThemes();
         var _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, ITheme::name, _settings::setCurrentTheme, () -> settings.getCurrentTheme().dropdown());
@@ -58,7 +58,7 @@ public class ThemeScreen implements IScreen {
 
         _layout.addChild(new Spacer(0, 48));
 
-        var accentLabel = new Label("Accent color", () -> settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL));
+        var accentLabel = new Label("Accent color", () -> settings.getCurrentTheme().label(ITheme.TextRole.CAPTION));
         _layout.addChild(accentLabel);
         var color = settings.getAccentColor();
         _icon = new Icon(color.color(), new Size<>(64, 64));

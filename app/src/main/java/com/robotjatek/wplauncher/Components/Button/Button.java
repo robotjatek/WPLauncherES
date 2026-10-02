@@ -36,34 +36,41 @@ public class Button implements UIElement, ITouchable {
     private ILayout _parent;
     private final Supplier<ITheme.ButtonStyle> _styleSupplier;
     private ITheme.ButtonStyle _currentStyle;
+    private ITheme.LabelStyle _labelStyle;
+    private ITheme.LayoutStyle _borderStyle;
+    private ITheme.LayoutStyle _bgStyle;
 
     public Button(String text, Icon icon, Size<Integer> size, Supplier<ITheme.ButtonStyle> style, Runnable onTap) {
         _styleSupplier = style;
         _currentStyle = style.get();
+        createInternalStyles();
         _onTap = onTap;
         _icon = icon;
         _size = size;
 
-        _label = new Label(text,
-                () -> new ITheme.LabelStyle(
-                        _currentStyle.textSize(),
-                        _currentStyle.typeface(),
-                        _currentStyle.textColor(),
-                        Colors.TRANSPARENT), -1, null);
-        _borderLayout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.borderColor()));
-        _layout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.bgColor()));
+        _label = new Label(text, () -> _labelStyle, -1, null);
+        _borderLayout = new AbsoluteLayout(() -> _borderStyle);
+        _layout = new AbsoluteLayout(() -> _bgStyle);
+    }
+
+    private void createInternalStyles() {
+        var s = _currentStyle;
+        _labelStyle = new ITheme.LabelStyle(s.textSize(), s.typeface(), s.textColor(), Colors.TRANSPARENT);
+        _borderStyle = new ITheme.LayoutStyle(s.borderColor());
+        _bgStyle = new ITheme.LayoutStyle(s.bgColor());
     }
 
     // TODO: remove legacy constructor?
+    private static final ITheme.ButtonStyle LEGACY_STYLE = new ITheme.ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE);
     public Button(String text, Icon icon, Size<Integer> size, Runnable onTap) {
-        this(text, icon, size,
-                () -> new ITheme.ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE), onTap);
+        this(text, icon, size, () -> LEGACY_STYLE, onTap);
     }
 
     private void syncTheme() {
         var style = _styleSupplier.get();
         if (!style.equals(_currentStyle)) {
             _currentStyle = style;
+            createInternalStyles();
             _isDirty = true;
         }
     }

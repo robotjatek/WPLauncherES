@@ -35,7 +35,7 @@ public interface ITheme {
         TITLE,
         SUBTITLE,
         TEXT,
-        DROPDOWN_LABEL,
+        CAPTION,
         LIST_ITEM,
         PAGE_LINK
     }

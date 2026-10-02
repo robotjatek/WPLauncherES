@@ -208,6 +208,7 @@ Feature-creep!
         - [x] AboutScreen is style aware
       - [x] GlanceScreen is style aware
   - [ ] Persist theme setting
+  - [ ] Fix: The top of the screen is black in light mode
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
@@ -255,6 +256,8 @@ Cleaning up the accumulated mess
 - [ ] Fix: Adjust the layer offset of the opened pages so spinning tiles won't overlap with the animated page
 - [ ] Relayout on child size change should be implicit
 - [ ] Kill TileUtil.java
+- [ ] Kill all theme-unaware legacy constructors
+- [ ] Fix: Top of the color picker screen is cut off
 
 ### M5 - Beta 2
 

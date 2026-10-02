@@ -1,8 +1,6 @@
 package com.robotjatek.wplauncher.Components.Checkbox;
 
 import android.content.Context;
-import android.graphics.Paint;
-import android.graphics.Typeface;
 
 import androidx.core.content.ContextCompat;
 
@@ -26,12 +24,10 @@ import java.util.function.Supplier;
 public class Checkbox implements UIElement {
     private static final int BORDER_SIZE_PX = 4; // TODO: make this DP aware
     private static final int TOGGLE_SIZE = 100;
-    private static final int TEXT_SIZE = 48;
     private boolean _disposed = false;
     private boolean _state;
     private final Consumer<Boolean> _onChange;
     private boolean _dirty = true;
-    private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private ILayout _parent;
     private Size<Integer> _size = new Size<>(-1, -1);
     private final AbsoluteLayout _layout;
@@ -41,29 +37,37 @@ public class Checkbox implements UIElement {
     private final Icon _tickIcon;
     private final Supplier<ITheme.CheckboxStyle> _styleSupplier;
     private ITheme.CheckboxStyle _currentStyle;
+    private ITheme.LabelStyle _labelStyle;
+    private ITheme.LayoutStyle _borderStyle;
+    private ITheme.LayoutStyle _bgStyle;
 
     public Checkbox(String text, boolean initialState, Consumer<Boolean> onChange, Context context, Supplier<ITheme.CheckboxStyle> style) {
         _onChange = onChange;
         _state = initialState;
         _styleSupplier = style;
         _currentStyle = style.get();
+        createInternalStyles();
         _tickIcon = new Icon(ContextCompat.getDrawable(context, R.drawable.icon_tick), new Size<>(TOGGLE_SIZE, TOGGLE_SIZE));
         _tickIcon.setTint(_currentStyle.textColor());
 
-        _label = new Label(
-                text,
-                () -> new ITheme.LabelStyle(_currentStyle.textSize(), _currentStyle.typeface(), _currentStyle.textColor(), Colors.TRANSPARENT),
-                -1,
-                null);
+        _label = new Label(text, () -> _labelStyle, -1, null);
         _layout = new AbsoluteLayout();
-        _checkboxBorderLayout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.borderColor()));
-        _checkboxBackground = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.bgColor()));
+        _checkboxBorderLayout = new AbsoluteLayout(() -> _borderStyle);
+        _checkboxBackground = new AbsoluteLayout(() -> _bgStyle);
+    }
+
+    private void createInternalStyles() {
+        var s = _currentStyle;
+        _labelStyle = new ITheme.LabelStyle(s.textSize(), s.typeface(), s.textColor(), Colors.TRANSPARENT);
+        _borderStyle = new ITheme.LayoutStyle(s.borderColor());
+        _bgStyle = new ITheme.LayoutStyle(s.bgColor());
     }
 
     private void syncStyle() {
         var s = _styleSupplier.get();
         if (!s.equals(_currentStyle)) {
             _currentStyle = s;
+            createInternalStyles();
             _tickIcon.setTint(_currentStyle.textColor());
             _dirty = true;
         }
@@ -96,7 +100,7 @@ public class Checkbox implements UIElement {
 
             _layout.removeChild(_label);
             _label.setMaxWidth(labelWidth);
-            _layout.addChild(_label, new Position<>(TOGGLE_SIZE + 16f, (h-BORDER_SIZE_PX*2f) / 2f - _label.measure().height() / 2f));
+            _layout.addChild(_label, new Position<>(TOGGLE_SIZE + 16f, (h) / 2f - _label.measure().height() / 2f));
 
             _dirty = false;
         }
@@ -106,8 +110,6 @@ public class Checkbox implements UIElement {
 
     @Override
     public Size<Integer> measure() {
-        _paint.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
-        _paint.setTextSize(TEXT_SIZE);
         var textWidth = _label.measure().width();
         var size = new Size<>(TOGGLE_SIZE + 16 + textWidth, TOGGLE_SIZE);
         if (!_size.equals(size)) {

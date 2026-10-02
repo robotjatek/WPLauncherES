@@ -43,7 +43,7 @@ public class ListItem<T> implements ITouchable {
         }
     }
 
-    // TODO: remove this deprecated constructor when theme support is complete across the application
+    // TODO: remove this deprecated constructor when theme support is complete across the application (used in applist only)
     public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
        this(label, icon, iconBgColor, onTap, payload, DarkTheme::new);
     }

@@ -31,26 +31,31 @@ public class DropdownContent<T> implements UIElement, ITouchable {
     private boolean _isDirty = true;
     private final Supplier<ITheme.DropdownStyle> _styleSupplier;
     private ITheme.DropdownStyle _currentStyle;
+    private ITheme.LabelStyle _labelStyle;
+    private ITheme.LayoutStyle _layoutStyle;
 
     public DropdownContent(Dropdown<T> parent, T item, String label, Supplier<ITheme.DropdownStyle> style) {
         _parent = parent;
         _item = item;
         _styleSupplier = style;
         _currentStyle = style.get();
+        createInternalStyles();
 
-        _label = new Label(label,
-                () -> new ITheme.LabelStyle(
-                        _currentStyle.textSize(),
-                        _currentStyle.typeface(),
-                        _currentStyle.textColor(),
-                        Colors.TRANSPARENT));
-        _layout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.bgColor()));
+        _label = new Label(label, () -> _labelStyle);
+        _layout = new AbsoluteLayout(() -> _layoutStyle);
+    }
+
+    private void createInternalStyles() {
+        var s = _currentStyle;
+        _labelStyle = new ITheme.LabelStyle(s.textSize(), s.typeface(), s.textColor(), Colors.TRANSPARENT);
+        _layoutStyle = new ITheme.LayoutStyle(s.bgColor());
     }
 
     private void syncTheme() {
         var style = _styleSupplier.get();
         if (!style.equals(_currentStyle)) {
             _currentStyle = style;
+            createInternalStyles();
             _isDirty = true;
         }
     }

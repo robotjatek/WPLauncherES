@@ -39,11 +39,9 @@ public class StackLayout implements ILayout {
     private final float[] _model = new float[16];
     private Size<Integer> _size = new Size<>(-1, -1);
     private final Supplier<ITheme.LayoutStyle> _styleSupplier;
-    private ITheme.LayoutStyle _currentStyle;
 
     public StackLayout(Supplier<ITheme.LayoutStyle> style, Orientation orientation, int padding) {
         _styleSupplier = style;
-        _currentStyle = style.get();
         _orientation = orientation;
         setPadding(padding);
         _drawContext = new StackLayoutDrawContext(this);
@@ -53,19 +51,13 @@ public class StackLayout implements ILayout {
         this(style, Orientation.VERTICAL, DEFAULT_PADDING);
     }
 
+    private static final ITheme.LayoutStyle LEGACY = new ITheme.LayoutStyle(Colors.TRANSPARENT);
     public StackLayout() {
-        this(() -> new ITheme.LayoutStyle(Colors.TRANSPARENT), Orientation.VERTICAL, DEFAULT_PADDING);
+        this(() -> LEGACY, Orientation.VERTICAL, DEFAULT_PADDING);
     }
 
     public StackLayout(Orientation orientation, int padding) {
-        this(() -> new ITheme.LayoutStyle(Colors.TRANSPARENT), orientation, padding);
-    }
-
-    public void syncStyle() {
-        var s = _styleSupplier.get();
-        if (!s.equals(_currentStyle)) {
-            _currentStyle = s;
-        }
+        this(() -> LEGACY, orientation, padding);
     }
 
     @Override
@@ -81,14 +73,12 @@ public class StackLayout implements ILayout {
     @Override
     public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position,
                      Size<Integer> size) {
-
-        syncStyle();
         renderer.pushLayer();
         Matrix.setIdentityM(_model, 0);
         Matrix.translateM(_model, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_model, 0, size.width(), size.height(), 1f);
         Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
-        var bgColor = _bgColor == null ? _currentStyle.bgColor() : _bgColor;
+        var bgColor = _bgColor == null ? _styleSupplier.get().bgColor() : _bgColor;
         renderer.drawFlat(proj, _model, bgColor);
 
         Matrix.setIdentityM(_model, 0);

@@ -46,6 +46,8 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
 
     private final Supplier<ITheme.DropdownStyle> _styleSupplier;
     private ITheme.DropdownStyle _currentStyle;
+    private ITheme.LayoutStyle _borderStyle;
+    private ITheme.LayoutStyle _bgStyle;
 
     public IState IDLE_STATE() {
         return new IdleState<>(this);
@@ -76,6 +78,7 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
     public Dropdown(Size<Integer> size, List<TPayload> items, Function<TPayload, String> labelSelector, Consumer<TPayload> onChange, Supplier<ITheme.DropdownStyle> style) {
         _styleSupplier = style;
         _currentStyle = style.get();
+        createInternalStyles();
         _model = items;
         _onChange = onChange;
         _closedSize = size;
@@ -90,8 +93,8 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
             _contents.add(content);
         }
 
-        _borderLayout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.borderColor()));
-        _layout = new AbsoluteLayout(() -> new ITheme.LayoutStyle(_currentStyle.bgColor()));
+        _borderLayout = new AbsoluteLayout(() -> _borderStyle);
+        _layout = new AbsoluteLayout(() -> _bgStyle);
         if (!_model.isEmpty()) {
             _selected = _model.get(0);
             if (_onChange != null) {
@@ -101,10 +104,17 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
         _state.enter();
     }
 
+    private void createInternalStyles() {
+        var s = _currentStyle;
+        _borderStyle = new ITheme.LayoutStyle(s.borderColor());
+        _bgStyle = new ITheme.LayoutStyle(s.bgColor());
+    }
+
     private void syncTheme() {
         var style = _styleSupplier.get();
         if (!style.equals(_currentStyle)) {
             _currentStyle = style;
+            createInternalStyles();
             _isDirty = true;
         }
     }

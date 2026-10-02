@@ -19,6 +19,8 @@ import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
+import java.util.function.Supplier;
+
 public class AboutScreen implements IScreen {
 
     private boolean _disposed = false;
@@ -40,9 +42,9 @@ public class AboutScreen implements IScreen {
         _layout.addChild(new Label("LAUNCHER SETTINGS", () -> settings.getCurrentTheme().label(ITheme.TextRole.TITLE)));
         _layout.addChild(new Label("about", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE)));
         _layout.addChild(new Spacer(0, 48));
-        var appLabelStyle = settings.getCurrentTheme().label(ITheme.TextRole.TEXT).withTypeFace(Typeface.BOLD).withTextSize(60);
-        _layout.addChild(new Label("WP Launcher ES Beta", () -> appLabelStyle));
-        _versionLabel = new Label("", () -> settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL));
+        Supplier<ITheme.LabelStyle> appLabelStyle = () -> settings.getCurrentTheme().label(ITheme.TextRole.TEXT).withTypeFace(Typeface.BOLD).withTextSize(60);
+        _layout.addChild(new Label("WP Launcher ES Beta", appLabelStyle));
+        _versionLabel = new Label("", () -> settings.getCurrentTheme().label(ITheme.TextRole.CAPTION));
         _layout.addChild(_versionLabel);
         _layout.addChild(new Spacer(0, 48));
         _description = new TextBlock("A Windows Phone inspired launcher for Android built from scratch in OpenGL ES",
@@ -53,9 +55,9 @@ public class AboutScreen implements IScreen {
                 () -> settings.getCurrentTheme().textBlock(), -1);
         _layout.addChild(_free);
         _layout.addChild(new Spacer(0, 48));
-        var urlStyle = settings.getCurrentTheme().label(ITheme.TextRole.DROPDOWN_LABEL).withTextColor(settings.getAccentColor().color());
-        _layout.addChild(new Label(_githubURL, () -> urlStyle, -1, () -> launchBrowser(_githubURL)));
-        _layout.addChild(new Label(_siteURL, () -> urlStyle, -1, () -> launchBrowser(_siteURL)));
+        Supplier<ITheme.LabelStyle> urlStyle = () -> settings.getCurrentTheme().label(ITheme.TextRole.CAPTION).withTextColor(settings.getAccentColor().color());
+        _layout.addChild(new Label(_githubURL, urlStyle, -1, () -> launchBrowser(_githubURL)));
+        _layout.addChild(new Label(_siteURL, urlStyle, -1, () -> launchBrowser(_siteURL)));
     }
 
     @Override

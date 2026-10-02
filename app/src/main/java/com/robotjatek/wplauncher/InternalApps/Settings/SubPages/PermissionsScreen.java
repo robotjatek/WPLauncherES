@@ -1,9 +1,7 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.content.Context;
-import android.graphics.Typeface;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Checkbox.Checkbox;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
@@ -15,6 +13,8 @@ import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
+import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class PermissionsScreen implements IScreen {
@@ -22,20 +22,22 @@ public class PermissionsScreen implements IScreen {
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final PermissionService _permissionService;
-    private final StackLayout _layout = new StackLayout();
+    private final StackLayout _layout;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final TextBlock _description = new TextBlock("You can re-ask for missing permissions from this screen.", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, -1);
+    private final TextBlock _description;
     private final Checkbox _locationCheckbox;
     private final Checkbox _notificationCheckbox;
     private final Checkbox _mediaCheckbox;
 
-    public PermissionsScreen(IScreenNavigator navigator, PermissionService permissionService, Context context) {
+    public PermissionsScreen(IScreenNavigator navigator, PermissionService permissionService, SettingsService settings, Context context) {
         _navigator = navigator;
         _permissionService = permissionService;
-        _layout.setBgColor(Colors.BLACK);
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("permissions", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
+        _layout.addChild(new Label("LAUNCHER SETTINGS", () -> settings.getCurrentTheme().label(ITheme.TextRole.TITLE)));
+        _layout.addChild(new Label("permissions", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE)));
         _layout.addChild(new Spacer(0, 32));
+        _description= new TextBlock("You can re-ask for missing permissions from this screen.",
+                () -> settings.getCurrentTheme().textBlock(), -1);
         _layout.addChild(_description);
         _layout.addChild(new Spacer(0, 32));
 
@@ -43,21 +45,21 @@ public class PermissionsScreen implements IScreen {
             if (state) {
                 _permissionService.requestLocationPermission();
             }
-        }, context);
+        }, context, () -> settings.getCurrentTheme().checkbox());
         _layout.addChild(_locationCheckbox);
         _layout.addChild(new Spacer(0, 32));
         _notificationCheckbox = new Checkbox("notifications", _permissionService.hasNotificationAccess(), (Boolean state) -> {
             if (state) {
                 _permissionService.openNotificationSettings();
             }
-        }, context);
+        }, context, () -> settings.getCurrentTheme().checkbox());
         _layout.addChild(_notificationCheckbox);
         _layout.addChild(new Spacer(0, 32));
         _mediaCheckbox = new Checkbox("photos", _permissionService.hasMediaPermission(),(Boolean state) -> {
             if (state) {
                 _permissionService.requestMediaPermission();
             }
-        }, context);
+        }, context, () -> settings.getCurrentTheme().checkbox());
         _layout.addChild(_mediaCheckbox);
     }
 

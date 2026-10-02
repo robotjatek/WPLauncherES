@@ -192,7 +192,7 @@ Feature-creep!
       - [x] Dropdown is style aware
       - [ ] InputBox is style aware
       - [ ] ContextMenu is style aware
-      - [ ] Checkbox is style aware
+      - [x] Checkbox is style aware
       - [x] ListView is style aware
       - [x] ListPage is style aware
       - [ ] Modal is style aware
@@ -201,7 +201,7 @@ Feature-creep!
       - [ ] AppListScreen is style aware
       - [x] SettingsScreen is style aware
         - [x] ThemeScreen is style aware
-        - [ ] PermissionsScreen is style aware
+        - [x] PermissionsScreen is style aware
         - [x] CrashLogScreen is style aware
         - [x] DebugScreen is style aware
         - [x] TextReaderScreen is style aware
@@ -234,6 +234,7 @@ Feature-creep!
 - [x] Fix: checkbox label is squashed
 - [x] Fix: Dirty flag is set on tiles on scroll stop
 - [x] Call layout() in the parent layout on a component resize
+- [x] Make checkbox use higher level components
 
 ### M4.5
 
@@ -253,6 +254,7 @@ Cleaning up the accumulated mess
 - [ ] Opening a large crash-log crashes the launcher on texture creation 
 - [ ] Fix: Adjust the layer offset of the opened pages so spinning tiles won't overlap with the animated page
 - [ ] Relayout on child size change should be implicit
+- [ ] Kill TileUtil.java
 
 ### M5 - Beta 2
 
@@ -269,7 +271,6 @@ Creep got too big
 - [ ] Reduce memory footprint by not keeping bitmaps in memory (see the TODO App.java)
 - [ ] Floating tiles in edit-mode
 - [ ] 6 column mode setting
-- [ ] Make checkbox use higher level components (then kill TileUtil.java)
 - [ ] Show weather icon on the Glance tile
 - [ ] Add tile adorners to the top level overlay
 - [ ] Apps can pin their shortcuts to the home screen

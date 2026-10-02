@@ -47,4 +47,9 @@ public class DarkTheme implements ITheme {
     public DropdownStyle dropdown() {
         return new DropdownStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.BOLD, Colors.WHITE);
     }
+
+    @Override
+    public CheckboxStyle checkbox() {
+        return new CheckboxStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.NORMAL, Colors.WHITE);
+    }
 }

@@ -47,4 +47,9 @@ public class LightTheme implements ITheme {
     public DropdownStyle dropdown() {
         return new DropdownStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.BOLD, Colors.BLACK);
     }
+
+    @Override
+    public CheckboxStyle checkbox() {
+        return new CheckboxStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.NORMAL, Colors.BLACK);
+    }
 }

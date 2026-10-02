@@ -1,7 +1,5 @@
 package com.robotjatek.wplauncher.Theme;
 
-import android.graphics.Typeface;
-
 public interface ITheme {
 
     record LabelStyle(int textSize, int typeface, int textColor, int bgColor) {
@@ -31,6 +29,8 @@ public interface ITheme {
 
     record DropdownStyle(int bgColor, int borderColor, int textSize, int typeface, int textColor) {}
 
+    record CheckboxStyle(int bgColor, int borderColor, int textSize, int typeface, int textColor) {}
+
     enum TextRole {
         TITLE,
         SUBTITLE,
@@ -52,5 +52,7 @@ public interface ITheme {
     LayoutStyle layout();
 
     DropdownStyle dropdown();
+
+    CheckboxStyle checkbox();
     // TODO: separate listview and listpage styles?
 }

@@ -47,7 +47,8 @@ public class Checkbox implements UIElement {
         _state = initialState;
         _styleSupplier = style;
         _currentStyle = style.get();
-        _tickIcon = new Icon(ContextCompat.getDrawable(context, R.drawable.icon_tick), new Size<>(TOGGLE_SIZE, TOGGLE_SIZE)); // TODO: them aware icon
+        _tickIcon = new Icon(ContextCompat.getDrawable(context, R.drawable.icon_tick), new Size<>(TOGGLE_SIZE, TOGGLE_SIZE));
+        _tickIcon.setTint(_currentStyle.textColor());
 
         _label = new Label(
                 text,
@@ -69,6 +70,7 @@ public class Checkbox implements UIElement {
         var s = _styleSupplier.get();
         if (!s.equals(_currentStyle)) {
             _currentStyle = s;
+            _tickIcon.setTint(_currentStyle.textColor());
             _dirty = true;
         }
     }

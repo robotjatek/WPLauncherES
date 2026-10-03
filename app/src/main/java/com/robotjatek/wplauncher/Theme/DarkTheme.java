@@ -13,7 +13,6 @@ public class DarkTheme implements ITheme {
     private final LabelStyle _listItem = new LabelStyle(60, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
     private final LabelStyle _pageLink = new LabelStyle(96, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
 
-
     @Override
     public String name() {
         return "dark";
@@ -44,6 +43,11 @@ public class DarkTheme implements ITheme {
     @Override
     public ButtonStyle button() {
         return new ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE);
+    }
+
+    @Override
+    public InputBoxStyle inputBox() {
+        return new InputBoxStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE, Colors.LIGHT_GRAY);
     }
 
     @Override

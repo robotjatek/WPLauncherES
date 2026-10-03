@@ -25,6 +25,8 @@ public interface ITheme {
     record ButtonStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor) {
     }
 
+    record InputBoxStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor, int placeholderColor) {}
+
     record LayoutStyle(int bgColor)  {}
 
     record DropdownStyle(int bgColor, int borderColor, int textSize, int typeface, int textColor) {}
@@ -54,5 +56,7 @@ public interface ITheme {
     DropdownStyle dropdown();
 
     CheckboxStyle checkbox();
+
+    InputBoxStyle inputBox();
     // TODO: separate listview and listpage styles?
 }

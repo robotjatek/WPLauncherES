@@ -190,7 +190,7 @@ Feature-creep!
       - [x] Button is style aware
       - [x] TextBlock is style aware
       - [x] Dropdown is style aware
-      - [ ] InputBox is style aware
+      - [x] InputBox is style aware
       - [ ] ContextMenu is style aware
       - [x] Checkbox is style aware
       - [x] ListView is style aware
@@ -198,7 +198,7 @@ Feature-creep!
       - [ ] Modal is style aware
     - [ ] Screens
       - [ ] TileGrid is style aware
-      - [ ] AppListScreen is style aware
+      - [x] AppListScreen is style aware
       - [x] SettingsScreen is style aware
         - [x] ThemeScreen is style aware
         - [x] PermissionsScreen is style aware

@@ -46,6 +46,11 @@ public class LightTheme implements ITheme {
     }
 
     @Override
+    public InputBoxStyle inputBox() {
+        return new InputBoxStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK, Colors.DARK_GRAY);
+    }
+
+    @Override
     public LayoutStyle layout() {
         return new LayoutStyle(Colors.WHITE);
     }

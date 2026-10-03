@@ -10,7 +10,6 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.Theme.DarkTheme;
 import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
@@ -41,11 +40,6 @@ public class ListItem<T> implements ITouchable {
         if (icon != null) {
             _icon = new Icon(icon, iconBgColor, DEFAULT_SIZE);
         }
-    }
-
-    // TODO: remove this deprecated constructor when theme support is complete across the application (used in applist only)
-    public ListItem(String label, Drawable icon, int iconBgColor, Runnable onTap, T payload) {
-       this(label, icon, iconBgColor, onTap, payload, DarkTheme::new);
     }
 
     private void syncTheme() {

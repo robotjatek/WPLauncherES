@@ -16,7 +16,6 @@ import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
-import com.robotjatek.wplauncher.Theme.DarkTheme;
 import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
@@ -65,17 +64,13 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         return new ContextMenuState<>(this, x, y);
     }
 
+    // TODO: dedicated Theme for listview
     public ListView(int topMargin, int bottomMargin, int padding, Supplier<ITheme> themeSupplier) {
         _topMargin = topMargin;
         _bottomMargin = bottomMargin;
         _padding = padding;
         _itemDrawContext = new ListItemDrawContext<>(padding, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
         _bgLayout = new StackLayout(() -> themeSupplier.get().layout());
-    }
-
-    // TODO: remove this deprecated constructor when theme support is complete across the application (used in applist only)
-    public ListView(int topMargin, int bottomMargin, int padding) {
-        this(topMargin, bottomMargin, padding, DarkTheme::new);
     }
 
     @Override

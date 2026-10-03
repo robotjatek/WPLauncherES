@@ -43,8 +43,8 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private final IPageNavigator _navigator;
     private final SettingsService _settingsService;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final StackLayout _layout = new StackLayout();
-    private final ListView<App> _list = new ListView<>(0, 0, PAGE_PADDING_PX);
+    private final StackLayout _layout;
+    private final ListView<App> _list;
     private final InputBox _searchBox;
 
     public AppList(Context context, IPageNavigator navigator, TileService tileService,
@@ -55,9 +55,11 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _tileService = tileService;
         _settingsService = settingsService;
         _settingsService.subscribeToAccentColorChange(this);
+        _list = new ListView<>(0, 0, PAGE_PADDING_PX, settingsService::getCurrentTheme);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_list);
 
-        _searchBox = new InputBox("Search", this::onSearchTextChanged, screenNavigator, context);
+        _layout = new StackLayout(() -> settingsService.getCurrentTheme().layout());
+        _searchBox = new InputBox("Search", this::onSearchTextChanged, screenNavigator, () -> settingsService.getCurrentTheme().inputBox(), context);
         _layout.addChild(_searchBox);
         _layout.addChild(_list);
 
@@ -144,7 +146,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     private ListItem<App> createItem(App app) {
         var accentColor = _settingsService.getAccentColor().color();
-        return new ListItem<>(app.name(), app.icon(), accentColor, app.action(), app);
+        return new ListItem<>(app.name(), app.icon(), accentColor, app.action(), app, _settingsService::getCurrentTheme);
     }
 
     private void uninstallApp(String packageName) {

@@ -12,41 +12,60 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class TextBlock implements UIElement {
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private String _text;
-    private int _textSize;
-    private int _typeFace;
-    private int _textColor;
-    private int _bgColor;
     private int _maxWidth;
     private int _maxHeight; // Maximum height (optional, -1 for unlimited)
-    private float _lineSpacing = 1.2f;
+    private final float _lineSpacing = 1.2f;
     private boolean _dirty = true;
     private int _textureId = -1;
     private Size<Integer> _cachedSize = new Size<>(0, 0);
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private List<String> _wrappedLines = null; // Cache for wrapped lines
     private ILayout _parent;
+    private final Supplier<ITheme.TextBlockStyle> _styleSupplier;
+    private ITheme.TextBlockStyle _currentStyle;
 
+    public TextBlock(String text, Supplier<ITheme.TextBlockStyle> style, int maxWidth) {
+        this(text, style, maxWidth, -1);
+    }
+
+    public TextBlock(String text, Supplier<ITheme.TextBlockStyle> style, int maxWidth, int maxHeight) {
+        _text = text;
+        _styleSupplier = style;
+        _currentStyle = style.get();
+        _maxWidth = maxWidth;
+        _maxHeight = maxHeight;
+    }
+
+    // TODO: Legacy constructors: used only in modal and notificationelement (delete later)
     public TextBlock(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
         this(text, textSize, typeFace, textColor, bgColor, maxWidth, -1);
     }
 
     public TextBlock(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, int maxHeight) {
-        _text = text;
-        _textSize = textSize;
-        _typeFace = typeFace;
-        _textColor = textColor;
-        _bgColor = bgColor;
-        _maxWidth = maxWidth;
-        _maxHeight = maxHeight;
+        this(text, constant(new ITheme.TextBlockStyle(textSize, typeFace, textColor, bgColor)), maxWidth, maxHeight);
+    }
+
+    private static Supplier<ITheme.TextBlockStyle> constant(ITheme.TextBlockStyle style) {
+        return () -> style;
+    }
+
+    private void syncStyle() {
+        var style = _styleSupplier.get();
+        if (!style.equals(_currentStyle)) {
+            _currentStyle = style;
+            invalidate();
+        }
     }
 
     @Override
@@ -54,6 +73,7 @@ public class TextBlock implements UIElement {
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
 
+        syncStyle();
         if (_dirty || _textureId == -1) {
             measure();
             if (_cachedSize.width() <= 0 || _cachedSize.height() <= 0 || _wrappedLines == null) {
@@ -75,9 +95,9 @@ public class TextBlock implements UIElement {
 
     private int createMultilineTexture() {
         _paint.setTextAlign(Paint.Align.LEFT);
-        _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
-        _paint.setTextSize(_textSize);
-        _paint.setColor(_textColor);
+        _paint.setTypeface(Typeface.create("sans-serif-light", _currentStyle.typeface()));
+        _paint.setTextSize(_currentStyle.textSize());
+        _paint.setColor(_currentStyle.textColor());
 
         var lines = _wrappedLines;
         var fm = _paint.getFontMetrics();
@@ -86,7 +106,7 @@ public class TextBlock implements UIElement {
 
         var bitmap = Bitmap.createBitmap(_cachedSize.width(), totalHeight, Bitmap.Config.ARGB_8888);
         var canvas = new Canvas(bitmap);
-        canvas.drawColor(_bgColor);
+        canvas.drawColor(_currentStyle.bgColor());
 
         var baselineY = -fm.ascent;
         for (var line : lines) {
@@ -125,8 +145,8 @@ public class TextBlock implements UIElement {
     public Size<Integer> measure() {
         if (_dirty || _wrappedLines == null) {
             _paint.setTextAlign(Paint.Align.LEFT);
-            _paint.setTypeface(Typeface.create("sans-serif-light", _typeFace));
-            _paint.setTextSize(_textSize);
+            _paint.setTypeface(Typeface.create("sans-serif-light", _currentStyle.typeface()));
+            _paint.setTextSize(_currentStyle.textSize());
 
             _wrappedLines = wrapText(_text, _maxWidth, _paint);
             var fm = _paint.getFontMetrics();
@@ -190,29 +210,6 @@ public class TextBlock implements UIElement {
             _maxHeight = maxHeight;
             invalidate();
         }
-    }
-
-    public void setLineSpacing(float lineSpacing) {
-        if (_lineSpacing != lineSpacing) {
-            _lineSpacing = lineSpacing;
-            invalidate();
-        }
-    }
-
-    public int getBgColor() {
-        return _bgColor;
-    }
-
-    public int getTextColor() {
-        return _textColor;
-    }
-
-    public int getTextSize() {
-        return _textSize;
-    }
-
-    public int getTypeFace() {
-        return _typeFace;
     }
 
     @Override

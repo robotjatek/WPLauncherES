@@ -9,12 +9,14 @@ import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 
 public class StackLayout implements ILayout {
     public static  final int DEFAULT_PADDING = 32;
@@ -25,7 +27,7 @@ public class StackLayout implements ILayout {
 
     private ILayout _parent;
     private boolean _disposed = false;
-    private int _bgColor = Colors.TRANSPARENT;
+    private Integer _bgColor = null;
     private int _padding = 0;
     public static final int TOP_MARGIN_PX = 0;
     private final List<UIElement> _children = new CopyOnWriteArrayList<>();
@@ -36,19 +38,26 @@ public class StackLayout implements ILayout {
     private int _height;
     private final float[] _model = new float[16];
     private Size<Integer> _size = new Size<>(-1, -1);
+    private final Supplier<ITheme.LayoutStyle> _styleSupplier;
 
-    public StackLayout() {
-        this(Orientation.VERTICAL, DEFAULT_PADDING);
-    }
-
-    public StackLayout(Orientation orientation) {
-        this(orientation, DEFAULT_PADDING);
-    }
-
-    public StackLayout(Orientation orientation, int padding) {
+    public StackLayout(Supplier<ITheme.LayoutStyle> style, Orientation orientation, int padding) {
+        _styleSupplier = style;
         _orientation = orientation;
         setPadding(padding);
         _drawContext = new StackLayoutDrawContext(this);
+    }
+
+    public StackLayout(Supplier<ITheme.LayoutStyle> style) {
+        this(style, Orientation.VERTICAL, DEFAULT_PADDING);
+    }
+
+    private static final ITheme.LayoutStyle LEGACY = new ITheme.LayoutStyle(Colors.TRANSPARENT);
+    public StackLayout() {
+        this(() -> LEGACY, Orientation.VERTICAL, DEFAULT_PADDING);
+    }
+
+    public StackLayout(Orientation orientation, int padding) {
+        this(() -> LEGACY, orientation, padding);
     }
 
     @Override
@@ -64,13 +73,13 @@ public class StackLayout implements ILayout {
     @Override
     public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer, Position<Float> position,
                      Size<Integer> size) {
-
         renderer.pushLayer();
         Matrix.setIdentityM(_model, 0);
         Matrix.translateM(_model, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_model, 0, size.width(), size.height(), 1f);
         Matrix.multiplyMM(_model, 0, view, 0, _model, 0);
-        renderer.drawFlat(proj, _model, _bgColor);
+        var bgColor = _bgColor == null ? _styleSupplier.get().bgColor() : _bgColor;
+        renderer.drawFlat(proj, _model, bgColor);
 
         Matrix.setIdentityM(_model, 0);
         Matrix.translateM(_model, 0, position.x(), position.y() + TOP_MARGIN_PX, 0f);
@@ -188,7 +197,7 @@ public class StackLayout implements ILayout {
         return null;
     }
 
-    public void setBgColor(int color) {
+    public void setBgColor(Integer color) {
         _bgColor = color;
     }
 

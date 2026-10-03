@@ -179,9 +179,36 @@ Feature-creep!
 - [x] More live-tiles
   - [x] Photos
   - [x] Weather
-- [ ] Light mode/Dark mode support
+- [x] Light mode/Dark mode support
   - [x] Dropdown component
   - [ ] Theming support
+    - [ ] Components
+      - [x] StackLayout is style aware
+      - [x] AbsoluteLayout is style aware
+      - [ ] FlexLayout is style aware
+      - [x] Label is style aware
+      - [x] Button is style aware
+      - [x] TextBlock is style aware
+      - [x] Dropdown is style aware
+      - [x] InputBox is style aware
+      - [ ] ContextMenu is style aware
+      - [x] Checkbox is style aware
+      - [x] ListView is style aware
+      - [x] ListPage is style aware
+      - [ ] Modal is style aware
+    - [ ] Screens
+      - [ ] TileGrid is style aware
+      - [x] AppListScreen is style aware
+      - [x] SettingsScreen is style aware
+        - [x] ThemeScreen is style aware
+        - [x] PermissionsScreen is style aware
+        - [x] CrashLogScreen is style aware
+        - [x] DebugScreen is style aware
+        - [x] TextReaderScreen is style aware
+        - [x] AboutScreen is style aware
+      - [x] GlanceScreen is style aware
+  - [ ] Persist theme setting
+  - [ ] Fix: The top of the screen is black in light mode
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
@@ -208,6 +235,7 @@ Feature-creep!
 - [x] Fix: checkbox label is squashed
 - [x] Fix: Dirty flag is set on tiles on scroll stop
 - [x] Call layout() in the parent layout on a component resize
+- [x] Make checkbox use higher level components
 
 ### M4.5
 
@@ -227,6 +255,9 @@ Cleaning up the accumulated mess
 - [ ] Opening a large crash-log crashes the launcher on texture creation 
 - [ ] Fix: Adjust the layer offset of the opened pages so spinning tiles won't overlap with the animated page
 - [ ] Relayout on child size change should be implicit
+- [ ] Kill TileUtil.java
+- [ ] Kill all theme-unaware legacy constructors
+- [ ] Fix: Top of the color picker screen is cut off
 
 ### M5 - Beta 2
 
@@ -243,9 +274,9 @@ Creep got too big
 - [ ] Reduce memory footprint by not keeping bitmaps in memory (see the TODO App.java)
 - [ ] Floating tiles in edit-mode
 - [ ] 6 column mode setting
-- [ ] Make checkbox use higher level components (then kill TileUtil.java)
 - [ ] Show weather icon on the Glance tile
 - [ ] Add tile adorners to the top level overlay
+- [ ] Apps can pin their shortcuts to the home screen
 
 ### M5.5
 

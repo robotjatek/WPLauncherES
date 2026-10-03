@@ -1,9 +1,7 @@
 package com.robotjatek.wplauncher.InternalApps.Settings;
 
 import android.content.Context;
-import android.graphics.Typeface;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.Spacer.Spacer;
 import com.robotjatek.wplauncher.Gestures.Gesture;
@@ -19,6 +17,7 @@ import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.DebugScreen;
 import com.robotjatek.wplauncher.InternalApps.Settings.SubPages.ThemeScreen;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class Settings implements IScreen {
@@ -30,19 +29,22 @@ public class Settings implements IScreen {
 
     public Settings(IScreenNavigator navigator, SettingsService settings, PermissionService permissionService, Context context) {
         _navigator = navigator;
-        _layout = new StackLayout();
-        _layout.setBgColor(Colors.BLACK);
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
+        _layout.addChild(new Label("LAUNCHER SETTINGS", () -> settings.getCurrentTheme().label(ITheme.TextRole.TITLE)));
         _layout.addChild(new Spacer(0, 160));
-        _layout.addChild(new Label("theme", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+        _layout.addChild(new Label("theme", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 () -> navigator.push(new ThemeScreen(navigator, settings))));
-        _layout.addChild(new Label("permissions", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
-                () -> navigator.push(new PermissionsScreen(navigator, permissionService, context))));
-        _layout.addChild(new Label("crash log", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
-                () -> navigator.push(new CrashLogScreen(navigator, context))));
-        _layout.addChild(new Label("debug", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+
+        _layout.addChild(new Label("permissions", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
+                () -> navigator.push(new PermissionsScreen(navigator, permissionService, settings, context))));
+
+        _layout.addChild(new Label("crash log", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
+                () -> navigator.push(new CrashLogScreen(navigator, context, settings))));
+
+        _layout.addChild(new Label("debug", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 () -> navigator.push(new DebugScreen(navigator, settings, context))));
-        _layout.addChild(new Label("about", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+
+        _layout.addChild(new Label("about", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 () -> navigator.push(new AboutScreen(navigator, context, settings))));
     }
 

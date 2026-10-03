@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.Components.InputBox;
 
 import android.content.Context;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 
 import androidx.core.content.ContextCompat;
 
@@ -21,9 +20,11 @@ import com.robotjatek.wplauncher.IUIContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IOverlay;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class InputBox implements UIElement, ITextInputHandler {
 
@@ -31,8 +32,8 @@ public class InputBox implements UIElement, ITextInputHandler {
     private static final float TEXT_OFFSET = 16f; // Offset from the border of the input box // TODO: this is a hard-coded offset. Make it density aware
     private boolean _disposed = false;
     private boolean _isDirty = true;
-    private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
-    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final AbsoluteLayout _borderLayout;
+    private final AbsoluteLayout _layout;
     private int _cursorPosition = 0;
     private boolean _showCursor = false;
     private boolean _showHandle = false;
@@ -47,6 +48,11 @@ public class InputBox implements UIElement, ITextInputHandler {
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final IOverlay _overlay;
     private ILayout _parent;
+    private final Supplier<ITheme.InputBoxStyle> _styleSupplier;
+    private ITheme.InputBoxStyle _currentStyle;
+    private ITheme.LabelStyle _labelStyle;
+    private ITheme.LayoutStyle _borderStyle;
+    private ITheme.LayoutStyle _bgStyle;
 
     public BaseState IDLE_STATE() {
         return new IdleState(this);
@@ -54,22 +60,45 @@ public class InputBox implements UIElement, ITextInputHandler {
     public BaseState ACTIVE_STATE(IUIContext uiContext) { return new ActiveState(this, uiContext); }
     private BaseState _state = IDLE_STATE();
 
-    public InputBox(String placeholder, Consumer<String> onTextChanged, IOverlay overlay, Context context) {
+    public InputBox(String placeholder, Consumer<String> onTextChanged, IOverlay overlay, Supplier<ITheme.InputBoxStyle> style, Context context) {
         _placeholder = placeholder;
         _onTextChanged = onTextChanged;
         _overlay = overlay;
+        _styleSupplier = style;
+        _currentStyle = style.get();
+        createInternalStyles();
+
         var handleIcon = ContextCompat.getDrawable(context, R.drawable.ic_cursor_handle);
         _handle = new CursorHandle(this, handleIcon);
 
-        _label = new Label(_placeholder, 48, Typeface.BOLD, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
+        _label = new Label(_placeholder, () -> _labelStyle);
         _paint.setTypeface(_label.getTypeFace());
         _paint.setTextSize(_label.getTextSize());
-        _borderLayout.setBgColor(Colors.WHITE);
-        _layout.setBgColor(Colors.BLACK);
+        _borderLayout = new AbsoluteLayout(() -> _borderStyle);
+        _layout = new AbsoluteLayout(() -> _bgStyle);
         _layout.addChild(_cursor, new Position<>(0f, 0f));
         _cursor.setSize(new Size<>(6, _label.measure().height())); // TODO: density aware: Math.max(2, Math.round(2f * density)); // 2dp wide
-        
+
+        updateLabel();
         _state.enter();
+    }
+
+    private void createInternalStyles() {
+        var s = _currentStyle;
+        var textColor = _text.isEmpty() ? s.placeholderColor() : s.textColor();
+        _labelStyle = new ITheme.LabelStyle(s.textSize(), s.typeface(), textColor, Colors.TRANSPARENT);
+        _borderStyle = new ITheme.LayoutStyle(s.borderColor());
+        _bgStyle = new ITheme.LayoutStyle(s.bgColor());
+    }
+
+    private void syncTheme() {
+        var style = _styleSupplier.get();
+        if (!style.equals(_currentStyle)) {
+            _currentStyle = style;
+            _cursor.setColor(style.textColor());
+            createInternalStyles();
+            _isDirty = true;
+        }
     }
 
     public void changeState(BaseState state) {
@@ -86,6 +115,7 @@ public class InputBox implements UIElement, ITextInputHandler {
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
+        syncTheme();
         if (_isDirty) {
             _borderLayout.removeChild(_layout);
             var borderPosition = new Position<>((float) BORDER_SIZE_PX, (float) BORDER_SIZE_PX);
@@ -234,11 +264,10 @@ public class InputBox implements UIElement, ITextInputHandler {
     private void updateLabel() {
         if (_text.isEmpty()) {
             _label.setText(_placeholder);
-            _label.setTextColor(Colors.LIGHT_GRAY);
         } else {
             _label.setText(_text);
-            _label.setTextColor(Colors.WHITE);
         }
+        createInternalStyles();
     }
 
     @Override

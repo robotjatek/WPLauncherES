@@ -9,10 +9,12 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 
 
 public class AbsoluteLayout implements ILayout {
@@ -20,10 +22,20 @@ public class AbsoluteLayout implements ILayout {
     private final List<PositionedElement> _positionedElements = new CopyOnWriteArrayList<>();
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _modelMatrix = new float[16];
-    private int _bgColor = Colors.TRANSPARENT;
-    private boolean _dirty = true;
+    private Integer _bgColor = null;
     private final IDrawContext<UIElement> _drawContext = new AbsoluteLayoutDrawContext(this);
     private ILayout _parent;
+    private final Supplier<ITheme.LayoutStyle> _styleSupplier;
+
+    public AbsoluteLayout(Supplier<ITheme.LayoutStyle> style) {
+        _styleSupplier = style;
+    }
+
+    private static final ITheme.LayoutStyle LEGACY = new ITheme.LayoutStyle(Colors.TRANSPARENT);
+
+    public AbsoluteLayout() {
+        this(() -> LEGACY);
+    }
 
     public static class PositionedElement {
         UIElement _element;
@@ -43,7 +55,6 @@ public class AbsoluteLayout implements ILayout {
     public void addChild(UIElement element, Position<Float> position) {
         _positionedElements.add(new PositionedElement(element, position));
         element.setParent(this);
-        _dirty = true;
     }
 
     public void removeChild(UIElement element) {
@@ -64,7 +75,6 @@ public class AbsoluteLayout implements ILayout {
         for (var child : _positionedElements) {
             if (child._element == element) {
                 child._position = position;
-                _dirty = true;
                 return;
             }
         }
@@ -78,9 +88,8 @@ public class AbsoluteLayout implements ILayout {
         return !_positionedElements.isEmpty();
     }
 
-    public void setBgColor(int bgColor) {
+    public void setBgColor(Integer bgColor) {
         _bgColor = bgColor;
-        _dirty = true;
     }
 
     public List<PositionedElement> getPositionedElements() {
@@ -95,7 +104,6 @@ public class AbsoluteLayout implements ILayout {
     @Override
     public void onResize(int width, int height) {
         _size = new Size<>(width, height);
-        _dirty = true;
     }
 
     @Override
@@ -118,7 +126,6 @@ public class AbsoluteLayout implements ILayout {
                      Position<Float> position, Size<Integer> size) {
         if (!_size.equals(size)) {
             _size = size;
-            _dirty = true;
         }
 
         renderer.pushLayer();
@@ -128,7 +135,8 @@ public class AbsoluteLayout implements ILayout {
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.drawFlat(proj, _modelMatrix, _bgColor);
+        var bgColor = _bgColor == null ? _styleSupplier.get().bgColor() : _bgColor;
+        renderer.drawFlat(proj, _modelMatrix, bgColor);
 
         // Draw children with offset
         Matrix.setIdentityM(_modelMatrix, 0);

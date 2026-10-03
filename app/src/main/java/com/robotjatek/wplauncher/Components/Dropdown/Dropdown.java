@@ -15,12 +15,14 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class Dropdown<TPayload> implements UIElement, ITouchable {
     private final List<TPayload> _model;
@@ -28,8 +30,8 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
     public static final int BORDER_SIZE_PX = 4; // TODO: make this DP aware
     private boolean _disposed = false;
     private final TouchHandler _touchHandler = new TouchHandler(this);
-    private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
-    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final AbsoluteLayout _borderLayout;
+    private final AbsoluteLayout _layout;
     private final List<DropdownContent<TPayload>> _contents = new ArrayList<>();
     private final Size<Integer> _closedSize;
     private final Size<Integer> _openSize;
@@ -41,6 +43,11 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
     private final float[] _modelMatrix = new float[16];
     private ILayout _parent;
     private float _animationOffset = 0f;
+
+    private final Supplier<ITheme.DropdownStyle> _styleSupplier;
+    private ITheme.DropdownStyle _currentStyle;
+    private ITheme.LayoutStyle _borderStyle;
+    private ITheme.LayoutStyle _bgStyle;
 
     public IState IDLE_STATE() {
         return new IdleState<>(this);
@@ -68,7 +75,10 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
 
     // TODO: what to do on focus loss
     // TODO: the selected label should be in the accent color when the box is opened
-    public Dropdown(Size<Integer> size, List<TPayload> items, Function<TPayload, String> labelSelector, Consumer<TPayload> onChange) {
+    public Dropdown(Size<Integer> size, List<TPayload> items, Function<TPayload, String> labelSelector, Consumer<TPayload> onChange, Supplier<ITheme.DropdownStyle> style) {
+        _styleSupplier = style;
+        _currentStyle = style.get();
+        createInternalStyles();
         _model = items;
         _onChange = onChange;
         _closedSize = size;
@@ -79,12 +89,12 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
 
         for (TPayload item : _model) {
             var labelString = labelSelector != null ? labelSelector.apply(item) : item.toString();
-            var content = new DropdownContent<>(this, item, labelString);
+            var content = new DropdownContent<>(this, item, labelString, _styleSupplier);
             _contents.add(content);
         }
 
-        _borderLayout.setBgColor(Colors.WHITE);
-        _layout.setBgColor(Colors.BLACK);
+        _borderLayout = new AbsoluteLayout(() -> _borderStyle);
+        _layout = new AbsoluteLayout(() -> _bgStyle);
         if (!_model.isEmpty()) {
             _selected = _model.get(0);
             if (_onChange != null) {
@@ -94,6 +104,20 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
         _state.enter();
     }
 
+    private void createInternalStyles() {
+        var s = _currentStyle;
+        _borderStyle = new ITheme.LayoutStyle(s.borderColor());
+        _bgStyle = new ITheme.LayoutStyle(s.bgColor());
+    }
+
+    private void syncTheme() {
+        var style = _styleSupplier.get();
+        if (!style.equals(_currentStyle)) {
+            _currentStyle = style;
+            createInternalStyles();
+            _isDirty = true;
+        }
+    }
     public void setAnimationOffset(float offset) {
         _animationOffset = offset;
     }
@@ -107,6 +131,7 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
+        syncTheme();
         if (_isDirty) {
             var contentWidth = w - BORDER_SIZE_PX * 2;
             var contentHeight = h - BORDER_SIZE_PX * 2;

@@ -11,9 +11,11 @@ import com.robotjatek.wplauncher.Components.ListPage.ListPage;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
+import com.robotjatek.wplauncher.Theme.ITheme;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ColorPickerScreen implements IScreen {
 
@@ -22,18 +24,23 @@ public class ColorPickerScreen implements IScreen {
     private final ListPage<AccentColor> _view;
     private final List<OnChangeListener<AccentColor>> _changeListeners = new ArrayList<>();
 
-    public ColorPickerScreen(IScreenNavigator navigator) {
+    private final Supplier<ITheme> _themeSupplier;
+
+    public ColorPickerScreen(IScreenNavigator navigator, Supplier<ITheme> themeSupplier) {
         _navigator = navigator;
-        _view = new ListPage<>();
+        _themeSupplier = themeSupplier;
+        _view = new ListPage<>(themeSupplier);
         _view.addItems(createItems());
     }
 
     private List<ListItem<AccentColor>> createItems() {
-        return Colors.ACCENT_COLORS.stream().map(i ->
-                new ListItem<>(i.name(),
-                        new ColorDrawable(i.color()),
+        return Colors.ACCENT_COLORS.stream().map(accentColor ->
+                new ListItem<>(accentColor.name(),
+                        new ColorDrawable(accentColor.color()),
                         Colors.TRANSPARENT,
-                        () -> selectColor(i), i)).toList();
+                        () -> selectColor(accentColor), accentColor,
+                        _themeSupplier)
+                ).toList();
     }
 
     public void subscribe(OnChangeListener<AccentColor> listener) {

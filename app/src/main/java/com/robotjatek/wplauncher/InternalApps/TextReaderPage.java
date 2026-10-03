@@ -1,9 +1,7 @@
 package com.robotjatek.wplauncher.InternalApps;
 
-import android.graphics.Typeface;
 import android.util.Log;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.ScrollView.ScrollView;
@@ -14,6 +12,7 @@ import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.io.BufferedReader;
@@ -28,23 +27,23 @@ public class TextReaderPage implements IScreen {
     private boolean _disposed = false;
     public final IScreenNavigator _navigator;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final StackLayout _layout = new StackLayout();
+    private final StackLayout _layout;
     private final TextBlock _textbox;
     private final Button _deleteButton; // delete the file and close the page
     private final ScrollView _scrollView;
-
     private final File _file;
     private boolean _dirty = true;
     private final Consumer<File> _onClose;
 
-    public TextReaderPage(IScreenNavigator navigator, File file, Consumer<File> onClose) {
+    public TextReaderPage(IScreenNavigator navigator, File file, Consumer<File> onClose, SettingsService settings) {
         _navigator = navigator;
         _file = file;
         _onClose = onClose;
         var content = readFileContent(file);
-        _deleteButton = new Button("Delete log", null, new Size<>(0, 100), this::deleteFileAndExit);
-        _textbox = new TextBlock(content, 38, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, -1);
+        _deleteButton = new Button("Delete log", null, new Size<>(0, 100), () -> settings.getCurrentTheme().button(), this::deleteFileAndExit);
+        _textbox = new TextBlock(content, () -> settings.getCurrentTheme().textBlock(), -1);
         _scrollView = new ScrollView(_textbox, 0, LauncherRenderer.SCREEN_DATA.bottomInset);
+        _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
         _layout.addChild(_deleteButton);
         _layout.addChild(_scrollView);
 

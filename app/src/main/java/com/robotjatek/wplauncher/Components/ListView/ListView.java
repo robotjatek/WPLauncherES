@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.Components.ListView;
 
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ContextMenu.ContextMenu;
 import com.robotjatek.wplauncher.Components.ContextMenu.IContextMenuParent;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
@@ -17,6 +16,7 @@ import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.ScrollController;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.ArrayList;
@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Supplier;
 
 /**
  * A list that is embeddable to any layouts, with arbitrary size (if the said layout supports it)
@@ -37,7 +38,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
     private final float[] _modelMatrix = new float[16];
     private final float[] _menuMatrix = new float[16];
     private final float[] _clipMatrix = new float[16];
-    private final StackLayout _bgLayout = new StackLayout();
+    private final StackLayout _bgLayout;
     private final List<ListItem<T>> _allItems = Collections.synchronizedList(new ArrayList<>());
     private final List<ListItem<T>> _filteredItems = Collections.synchronizedList(new ArrayList<>());
     private Size<Integer> _size = new Size<>(-1, -1);
@@ -63,12 +64,13 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         return new ContextMenuState<>(this, x, y);
     }
 
-    public ListView(int topMargin, int bottomMargin, int padding) {
+    // TODO: dedicated Theme for listview
+    public ListView(int topMargin, int bottomMargin, int padding, Supplier<ITheme> themeSupplier) {
         _topMargin = topMargin;
         _bottomMargin = bottomMargin;
         _padding = padding;
         _itemDrawContext = new ListItemDrawContext<>(padding, ITEM_HEIGHT_PX, ITEM_GAP_PX, this);
-        _bgLayout.setBgColor(Colors.BLACK);
+        _bgLayout = new StackLayout(() -> themeSupplier.get().layout());
     }
 
     @Override

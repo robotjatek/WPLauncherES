@@ -63,7 +63,7 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
     private final AbsoluteLayout _overlay = new AbsoluteLayout();
 
     public ScreenNavigator() {
-        _fullscreen.setBgColor(Colors.BLACK);
+        _fullscreen.setBgColor(Colors.TILE_RED); // TODO: part of the reason for the cut off color on the screens
     }
 
     public void changeState(IState state) {

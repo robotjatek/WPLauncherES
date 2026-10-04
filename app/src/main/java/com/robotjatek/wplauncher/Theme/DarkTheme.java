@@ -64,4 +64,9 @@ public class DarkTheme implements ITheme {
     public CheckboxStyle checkbox() {
         return new CheckboxStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.NORMAL, Colors.WHITE);
     }
+
+    @Override
+    public AdornerStyle adorner() {
+        return new AdornerStyle(Colors.LIGHT_GRAY);
+    }
 }

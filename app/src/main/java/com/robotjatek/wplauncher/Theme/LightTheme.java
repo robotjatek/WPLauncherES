@@ -64,4 +64,9 @@ public class LightTheme implements ITheme {
     public CheckboxStyle checkbox() {
         return new CheckboxStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.NORMAL, Colors.BLACK);
     }
+
+    @Override
+    public AdornerStyle adorner() {
+        return new AdornerStyle(Colors.BLACK);
+    }
 }

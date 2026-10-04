@@ -33,6 +33,7 @@ public class AbsoluteLayout implements ILayout {
 
     private static final ITheme.LayoutStyle LEGACY = new ITheme.LayoutStyle(Colors.TRANSPARENT);
 
+    // TODO: remove legacy constructor
     public AbsoluteLayout() {
         this(() -> LEGACY);
     }

@@ -182,6 +182,7 @@ Feature-creep!
 - [x] Light mode/Dark mode support
   - [x] Dropdown component
   - [ ] Theming support
+    - [ ] Persist theme setting
     - [ ] Components
       - [x] StackLayout is style aware
       - [x] AbsoluteLayout is style aware
@@ -196,8 +197,9 @@ Feature-creep!
       - [x] ListView is style aware
       - [x] ListPage is style aware
       - [ ] Modal is style aware
-    - [ ] Screens
-      - [ ] TileGrid is style aware
+      - [x] Adorner is style aware
+    - [x] Screens
+      - [x] TileGrid is style aware
       - [x] AppListScreen is style aware
       - [x] SettingsScreen is style aware
         - [x] ThemeScreen is style aware
@@ -207,7 +209,6 @@ Feature-creep!
         - [x] TextReaderScreen is style aware
         - [x] AboutScreen is style aware
       - [x] GlanceScreen is style aware
-  - [ ] Persist theme setting
   - [ ] Fix: The top of the screen is black in light mode
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
@@ -236,6 +237,7 @@ Feature-creep!
 - [x] Fix: Dirty flag is set on tiles on scroll stop
 - [x] Call layout() in the parent layout on a component resize
 - [x] Make checkbox use higher level components
+- [x] Make adorner use high level components
 
 ### M4.5
 

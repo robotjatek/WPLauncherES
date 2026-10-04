@@ -60,7 +60,7 @@ public class Button implements UIElement, ITouchable {
         _bgStyle = new ITheme.LayoutStyle(s.bgColor());
     }
 
-    // TODO: remove legacy constructor?
+    // TODO: remove legacy constructor? modal only
     private static final ITheme.ButtonStyle LEGACY_STYLE = new ITheme.ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE);
     public Button(String text, Icon icon, Size<Integer> size, Runnable onTap) {
         this(text, icon, size, () -> LEGACY_STYLE, onTap);

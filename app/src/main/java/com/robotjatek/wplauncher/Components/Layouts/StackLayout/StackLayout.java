@@ -51,6 +51,7 @@ public class StackLayout implements ILayout {
         this(style, Orientation.VERTICAL, DEFAULT_PADDING);
     }
 
+    // TODO: remove legacy constructors
     private static final ITheme.LayoutStyle LEGACY = new ITheme.LayoutStyle(Colors.TRANSPARENT);
     public StackLayout() {
         this(() -> LEGACY, Orientation.VERTICAL, DEFAULT_PADDING);

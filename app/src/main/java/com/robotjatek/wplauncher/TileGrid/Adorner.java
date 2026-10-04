@@ -1,39 +1,62 @@
 package com.robotjatek.wplauncher.TileGrid;
 
 import android.graphics.drawable.Drawable;
-import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.BitmapUtil;
+import com.robotjatek.wplauncher.Components.Icon.Icon;
+import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
+import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
-import com.robotjatek.wplauncher.TileUtil;
+import com.robotjatek.wplauncher.Theme.ITheme;
 
+import java.util.function.Supplier;
+
+// TODO: make adorner an UI element
+// TODO: make adorner to appear on the overlay instead of baked into the tilegrid
 public class Adorner {
     private boolean _disposed = false;
     private final IDrawContext<Adorner> _context;
     private final Runnable _onTap;
-    private final int _textureId;
-    private final float[] _modelMatrix = new float[16];
     private final Position<Float> _relativePosition;
+    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final Icon _icon;
+    private final static int ICON_SIZE = 96;
+    private final Supplier<ITheme.AdornerStyle> _styleSupplier;
+    private ITheme.AdornerStyle _currentStyle;
 
-    public Adorner(Runnable onTap, Drawable icon, Position<Float> relativePosition, IDrawContext<Adorner> context) {
+    public Adorner(Runnable onTap, Drawable icon, Position<Float> relativePosition, IDrawContext<Adorner> context, Supplier<ITheme.AdornerStyle> themeSupplier) {
         _context = context;
         _onTap = onTap;
-        _textureId = BitmapUtil.createTextureFromDrawable(icon, 96, 96);
+        _styleSupplier = themeSupplier;
+        _currentStyle = themeSupplier.get();
         _relativePosition = relativePosition;
+
+        _icon = new Icon(icon, new Size<>(ICON_SIZE, ICON_SIZE));
+        _icon.setTint(_currentStyle.tint());
+        _layout.addChild(_icon, Position.ZERO);
     }
 
-    public void draw(float[] proj, float[] view, QuadRenderer renderer) {
+    private void syncTheme() {
+        var style = _styleSupplier.get();
+        if (!style.equals(_currentStyle)) {
+            _currentStyle = style;
+            _icon.setTint(_currentStyle.tint());
+        }
+    }
+
+    public void draw(float delta, float[] proj, float[] view, QuadRenderer renderer) {
         var x = _context.xOf(this);
         var y = _context.yOf(this);
-        var w = _context.widthOf(this);
-        var h = _context.heightOf(this);
+        var w = (int) _context.widthOf(this);
+        var h = (int) _context.heightOf(this);
 
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, w, h, 1);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _textureId);
+        syncTheme();
+
+        if (_icon.measure().width() != w || _icon.measure().height() != h) {
+            _icon.setSize(new Size<>(w, h));
+        }
+
+        _layout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
     }
 
     public void onTap() {
@@ -56,7 +79,7 @@ public class Adorner {
 
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_textureId);
+            _layout.dispose();
             _disposed = true;
         }
     }

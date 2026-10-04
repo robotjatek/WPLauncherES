@@ -16,14 +16,9 @@ public interface ITheme {
         }
     }
 
-    record TextBlockStyle(int textSize, int typeface, int textColor, int bgColor) {
-        public TextBlockStyle withTextColor(int color) {
-            return new TextBlockStyle(textSize, typeface, color, bgColor);
-        }
-    }
+    record TextBlockStyle(int textSize, int typeface, int textColor, int bgColor) {}
 
-    record ButtonStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor) {
-    }
+    record ButtonStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor) {}
 
     record InputBoxStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor, int placeholderColor) {}
 
@@ -33,6 +28,14 @@ public interface ITheme {
 
     record CheckboxStyle(int bgColor, int borderColor, int textSize, int typeface, int textColor) {}
 
+    record AdornerStyle(int tint) {}
+
+    // TODO: inkább úgy hogy
+    // modalstyle
+    //      => title label
+    //      => description textblock
+    //      => button
+
     enum TextRole {
         TITLE,
         SUBTITLE,
@@ -40,6 +43,7 @@ public interface ITheme {
         CAPTION,
         LIST_ITEM,
         PAGE_LINK
+        // TODO: modal title
     }
 
     String name();
@@ -47,7 +51,7 @@ public interface ITheme {
 
     LabelStyle label(TextRole role);
 
-    TextBlockStyle textBlock();
+    TextBlockStyle textBlock(); // TODO: modal desctiption role, normal role
 
     ButtonStyle button();
 
@@ -58,5 +62,7 @@ public interface ITheme {
     CheckboxStyle checkbox();
 
     InputBoxStyle inputBox();
+
+    AdornerStyle adorner();
     // TODO: separate listview and listpage styles?
 }

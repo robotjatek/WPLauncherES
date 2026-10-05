@@ -36,6 +36,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private final LauncherSurfaceView _view;
     private final ScreenNavigator _navigator;
     private final SettingsService _settingsService;
+    private int _currentBgColor = -1;
 
     public LauncherRenderer(Context context, LocationService locationService, PermissionService permissionService,
                             WeatherService weatherService, MediaService mediaService, SettingsService settingsService,
@@ -75,9 +76,6 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         _renderer = new QuadRenderer(_shader);
         _navigator.init(new StartScreen(_context, _navigator, _locationService, _permissionService, _weatherService, _mediaService, _settingsService, _appChangeReceiver, _view));
     }
-
-
-    private int _currentBgColor = -1;
 
     @Override
     public void onDrawFrame(javax.microedition.khronos.opengles.GL10 glUnused) {

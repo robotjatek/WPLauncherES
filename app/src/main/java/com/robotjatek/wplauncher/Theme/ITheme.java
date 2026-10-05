@@ -51,7 +51,7 @@ public interface ITheme {
 
     LabelStyle label(TextRole role);
 
-    TextBlockStyle textBlock(); // TODO: modal desctiption role, normal role
+    TextBlockStyle textBlock(); // TODO: modal description role, normal role
 
     ButtonStyle button();
 

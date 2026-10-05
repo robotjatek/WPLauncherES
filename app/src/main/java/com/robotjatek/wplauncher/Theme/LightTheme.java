@@ -12,6 +12,13 @@ public class LightTheme implements ITheme {
     private final LabelStyle _caption = new LabelStyle(48, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
     private final LabelStyle _listItem = new LabelStyle(60, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
     private final LabelStyle _pageLink = new LabelStyle(96, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);
+    private final TextBlockStyle _textblock = new TextBlockStyle(48, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
+    private final ButtonStyle _button = new ButtonStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK);
+    private final InputBoxStyle _inputBox = new InputBoxStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK, Colors.DARK_GRAY);
+    private final LayoutStyle _layout = new LayoutStyle(Colors.WHITE);
+    private final DropdownStyle _dropdown = new DropdownStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.BOLD, Colors.BLACK);
+    private final CheckboxStyle _checkbox = new CheckboxStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.NORMAL, Colors.BLACK);
+    private final AdornerStyle _adorner = new AdornerStyle(Colors.BLACK);
 
     @Override
     public String name() {
@@ -37,36 +44,36 @@ public class LightTheme implements ITheme {
 
     @Override
     public TextBlockStyle textBlock() {
-        return new TextBlockStyle(48, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
+        return _textblock;
     }
 
     @Override
     public ButtonStyle button() {
-        return new ButtonStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK);
+        return _button;
     }
 
     @Override
     public InputBoxStyle inputBox() {
-        return new InputBoxStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK, Colors.DARK_GRAY);
+        return _inputBox;
     }
 
     @Override
     public LayoutStyle layout() {
-        return new LayoutStyle(Colors.WHITE);
+        return _layout;
     }
 
     @Override
     public DropdownStyle dropdown() {
-        return new DropdownStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.BOLD, Colors.BLACK);
+        return _dropdown;
     }
 
     @Override
     public CheckboxStyle checkbox() {
-        return new CheckboxStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.NORMAL, Colors.BLACK);
+        return _checkbox;
     }
 
     @Override
     public AdornerStyle adorner() {
-        return new AdornerStyle(Colors.BLACK);
+        return _adorner;
     }
 }

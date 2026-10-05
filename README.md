@@ -10,6 +10,7 @@ A Windows Phone inspired launcher for Android written in OpenGL ES
 - Pin apps to the screen
 - Installed apps
 - Resizable tiles
+- Dark/light mode
 - Tile color
 - Photos live tile
 - Weather live tile
@@ -254,12 +255,13 @@ Cleaning up the accumulated mess
 - [ ] Fix: Scroll/drag lags behind finger movement
 - [ ] Gesture handling is a hot garbage
 - [ ] Show the context menu in the new overlay system
-- [ ] Opening a large crash-log crashes the launcher on texture creation 
+- [ ] Fix: Opening a large crash-log crashes the launcher on texture creation 
 - [ ] Fix: Adjust the layer offset of the opened pages so spinning tiles won't overlap with the animated page
 - [ ] Relayout on child size change should be implicit
 - [ ] Kill TileUtil.java
 - [ ] Kill all theme-unaware legacy constructors
 - [ ] Fix: Top of the color picker screen is cut off
+- [ ] Fix: Fade overlay on opening a modal is not fullscreen
 
 ### M5 - Beta 2
 

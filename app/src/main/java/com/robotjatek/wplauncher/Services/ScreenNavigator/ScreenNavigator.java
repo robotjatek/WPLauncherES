@@ -4,7 +4,6 @@ import android.opengl.Matrix;
 
 import androidx.annotation.NonNull;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Modal.IModal;
@@ -20,12 +19,15 @@ import com.robotjatek.wplauncher.Services.ScreenNavigator.States.ClosingScreenSt
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.IdleState;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.OpeningModalState;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.States.OpeningScreenState;
+import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.Deque;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Supplier;
 
 // TODO: add tile adorners to the new overlay later too
 public class ScreenNavigator implements IScreenNavigator, IOverlay {
@@ -62,8 +64,21 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
     private final StackLayout _fullscreen = new StackLayout();
     private final AbsoluteLayout _overlay = new AbsoluteLayout();
 
-    public ScreenNavigator() {
-        _fullscreen.setBgColor(Colors.TILE_RED); // TODO: part of the reason for the cut off color on the screens
+    private final Supplier<ITheme.LayoutStyle> _themeSupplier;
+    private ITheme.LayoutStyle _currentTheme;
+
+    public ScreenNavigator(SettingsService settings) {
+        _themeSupplier = () -> settings.getCurrentTheme().layout();
+        _currentTheme = _themeSupplier.get();
+        _fullscreen.setBgColor(_currentTheme.bgColor());
+    }
+
+    private void syncTheme() {
+        var theme = _themeSupplier.get();
+        if (!theme.equals(_currentTheme)) {
+            _currentTheme = theme;
+            _fullscreen.setBgColor(_currentTheme.bgColor());
+        }
     }
 
     public void changeState(IState state) {
@@ -82,6 +97,7 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
 
     public void draw(float delta, float[] proj, QuadRenderer renderer) {
         executeCommands();
+        syncTheme();
         _state.update(delta);
 
         var size = new Size<>(_width, _height);

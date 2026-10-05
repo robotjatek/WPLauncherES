@@ -25,6 +25,7 @@ import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
+import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 
 public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
@@ -38,8 +39,9 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
 
     public LauncherSurfaceView(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, MediaService mediaService, AppChangeReceiver appChangeReceiver) {
         super(context);
-        var navigator = new ScreenNavigator();
-        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, mediaService, appChangeReceiver, navigator, this);
+        var settingsService = new SettingsService(context);
+        var navigator = new ScreenNavigator(settingsService);
+        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, mediaService, settingsService, appChangeReceiver, navigator, this);
         _gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
            @Override

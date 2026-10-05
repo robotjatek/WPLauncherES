@@ -209,7 +209,7 @@ Feature-creep!
         - [x] TextReaderScreen is style aware
         - [x] AboutScreen is style aware
       - [x] GlanceScreen is style aware
-  - [ ] Fix: The top of the screen is black in light mode
+  - [x] Fix: The top of the screen is black in light mode
 - [x] Animated tile resize
 - [x] Animate internal app/subpage navigation
 - [x] Re-ask for permissions from the launcher settings
@@ -277,6 +277,7 @@ Creep got too big
 - [ ] Floating tiles in edit-mode
 - [ ] 6 column mode setting
 - [ ] Show weather icon on the Glance tile
+- [ ] Make adorners UIElement-s
 - [ ] Add tile adorners to the top level overlay
 - [ ] Apps can pin their shortcuts to the home screen
 

@@ -6,8 +6,6 @@ import android.opengl.Matrix;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
-import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
@@ -65,11 +63,8 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private final Adorner _unpinButton;
     private final Adorner _resizeButton;
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
-    private final StackLayout _background;
-    private Size<Integer> _size = new Size<>(-1, -1);
 
     public TileGrid(TileService tileService, Context context, AppChangeReceiver appChangeReceiver, SettingsService settings) {
-        _background = new StackLayout(() -> settings.getCurrentTheme().layout());
         _tileService = tileService;
         _tiles = tileService.getTiles();
         _tileService.subscribe(this);
@@ -103,8 +98,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         _scroll.update(delta);
         executeCommands();
 
-        _background.draw(delta, projMatrix, viewMatrix, renderer, Position.ZERO, _size);
-
         Matrix.setIdentityM(scrollMatrix, 0);
         Matrix.translateM(scrollMatrix, 0, 0, _scroll.getScrollOffset() + TOP_MARGIN_PX, 0);
         Matrix.multiplyMM(scrollMatrix, 0, scrollMatrix, 0, viewMatrix, 0);
@@ -116,7 +109,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
             }
             tile.drawWithOffset(delta, projMatrix, scrollMatrix, Position.ZERO, _tileDrawContext, renderer);
         }
-
         // render the selected tile with different scaling, and on its current drag position
         if (_selectedTile != null) {
             renderer.pushLayer();
@@ -161,8 +153,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     }
 
     public void onSizeChanged(int width, int height) {
-        _size = new Size<>(width, height);
-        _background.onResize(width, height);
         var usableWidth = width - 2 * PAGE_PADDING_PX - (COLUMNS - 1) * TILE_GAP_PX;
         tileSizePx = usableWidth / COLUMNS;
         _pageHeight = height;
@@ -270,7 +260,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         if (!_disposed) {
             _unpinButton.dispose();
             _resizeButton.dispose();
-            _background.dispose();
             _disposed = true;
         }
     }

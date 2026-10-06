@@ -20,7 +20,7 @@ public interface ITheme {
 
     record ButtonStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor) {}
 
-    record InputBoxStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor, int placeholderColor) {}
+    record InputBoxStyle(int textSize, int typeface, int textColor, int bgColor, int borderColor, int placeholderColor, CursorStyle cursor) {}
 
     record LayoutStyle(int bgColor)  {}
 
@@ -31,6 +31,8 @@ public interface ITheme {
     record AdornerStyle(int tint) {}
 
     record ModalStyle(LayoutStyle bgColor, LabelStyle title, TextBlockStyle messageStyle, ButtonStyle buttonStyle) {}
+
+    record CursorStyle(int color) {}
 
     enum TextRole {
         TITLE,

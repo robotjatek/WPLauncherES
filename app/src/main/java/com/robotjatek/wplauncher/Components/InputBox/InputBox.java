@@ -37,7 +37,7 @@ public class InputBox implements UIElement, ITextInputHandler {
     private int _cursorPosition = 0;
     private boolean _showCursor = false;
     private boolean _showHandle = false;
-    private final Cursor _cursor = new Cursor();
+    private final Cursor _cursor;
     private final CursorHandle _handle;
     private final Label _label;
     private String _text = "";
@@ -68,6 +68,8 @@ public class InputBox implements UIElement, ITextInputHandler {
         _currentStyle = style.get();
         createInternalStyles();
 
+        _cursor = new Cursor(() -> _currentStyle.cursor());
+
         var handleIcon = ContextCompat.getDrawable(context, R.drawable.ic_cursor_handle);
         _handle = new CursorHandle(this, handleIcon);
 
@@ -95,7 +97,6 @@ public class InputBox implements UIElement, ITextInputHandler {
         var style = _styleSupplier.get();
         if (!style.equals(_currentStyle)) {
             _currentStyle = style;
-            _cursor.setColor(style.textColor());
             createInternalStyles();
             _isDirty = true;
         }

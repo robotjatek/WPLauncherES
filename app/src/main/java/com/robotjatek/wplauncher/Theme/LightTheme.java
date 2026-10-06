@@ -7,6 +7,7 @@ import com.robotjatek.wplauncher.Colors;
 public class LightTheme implements ITheme {
 
     // TODO: text size DP aware
+    private final CursorStyle _cursor = new CursorStyle(Colors.BLACK);
     private final LabelStyle _text = new LabelStyle(64, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
     private final LabelStyle _title = new LabelStyle(64, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);
     private final LabelStyle _subtitle = new LabelStyle(160, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);
@@ -15,7 +16,7 @@ public class LightTheme implements ITheme {
     private final LabelStyle _pageLink = new LabelStyle(96, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);
     private final TextBlockStyle _textblock = new TextBlockStyle(48, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
     private final ButtonStyle _button = new ButtonStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK);
-    private final InputBoxStyle _inputBox = new InputBoxStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK, Colors.DARK_GRAY);
+    private final InputBoxStyle _inputBox = new InputBoxStyle(48, Typeface.BOLD, Colors.BLACK, Colors.WHITE, Colors.BLACK, Colors.DARK_GRAY, _cursor);
     private final LayoutStyle _layout = new LayoutStyle(Colors.WHITE);
     private final DropdownStyle _dropdown = new DropdownStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.BOLD, Colors.BLACK);
     private final CheckboxStyle _checkbox = new CheckboxStyle(Colors.WHITE, Colors.BLACK, 48, Typeface.NORMAL, Colors.BLACK);

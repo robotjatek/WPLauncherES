@@ -7,6 +7,7 @@ import com.robotjatek.wplauncher.Colors;
 public class DarkTheme implements ITheme {
 
     // TODO: text size DP aware
+    private final CursorStyle _cursor = new CursorStyle(Colors.WHITE);
     private final LabelStyle _text = new LabelStyle(64, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
     private final LabelStyle _title = new LabelStyle(64, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     private final LabelStyle _subtitle = new LabelStyle(160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
@@ -15,14 +16,13 @@ public class DarkTheme implements ITheme {
     private final LabelStyle _pageLink = new LabelStyle(96, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     private final TextBlockStyle _textBlock = new TextBlockStyle(48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
     private final ButtonStyle _button = new ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE);
-    private final InputBoxStyle _inputBox = new InputBoxStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE, Colors.LIGHT_GRAY);
+    private final InputBoxStyle _inputBox = new InputBoxStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE, Colors.LIGHT_GRAY, _cursor);
     private final LayoutStyle _layout = new LayoutStyle(Colors.BLACK);
     private final DropdownStyle _dropdown = new DropdownStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.BOLD, Colors.WHITE);
     private final CheckboxStyle _checkbox = new CheckboxStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.NORMAL, Colors.WHITE);
     private final AdornerStyle _adorner = new AdornerStyle(Colors.LIGHT_GRAY);
     private final LabelStyle _modalTitle = new LabelStyle(72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
     private final TextBlockStyle _modalDescription = new TextBlockStyle(48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
-
     private final LayoutStyle _modalBackground = new LayoutStyle(Colors.CONTEXT_MENU_GRAY);
     private final ModalStyle _modal =  new ModalStyle(_modalBackground, label(TextRole.MODAL_TITLE), _modalDescription, _button);
 

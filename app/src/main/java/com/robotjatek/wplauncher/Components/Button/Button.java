@@ -1,7 +1,5 @@
 package com.robotjatek.wplauncher.Components.Button;
 
-import android.graphics.Typeface;
-
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
@@ -58,12 +56,6 @@ public class Button implements UIElement, ITouchable {
         _labelStyle = new ITheme.LabelStyle(s.textSize(), s.typeface(), s.textColor(), Colors.TRANSPARENT);
         _borderStyle = new ITheme.LayoutStyle(s.borderColor());
         _bgStyle = new ITheme.LayoutStyle(s.bgColor());
-    }
-
-    // TODO: remove legacy constructor? modal only
-    private static final ITheme.ButtonStyle LEGACY_STYLE = new ITheme.ButtonStyle(48, Typeface.BOLD, Colors.WHITE, Colors.BLACK, Colors.WHITE);
-    public Button(String text, Icon icon, Size<Integer> size, Runnable onTap) {
-        this(text, icon, size, () -> LEGACY_STYLE, onTap);
     }
 
     private void syncTheme() {

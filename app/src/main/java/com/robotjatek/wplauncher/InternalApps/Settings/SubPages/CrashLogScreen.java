@@ -142,10 +142,14 @@ public class CrashLogScreen implements IScreen {
     }
 
     private void showClearLogsModal() {
-        var modal = new Modal("Are you sure?", "This will delete all crash logs" , () -> {
-            clearAll();
-            _navigator.dismissModal();
-        }, _navigator::dismissModal);
+        var modal = new Modal(
+                "Are you sure?", "This will delete all crash logs" ,
+                () -> {
+                    clearAll();
+                    _navigator.dismissModal();
+                    },
+                _navigator::dismissModal,
+                () -> _settings.getCurrentTheme().modal());
         _navigator.openModal(modal);
     }
 

@@ -20,6 +20,11 @@ public class DarkTheme implements ITheme {
     private final DropdownStyle _dropdown = new DropdownStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.BOLD, Colors.WHITE);
     private final CheckboxStyle _checkbox = new CheckboxStyle(Colors.BLACK, Colors.WHITE, 48, Typeface.NORMAL, Colors.WHITE);
     private final AdornerStyle _adorner = new AdornerStyle(Colors.LIGHT_GRAY);
+    private final LabelStyle _modalTitle = new LabelStyle(72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    private final TextBlockStyle _modalDescription = new TextBlockStyle(48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT);
+
+    private final LayoutStyle _modalBackground = new LayoutStyle(Colors.CONTEXT_MENU_GRAY);
+    private final ModalStyle _modal =  new ModalStyle(_modalBackground, label(TextRole.MODAL_TITLE), _modalDescription, _button);
 
     @Override
     public String name() {
@@ -40,6 +45,7 @@ public class DarkTheme implements ITheme {
             case CAPTION -> _caption;
             case LIST_ITEM -> _listItem;
             case PAGE_LINK -> _pageLink;
+            case MODAL_TITLE -> _modalTitle;
         };
     }
 
@@ -76,5 +82,10 @@ public class DarkTheme implements ITheme {
     @Override
     public AdornerStyle adorner() {
         return _adorner;
+    }
+
+    @Override
+    public ModalStyle modal() {
+        return _modal;
     }
 }

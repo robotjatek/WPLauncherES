@@ -68,14 +68,14 @@ public class DebugScreen implements IScreen {
     private void showCrashAppMessageBox() {
         var modal = new Modal("WARNING!", "This will crash the application! A log will be created in the crash-log", () -> {
             throw new RuntimeException("App was crashed from the debug screen");
-        }, _navigator::dismissModal);
+        }, _navigator::dismissModal, () -> _settingsService.getCurrentTheme().modal());
 
         _navigator.openModal(modal);
     }
 
     private void showRestartApplicationMessageBox() {
         var modal = new Modal("WARNING!", "This will make the application restart",
-                this::restartApplication, _navigator::dismissModal);
+                this::restartApplication, _navigator::dismissModal, () -> _settingsService.getCurrentTheme().modal());
         _navigator.openModal(modal);
     }
 
@@ -88,7 +88,7 @@ public class DebugScreen implements IScreen {
 
     private void showResetConfigurationMessageBox() {
         var modal = new Modal("WARNING!", "This will delete the current configuration and restart the app",
-                this::deleteConfiguration, _navigator::dismissModal);
+                this::deleteConfiguration, _navigator::dismissModal, () -> _settingsService.getCurrentTheme().modal());
         _navigator.openModal(modal);
     }
 

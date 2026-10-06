@@ -61,7 +61,7 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
     private int _width = -1;
     private int _height = -1;
     private final float[] _model = new float[16];
-    private final StackLayout _fullscreen = new StackLayout();
+    private final StackLayout _fullscreen;
     private final AbsoluteLayout _overlay = new AbsoluteLayout();
 
     private final Supplier<ITheme.LayoutStyle> _themeSupplier;
@@ -70,7 +70,7 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
     public ScreenNavigator(SettingsService settings) {
         _themeSupplier = () -> settings.getCurrentTheme().layout();
         _currentTheme = _themeSupplier.get();
-        _fullscreen.setBgColor(_currentTheme.bgColor());
+        _fullscreen = new StackLayout(() -> _currentTheme);
     }
 
     private void syncTheme() {

@@ -198,7 +198,7 @@ Feature-creep!
       - [x] Checkbox is style aware
       - [x] ListView is style aware
       - [x] ListPage is style aware
-      - [ ] Modal is style aware
+      - [x] Modal is style aware
       - [x] Adorner is style aware
     - [x] Screens
       - [x] TileGrid is style aware
@@ -273,14 +273,18 @@ Creep got too big
   - [ ] Step Counter
 - [ ] Device resolution independent UI (https://developer.android.com/training/multiscreen/screendensities)
   - [ ] Make dragging in edit mode density aware
-- [ ] Animate context menu
+- [ ] Make context menu to resemble the original WP8 context menu more closely
+  - [ ] Full-wide
+  - [ ] Animated open
+  - [ ] White background in dark mode
+  - [ ] Black background in light mode
 - [ ] Custom tile color
 - [ ] Show a transparent tile on the drop-target
 - [ ] Reduce memory footprint by not keeping bitmaps in memory (see the TODO App.java)
 - [ ] Floating tiles in edit-mode
 - [ ] 6 column mode setting
 - [ ] Show weather icon on the Glance tile
-- [ ] Make adorners UIElement-s
+- [ ] Make adorners UIElements
 - [ ] Add tile adorners to the top level overlay
 - [ ] Apps can pin their shortcuts to the home screen
 

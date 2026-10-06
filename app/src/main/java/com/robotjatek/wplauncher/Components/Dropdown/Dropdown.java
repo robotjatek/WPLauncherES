@@ -2,7 +2,6 @@ package com.robotjatek.wplauncher.Components.Dropdown;
 
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Dropdown.States.IdleState;
 import com.robotjatek.wplauncher.Components.Dropdown.States.AnimationState;
 import com.robotjatek.wplauncher.Components.ITouchable;
@@ -179,7 +178,6 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
 
     @Override
     public void onPress() {
-        _layout.setBgColor(Colors.WHITE);
         var selectedIndex = _model.isEmpty() ? -1 : _model.indexOf(_selected);
         if (selectedIndex >= 0 && selectedIndex < _contents.size()) {
             _contents.get(selectedIndex).onPress();
@@ -188,7 +186,6 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
 
     @Override
     public void onRelease() {
-        _layout.setBgColor(Colors.BLACK);
         var selectedIndex = _model.isEmpty() ? -1 : _model.indexOf(_selected);
         if (selectedIndex >= 0 && selectedIndex < _contents.size()) {
             _contents.get(selectedIndex).onRelease();

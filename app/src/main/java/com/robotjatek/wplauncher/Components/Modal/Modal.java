@@ -1,9 +1,7 @@
 package com.robotjatek.wplauncher.Components.Modal;
 
-import android.graphics.Typeface;
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
@@ -13,35 +11,55 @@ import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
+
+import java.util.function.Supplier;
 
 public class Modal implements IModal {
 
     private boolean _disposed = false;
-    private final StackLayout _layout = new StackLayout();
-    private final StackLayout _contentLayout = new StackLayout();
-    private final StackLayout _buttonLayout = new StackLayout(StackLayout.Orientation.HORIZONTAL, 0);
+    private final StackLayout _layout;
+    private final StackLayout _contentLayout;
+    private final StackLayout _buttonLayout;
     private final Spacer _buttonTopSpacer = new Spacer(-1, -1);
     private final Spacer _buttonSpacer = new Spacer(-1, -1);
-    private final Label _titleLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, 0);
-    private final TextBlock _messageBlock = new TextBlock("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0, 0);
-    private final Button _okButton = new Button("OK", null, new Size<>(-1, -1), null);
-    private final Button _cancelButton = new Button("Cancel", null, new Size<>(-1, -1), null);
+    private final Label _titleLabel;
+    private final TextBlock _messageBlock;
+    private final Button _okButton;
+    private final Button _cancelButton;
     private Size<Integer> _size = new Size<>(-1, -1);
     private final float[] _model = new float[16];
     private float _modalTranslationHeight = 0f;
+    private final Supplier<ITheme.ModalStyle> _styleSupplier;
+    private ITheme.ModalStyle _currentStyle;
 
-    public Modal(String title, String message, Runnable onOk, Runnable onDismiss) {
+    public Modal(String title, String message, Runnable onOk, Runnable onDismiss, Supplier<ITheme.ModalStyle> styleSupplier) {
+        _styleSupplier = styleSupplier;
+        _currentStyle = _styleSupplier.get();
+
+        _layout = new StackLayout(() -> _currentStyle.bgColor());
+        _buttonLayout = new StackLayout(() -> _currentStyle.bgColor(), StackLayout.Orientation.HORIZONTAL, 0);
+
+        _okButton =  new Button("OK", null, new Size<>(-1, -1), () -> _currentStyle.buttonStyle(), null);
         _okButton.setOnTap(onOk);
+
+        _cancelButton = new Button("Cancel", null, new Size<>(-1, -1), () -> _currentStyle.buttonStyle(), null);
         _cancelButton.setOnTap(onDismiss);
 
-        _layout.setBgColor(Colors.CONTEXT_MENU_GRAY);
         _layout.setPadding(16);
+
+        _contentLayout = new StackLayout(() -> _currentStyle.bgColor());
         _layout.addChild(_contentLayout);
         _contentLayout.setPadding(0);
         _contentLayout.addChild(new Spacer(0, LauncherRenderer.SCREEN_DATA.topInset));
+        _titleLabel = new Label("", () -> _currentStyle.title(), -1, null);
         _titleLabel.setText(title);
         _contentLayout.addChild(_titleLabel);
+
+        _contentLayout.addChild(new Spacer(0, 36));
+
+        _messageBlock = new TextBlock("", () -> _currentStyle.messageStyle(), 0, 0);
         _messageBlock.setText(message);
         _contentLayout.addChild(_messageBlock);
         _layout.addChild(_buttonTopSpacer);
@@ -51,8 +69,16 @@ public class Modal implements IModal {
         _layout.addChild(_buttonLayout);
     }
 
+    private void syncTheme() {
+        var style = _styleSupplier.get();
+        if (!style.equals(_currentStyle)) {
+            _currentStyle = style;
+        }
+    }
+
     @Override
     public void draw(float delta, float[] projMatrix, QuadRenderer renderer) {
+        syncTheme();
         Matrix.setIdentityM(_model, 0);
         Matrix.translateM(_model, 0, _model, 0, 0, -LauncherRenderer.SCREEN_DATA.topInset + _modalTranslationHeight, 0);
         _layout.draw(delta, projMatrix, _model, renderer, Position.ZERO, new Size<>(_layout.getWidth(), _layout.getHeight()));

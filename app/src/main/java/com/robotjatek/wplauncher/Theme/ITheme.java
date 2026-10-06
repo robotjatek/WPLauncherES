@@ -30,11 +30,7 @@ public interface ITheme {
 
     record AdornerStyle(int tint) {}
 
-    // TODO: inkább úgy hogy
-    // modalstyle
-    //      => title label
-    //      => description textblock
-    //      => button
+    record ModalStyle(LayoutStyle bgColor, LabelStyle title, TextBlockStyle messageStyle, ButtonStyle buttonStyle) {}
 
     enum TextRole {
         TITLE,
@@ -42,8 +38,8 @@ public interface ITheme {
         TEXT,
         CAPTION,
         LIST_ITEM,
-        PAGE_LINK
-        // TODO: modal title
+        PAGE_LINK,
+        MODAL_TITLE
     }
 
     String name();
@@ -51,7 +47,7 @@ public interface ITheme {
 
     LabelStyle label(TextRole role);
 
-    TextBlockStyle textBlock(); // TODO: modal description role, normal role
+    TextBlockStyle textBlock();
 
     ButtonStyle button();
 
@@ -64,5 +60,8 @@ public interface ITheme {
     InputBoxStyle inputBox();
 
     AdornerStyle adorner();
+
+    ModalStyle modal();
+
     // TODO: separate listview and listpage styles?
 }

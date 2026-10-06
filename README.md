@@ -184,10 +184,11 @@ Feature-creep!
   - [x] Dropdown component
   - [ ] Theming support
     - [ ] Persist theme setting
+    - [ ] Status bar is style aware
     - [ ] Components
       - [x] StackLayout is style aware
       - [x] AbsoluteLayout is style aware
-      - [ ] FlexLayout is style aware
+      - [x] FlexLayout is style aware
       - [x] Label is style aware
       - [x] Button is style aware
       - [x] TextBlock is style aware
@@ -237,7 +238,7 @@ Feature-creep!
 - [x] Fix: checkbox label is squashed
 - [x] Fix: Dirty flag is set on tiles on scroll stop
 - [x] Call layout() in the parent layout on a component resize
-- [x] Make checkbox use higher level components
+- [x] Make checkbox use high level components
 - [x] Make adorner use high level components
 
 ### M4.5

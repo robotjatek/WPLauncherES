@@ -2,19 +2,20 @@ package com.robotjatek.wplauncher.Components.Layouts.FlexLayout;
 
 import android.opengl.Matrix;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.LayoutInfo;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 
 // TODO: layout padding
 /**
@@ -61,17 +62,17 @@ public class FlexLayout implements ILayout {
     private float _flexGrow = 0f;
     private final IDrawContext<UIElement> _itemDrawContext;
     private boolean _dirty = true;
-    private int _bgColor = Colors.TRANSPARENT;
+    private Integer _bgColor = null;
     private ILayout _parent;
+    private final Supplier<ITheme.LayoutStyle> _styleSupplier;
 
     public FlexLayout(
-            JustifyContent justify,
-            AlignItems align,
-            Direction direction) {
+            JustifyContent justify, AlignItems align, Direction direction, Supplier<ITheme.LayoutStyle> style) {
         _justify = justify;
         _align = align;
         _direction = direction;
         _itemDrawContext = new FlexLayoutItemDrawContext(this);
+        _styleSupplier = style;
     }
 
     public void setParent(ILayout parent) {
@@ -297,7 +298,8 @@ public class FlexLayout implements ILayout {
         Matrix.translateM(_modelMatrix, 0, position.x(), position.y(), 0f);
         Matrix.scaleM(_modelMatrix, 0, size.width(), size.height(), 1);
         Matrix.multiplyMM(_modelMatrix, 0, viewMatrix, 0, _modelMatrix, 0);
-        renderer.drawFlat(projMatrix, _modelMatrix, _bgColor);
+        var bgColor = _bgColor == null ? _styleSupplier.get().bgColor() : _bgColor;
+        renderer.drawFlat(projMatrix, _modelMatrix, bgColor);
     }
 
     private void drawChildren(float delta, float[] proj, float[] viewMatrix, QuadRenderer renderer, Position<Float> position) {

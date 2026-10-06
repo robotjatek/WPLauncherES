@@ -6,6 +6,7 @@ import com.robotjatek.wplauncher.Colors;
 
 public class LightTheme implements ITheme {
 
+    // TODO: text size DP aware
     private final LabelStyle _text = new LabelStyle(64, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
     private final LabelStyle _title = new LabelStyle(64, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);
     private final LabelStyle _subtitle = new LabelStyle(160, Typeface.NORMAL, Colors.BLACK, Colors.TRANSPARENT);

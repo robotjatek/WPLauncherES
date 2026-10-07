@@ -109,11 +109,15 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private ContextMenu<App> createContextMenu() {
         var menu = new ContextMenu<>(new Position<>(0f, 0f), _contextMenuDrawContext);
         var options = List.of(
-                new MenuOption<>("Pin", this::pinApp, menu, (a) -> a != null && !_tileService.isPinned(a)),
+                new MenuOption<>("Pin", this::pinApp, menu, (a) -> a != null && !_tileService.isPinned(a),
+                        () -> _settingsService.getCurrentTheme().contextMenu()),
                 new MenuOption<>("Uninstall", (a) -> {
                     if (a == null) return;
                     uninstallApp(a.packageName());
-                }, menu, (a) -> a != null && !a.isSystemApp()));
+                    },
+                        menu,
+                        (a) -> a != null && !a.isSystemApp(),
+                        () -> _settingsService.getCurrentTheme().contextMenu()));
         menu.addOptions(options);
         return menu;
     }

@@ -34,6 +34,8 @@ public interface ITheme {
 
     record CursorStyle(int color) {}
 
+    record ContextMenuStyle(int bgColor, int textSize, int typeface, int textColor, int disabledTextColor) {}
+
     enum TextRole {
         TITLE,
         SUBTITLE,
@@ -64,6 +66,8 @@ public interface ITheme {
     AdornerStyle adorner();
 
     ModalStyle modal();
+
+    ContextMenuStyle contextMenu();
 
     // TODO: separate listview and listpage styles?
 }

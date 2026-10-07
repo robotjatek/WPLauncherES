@@ -26,6 +26,7 @@ public class LightTheme implements ITheme {
     private final TextBlockStyle _modalDescription = new TextBlockStyle(48, Typeface.NORMAL, Colors.DARK_GRAY, Colors.TRANSPARENT);
     private final LayoutStyle _modalBackground = new LayoutStyle(Colors.WHITE);
     private final ModalStyle _modal = new ModalStyle(_modalBackground, label(TextRole.MODAL_TITLE), _modalDescription, _modalButton);
+    private final ContextMenuStyle _contextMenu = new ContextMenuStyle(Colors.BLACK, 48, Typeface.BOLD, Colors.WHITE, Colors.LIGHT_GRAY);
 
     @Override
     public String name() {
@@ -88,5 +89,10 @@ public class LightTheme implements ITheme {
     @Override
     public ModalStyle modal() {
         return _modal;
+    }
+
+    @Override
+    public ContextMenuStyle contextMenu() {
+        return _contextMenu;
     }
 }

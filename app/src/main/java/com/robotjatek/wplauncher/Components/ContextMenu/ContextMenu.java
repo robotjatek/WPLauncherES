@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public class ContextMenu<T> implements IDrawContext<MenuOption<T>> {
 
-    private static final float ITEM_HEIGHT_PX = 150;
+    private static final float ITEM_HEIGHT_PX = 150; // TODO: make dp aware
     private boolean _disposed = false;
     private final IDrawContext<ContextMenu<T>> _context;
     private final List<MenuOption<T>> _options = new ArrayList<>();

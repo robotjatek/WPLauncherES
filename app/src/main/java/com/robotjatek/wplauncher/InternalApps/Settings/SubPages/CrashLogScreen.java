@@ -122,8 +122,8 @@ public class CrashLogScreen implements IScreen {
     private ContextMenu<File> createContextMenu() {
         var menu = new ContextMenu<>(Position.ZERO, _contextMenuDrawContext);
         var options = List.of(
-                new MenuOption<>("Open", this::openFileReaderPage, menu, null),
-                new MenuOption<>("Delete", this::deleteFile, menu, null)
+                new MenuOption<>("Open", this::openFileReaderPage, menu, null, () -> _settings.getCurrentTheme().contextMenu()),
+                new MenuOption<>("Delete", this::deleteFile, menu, null, () -> _settings.getCurrentTheme().contextMenu())
         );
         menu.addOptions(options);
         return menu;

@@ -185,7 +185,7 @@ Feature-creep!
   - [ ] Theming support
     - [ ] Persist theme setting
     - [ ] Status bar is style aware
-    - [ ] Components
+    - [x] Components
       - [x] StackLayout is style aware
       - [x] AbsoluteLayout is style aware
       - [x] FlexLayout is style aware
@@ -194,7 +194,7 @@ Feature-creep!
       - [x] TextBlock is style aware
       - [x] Dropdown is style aware
       - [x] InputBox is style aware
-      - [ ] ContextMenu is style aware
+      - [x] ContextMenu is style aware
       - [x] Checkbox is style aware
       - [x] ListView is style aware
       - [x] ListPage is style aware
@@ -276,8 +276,8 @@ Creep got too big
 - [ ] Make context menu to resemble the original WP8 context menu more closely
   - [ ] Full-wide
   - [ ] Animated open
-  - [ ] White background in dark mode
-  - [ ] Black background in light mode
+  - [x] White background in dark mode
+  - [x] Black background in light mode
 - [ ] Custom tile color
 - [ ] Show a transparent tile on the drop-target
 - [ ] Reduce memory footprint by not keeping bitmaps in memory (see the TODO App.java)

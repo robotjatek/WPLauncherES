@@ -182,9 +182,9 @@ Feature-creep!
   - [x] Weather
 - [x] Light mode/Dark mode support
   - [x] Dropdown component
-  - [ ] Theming support
+  - [x] Theming support
     - [x] Persist theme setting
-    - [ ] Status bar is style aware
+    - [x] Status bar is style aware
     - [x] Components
       - [x] StackLayout is style aware
       - [x] AbsoluteLayout is style aware

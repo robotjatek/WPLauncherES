@@ -1,8 +1,5 @@
 package com.robotjatek.wplauncher;
 
-import static android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
-import static android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS;
-
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -14,6 +11,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsAnimationCompat;
 import androidx.core.view.WindowInsetsCompat;
 
@@ -22,6 +20,7 @@ import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 
 import java.util.List;
 
@@ -43,6 +42,8 @@ public class MainActivity extends ComponentActivity {
 
         _surface = new LauncherSurfaceView(this, _locationService, _permissionService, _weatherService, _mediaService, _appChangeReceiver);
         _surface.setPreserveEGLContextOnPause(true);
+
+        _surface.getSettingsService().subscribeToThemeChange(this::setStatusBarColor);
 
         ViewCompat.setWindowInsetsAnimationCallback(getWindow().getDecorView(),
                 new WindowInsetsAnimationCompat.Callback(WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP) {
@@ -66,11 +67,8 @@ public class MainActivity extends ComponentActivity {
             _surface.getRenderer().setInsets(sys.left, sys.top, sys.right, sys.bottom);
             return insets;
         });
-        var controller = getWindow().getInsetsController();
-        if (controller != null) {
-            controller.setSystemBarsAppearance(
-                    0, APPEARANCE_LIGHT_STATUS_BARS | APPEARANCE_LIGHT_NAVIGATION_BARS);
-        }
+
+        setStatusBarColor(_surface.getSettingsService().getCurrentTheme());
 
         setContentView(_surface);
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
@@ -84,6 +82,16 @@ public class MainActivity extends ComponentActivity {
         _permissionService.ensureNotificationPermission();
         _permissionService.ensureMediaPermission();
         setupAppChangeListener();
+    }
+
+    private void setStatusBarColor(ITheme theme) {
+        var color = theme.isLight();
+        runOnUiThread(() -> {
+            var window = getWindow();
+            var controller = WindowCompat.getInsetsController(window, window.getDecorView());
+            controller.setAppearanceLightStatusBars(color);
+            controller.setAppearanceLightNavigationBars(color);
+        });
     }
 
     private void setupAppChangeListener() {
@@ -118,6 +126,7 @@ public class MainActivity extends ComponentActivity {
         super.onDestroy();
         _surface.dispose();
         _weatherService.stop();
+        _surface.getSettingsService().unsubscribeFromThemeChange(this::setStatusBarColor);
         if (_appChangeReceiver != null) {
             unregisterReceiver(_appChangeReceiver);
         }

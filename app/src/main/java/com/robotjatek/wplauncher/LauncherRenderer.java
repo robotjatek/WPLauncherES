@@ -127,7 +127,6 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
 
     public void dispose() {
         if (!_disposed) {
-            _navigator.dispose();
             if (_renderer != null) _renderer.dispose();
             if (_shader != null) _shader.delete();
             _disposed = true;

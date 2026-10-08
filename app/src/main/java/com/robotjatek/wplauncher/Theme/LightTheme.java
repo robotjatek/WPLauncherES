@@ -39,6 +39,11 @@ public class LightTheme implements ITheme {
     }
 
     @Override
+    public boolean isLight() {
+        return true;
+    }
+
+    @Override
     public LabelStyle label(TextRole role) {
         return switch (role) {
             case TEXT -> _text;

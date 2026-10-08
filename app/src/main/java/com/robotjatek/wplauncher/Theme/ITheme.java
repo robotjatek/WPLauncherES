@@ -1,5 +1,7 @@
 package com.robotjatek.wplauncher.Theme;
 
+import android.graphics.Color;
+
 public interface ITheme {
 
     record LabelStyle(int textSize, int typeface, int textColor, int bgColor) {
@@ -47,7 +49,10 @@ public interface ITheme {
     }
 
     String name();
+
     int getBgColor();
+
+    boolean isLight();
 
     LabelStyle label(TextRole role);
 

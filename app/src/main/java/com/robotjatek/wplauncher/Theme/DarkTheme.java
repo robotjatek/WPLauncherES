@@ -38,6 +38,11 @@ public class DarkTheme implements ITheme {
     }
 
     @Override
+    public boolean isLight() {
+        return false;
+    }
+
+    @Override
     public LabelStyle label(TextRole role) {
         return switch (role) {
             case TEXT -> _text;

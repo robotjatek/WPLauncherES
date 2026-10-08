@@ -15,12 +15,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class SettingsService {
     public static final String PREF_NAME = "WPLAUNCHER";
     public static final String SETTINGS = "SETTINGS";
     private boolean _disposed = false;
     private final List<OnChangeListener<AccentColor>> _accentChangeListeners = new ArrayList<>();
+    private final List<Consumer<ITheme>> _themeChangeListeners = new ArrayList<>();
     private AccentColor _accentColor = Colors.ACCENT_COLORS.get(0);
     private final List<ITheme> _themes = List.of(new DarkTheme(), new LightTheme());
     private ITheme _theme = _themes.get(0);
@@ -55,12 +57,23 @@ public class SettingsService {
         _accentChangeListeners.remove(listener);
     }
 
+    public void subscribeToThemeChange(Consumer<ITheme> listener) {
+        _themeChangeListeners.add(listener);
+    }
+
+    public void unsubscribeFromThemeChange(Consumer<ITheme> listener) {
+        _themeChangeListeners.remove(listener);
+    }
+
     public List<ITheme> getThemes() {
         return _themes;
     }
 
     public void setCurrentTheme(ITheme theme) {
         _theme = theme;
+        for (var listener : _themeChangeListeners) {
+            listener.accept(theme);
+        }
         persistSettings();
     }
 

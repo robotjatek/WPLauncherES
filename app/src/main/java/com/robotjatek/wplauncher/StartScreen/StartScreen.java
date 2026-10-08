@@ -86,13 +86,14 @@ public class StartScreen implements IPageNavigator, IScreen {
                        PermissionService permissionService,
                        WeatherService weatherService,
                        MediaService mediaService,
+                       SettingsService settingsService,
                        AppChangeReceiver appChangeReceiver,
                        LauncherSurfaceView view) {
         _state = IDLE_STATE();
-        _settingsService = new SettingsService(context);
+        _settingsService = settingsService;
         _internalAppsService = new InternalAppsService(context, _settingsService, permissionService, navigator);
         _tileService = new TileService(context, _internalAppsService, _settingsService, locationService, weatherService, mediaService);
-        _tileGrid = new TileGrid(_tileService, context, appChangeReceiver);
+        _tileGrid = new TileGrid(_tileService, context, appChangeReceiver, _settingsService);
         _appList = new AppList(context, this, _tileService, _internalAppsService, _settingsService, appChangeReceiver, navigator);
         _pages = new ArrayList<>(List.of(_tileGrid, _appList));
         _view = view;

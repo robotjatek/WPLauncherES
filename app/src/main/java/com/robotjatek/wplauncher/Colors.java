@@ -11,7 +11,8 @@ public class Colors {
     public static final int BLACK = 0xff000000;
     public static final int TRANSPARENT = 0;
     public static final int LIGHT_GRAY = 0xffbbbbbb;
-    public static final int CONTEXT_MENU_GRAY = 0xff222222;
+    public static final int DARK_GRAY = 0xff444444;
+    public static final int MODAL_GRAY = 0xff222222;
     public static final int MIDNIGHT_BLUE = Color.argb(255, 26, 26, 46);
     public static final int TILE_AMBER = Color.argb(255, 240, 163, 10);
     public static final int TILE_BROWN = Color.argb(255, 130, 90, 44);

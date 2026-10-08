@@ -2,9 +2,7 @@ package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Modal.Modal;
@@ -15,6 +13,7 @@ import com.robotjatek.wplauncher.MainActivity;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 // TODO: make this a generic pivot view with one tab
@@ -24,24 +23,24 @@ public class DebugScreen implements IScreen {
     private final IScreenNavigator _navigator;
     private final SettingsService _settingsService;
     private final Context _context;
-    private final StackLayout _layout = new StackLayout();
+    private final StackLayout _layout;
     private Size<Integer> _size = new Size<>(-1, -1);
 
     public DebugScreen(IScreenNavigator navigator, SettingsService settingsService, Context context) {
         _navigator = navigator;
         _settingsService = settingsService;
         _context = context;
-        _layout.setBgColor(Colors.BLACK);
+        _layout = new StackLayout(() -> settingsService.getCurrentTheme().layout());
         // Title
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("debug", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout.addChild(new Label("LAUNCHER SETTINGS", () -> settingsService.getCurrentTheme().label(ITheme.TextRole.TITLE)));
+        _layout.addChild(new Label("debug", () -> settingsService.getCurrentTheme().label(ITheme.TextRole.SUBTITLE)));
 
         // Content
-        _layout.addChild(new Label("crash application", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+        _layout.addChild(new Label("crash application", () -> settingsService.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 this::showCrashAppMessageBox));
-        _layout.addChild(new Label("restart application", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+        _layout.addChild(new Label("restart application", () -> settingsService.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 this::showRestartApplicationMessageBox));
-        _layout.addChild(new Label("reset configuration", 96, Typeface.NORMAL, Colors.WHITE, 0, -1,
+        _layout.addChild(new Label("reset configuration", () -> settingsService.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 this::showResetConfigurationMessageBox));
     }
 
@@ -69,14 +68,14 @@ public class DebugScreen implements IScreen {
     private void showCrashAppMessageBox() {
         var modal = new Modal("WARNING!", "This will crash the application! A log will be created in the crash-log", () -> {
             throw new RuntimeException("App was crashed from the debug screen");
-        }, _navigator::dismissModal);
+        }, _navigator::dismissModal, () -> _settingsService.getCurrentTheme().modal());
 
         _navigator.openModal(modal);
     }
 
     private void showRestartApplicationMessageBox() {
         var modal = new Modal("WARNING!", "This will make the application restart",
-                this::restartApplication, _navigator::dismissModal);
+                this::restartApplication, _navigator::dismissModal, () -> _settingsService.getCurrentTheme().modal());
         _navigator.openModal(modal);
     }
 
@@ -89,7 +88,7 @@ public class DebugScreen implements IScreen {
 
     private void showResetConfigurationMessageBox() {
         var modal = new Modal("WARNING!", "This will delete the current configuration and restart the app",
-                this::deleteConfiguration, _navigator::dismissModal);
+                this::deleteConfiguration, _navigator::dismissModal, () -> _settingsService.getCurrentTheme().modal());
         _navigator.openModal(modal);
     }
 

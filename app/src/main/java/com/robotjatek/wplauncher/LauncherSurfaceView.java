@@ -25,6 +25,7 @@ import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
+import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 
 public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
@@ -35,11 +36,14 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
     private final IUIContext _uiContext = this;
     private ITextInputHandler _focusedInputHandler = null;
     private CustomInputConnection _currentInputConnection = null;
+    private final SettingsService _settingsService;
+    private final ScreenNavigator _navigator;
 
     public LauncherSurfaceView(Context context, LocationService locationService, PermissionService permissionService, WeatherService weatherService, MediaService mediaService, AppChangeReceiver appChangeReceiver) {
         super(context);
-        var navigator = new ScreenNavigator();
-        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, mediaService, appChangeReceiver, navigator, this);
+        _settingsService = new SettingsService(context);
+        _navigator = new ScreenNavigator(_settingsService);
+        _renderer = new LauncherRenderer(context, locationService, permissionService, weatherService, mediaService, _settingsService, appChangeReceiver, _navigator, this);
         _gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener()
         {
            @Override
@@ -215,9 +219,15 @@ public class LauncherSurfaceView extends GLSurfaceView implements IUIContext {
         return _renderer;
     }
 
+    public SettingsService getSettingsService() {
+        return _settingsService;
+    }
+
     public void dispose() {
         if (!_disposed) {
             _renderer.dispose();
+            _settingsService.dispose();
+            _navigator.dispose();
             _disposed = true;
         }
     }

@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
@@ -11,6 +12,7 @@ import com.robotjatek.wplauncher.Services.LocationService;
 import com.robotjatek.wplauncher.Services.MediaService;
 import com.robotjatek.wplauncher.Services.PermissionService;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
+import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
 
@@ -33,15 +35,18 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private boolean _needsResize = false;
     private final LauncherSurfaceView _view;
     private final ScreenNavigator _navigator;
+    private final SettingsService _settingsService;
+    private int _currentBgColor = -1;
 
     public LauncherRenderer(Context context, LocationService locationService, PermissionService permissionService,
-                            WeatherService weatherService, MediaService mediaService, AppChangeReceiver appChangeReceiver,
-                            ScreenNavigator navigator, LauncherSurfaceView view) {
+                            WeatherService weatherService, MediaService mediaService, SettingsService settingsService,
+                            AppChangeReceiver appChangeReceiver, ScreenNavigator navigator, LauncherSurfaceView view) {
         _context = context;
         _locationService = locationService;
         _permissionService = permissionService;
         _weatherService = weatherService;
         _mediaService = mediaService;
+        _settingsService = settingsService;
         _appChangeReceiver = appChangeReceiver;
         _navigator = navigator;
         _view = view;
@@ -52,7 +57,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
                                  javax.microedition.khronos.egl.EGLConfig config) {
         Thread.currentThread().setUncaughtExceptionHandler(new CrashHandler(_context.getApplicationContext())); // Log GL thread crashes as well
         // Init screens and every GL related objects in surfaceCreated so no accidental gl calls before the surface is ready
-        GLES32.glClearColor(0f, 0f, 0f, 1f);
+        var bgColor = _settingsService.getCurrentTheme().layout().bgColor();
+        GLES32.glClearColor(Color.red(bgColor) / 255f, Color.green(bgColor) / 255f, Color.blue(bgColor) / 255f, Color.alpha(bgColor) / 255f);
         GLES32.glEnable(GLES32.GL_CULL_FACE);
         GLES32.glFrontFace(GLES32.GL_CW);
         GLES32.glCullFace(GLES32.GL_BACK);
@@ -67,7 +73,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         }
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
-        _navigator.init(new StartScreen(_context, _navigator, _locationService, _permissionService, _weatherService, _mediaService, _appChangeReceiver, _view));
+        _navigator.init(new StartScreen(_context, _navigator, _locationService, _permissionService, _weatherService, _mediaService, _settingsService, _appChangeReceiver, _view));
     }
 
     @Override
@@ -75,6 +81,12 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         if (_needsResize && _width > 0 && _height > 0) {
             updateLayout();
             _needsResize = false;
+        }
+
+        var bgColor = _settingsService.getCurrentTheme().getBgColor();
+        if (_currentBgColor != bgColor) {
+            GLES32.glClearColor(Color.red(bgColor) / 255f, Color.green(bgColor) / 255f, Color.blue(bgColor) / 255f, Color.alpha(bgColor) / 255f);
+            _currentBgColor = bgColor;
         }
 
         var now = System.nanoTime();
@@ -115,7 +127,6 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
 
     public void dispose() {
         if (!_disposed) {
-            _navigator.dispose();
             if (_renderer != null) _renderer.dispose();
             if (_shader != null) _shader.delete();
             _disposed = true;

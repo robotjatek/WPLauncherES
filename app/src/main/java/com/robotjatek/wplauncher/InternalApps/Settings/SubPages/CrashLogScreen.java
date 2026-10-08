@@ -1,7 +1,6 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
@@ -21,6 +20,8 @@ import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.InternalApps.TextReaderPage;
 import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import java.io.File;
@@ -34,25 +35,30 @@ public class CrashLogScreen implements IScreen {
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final Context _context;
-    private final StackLayout _layout = new StackLayout();
+    private final StackLayout _layout;
     private final ListView<File> _crashList;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final Label _titleLabel = new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0);
-    private final Label _subTitleLabel = new Label("crash log", 160, Typeface.NORMAL, Colors.WHITE, 0);
-    private final Button _clearAllButton = new Button("clear", null, new Size<>(0, 100), this::showClearLogsModal);
+    private final Label _titleLabel;
+    private final Label _subTitleLabel;
+    private final Button _clearAllButton;
     private final ContextMenuDrawContext<File> _contextMenuDrawContext;
+    private final SettingsService _settings;
 
-    public CrashLogScreen(IScreenNavigator navigator, Context context) {
+    public CrashLogScreen(IScreenNavigator navigator, Context context, SettingsService settings) {
         _navigator = navigator;
         _context = context;
-        _crashList = new ListView<>(0, 0, 0);
-        _contextMenuDrawContext = new ContextMenuDrawContext<>(_crashList);
+        _settings = settings;
+        _titleLabel = new Label("LAUNCHER SETTINGS", () -> settings.getCurrentTheme().label(ITheme.TextRole.TITLE));
+        _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
         _layout.addChild(_titleLabel);
+        _subTitleLabel = new Label("crash log", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE));
         _layout.addChild(_subTitleLabel);
+        _clearAllButton = new Button("clear", null, new Size<>(0, 100), () -> settings.getCurrentTheme().button(), this::showClearLogsModal);
         _layout.addChild(_clearAllButton);
+        _crashList = new ListView<>(0, 0, 0, settings::getCurrentTheme);
+        _contextMenuDrawContext = new ContextMenuDrawContext<>(_crashList);
         _layout.addChild(_crashList);
         _crashList.addItems(createItems());
-        _layout.setBgColor(Colors.BLACK);
     }
 
     @Override
@@ -99,7 +105,9 @@ public class CrashLogScreen implements IScreen {
                         f.getName(),
                         null,
                         Colors.TRANSPARENT,
-                        () -> openFileReaderPage(f), f)).toList();
+                        () -> openFileReaderPage(f), f,
+                        _settings::getCurrentTheme))
+                .toList();
     }
 
     private void openFileReaderPage(File file) {
@@ -107,15 +115,15 @@ public class CrashLogScreen implements IScreen {
             if (payload != null) {
                 _crashList.removeItemByPayload(file);
             }
-        });
+        }, _settings);
         _navigator.push(page);
     }
 
     private ContextMenu<File> createContextMenu() {
         var menu = new ContextMenu<>(Position.ZERO, _contextMenuDrawContext);
         var options = List.of(
-                new MenuOption<>("Open", this::openFileReaderPage, menu, null),
-                new MenuOption<>("Delete", this::deleteFile, menu, null)
+                new MenuOption<>("Open", this::openFileReaderPage, menu, null, () -> _settings.getCurrentTheme().contextMenu()),
+                new MenuOption<>("Delete", this::deleteFile, menu, null, () -> _settings.getCurrentTheme().contextMenu())
         );
         menu.addOptions(options);
         return menu;
@@ -134,10 +142,14 @@ public class CrashLogScreen implements IScreen {
     }
 
     private void showClearLogsModal() {
-        var modal = new Modal("Are you sure?", "This will delete all crash logs" , () -> {
-            clearAll();
-            _navigator.dismissModal();
-        }, _navigator::dismissModal);
+        var modal = new Modal(
+                "Are you sure?", "This will delete all crash logs" ,
+                () -> {
+                    clearAll();
+                    _navigator.dismissModal();
+                    },
+                _navigator::dismissModal,
+                () -> _settings.getCurrentTheme().modal());
         _navigator.openModal(modal);
     }
 

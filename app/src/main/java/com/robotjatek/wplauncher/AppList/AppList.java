@@ -43,8 +43,8 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private final IPageNavigator _navigator;
     private final SettingsService _settingsService;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final StackLayout _layout = new StackLayout();
-    private final ListView<App> _list = new ListView<>(0, 0, PAGE_PADDING_PX);
+    private final StackLayout _layout;
+    private final ListView<App> _list;
     private final InputBox _searchBox;
 
     public AppList(Context context, IPageNavigator navigator, TileService tileService,
@@ -54,10 +54,12 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
         _navigator = navigator;
         _tileService = tileService;
         _settingsService = settingsService;
-        _settingsService.subscribe(this);
+        _settingsService.subscribeToAccentColorChange(this);
+        _list = new ListView<>(0, 0, PAGE_PADDING_PX, settingsService::getCurrentTheme);
         _contextMenuDrawContext = new ContextMenuDrawContext<>(_list);
 
-        _searchBox = new InputBox("Search", this::onSearchTextChanged, screenNavigator, context);
+        _layout = new StackLayout(() -> settingsService.getCurrentTheme().layout());
+        _searchBox = new InputBox("Search", this::onSearchTextChanged, screenNavigator, () -> settingsService.getCurrentTheme().inputBox(), context);
         _layout.addChild(_searchBox);
         _layout.addChild(_list);
 
@@ -107,11 +109,15 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     private ContextMenu<App> createContextMenu() {
         var menu = new ContextMenu<>(new Position<>(0f, 0f), _contextMenuDrawContext);
         var options = List.of(
-                new MenuOption<>("Pin", this::pinApp, menu, (a) -> a != null && !_tileService.isPinned(a)),
+                new MenuOption<>("Pin", this::pinApp, menu, (a) -> a != null && !_tileService.isPinned(a),
+                        () -> _settingsService.getCurrentTheme().contextMenu()),
                 new MenuOption<>("Uninstall", (a) -> {
                     if (a == null) return;
                     uninstallApp(a.packageName());
-                }, menu, (a) -> a != null && !a.isSystemApp()));
+                    },
+                        menu,
+                        (a) -> a != null && !a.isSystemApp(),
+                        () -> _settingsService.getCurrentTheme().contextMenu()));
         menu.addOptions(options);
         return menu;
     }
@@ -144,7 +150,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
 
     private ListItem<App> createItem(App app) {
         var accentColor = _settingsService.getAccentColor().color();
-        return new ListItem<>(app.name(), app.icon(), accentColor, app.action(), app);
+        return new ListItem<>(app.name(), app.icon(), accentColor, app.action(), app, _settingsService::getCurrentTheme);
     }
 
     private void uninstallApp(String packageName) {
@@ -172,6 +178,7 @@ public class AppList implements Page, OnChangeListener<AccentColor>, AppChangeRe
     public void dispose() {
         if (!_disposed) {
             _layout.dispose();
+            _settingsService.unsubscribeFromAccentColorChange(this);
             _disposed = true;
         }
     }

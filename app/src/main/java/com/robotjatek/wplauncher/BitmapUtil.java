@@ -4,12 +4,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.AdaptiveIconDrawable;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES32;
 import android.opengl.GLUtils;
-
-import java.util.Objects;
 
 public class BitmapUtil {
 
@@ -47,17 +44,6 @@ public class BitmapUtil {
     private static Bitmap toBitmap(Drawable drawable, int width, int height) {
         if (width <= 0 || height <= 0) {
             return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-        }
-
-        if (drawable instanceof BitmapDrawable bitmapDrawable) {
-            var bitmap = bitmapDrawable.getBitmap();
-            if (bitmap != null) {
-                var scaled = Bitmap.createScaledBitmap(bitmap, width, height, true);
-                if (scaled == bitmap) {
-                    return bitmap.copy(Objects.requireNonNull(bitmap.getConfig()), false);
-                }
-                return scaled;
-            }
         }
 
         if (drawable instanceof AdaptiveIconDrawable adaptive) {

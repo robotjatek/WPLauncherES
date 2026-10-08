@@ -56,7 +56,7 @@ public class TileService implements OnChangeListener<AccentColor> {
         _context = context;
         _internalAppsService = internalAppsService;
         _settingsService = settingsService;
-        _settingsService.subscribe(this);
+        _settingsService.subscribeToAccentColorChange(this);
         _locationService = locationService;
         _weatherService = weatherService;
         _mediaService = mediaService;
@@ -325,6 +325,7 @@ public class TileService implements OnChangeListener<AccentColor> {
         if (!_disposed) {
             _tiles.forEach(Tile::dispose);
             _tiles.clear();
+            _settingsService.unsubscribeFromAccentColorChange(this);
             _disposed = true;
         }
     }

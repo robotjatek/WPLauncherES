@@ -1,7 +1,5 @@
 package com.robotjatek.wplauncher.Components.Button;
 
-import android.graphics.Typeface;
-
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
@@ -16,7 +14,10 @@ import com.robotjatek.wplauncher.Gestures.MoveGesture;
 import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
+
+import java.util.function.Supplier;
 
 public class Button implements UIElement, ITouchable {
 
@@ -25,20 +26,45 @@ public class Button implements UIElement, ITouchable {
     private boolean _disposed = false;
     private Runnable _onTap;
     private boolean _isDirty = true;
-    private final AbsoluteLayout _borderLayout = new AbsoluteLayout();
-    private final AbsoluteLayout _layout = new AbsoluteLayout();
+    private final AbsoluteLayout _borderLayout;
+    private final AbsoluteLayout _layout;
     private final Label _label;
     private Icon _icon;
     private Size<Integer> _size;
     private ILayout _parent;
+    private final Supplier<ITheme.ButtonStyle> _styleSupplier;
+    private ITheme.ButtonStyle _currentStyle;
+    private ITheme.LabelStyle _labelStyle;
+    private ITheme.LayoutStyle _borderStyle;
+    private ITheme.LayoutStyle _bgStyle;
 
-    public Button(String text, Icon icon, Size<Integer> size, Runnable onTap) {
-        _label = new Label(text, 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-        _size = size;
-        _icon = icon;
+    public Button(String text, Icon icon, Size<Integer> size, Supplier<ITheme.ButtonStyle> style, Runnable onTap) {
+        _styleSupplier = style;
+        _currentStyle = style.get();
+        createInternalStyles();
         _onTap = onTap;
-        _borderLayout.setBgColor(Colors.WHITE);
-        _layout.setBgColor(Colors.BLACK);
+        _icon = icon;
+        _size = size;
+
+        _label = new Label(text, () -> _labelStyle, -1, null);
+        _borderLayout = new AbsoluteLayout(() -> _borderStyle);
+        _layout = new AbsoluteLayout(() -> _bgStyle);
+    }
+
+    private void createInternalStyles() {
+        var s = _currentStyle;
+        _labelStyle = new ITheme.LabelStyle(s.textSize(), s.typeface(), s.textColor(), Colors.TRANSPARENT);
+        _borderStyle = new ITheme.LayoutStyle(s.borderColor());
+        _bgStyle = new ITheme.LayoutStyle(s.bgColor());
+    }
+
+    private void syncTheme() {
+        var style = _styleSupplier.get();
+        if (!style.equals(_currentStyle)) {
+            _currentStyle = style;
+            createInternalStyles();
+            _isDirty = true;
+        }
     }
 
     @Override
@@ -50,6 +76,7 @@ public class Button implements UIElement, ITouchable {
         var w = (int) drawContext.widthOf(this);
         var h = (int) drawContext.heightOf(this);
 
+        syncTheme();
         if (_isDirty) {
             _borderLayout.removeChild(_layout);
             _layout.onResize(w - BORDER_SIZE_PX * 2, h - BORDER_SIZE_PX * 2);
@@ -74,12 +101,15 @@ public class Button implements UIElement, ITouchable {
 
     @Override
     public void onPress() {
-        _layout.setBgColor(Colors.WHITE);
+        // swap background and border color on press
+        _layout.setBgColor(_currentStyle.borderColor());
+        _label.setTextColor(_currentStyle.bgColor());
     }
 
     @Override
     public void onRelease() {
-        _layout.setBgColor(Colors.BLACK);
+        _layout.setBgColor(null); // re-enable original styling
+        _label.setTextColor(null);
     }
 
     @Override

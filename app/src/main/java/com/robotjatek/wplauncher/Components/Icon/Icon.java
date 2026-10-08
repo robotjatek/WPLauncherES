@@ -117,6 +117,14 @@ public class Icon implements UIElement {
         _dirty = true;
     }
 
+    public void setTint(int color) {
+        if (_iconDrawable != null) {
+            _iconDrawable.mutate();
+            _iconDrawable.setTint(color);
+            _dirty = true;
+        }
+    }
+
     @Override
     public void dispose() {
         if (!_disposed) {

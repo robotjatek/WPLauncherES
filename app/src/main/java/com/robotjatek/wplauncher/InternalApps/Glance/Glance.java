@@ -1,9 +1,7 @@
 package com.robotjatek.wplauncher.InternalApps.Glance;
 
 import android.content.Context;
-import android.graphics.Typeface;
 
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Checkbox.Checkbox;
@@ -12,6 +10,8 @@ import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.Services.ScreenNavigator.IScreenNavigator;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
 import org.json.JSONException;
@@ -29,19 +29,18 @@ public class Glance implements IScreen {
     private boolean _locationEnabled;
     private Size<Integer> _size = new Size<>(-1, -1);
 
-    public Glance(IScreenNavigator navigator, Context context) {
+    public Glance(IScreenNavigator navigator, SettingsService settings, Context context) {
         _navigator = navigator;
         _context = context;
         loadSettings();
 
-        _layout = new StackLayout();
-        _layout.setBgColor(Colors.BLACK);
-        _layout.addChild(new Label("GLANCE", 52, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("settings", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
+        _layout.addChild(new Label("GLANCE", () -> settings.getCurrentTheme().label(ITheme.TextRole.TITLE)));
+        _layout.addChild(new Label("settings", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE)));
         _layout.addChild(new Checkbox("Show location based data when available", _locationEnabled, (b) -> {
             _locationEnabled = b;
             persistSettings();
-        }, context));
+        }, context, () -> settings.getCurrentTheme().checkbox()));
     }
 
     private void persistSettings() {

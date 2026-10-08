@@ -1,8 +1,5 @@
 package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 
-import android.graphics.Typeface;
-
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Button.Button;
 import com.robotjatek.wplauncher.Components.Dropdown.Dropdown;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
@@ -18,63 +15,61 @@ import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.AccentColor;
 import com.robotjatek.wplauncher.Services.SettingsService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
 
-import java.util.Collections;
-import java.util.List;
+public class ThemeScreen implements IScreen {
 
-public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
-
+    private final OnChangeListener<AccentColor> _accentColorListener = this::accentChanged;
     private boolean _disposed = false;
     private final IScreenNavigator _navigator;
     private final StackLayout _layout;
     private final Button _colorPickerBtn;
-    private final Dropdown<PayloadPlaceholder> _backgroundDropdown; // TODO: make this a Dropdown<Theme>
     private Icon _icon;
     private final SettingsService _settings;
     private Size<Integer> _size = new Size<>(-1, -1);
-    private final TextBlock _description = new TextBlock("You can change your phone's background" +
-            " and accent color to match your mood today, this week, or all month",
-            48, Typeface.NORMAL, Colors.LIGHT_GRAY, Colors.TRANSPARENT, -1);
-
-    public record PayloadPlaceholder(String name, List<Integer> something) { } // TODO: remove when theme change is implemented
+    private final TextBlock _description;
 
     public ThemeScreen(IScreenNavigator navigator, SettingsService settings) {
         _navigator = navigator;
         _settings = settings;
-        _layout = new StackLayout();
-        _layout.setBgColor(Colors.BLACK);
+        var theme = _settings.getCurrentTheme();
+        _layout = new StackLayout(() -> settings.getCurrentTheme().layout());
 
-        _layout.addChild(new Label("LAUNCHER SETTINGS", 64, Typeface.NORMAL, Colors.WHITE, 0));
-        _layout.addChild(new Label("theme", 160, Typeface.NORMAL, Colors.WHITE, 0));
+        var _title = new Label("LAUNCHER SETTINGS", () -> _settings.getCurrentTheme().label(ITheme.TextRole.TITLE));
+        _layout.addChild(_title);
+        var _subtitle = new Label("theme", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE));
+        _layout.addChild(_subtitle);
 
         _layout.addChild(new Spacer(0, 64));
+
+        _description = new TextBlock("You can change your phone's background" +
+                " and accent color to match your mood today, this week, or all month",
+                () -> _settings.getCurrentTheme().textBlock(), -1);
         _layout.addChild(_description);
         _layout.addChild(new Spacer(0, 48));
 
-        var selectedContent = new Label("", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0); // TODO: remove when theme change is implemented
-        _layout.addChild(selectedContent);
-
-        _layout.addChild(new Label("Background color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
-        var options = List.of( // TODO: replace with real choices
-                new PayloadPlaceholder("light", Collections.emptyList()),
-                new PayloadPlaceholder("dark", Collections.emptyList()));
-        _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, PayloadPlaceholder::name,
-                (selected) -> selectedContent.setText(selected.name()));
+        var backgroundLabel = new Label("Background color", () -> settings.getCurrentTheme().label(ITheme.TextRole.CAPTION));
+        _layout.addChild(backgroundLabel);
+        var options = _settings.getThemes();
+        var _backgroundDropdown = new Dropdown<>(new Size<>(0, 100), options, ITheme::name, _settings::setCurrentTheme, () -> settings.getCurrentTheme().dropdown());
+        _backgroundDropdown.setSelected(theme);
         _layout.addChild(_backgroundDropdown);
 
         _layout.addChild(new Spacer(0, 48));
 
-        _layout.addChild(new Label("Accent color", 48, Typeface.NORMAL, Colors.LIGHT_GRAY, 0));
+        var accentLabel = new Label("Accent color", () -> settings.getCurrentTheme().label(ITheme.TextRole.CAPTION));
+        _layout.addChild(accentLabel);
         var color = settings.getAccentColor();
         _icon = new Icon(color.color(), new Size<>(64, 64));
         _colorPickerBtn = new Button(
                 color.name(),
                 _icon,
                 new Size<>(0, 100),
+                () -> settings.getCurrentTheme().button(),
                 () -> {
-                    var colorPickerScreen = new ColorPickerScreen(navigator);
-                    colorPickerScreen.subscribe(this);
+                    var colorPickerScreen = new ColorPickerScreen(navigator, settings::getCurrentTheme);
+                    colorPickerScreen.subscribe(_accentColorListener);
                     navigator.push(colorPickerScreen);
                 });
         _layout.addChild(_colorPickerBtn);
@@ -97,8 +92,7 @@ public class ThemeScreen implements IScreen, OnChangeListener<AccentColor> {
         _layout.onResize(width, height);
     }
 
-    @Override
-    public void changed(AccentColor changed) {
+    private void accentChanged(AccentColor changed) {
         _settings.setAccentColor(changed);
         _icon.dispose();
         _colorPickerBtn.setText(changed.name());

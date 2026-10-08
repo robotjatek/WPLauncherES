@@ -15,6 +15,7 @@ import com.robotjatek.wplauncher.Page;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.R;
 import com.robotjatek.wplauncher.ScrollController;
+import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.TileGrid.States.EditState;
 import com.robotjatek.wplauncher.TileGrid.States.IdleState;
 import com.robotjatek.wplauncher.TileGrid.States.ScrollState;
@@ -63,7 +64,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
     private final Adorner _resizeButton;
     private final Queue<Runnable> _commands = new ConcurrentLinkedQueue<>();
 
-    public TileGrid(TileService tileService, Context context, AppChangeReceiver appChangeReceiver) {
+    public TileGrid(TileService tileService, Context context, AppChangeReceiver appChangeReceiver, SettingsService settings) {
         _tileService = tileService;
         _tiles = tileService.getTiles();
         _tileService.subscribe(this);
@@ -78,7 +79,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                     cancelSelection();
                 });
             }
-        }, icon, new Position<>(1f, 0f), adornerDrawContext);
+        }, icon, new Position<>(1f, 0f), adornerDrawContext, () -> settings.getCurrentTheme().adorner());
 
         var resizeIcon = ContextCompat.getDrawable(context, R.drawable.resize);
         _resizeButton = new Adorner(() -> {
@@ -87,7 +88,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                 _tileService.resizeTile(tileToResize);
                 setScrollBounds();
             }
-        }, resizeIcon, new Position<>(1f, 1f), adornerDrawContext);
+        }, resizeIcon, new Position<>(1f, 1f), adornerDrawContext, () -> settings.getCurrentTheme().adorner());
         appChangeReceiver.subscribe(this);
     }
 
@@ -108,7 +109,6 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
             }
             tile.drawWithOffset(delta, projMatrix, scrollMatrix, Position.ZERO, _tileDrawContext, renderer);
         }
-
         // render the selected tile with different scaling, and on its current drag position
         if (_selectedTile != null) {
             renderer.pushLayer();
@@ -118,8 +118,8 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
                     _tileDrawContext,
                     renderer);
             renderer.pushLayer();
-            _unpinButton.draw(projMatrix, scrollMatrix, renderer);
-            _resizeButton.draw(projMatrix, scrollMatrix, renderer);
+            _unpinButton.draw(delta, projMatrix, scrollMatrix, renderer);
+            _resizeButton.draw(delta, projMatrix, scrollMatrix, renderer);
             renderer.popLayer();
             renderer.enableDepthTest();
             renderer.popLayer();

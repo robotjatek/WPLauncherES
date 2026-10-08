@@ -57,9 +57,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
                                  javax.microedition.khronos.egl.EGLConfig config) {
         Thread.currentThread().setUncaughtExceptionHandler(new CrashHandler(_context.getApplicationContext())); // Log GL thread crashes as well
         // Init screens and every GL related objects in surfaceCreated so no accidental gl calls before the surface is ready
-        var theme = _settingsService.getCurrentTheme().layout().bgColor();
-        var color = Color.toArgb(theme);
-        GLES32.glClearColor(Color.red(color) / 255f, Color.green(color) / 255f, Color.blue(color) / 255f, Color.alpha(color) / 255f);
+        var bgColor = _settingsService.getCurrentTheme().layout().bgColor();
+        GLES32.glClearColor(Color.red(bgColor) / 255f, Color.green(bgColor) / 255f, Color.blue(bgColor) / 255f, Color.alpha(bgColor) / 255f);
         GLES32.glEnable(GLES32.GL_CULL_FACE);
         GLES32.glFrontFace(GLES32.GL_CW);
         GLES32.glCullFace(GLES32.GL_BACK);

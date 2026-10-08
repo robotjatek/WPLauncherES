@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.Services;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.InternalApps.Settings.OnChangeListener;
@@ -22,12 +23,12 @@ public class SettingsService {
     private final List<OnChangeListener<AccentColor>> _accentChangeListeners = new ArrayList<>();
     private AccentColor _accentColor = Colors.ACCENT_COLORS.get(0);
     private final List<ITheme> _themes = List.of(new DarkTheme(), new LightTheme());
-    private ITheme _theme = _themes.get(0); // TODO: persist theme, load persisted theme, make sure glClearColor gets set to the correct value on application start
+    private ITheme _theme = _themes.get(0);
     private final Context _context;
 
     public SettingsService(Context context) {
         _context = context;
-        _accentColor = loadPersistedAccentColor();
+        loadPersistedSettings();
     }
 
     @SuppressLint("ApplySharedPref")
@@ -60,6 +61,7 @@ public class SettingsService {
 
     public void setCurrentTheme(ITheme theme) {
         _theme = theme;
+        persistSettings();
     }
 
     public ITheme getCurrentTheme() {
@@ -70,6 +72,8 @@ public class SettingsService {
         try {
             var settingsJson = new JSONObject();
             settingsJson.put("accentColor", _accentColor.color());
+            settingsJson.put("theme", _theme.name());
+
             var prefs = _context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
             prefs.edit()
                     .putString(SETTINGS, settingsJson.toString())
@@ -79,24 +83,38 @@ public class SettingsService {
         }
     }
 
-    private AccentColor loadPersistedAccentColor() {
+    private void loadPersistedSettings() {
         var prefs = _context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         var settingsJson = prefs.getString(SETTINGS, null);
         if (settingsJson == null) {
             // load default fallback values
-            return Colors.ACCENT_RED;
+            loadFallbackValues();
+            return;
         }
 
         try {
             var settings = new JSONObject(settingsJson);
+
             var color = settings.getInt("accentColor");
-            return Colors.ACCENT_COLORS.stream()
+            _accentColor = Colors.ACCENT_COLORS.stream()
                     .filter(c -> c.color() == color)
                     .findFirst()
                     .orElse(Colors.ACCENT_RED);
+            var theme = settings.getString("theme");
+            _theme = _themes.stream().filter(t -> t.name().equals(theme))
+                    .findFirst()
+                    .orElse(_themes.get(0));
+
+
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            loadFallbackValues();
+            Log.e("SettingsService", "Failed to load persisted settings");
         }
+    }
+
+    private void loadFallbackValues() {
+        _accentColor = Colors.ACCENT_RED;
+        _theme = _themes.get(0);
     }
 
     public void dispose() {

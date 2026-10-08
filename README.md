@@ -183,7 +183,7 @@ Feature-creep!
 - [x] Light mode/Dark mode support
   - [x] Dropdown component
   - [ ] Theming support
-    - [ ] Persist theme setting
+    - [x] Persist theme setting
     - [ ] Status bar is style aware
     - [x] Components
       - [x] StackLayout is style aware

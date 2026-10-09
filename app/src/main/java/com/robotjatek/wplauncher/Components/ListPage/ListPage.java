@@ -24,16 +24,17 @@ public class ListPage<T> {
     private static final int PAGE_PADDING_PX = 60;
     private Size<Integer> _size = new Size<>(-1, -1);
     private final StackLayout _layout;
-    private final ListView<T> _appList;
+    private final ListView<T> _listView;
 
     public ListPage(Supplier<ITheme> themeSupplier) {
         _layout = new StackLayout(() -> themeSupplier.get().layout());
-        _appList = new ListView<>(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset, PAGE_PADDING_PX, themeSupplier);
-        _layout.addChild(_appList);
+        _listView = new ListView<>(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset, PAGE_PADDING_PX, themeSupplier);
+        _listView.setClipping(false);
+        _layout.addChild(_listView);
     }
 
     public List<ListItem<T>> getItems() {
-        return _appList.getItems();
+        return _listView.getItems();
     }
 
     public void draw(float delta, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {
@@ -47,37 +48,39 @@ public class ListPage<T> {
     public void onSizeChanged(int width, int height) {
         _size = new Size<>(width, height);
         var listWidth = width - 2 * PAGE_PADDING_PX;
-        _appList.setMargins(LauncherRenderer.SCREEN_DATA.topInset, LauncherRenderer.SCREEN_DATA.bottomInset);
-        _appList.setSize(new Size<>(listWidth, height));
+        var topInset = LauncherRenderer.SCREEN_DATA.topInset;
+        var bottomInset = LauncherRenderer.SCREEN_DATA.bottomInset;
+        _listView.setSize(new Size<>(listWidth, height));
+        _listView.setMargins(topInset, bottomInset);
         _layout.onResize(width, height);
     }
 
     public void resetState() {
-        _appList.resetState();
+        _listView.resetState();
     }
 
     public void addItem(int index, ListItem<T> item) {
-          _appList.addItem(index, item);
+          _listView.addItem(index, item);
     }
 
     public void addItems(List<ListItem<T>> items) {
-        _appList.addItems(items);
+        _listView.addItems(items);
     }
 
     public void removeItem(ListItem<T> item) {
-        _appList.removeItemByPayload(item.getPayload());
+        _listView.removeItemByPayload(item.getPayload());
     }
 
     public void setContextMenu(ContextMenu<T> menu) {
-        _appList.setContextMenu(menu);
+        _listView.setContextMenu(menu);
     }
 
     public void resetScroll() {
-        _appList.getScroll().setScrollOffset(0);
+        _listView.getScroll().setScrollOffset(0);
     }
 
     public boolean isCatchingGestures() {
-        return _appList.isCatchingGestures();
+        return _listView.isCatchingGestures();
     }
 
     public void dispose() {

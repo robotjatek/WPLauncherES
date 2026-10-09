@@ -35,6 +35,7 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
     public static final int ITEM_GAP_PX = 5;
     private boolean _disposed = false;
     private boolean _dirty = true;
+    private boolean _clipping = true;
     private final float[] _modelMatrix = new float[16];
     private final float[] _menuMatrix = new float[16];
     private final float[] _clipMatrix = new float[16];
@@ -112,7 +113,10 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         Matrix.translateM(_clipMatrix, 0, x, y, 0);
         Matrix.scaleM(_clipMatrix, 0, w, h, 1);
         Matrix.multiplyMM(_clipMatrix, 0, view, 0, _clipMatrix, 0);
-        renderer.beginClip(proj, _clipMatrix);
+
+        if (_clipping) {
+            renderer.beginClip(proj, _clipMatrix);
+        }
 
         _bgLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
 
@@ -122,14 +126,17 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
 
         for (var item : _filteredItems) {
             // skip drawing items that are out of the view
-            if (!_itemDrawContext.isVisible(item)) {
+            if (!_itemDrawContext.isVisible(item, y)) {
                  continue;
             }
 
             item.update(delta, _itemDrawContext);
             item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer);
         }
-        renderer.endClip();
+
+        if (_clipping) {
+            renderer.endClip();
+        }
 
         if (_contextMenu != null && _contextMenu.isOpened()) {
             renderer.pushLayer();
@@ -297,6 +304,10 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
 
     public IDrawContext<ListItem<T>> getItemDrawContext() {
         return _itemDrawContext;
+    }
+
+    public void setClipping(boolean clipping) {
+        _clipping = clipping;
     }
 
     private void executeCommands() {

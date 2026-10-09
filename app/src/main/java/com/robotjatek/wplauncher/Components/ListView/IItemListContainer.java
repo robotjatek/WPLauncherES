@@ -10,4 +10,5 @@ public interface IItemListContainer<T> {
     List<ListItem<T>> getVisibleItems();
     Size<Integer> getSize();
     ScrollController getScroll();
+    int getTopMargin();
 }

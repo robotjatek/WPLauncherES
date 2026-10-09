@@ -1,6 +1,7 @@
 package com.robotjatek.wplauncher.InternalApps.Settings;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.Spacer.Spacer;
@@ -46,6 +47,14 @@ public class Settings implements IScreen {
 
         _layout.addChild(new Label("about", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 () -> navigator.push(new AboutScreen(navigator, context, settings))));
+
+        _layout.addChild(new Spacer(0, 80));
+
+        _layout.addChild(new Label("system settings", () -> settings.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
+                () -> {
+                    var intent = new Intent(android.provider.Settings.ACTION_SETTINGS);
+                    context.startActivity(intent);
+                }));
     }
 
     @Override

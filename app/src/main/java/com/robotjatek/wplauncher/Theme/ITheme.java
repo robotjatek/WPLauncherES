@@ -1,7 +1,5 @@
 package com.robotjatek.wplauncher.Theme;
 
-import android.graphics.Color;
-
 public interface ITheme {
 
     record LabelStyle(int textSize, int typeface, int textColor, int bgColor) {

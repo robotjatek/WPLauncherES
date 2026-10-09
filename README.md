@@ -250,7 +250,7 @@ Cleaning up the accumulated mess
 - [ ] Add stencil clipping to layouts
 - [x] Make Notification surface layout more symmetric
 - [ ] Don't recalculate matrices every frame
-- [ ] Open system settings from launcher settings
+- [x] Open system settings from launcher settings
 - [ ] TextBlock wrapping: never start a new line with space
 - [ ] Discard keyboard on tapping outside the input box
 - [ ] Fix: Scroll/drag lags behind finger movement
@@ -287,6 +287,7 @@ Creep got too big
 - [ ] Make adorners UIElements
 - [ ] Add tile adorners to the top level overlay
 - [ ] Apps can pin their shortcuts to the home screen
+- [ ] Navigating away from the launcher and returning shouldn't reset its state
 
 ### M5.5
 

@@ -51,12 +51,17 @@ public class ListItemDrawContext<T, U extends IItemListContainer<T>> implements 
         return ITEM_HEIGHT_PX;
     }
 
-    public boolean isVisible(ListItem<T> item) {
+    public boolean isVisible(ListItem<T> item, float listViewY) {
         var scrollOffset = _itemContainer.getScroll().getScrollOffset();
         var containerHeight = _itemContainer.getSize().height();
-        var y = yOf(item);
+        var yPos = yOf(item);
         var itemHeight = heightOf(item);
-        return !(y + itemHeight + ITEM_GAP_PX + PAGE_PADDING_PX < -scrollOffset || y > -scrollOffset + containerHeight);
+        var topMargin = _itemContainer.getTopMargin();
+
+        var itemTop = listViewY + PAGE_PADDING_PX + scrollOffset + yPos;
+        var itemBottom = itemTop + itemHeight + ITEM_GAP_PX;
+
+        return itemBottom > -topMargin && itemTop < containerHeight;
     }
 
     public void invalidateCache() {

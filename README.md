@@ -261,7 +261,7 @@ Cleaning up the accumulated mess
 - [ ] Relayout on child size change should be implicit
 - [ ] Kill TileUtil.java
 - [ ] Kill all theme-unaware legacy constructors
-- [ ] Fix: Top of the color picker screen is cut off
+- [x] Fix: Top of the color picker screen is cut off
 - [x] Fix: Fade overlay on opening a modal is not fullscreen
 
 ### M5 - Beta 2

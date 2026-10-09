@@ -262,7 +262,7 @@ Cleaning up the accumulated mess
 - [ ] Kill TileUtil.java
 - [ ] Kill all theme-unaware legacy constructors
 - [ ] Fix: Top of the color picker screen is cut off
-- [ ] Fix: Fade overlay on opening a modal is not fullscreen
+- [x] Fix: Fade overlay on opening a modal is not fullscreen
 
 ### M5 - Beta 2
 

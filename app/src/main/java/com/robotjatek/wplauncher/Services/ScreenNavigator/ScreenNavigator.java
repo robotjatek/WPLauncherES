@@ -118,6 +118,7 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
 
         if (_modal != null) {
             Matrix.setIdentityM(_model, 0);
+            Matrix.translateM(_model, 0, 0, -(float)LauncherRenderer.SCREEN_DATA.topInset, 0);
             Matrix.scaleM(_model, 0, _width, _height, 1);
             renderer.pushLayers(200);
             renderer.drawFlat(proj, _model, 0x88050505);

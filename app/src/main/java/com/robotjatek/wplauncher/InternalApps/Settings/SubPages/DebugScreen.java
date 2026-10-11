@@ -3,10 +3,12 @@ package com.robotjatek.wplauncher.InternalApps.Settings.SubPages;
 import android.content.Context;
 import android.content.Intent;
 
+import com.robotjatek.wplauncher.Components.Checkbox.Checkbox;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
 import com.robotjatek.wplauncher.Components.Modal.Modal;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.Spacer.Spacer;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.IScreen;
 import com.robotjatek.wplauncher.MainActivity;
@@ -42,6 +44,15 @@ public class DebugScreen implements IScreen {
                 this::showRestartApplicationMessageBox));
         _layout.addChild(new Label("reset configuration", () -> settingsService.getCurrentTheme().label(ITheme.TextRole.PAGE_LINK), -1,
                 this::showResetConfigurationMessageBox));
+
+        _layout.addChild(new Spacer(0, 128));
+        _layout.addChild(
+                new Checkbox(
+                        "Show FPS counter",
+                        false,
+                        _settingsService::fpsCounter,
+                        context,
+                        () -> settingsService.getCurrentTheme().checkbox()));
     }
 
     @Override

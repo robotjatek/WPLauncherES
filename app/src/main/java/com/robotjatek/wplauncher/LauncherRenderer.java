@@ -2,10 +2,12 @@ package com.robotjatek.wplauncher;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.opengl.GLES32;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
+import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Gestures.Gesture;
 import com.robotjatek.wplauncher.Services.AppChangeReceiver;
 import com.robotjatek.wplauncher.Services.LocationService;
@@ -15,6 +17,8 @@ import com.robotjatek.wplauncher.Services.ScreenNavigator.ScreenNavigator;
 import com.robotjatek.wplauncher.Services.SettingsService;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
 import com.robotjatek.wplauncher.StartScreen.StartScreen;
+import com.robotjatek.wplauncher.Theme.ITheme;
+import com.robotjatek.wplauncher.TileGrid.Position;
 
 public class LauncherRenderer implements GLSurfaceView.Renderer {
     public static ScreenData SCREEN_DATA = new ScreenData();
@@ -37,6 +41,7 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
     private final ScreenNavigator _navigator;
     private final SettingsService _settingsService;
     private int _currentBgColor = -1;
+    private Label _fpsLabel;
 
     public LauncherRenderer(Context context, LocationService locationService, PermissionService permissionService,
                             WeatherService weatherService, MediaService mediaService, SettingsService settingsService,
@@ -73,11 +78,27 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         }
         _shader = new Shader("","");
         _renderer = new QuadRenderer(_shader);
+        var fpsStyle = new ITheme.LabelStyle(96, Typeface.NORMAL, Colors.TILE_PINK, Colors.BLACK);
+        _fpsLabel = new Label("", () -> fpsStyle);
+        _settingsService.subscribeToFpsCounterChange(this::fpsCounterEnabled);
+        fpsCounterEnabled(_settingsService.fpsCounter());
         _navigator.init(new StartScreen(_context, _navigator, _locationService, _permissionService, _weatherService, _mediaService, _settingsService, _appChangeReceiver, _view));
+    }
+
+    void fpsCounterEnabled(Boolean enabled) {
+        if (enabled) {
+            _navigator.setAdornerAt(_fpsLabel, Position.ZERO);
+        } else {
+            _navigator.removeAdorner(_fpsLabel);
+        }
     }
 
     @Override
     public void onDrawFrame(javax.microedition.khronos.opengles.GL10 glUnused) {
+        var now = System.nanoTime();
+        var delta = (now - lastTime) / 1000000f;
+        lastTime = now;
+
         if (_needsResize && _width > 0 && _height > 0) {
             updateLayout();
             _needsResize = false;
@@ -89,21 +110,17 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
             _currentBgColor = bgColor;
         }
 
-        var now = System.nanoTime();
-        var delta = (now - lastTime) / 1000000f;
-        lastTime = now;
-
-        frameCount++;
-//        Log.d("FPS", "delta: " + delta);
-        if (System.currentTimeMillis() - fpsTime >= 1000) {
-         //   Log.d("FPS", "FPS: " + frameCount);
-            frameCount = 0;
-            fpsTime = System.currentTimeMillis();
-        }
         GLES32.glClear(GLES32.GL_COLOR_BUFFER_BIT | GLES32.GL_DEPTH_BUFFER_BIT | GLES32.GL_STENCIL_BUFFER_BIT);
         GLES32.glDisable(GLES32.GL_STENCIL_TEST);
         _renderer.resetOffset();
         _navigator.draw(delta, _projMatrix, _renderer);
+
+        if (System.currentTimeMillis() - fpsTime >= 1000) {
+            _fpsLabel.setText(frameCount + "");
+            frameCount = 0;
+            fpsTime = System.currentTimeMillis();
+        }
+        frameCount++;
     }
 
     @Override
@@ -129,6 +146,8 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
         if (!_disposed) {
             if (_renderer != null) _renderer.dispose();
             if (_shader != null) _shader.delete();
+            if (_fpsLabel != null) _fpsLabel.dispose();
+            _settingsService.unsubscribeFromFpsCounterChange(this::fpsCounterEnabled);
             _disposed = true;
         }
     }

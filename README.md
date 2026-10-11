@@ -261,7 +261,8 @@ Cleaning up the accumulated mess
 - [x] Fix: Fade overlay on opening a modal is not fullscreen
 - [x] pushLayers/popLayers should be merged into one call
 - [x] beginClip/endClip should be merged into one call
-- [x] Fix: black flash on the bottom of the screen when opening the theme page
+- [x] Fix: black flash at the bottom of the screen when opening the theme page
+- [x] Debug menu: FPS counter
 
 ### M5 - Beta 2
 
@@ -330,6 +331,6 @@ Haven't seen these for a while
 Nice to have, but I feel no pressure to implement them for now, or I have no idea where to squeeze them or what to do with them in general 
 
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
-- [ ] Add stencil clipping to layouts
+- [ ] Add stencil clipping to layouts (Photos tile content is not clipped when pressed)
 - [ ] Relayout on child size change should be implicit
 - [ ] Gesture handling is a hot garbage

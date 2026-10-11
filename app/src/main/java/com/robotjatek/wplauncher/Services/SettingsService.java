@@ -23,9 +23,11 @@ public class SettingsService {
     private boolean _disposed = false;
     private final List<OnChangeListener<AccentColor>> _accentChangeListeners = new ArrayList<>();
     private final List<Consumer<ITheme>> _themeChangeListeners = new ArrayList<>();
+    private final List<Consumer<Boolean>> _fpsCounterListeners = new ArrayList<>();
     private AccentColor _accentColor = Colors.ACCENT_COLORS.get(0);
     private final List<ITheme> _themes = List.of(new DarkTheme(), new LightTheme());
     private ITheme _theme = _themes.get(0);
+    private boolean _fpsCounterEnabled = false;
     private final Context _context;
 
     public SettingsService(Context context) {
@@ -81,11 +83,30 @@ public class SettingsService {
         return _theme;
     }
 
+    public void fpsCounter(boolean enabled) {
+        _fpsCounterEnabled = enabled;
+        _fpsCounterListeners.forEach(l -> l.accept(enabled));
+        persistSettings();
+    }
+
+    public boolean fpsCounter() {
+        return _fpsCounterEnabled;
+    }
+
+    public void subscribeToFpsCounterChange(Consumer<Boolean> listener) {
+        _fpsCounterListeners.add(listener);
+    }
+
+    public void unsubscribeFromFpsCounterChange(Consumer<Boolean> listener) {
+        _fpsCounterListeners.remove(listener);
+    }
+
     private void persistSettings() {
         try {
             var settingsJson = new JSONObject();
             settingsJson.put("accentColor", _accentColor.color());
             settingsJson.put("theme", _theme.name());
+            settingsJson.put("fpsCounter", _fpsCounterEnabled);
 
             var prefs = _context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
             prefs.edit()
@@ -107,7 +128,6 @@ public class SettingsService {
 
         try {
             var settings = new JSONObject(settingsJson);
-
             var color = settings.getInt("accentColor");
             _accentColor = Colors.ACCENT_COLORS.stream()
                     .filter(c -> c.color() == color)
@@ -117,8 +137,9 @@ public class SettingsService {
             _theme = _themes.stream().filter(t -> t.name().equals(theme))
                     .findFirst()
                     .orElse(_themes.get(0));
-
-
+            if (settings.has("fpsCounter")) {
+                _fpsCounterEnabled = settings.getBoolean("fpsCounter");
+            }
         } catch (JSONException e) {
             loadFallbackValues();
             Log.e("SettingsService", "Failed to load persisted settings");

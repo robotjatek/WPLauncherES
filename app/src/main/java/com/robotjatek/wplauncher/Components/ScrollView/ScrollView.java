@@ -66,9 +66,7 @@ public class ScrollView implements UIElement {
         Matrix.translateM(_modelMatrix, 0, x, y + _scroll.getScrollOffset(), 0);
         Matrix.multiplyMM(_modelMatrix, 0, _modelMatrix, 0, view, 0);
 
-        renderer.beginClip(proj, _clipMatrix);
-        _child.draw(delta, proj, _modelMatrix, _drawContext, renderer);
-        renderer.endClip();
+        renderer.clip(proj, _clipMatrix, () -> _child.draw(delta, proj, _modelMatrix, _drawContext, renderer));
     }
 
     public void changeState(IState state) {

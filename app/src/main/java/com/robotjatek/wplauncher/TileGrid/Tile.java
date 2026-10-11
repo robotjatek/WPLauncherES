@@ -101,17 +101,16 @@ public class Tile implements ITouchable {
         Matrix.scaleM(_clipMatrix, 0, _visualWidth, _visualHeight, 1f);
         Matrix.multiplyMM(_clipMatrix, 0, viewMatrix, 0, _clipMatrix, 0);
 
-        renderer.beginClip(projMatrix, _clipMatrix);
-
-        // Render with the new size while scaling it with the gradually smaller visual size
-        var logicalSize = new Size<>((int)targetWidth, (int)targetHeight);
-        if (logicalSize.width() > 0 && logicalSize.height() > 0) {
-            _content.draw(delta, projMatrix, _frontViewMatrix, renderer, Position.ZERO, logicalSize);
-            if (_backContent != null) {
-                _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, Position.ZERO, logicalSize);
+        renderer.clip(projMatrix, _clipMatrix, () -> {
+            // Render with the new size while scaling it with the gradually smaller visual size
+            var logicalSize = new Size<>((int)targetWidth, (int)targetHeight);
+            if (logicalSize.width() > 0 && logicalSize.height() > 0) {
+                _content.draw(delta, projMatrix, _frontViewMatrix, renderer, Position.ZERO, logicalSize);
+                if (_backContent != null) {
+                    _backContent.draw(delta, projMatrix, _backViewMatrix, renderer, Position.ZERO, logicalSize);
+                }
             }
-        }
-        renderer.endClip();
+        });
     }
 
     private void updateFlip(float delta) {

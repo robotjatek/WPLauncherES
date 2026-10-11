@@ -111,18 +111,18 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         }
         // render the selected tile with different scaling, and on its current drag position
         if (_selectedTile != null) {
-            renderer.pushLayer();
-            renderer.disableDepthTest();
-            _selectedTile.drawWithOffset(delta, projMatrix, scrollMatrix,
-                    new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
-                    _tileDrawContext,
-                    renderer);
-            renderer.pushLayer();
-            _unpinButton.draw(delta, projMatrix, scrollMatrix, renderer);
-            _resizeButton.draw(delta, projMatrix, scrollMatrix, renderer);
-            renderer.popLayer();
-            renderer.enableDepthTest();
-            renderer.popLayer();
+            renderer.pushLayers(1, () -> {
+                renderer.withoutDepthTest(() -> {
+                    _selectedTile.drawWithOffset(delta, projMatrix, scrollMatrix,
+                            new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
+                            _tileDrawContext,
+                            renderer);
+                    renderer.pushLayers(1, () -> {
+                        _unpinButton.draw(delta, projMatrix, scrollMatrix, renderer);
+                        _resizeButton.draw(delta, projMatrix, scrollMatrix, renderer);
+                    });
+                });
+            });
         }
     }
 

@@ -288,9 +288,7 @@ public class FlexLayout implements ILayout {
         }
 
         drawBg(position, size, proj, viewMatrix, renderer);
-        renderer.pushLayer();
-        drawChildren(delta, proj, viewMatrix, renderer, position);
-        renderer.popLayer();
+        renderer.pushLayers(1, () -> drawChildren(delta, proj, viewMatrix, renderer, position));
     }
 
     private void drawBg(Position<Float> position, Size<Integer> size, float[] projMatrix, float[] viewMatrix, QuadRenderer renderer) {

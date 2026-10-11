@@ -247,22 +247,21 @@ Cleaning up the accumulated mess
 
 - [ ] Cache UI element size measurement results
 - [ ] Double call of createTile in tileService
-- [ ] Add stencil clipping to layouts
 - [x] Make Notification surface layout more symmetric
 - [ ] Don't recalculate matrices every frame
 - [x] Open system settings from launcher settings
 - [ ] TextBlock wrapping: never start a new line with space
-- [ ] Discard keyboard on tapping outside the input box
+- [ ] Fix: TextBlock: Opening a large crash-log crashes the launcher on texture creation
 - [ ] Fix: Scroll/drag lags behind finger movement
-- [ ] Gesture handling is a hot garbage
-- [ ] Show the context menu in the new overlay system
-- [ ] Fix: Opening a large crash-log crashes the launcher on texture creation 
-- [ ] Fix: Adjust the layer offset of the opened pages so spinning tiles won't overlap with the animated page
-- [ ] Relayout on child size change should be implicit
+- [ ] Show the context menu in the new overlay system 
+- [x] Fix: Opening pages overlap with spinning tiles
 - [ ] Kill TileUtil.java
 - [ ] Kill all theme-unaware legacy constructors
 - [x] Fix: Top of the color picker screen is cut off
 - [x] Fix: Fade overlay on opening a modal is not fullscreen
+- [x] pushLayers/popLayers should be merged into one call
+- [x] beginClip/endClip should be merged into one call
+- [x] Fix: black flash on the bottom of the screen when opening the theme page
 
 ### M5 - Beta 2
 
@@ -295,6 +294,7 @@ Janitor for hire
 
 - [ ] Fix: TouchHandler: Force state reset on focus loss. Pressed state can stick when a touch moves out of bounds before hitting Move threshold
 - [ ] Close dropdown on focus loss
+- [ ] Discard keyboard on tapping outside the input box
 
 ### M6 - RC
 
@@ -327,6 +327,9 @@ Haven't seen these for a while
 
 ### Backlog
 
-Nice to have, but I feel no pressure to implement them for now 
+Nice to have, but I feel no pressure to implement them for now, or I have no idea where to squeeze them or what to do with them in general 
 
 - [ ] Reconsider tile reflow logic (tile occupancy bool map, for every tile top to bottom -> remove -> find the highest available pos where it fits -> place?)
+- [ ] Add stencil clipping to layouts
+- [ ] Relayout on child size change should be implicit
+- [ ] Gesture handling is a hot garbage

@@ -5,6 +5,7 @@ import android.opengl.Matrix;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.function.Supplier;
 
 /**
  * Has only one set of vertex data, and call draw multiple times with different Model matrices
@@ -117,16 +118,14 @@ public class QuadRenderer {
         GLES32.glBindVertexArray(0);
     }
 
-    private final float[] colorBuf = new float[4];
-
     public void drawFlat(float[] projMatrix, float[] modelMatrix, int color) {
         _shader.use();
 
-        colorBuf[0] = ((color >> 24) & 0xFF) / 255.0f; // A
-        colorBuf[1] = ((color >> 16) & 0xFF) / 255.0f; // R
-        colorBuf[2] = ((color >> 8) & 0xFF) / 255.0f;  // G
-        colorBuf[3] = (color & 0xFF) / 255.0f; // B
-        _shader.setVec4Uniform("uColor", colorBuf[1], colorBuf[2], colorBuf[3], colorBuf[0]);
+        var a = ((color >> 24) & 0xFF) / 255.0f;
+        var r = ((color >> 16) & 0xFF) / 255.0f;
+        var g = ((color >> 8) & 0xFF) / 255.0f;
+        var b = (color & 0xFF) / 255.0f;
+        _shader.setVec4Uniform("uColor", r, g, b, a);
         _shader.setIntUniform("uUseTexture", 0);
 
         GLES32.glEnable(GLES32.GL_BLEND);
@@ -141,7 +140,15 @@ public class QuadRenderer {
         GLES32.glBindVertexArray(0);
     }
 
-    public void beginClip(float[] projMatrix, float[] modelMatrix) {
+    public void clipWhen(Supplier<Boolean> condition, float[] projMatrix, float[] modelMatrix, Runnable action) {
+        if (condition.get()) {
+            clip(projMatrix, modelMatrix, action);
+        } else {
+            action.run();
+        }
+    }
+
+    public void clip(float[] projMatrix, float[] modelMatrix, Runnable action) {
         GLES32.glEnable(GLES32.GL_STENCIL_TEST);
         GLES32.glStencilMask(0xFF);
         GLES32.glStencilFunc(GLES32.GL_ALWAYS, 1, 0xFF);
@@ -157,31 +164,27 @@ public class QuadRenderer {
 
         GLES32.glStencilFunc(GLES32.GL_EQUAL, 1, 0xFF);
         GLES32.glStencilOp(GLES32.GL_KEEP, GLES32.GL_KEEP, GLES32.GL_KEEP);
-    }
 
-    public void endClip() {
-        GLES32.glClear(GLES32.GL_STENCIL_BUFFER_BIT);
+        action.run();
+
         GLES32.glDisable(GLES32.GL_STENCIL_TEST);
-    }
-
-    public void enableDepthTest() {
-        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
-    }
-
-    public void disableDepthTest() {
-        GLES32.glDisable(GLES32.GL_DEPTH_TEST);
+        GLES32.glClear(GLES32.GL_STENCIL_BUFFER_BIT);
     }
 
     public void clearDepthBuffer() {
         GLES32.glClear(GLES32.GL_DEPTH_BUFFER_BIT);
     }
 
-    public void pushLayer() {
-        pushLayers(1);
+    public void withoutDepthTest(Runnable action) {
+        GLES32.glDisable(GLES32.GL_DEPTH_TEST);
+        action.run();
+        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
     }
 
-    public void popLayer() {
-        popLayers(1);
+    public void pushLayers(int count, Runnable action) {
+        pushLayers(count);
+        action.run();
+        popLayers(count);
     }
 
     public void pushLayers(int count) {

@@ -96,9 +96,6 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
         _layout = new AbsoluteLayout(() -> _bgStyle);
         if (!_model.isEmpty()) {
             _selected = _model.get(0);
-            if (_onChange != null) {
-                _onChange.accept(_model.get(0));
-            }
         }
         _state.enter();
     }
@@ -160,9 +157,10 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
             Matrix.translateM(_modelMatrix, 0, x + BORDER_SIZE_PX, y + BORDER_SIZE_PX, 0);
             Matrix.scaleM(_modelMatrix, 0, innerWidth, innerHeight, 1);
             Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-            renderer.beginClip(proj, _modelMatrix);
-            _layout.draw(delta, proj, view, renderer, new Position<>(x + BORDER_SIZE_PX, y + BORDER_SIZE_PX + _animationOffset), new Size<>(innerWidth, innerHeight));
-            renderer.endClip();
+            renderer.clip(proj, _modelMatrix,
+                    () -> _layout.draw(delta, proj, view, renderer,
+                            new Position<>(x + BORDER_SIZE_PX, y + BORDER_SIZE_PX + _animationOffset),
+                            new Size<>(innerWidth, innerHeight)));
         }
     }
 

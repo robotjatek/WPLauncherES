@@ -114,37 +114,31 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         Matrix.scaleM(_clipMatrix, 0, w, h, 1);
         Matrix.multiplyMM(_clipMatrix, 0, view, 0, _clipMatrix, 0);
 
-        if (_clipping) {
-            renderer.beginClip(proj, _clipMatrix);
-        }
+        renderer.clipWhen(() -> _clipping ,proj, _clipMatrix, () -> {
+            _bgLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
 
-        _bgLayout.draw(delta, proj, view, renderer, new Position<>(x, y), new Size<>(w, h));
+            Matrix.setIdentityM(_modelMatrix, 0);
+            Matrix.translateM(_modelMatrix, 0, x, y + _scroll.getScrollOffset() + _padding, 0);
+            Matrix.multiplyMM(_modelMatrix, 0, _modelMatrix, 0, view, 0);
 
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y + _scroll.getScrollOffset() + _padding, 0);
-        Matrix.multiplyMM(_modelMatrix, 0, _modelMatrix, 0, view, 0);
+            for (var item : _filteredItems) {
+                // skip drawing items that are out of the view
+                if (!_itemDrawContext.isVisible(item, y)) {
+                    continue;
+                }
 
-        for (var item : _filteredItems) {
-            // skip drawing items that are out of the view
-            if (!_itemDrawContext.isVisible(item, y)) {
-                 continue;
+                item.update(delta, _itemDrawContext);
+                item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer);
             }
-
-            item.update(delta, _itemDrawContext);
-            item.draw(delta, proj, _modelMatrix, _itemDrawContext, renderer);
-        }
-
-        if (_clipping) {
-            renderer.endClip();
-        }
+        });
 
         if (_contextMenu != null && _contextMenu.isOpened()) {
-            renderer.pushLayer();
-            Matrix.setIdentityM(_menuMatrix, 0);
-            Matrix.translateM(_menuMatrix, 0, x, y, 0);
-            Matrix.multiplyMM(_menuMatrix, 0, view, 0, _menuMatrix, 0);
-            _contextMenu.draw(delta, proj, _menuMatrix, renderer);
-            renderer.popLayer();
+            renderer.pushLayers(1, () -> {
+                Matrix.setIdentityM(_menuMatrix, 0);
+                Matrix.translateM(_menuMatrix, 0, x, y, 0);
+                Matrix.multiplyMM(_menuMatrix, 0, view, 0, _menuMatrix, 0);
+                _contextMenu.draw(delta, proj, _menuMatrix, renderer);
+            });
         }
     }
 

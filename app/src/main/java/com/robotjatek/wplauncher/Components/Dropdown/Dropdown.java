@@ -96,9 +96,6 @@ public class Dropdown<TPayload> implements UIElement, ITouchable {
         _layout = new AbsoluteLayout(() -> _bgStyle);
         if (!_model.isEmpty()) {
             _selected = _model.get(0);
-            if (_onChange != null) {
-                _onChange.accept(_model.get(0));
-            }
         }
         _state.enter();
     }

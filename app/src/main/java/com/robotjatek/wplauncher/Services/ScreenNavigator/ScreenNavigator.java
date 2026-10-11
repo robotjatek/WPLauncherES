@@ -108,12 +108,13 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
 
         if (_animatedScreen != null) {
             Matrix.setIdentityM(_model, 0);
-            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, -1);
+            Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
+            var fullscreenSize = new Size<>(_width, _height);
 
-            renderer.pushLayers(100);
-            _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), size);
-            _animatedScreen.draw(delta, proj, _model, renderer);
-            renderer.popLayers(100);
+            renderer.withoutDepthBuffer(() -> {
+                _fullscreen.draw(delta, proj, _model, renderer, Position.ZERO, fullscreenSize);
+                _animatedScreen.draw(delta, proj, _model, renderer);
+            });
         }
 
         if (_modal != null) {
@@ -136,6 +137,9 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
 
     @Override
     public void push(@NonNull IScreen screen) {
+        if (_width > 0 && _height > 0) {
+            screen.onResize(_width, _height);
+        }
         changeState(OPENING_SCREEN_STATE(screen));
     }
 

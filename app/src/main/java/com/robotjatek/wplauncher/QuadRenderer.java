@@ -160,7 +160,6 @@ public class QuadRenderer {
     }
 
     public void endClip() {
-        GLES32.glClear(GLES32.GL_STENCIL_BUFFER_BIT);
         GLES32.glDisable(GLES32.GL_STENCIL_TEST);
     }
 
@@ -174,6 +173,12 @@ public class QuadRenderer {
 
     public void clearDepthBuffer() {
         GLES32.glClear(GLES32.GL_DEPTH_BUFFER_BIT);
+    }
+
+    public void withoutDepthBuffer(Runnable action) {
+        GLES32.glDisable(GLES32.GL_DEPTH_TEST);
+        action.run();
+        GLES32.glEnable(GLES32.GL_DEPTH_TEST);
     }
 
     public void pushLayer() {

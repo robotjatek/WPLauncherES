@@ -257,12 +257,14 @@ Cleaning up the accumulated mess
 - [ ] Gesture handling is a hot garbage
 - [ ] Show the context menu in the new overlay system
 - [ ] Fix: Opening a large crash-log crashes the launcher on texture creation 
-- [ ] Fix: Adjust the layer offset of the opened pages so spinning tiles won't overlap with the animated page
+- [x] Fix: Opening pages overlap with spinning tiles
 - [ ] Relayout on child size change should be implicit
 - [ ] Kill TileUtil.java
 - [ ] Kill all theme-unaware legacy constructors
 - [x] Fix: Top of the color picker screen is cut off
 - [x] Fix: Fade overlay on opening a modal is not fullscreen
+- [ ] pushLayers/popLayers should be merged into one call
+- [ ] beginClip/endClip should be merged into one call
 
 ### M5 - Beta 2
 

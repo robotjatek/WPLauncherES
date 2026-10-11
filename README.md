@@ -245,17 +245,12 @@ Feature-creep!
 
 Cleaning up the accumulated mess
 
-- [ ] Cache UI element size measurement results
 - [ ] Double call of createTile in tileService
 - [x] Make Notification surface layout more symmetric
-- [ ] Don't recalculate matrices every frame
 - [x] Open system settings from launcher settings
 - [ ] TextBlock wrapping: never start a new line with space
-- [ ] Fix: TextBlock: Opening a large crash-log crashes the launcher on texture creation
-- [ ] Fix: Scroll/drag lags behind finger movement
-- [ ] Show the context menu in the new overlay system 
+- [ ] Fix: TextBlock: Opening a large crash-log crashes the launcher on texture creation 
 - [x] Fix: Opening pages overlap with spinning tiles
-- [ ] Kill TileUtil.java
 - [ ] Kill all theme-unaware legacy constructors
 - [x] Fix: Top of the color picker screen is cut off
 - [x] Fix: Fade overlay on opening a modal is not fullscreen
@@ -273,6 +268,7 @@ Creep got too big
   - [ ] Step Counter
 - [ ] Device resolution independent UI (https://developer.android.com/training/multiscreen/screendensities)
   - [ ] Make dragging in edit mode density aware
+- [ ] Show the context menu in the new overlay system
 - [ ] Make context menu to resemble the original WP8 context menu more closely
   - [ ] Full-wide
   - [ ] Animated open
@@ -288,6 +284,7 @@ Creep got too big
 - [ ] Add tile adorners to the top level overlay
 - [ ] Apps can pin their shortcuts to the home screen
 - [ ] Navigating away from the launcher and returning shouldn't reset its state
+- [ ] 120 Hz setting
 
 ### M5.5
 
@@ -296,6 +293,8 @@ Janitor for hire
 - [ ] Fix: TouchHandler: Force state reset on focus loss. Pressed state can stick when a touch moves out of bounds before hitting Move threshold
 - [ ] Close dropdown on focus loss
 - [ ] Discard keyboard on tapping outside the input box
+- [ ] Cache UI element size measurement results
+- [ ] Don't recalculate matrices every frame
 
 ### M6 - RC
 
@@ -304,6 +303,7 @@ Can we release now, pls?
 - [ ] Landscape mode support
 - [ ] Background image with transparent tiles
 - [ ] WP7/7.8 start screen setting
+- [ ] Switch UI component
 - [ ] Group apps by the first letter in the app list
 - [ ] Application icon
 - [ ] Privacy policy
@@ -334,3 +334,5 @@ Nice to have, but I feel no pressure to implement them for now, or I have no ide
 - [ ] Add stencil clipping to layouts (Photos tile content is not clipped when pressed)
 - [ ] Relayout on child size change should be implicit
 - [ ] Gesture handling is a hot garbage
+- [ ] Fix: Scroll/drag lags behind finger movement
+- [ ] Kill TileUtil.java

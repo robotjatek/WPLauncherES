@@ -261,6 +261,7 @@ Cleaning up the accumulated mess
 - [x] Fix: Fade overlay on opening a modal is not fullscreen
 - [x] pushLayers/popLayers should be merged into one call
 - [x] beginClip/endClip should be merged into one call
+- [x] Fix: black flash on the bottom of the screen when opening the theme page
 
 ### M5 - Beta 2
 

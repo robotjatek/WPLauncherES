@@ -112,7 +112,7 @@ public class TileGrid implements Page, IAdornedTileContainer, ITileListChangedLi
         // render the selected tile with different scaling, and on its current drag position
         if (_selectedTile != null) {
             renderer.pushLayers(1, () -> {
-                renderer.withoutDepthBuffer(() -> {
+                renderer.withoutDepthTest(() -> {
                     _selectedTile.drawWithOffset(delta, projMatrix, scrollMatrix,
                             new Position<>(_selectedTile.getDragInfo().totalX, _selectedTile.getDragInfo().totalY),
                             _tileDrawContext,

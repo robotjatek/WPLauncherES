@@ -109,10 +109,10 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
         if (_animatedScreen != null) {
             Matrix.setIdentityM(_model, 0);
             Matrix.translateM(_model, 0, _model, 0, _animatedScreenTranslation, 0, 0);
-            var fullscreenSize = new Size<>(_width, _height);
+            var fullscreenSize = new Size<>(_width, _height + LauncherRenderer.SCREEN_DATA.topInset);
 
-            renderer.withoutDepthBuffer(() -> {
-                _fullscreen.draw(delta, proj, _model, renderer, Position.ZERO, fullscreenSize);
+            renderer.withoutDepthTest(() -> {
+                _fullscreen.draw(delta, proj, _model, renderer, new Position<>(0f, -(float)LauncherRenderer.SCREEN_DATA.topInset), fullscreenSize);
                 _animatedScreen.draw(delta, proj, _model, renderer);
             });
         }

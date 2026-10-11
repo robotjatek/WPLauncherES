@@ -121,17 +121,17 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
             Matrix.setIdentityM(_model, 0);
             Matrix.translateM(_model, 0, 0, -(float)LauncherRenderer.SCREEN_DATA.topInset, 0);
             Matrix.scaleM(_model, 0, _width, _height, 1);
-            renderer.pushLayers(200);
-            renderer.drawFlat(proj, _model, 0x88050505);
-            _modal.draw(delta, proj, renderer);
-            renderer.popLayers(200);
+            renderer.pushLayers(200, () -> {
+                renderer.drawFlat(proj, _model, 0x88050505);
+                _modal.draw(delta, proj, renderer);
+            });
         }
 
         if (_overlay.hasContent()) {
             Matrix.setIdentityM(_model, 0);
-            renderer.pushLayers(300);
-            _overlay.draw(delta, proj, _model, renderer, Position.ZERO, size);
-            renderer.popLayers(300);
+            renderer.pushLayers(300, () -> {
+                _overlay.draw(delta, proj, _model, renderer, Position.ZERO, size);
+            });
         }
     }
 

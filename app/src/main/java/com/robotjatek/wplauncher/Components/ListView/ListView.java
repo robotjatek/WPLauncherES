@@ -139,12 +139,12 @@ public class ListView<T> implements UIElement, IItemListContainer<T>, IContextMe
         }
 
         if (_contextMenu != null && _contextMenu.isOpened()) {
-            renderer.pushLayer();
-            Matrix.setIdentityM(_menuMatrix, 0);
-            Matrix.translateM(_menuMatrix, 0, x, y, 0);
-            Matrix.multiplyMM(_menuMatrix, 0, view, 0, _menuMatrix, 0);
-            _contextMenu.draw(delta, proj, _menuMatrix, renderer);
-            renderer.popLayer();
+            renderer.pushLayers(1, () -> {
+                Matrix.setIdentityM(_menuMatrix, 0);
+                Matrix.translateM(_menuMatrix, 0, x, y, 0);
+                Matrix.multiplyMM(_menuMatrix, 0, view, 0, _menuMatrix, 0);
+                _contextMenu.draw(delta, proj, _menuMatrix, renderer);
+            });
         }
     }
 

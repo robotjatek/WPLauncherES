@@ -49,7 +49,7 @@ public class DebugScreen implements IScreen {
         _layout.addChild(
                 new Checkbox(
                         "Show FPS counter",
-                        false,
+                        _settingsService.fpsCounter(),
                         _settingsService::fpsCounter,
                         context,
                         () -> settingsService.getCurrentTheme().checkbox()));

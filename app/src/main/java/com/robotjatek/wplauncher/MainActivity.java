@@ -70,6 +70,26 @@ public class MainActivity extends ComponentActivity {
 
         setStatusBarColor(_surface.getSettingsService().getCurrentTheme());
 
+        // TODO: high refresh rate mode in settings menu
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//            var display = getDisplay();
+//            if (display != null) {
+//                float maxRefreshRate = 0f;
+//                int targetModeId = -1;
+//                for (var mode : display.getSupportedModes()) {
+//                    if (mode.getRefreshRate() > maxRefreshRate) {
+//                        maxRefreshRate = mode.getRefreshRate();
+//                        targetModeId = mode.getModeId();
+//                    }
+//                }
+//                if (targetModeId != -1) {
+//                    var params = getWindow().getAttributes();
+//                    params.preferredDisplayModeId = targetModeId;
+//                    getWindow().setAttributes(params);
+//                }
+//            }
+//        }
+
         setContentView(_surface);
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override

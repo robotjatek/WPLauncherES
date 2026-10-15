@@ -1,11 +1,9 @@
 package com.robotjatek.wplauncher.TileGrid;
 
 import android.app.Notification;
-import android.graphics.Typeface;
 import android.service.notification.StatusBarNotification;
 
 import com.robotjatek.wplauncher.AppList.App;
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
@@ -13,9 +11,11 @@ import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.INotificationChangedListener;
 import com.robotjatek.wplauncher.Services.NotificationListener;
+import com.robotjatek.wplauncher.Theme.ITheme;
 
 import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.function.Supplier;
 
 public class StaticTileContent implements ITileContent, INotificationChangedListener {
 
@@ -32,13 +32,13 @@ public class StaticTileContent implements ITileContent, INotificationChangedList
     private App _lastApp;
     private Tile _tile;
 
-    public StaticTileContent(App app) {
+    public StaticTileContent(App app, Supplier<ITheme> themeSupplier) {
         _packageName = app.packageName();
         NotificationListener.subscribe(_packageName, this);
         _lastApp = app;
         _layout = new AbsoluteLayout();
-        _titleLabel = new Label(app.name(), 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-        _notificationLabel = new Label("", 64, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+        _titleLabel = new Label(app.name(), () -> themeSupplier.get().tileLabel());
+        _notificationLabel = new Label("", () -> themeSupplier.get().notificationCountStyle());
         _icon = new Icon(app.icon(), ICON_SIZE);
         _layout.addChild(_icon, Position.ZERO);
         _layout.addChild(_titleLabel, Position.ZERO);

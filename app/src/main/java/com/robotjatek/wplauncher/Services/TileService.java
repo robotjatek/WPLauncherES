@@ -228,7 +228,7 @@ public class TileService implements OnChangeListener<AccentColor> {
                     size,
                     app,
                     _settingsService.getAccentColor().color(),
-                    new PhotosTileContent(_mediaService, app),
+                    new PhotosTileContent(_mediaService, app, _settingsService::getCurrentTheme),
                     null);
         }
 
@@ -236,8 +236,8 @@ public class TileService implements OnChangeListener<AccentColor> {
                 size,
                 app,
                 _settingsService.getAccentColor().color(),
-                new StaticTileContent(app),
-                new NotificationSurface(app));
+                new StaticTileContent(app, _settingsService::getCurrentTheme),
+                new NotificationSurface(app, _settingsService::getCurrentTheme));
     }
 
     public void persistTiles() {

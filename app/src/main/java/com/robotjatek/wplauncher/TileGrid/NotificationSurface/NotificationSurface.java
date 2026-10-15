@@ -9,6 +9,7 @@ import com.robotjatek.wplauncher.IState;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.INotificationChangedListener;
 import com.robotjatek.wplauncher.Services.NotificationListener;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.NotificationSurface.States.IdleState;
 import com.robotjatek.wplauncher.TileGrid.NotificationSurface.States.SwapState;
@@ -18,6 +19,7 @@ import com.robotjatek.wplauncher.TileGrid.Tile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Generic notification surface for tiles that don't have dedicated back content
@@ -44,8 +46,8 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     }
 
     private final AbsoluteLayout _layout = new AbsoluteLayout();
-    private NotificationElement _currentNotification = new NotificationElement();
-    private NotificationElement _nextNotification = new NotificationElement();
+    private NotificationElement _currentNotification;
+    private NotificationElement _nextNotification;
 
     public void swapElements() {
         var temp = _currentNotification;
@@ -56,8 +58,11 @@ public class NotificationSurface implements ITileContent, INotificationChangedLi
     private Tile _tile;
     private Size<Integer> _lastSize = new Size<>(0, 0);
 
-    public NotificationSurface(App app) {
+    public NotificationSurface(App app, Supplier<ITheme> themeSupplier) {
         _packageName = app.packageName();
+        _currentNotification = new NotificationElement(themeSupplier);
+        _nextNotification = new NotificationElement(themeSupplier);
+
         NotificationListener.subscribe(_packageName, this);
         _layout.addChild(_currentNotification, Position.ZERO);
     }

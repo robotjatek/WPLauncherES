@@ -71,6 +71,7 @@ public class TextBlock implements UIElement {
             _dirty = false;
         }
 
+        // TODO: only render visible chunks
         for (var chunk : _textureChunks) {
             Matrix.setIdentityM(_modelMatrix, 0);
             Matrix.translateM(_modelMatrix, 0, x + chunk.xOffset, y + chunk.yOffset, 0);
@@ -80,56 +81,52 @@ public class TextBlock implements UIElement {
         }
     }
 
+    // TODO: only create chunks that are actually visible
     private void createChunks(QuadRenderer renderer) {
         clearChunks();
+
         _paint.setTextAlign(Paint.Align.LEFT);
         _paint.setTypeface(Typeface.create("sans-serif-light", _currentStyle.typeface()));
         _paint.setTextSize(_currentStyle.textSize());
         _paint.setColor(_currentStyle.textColor());
 
         var totalHeight = _cachedSize.height();
+        var totalWidth = _cachedSize.width();
         var maxTextureSize = renderer.getMaxTextureSize();
-        var numberOfWholeChunks = (int)Math.ceil((float)totalHeight / maxTextureSize);
+        var numberOfXChunks = (int)Math.ceil((float)totalWidth / maxTextureSize);
+        var numberOfYChunks = (int)Math.ceil((float)totalHeight / maxTextureSize);
 
-        // TODO: a szélességet is kezelni kell!
-        if (numberOfWholeChunks > 1) {
-            // Split to chunks
-            var wholeTexture = createTextBitmap(); // TODO: direct per-chunk rendering as this is effin slow!
-            // TODO: handle width too, dupla for ciklussal
-            for (var i = 0; i < numberOfWholeChunks; i++) {
-                var chunkHeight = Math.min(maxTextureSize, totalHeight - i * maxTextureSize);
-                var tempBitmap = Bitmap.createBitmap(wholeTexture, 0, i * maxTextureSize, _cachedSize.width(), chunkHeight);
-                var id = BitmapUtil.createTextureFromBitmap(tempBitmap);
-                var chunk = new TextureChunk(id, tempBitmap.getWidth(), tempBitmap.getHeight(), 0, i * maxTextureSize);
-                _textureChunks.add(chunk);
-            }
-
-            wholeTexture.recycle();
-
-        } else {
-            // No need to split the texture
-            var bitmap = createTextBitmap();
-            var textureId = BitmapUtil.createTextureFromBitmap(bitmap);
-            bitmap.recycle();
-            _textureChunks.add(new TextureChunk(textureId, _cachedSize.width(), totalHeight, 0, 0));
-        }
-    }
-
-    private Bitmap createTextBitmap() {
         var fm = _paint.getFontMetrics();
-        var lineHeight = (int) ((fm.descent - fm.ascent) * _lineSpacing);
+        var lineHeight = (int)((fm.descent - fm.ascent) * _lineSpacing);
+        var firstLineBaseline = -fm.ascent;
 
-        var bitmap = Bitmap.createBitmap(_cachedSize.width(), _cachedSize.height(), Bitmap.Config.ARGB_8888);
-        var canvas = new Canvas(bitmap);
-        canvas.drawColor(_currentStyle.bgColor());
-        var baselineY = -fm.ascent;
-        for (var line : _wrappedLines) {
-            if (baselineY > _cachedSize.height()) break;
-            canvas.drawText(line, 0, baselineY, _paint);
-            baselineY += lineHeight;
+        for (var yId = 0; yId < numberOfYChunks; yId++) {
+            var startY = yId * maxTextureSize;
+            var chunkHeight = Math.min(maxTextureSize, totalHeight - startY);
+            var endY = startY + chunkHeight;
+
+            var startLineIdx = Math.max(0, (int) Math.floor((startY - firstLineBaseline) / (double) lineHeight));
+            var endLineIdx = Math.min(_wrappedLines.size(), (int) Math.ceil((endY - firstLineBaseline) / (double) lineHeight));
+
+            for (var xId = 0; xId < numberOfXChunks; xId++) {
+                var startX = xId * maxTextureSize;
+                var chunkWidth = Math.min(maxTextureSize, totalWidth - startX);
+
+                var chunkBitmap = Bitmap.createBitmap(chunkWidth, chunkHeight, Bitmap.Config.ARGB_8888);
+                var canvas = new Canvas(chunkBitmap);
+                canvas.drawColor(_currentStyle.bgColor());
+
+                var baseLineY = firstLineBaseline + (startLineIdx * lineHeight);
+                for (var i = startLineIdx; i < endLineIdx; i++) {
+                    canvas.drawText(_wrappedLines.get(i), -startX, baseLineY - startY, _paint);
+                    baseLineY += lineHeight;
+                }
+
+                var textureId = BitmapUtil.createTextureFromBitmap(chunkBitmap);
+                _textureChunks.add(new TextureChunk(textureId, chunkWidth, chunkHeight, startX, startY));
+                chunkBitmap.recycle();
+            }
         }
-
-        return bitmap;
     }
 
     private List<String> wrapText(String text, int maxWidth, Paint paint) {

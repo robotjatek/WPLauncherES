@@ -248,7 +248,7 @@ Cleaning up the accumulated mess
 - [ ] Fix: Double call of createTile in tileService
 - [x] Make Notification surface layout more symmetric
 - [x] Open system settings from launcher settings
-- [ ] TextBlock wrapping: never start a new line with space
+- [x] TextBlock wrapping: never start a new line with space
 - [ ] Fix: TextBlock: Opening a large crash-log crashes the launcher on texture creation 
 - [x] Fix: Opening pages overlap with spinning tiles
 - [x] Kill all theme-unaware legacy constructors

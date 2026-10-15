@@ -2,6 +2,7 @@ package com.robotjatek.wplauncher.Services;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.opengl.EGL14;
 import android.util.Log;
 
 import com.robotjatek.wplauncher.Colors;
@@ -28,6 +29,7 @@ public class SettingsService {
     private final List<ITheme> _themes = List.of(new DarkTheme(), new LightTheme());
     private ITheme _theme = _themes.get(0);
     private boolean _fpsCounterEnabled = false;
+    private boolean _uncapEnabled = false;
     private final Context _context;
 
     public SettingsService(Context context) {
@@ -93,6 +95,21 @@ public class SettingsService {
         return _fpsCounterEnabled;
     }
 
+    public boolean uncapFrameRate() {
+        return _uncapEnabled;
+    }
+
+    public void uncapFrameRate(boolean enabled) {
+        _uncapEnabled = enabled;
+        if (enabled) {
+            android.opengl.EGL14.eglSwapInterval(EGL14.eglGetCurrentDisplay(), 0);
+        } else {
+            android.opengl.EGL14.eglSwapInterval(EGL14.eglGetCurrentDisplay(), 1);
+        }
+
+        persistSettings();
+    }
+
     public void subscribeToFpsCounterChange(Consumer<Boolean> listener) {
         _fpsCounterListeners.add(listener);
     }
@@ -107,6 +124,7 @@ public class SettingsService {
             settingsJson.put("accentColor", _accentColor.color());
             settingsJson.put("theme", _theme.name());
             settingsJson.put("fpsCounter", _fpsCounterEnabled);
+            settingsJson.put("uncapFrameRate", _uncapEnabled);
 
             var prefs = _context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
             prefs.edit()
@@ -139,6 +157,10 @@ public class SettingsService {
                     .orElse(_themes.get(0));
             if (settings.has("fpsCounter")) {
                 _fpsCounterEnabled = settings.getBoolean("fpsCounter");
+            }
+            if (settings.has("uncapFrameRate")) {
+                _uncapEnabled = settings.getBoolean("uncapFrameRate");
+                uncapFrameRate(_uncapEnabled);
             }
         } catch (JSONException e) {
             loadFallbackValues();

@@ -62,8 +62,6 @@ public class LauncherRenderer implements GLSurfaceView.Renderer {
                                  javax.microedition.khronos.egl.EGLConfig config) {
         Thread.currentThread().setUncaughtExceptionHandler(new CrashHandler(_context.getApplicationContext())); // Log GL thread crashes as well
 
-//        android.opengl.EGL14.eglSwapInterval(EGL14.eglGetCurrentDisplay(), 0); // TODO: remove this after optimisations are completed -- uncaps framerate
-
         // Init screens and every GL related objects in surfaceCreated so no accidental gl calls before the surface is ready
         var bgColor = _settingsService.getCurrentTheme().layout().bgColor();
         GLES32.glClearColor(Color.red(bgColor) / 255f, Color.green(bgColor) / 255f, Color.blue(bgColor) / 255f, Color.alpha(bgColor) / 255f);

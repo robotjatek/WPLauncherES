@@ -245,7 +245,7 @@ Feature-creep!
 
 Cleaning up the accumulated mess
 
-- [ ] Double call of createTile in tileService
+- [ ] Fix: Double call of createTile in tileService
 - [x] Make Notification surface layout more symmetric
 - [x] Open system settings from launcher settings
 - [ ] TextBlock wrapping: never start a new line with space
@@ -258,6 +258,7 @@ Cleaning up the accumulated mess
 - [x] beginClip/endClip should be merged into one call
 - [x] Fix: black flash at the bottom of the screen when opening the theme page
 - [x] Debug menu: FPS counter
+- [x] Debug menu: Uncap frame rate
 
 ### M5 - Beta 2
 
@@ -304,6 +305,7 @@ Can we release now, pls?
 - [ ] Background image with transparent tiles
 - [ ] WP7/7.8 start screen setting
 - [ ] Switch UI component
+- [ ] "Elastic" scroll
 - [ ] Group apps by the first letter in the app list
 - [ ] Application icon
 - [ ] Privacy policy

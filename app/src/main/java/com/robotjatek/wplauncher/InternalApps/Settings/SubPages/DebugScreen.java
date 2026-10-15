@@ -27,6 +27,7 @@ public class DebugScreen implements IScreen {
     private final Context _context;
     private final StackLayout _layout;
     private Size<Integer> _size = new Size<>(-1, -1);
+    private final Checkbox _uncapCheckbox;
 
     public DebugScreen(IScreenNavigator navigator, SettingsService settingsService, Context context) {
         _navigator = navigator;
@@ -53,6 +54,15 @@ public class DebugScreen implements IScreen {
                         _settingsService::fpsCounter,
                         context,
                         () -> settingsService.getCurrentTheme().checkbox()));
+
+        _layout.addChild(new Spacer(0, 16));
+        _uncapCheckbox = new Checkbox(
+                "Uncap frame rate",
+                _settingsService.uncapFrameRate(),
+                this::openUncapWarningModal,
+                context,
+                () -> settingsService.getCurrentTheme().checkbox());
+        _layout.addChild(_uncapCheckbox);
     }
 
     @Override
@@ -94,7 +104,6 @@ public class DebugScreen implements IScreen {
         var intent = new Intent(_context, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         _context.startActivity(intent);
-        Runtime.getRuntime().exit(0);
     }
 
     private void showResetConfigurationMessageBox() {
@@ -106,6 +115,44 @@ public class DebugScreen implements IScreen {
     private void deleteConfiguration() {
         _settingsService.deleteSettings();
         restartApplication();
+    }
+
+    private void openUncapWarningModal(boolean enabled) {
+        Modal modal;
+        if (enabled) {
+            modal = new Modal(
+                    "WARNING!",
+                    "This will uncap the frame rate, which could affect battery-life negatively." +
+                            " To re-enable frame rate cap you need to restart the app.",
+                    () -> {
+                        // OK
+                        _settingsService.uncapFrameRate(true);
+                        _navigator.dismissModal();
+                    },
+                    () -> {
+                        // Cancel
+                        _navigator.dismissModal();
+                        _uncapCheckbox.setState(false);
+                    },
+                    () -> _settingsService.getCurrentTheme().modal());
+        } else {
+            modal = new Modal(
+                    "WARNING!",
+                    "The application will restart.",
+                    () -> {
+                        // OK
+                        _settingsService.uncapFrameRate(false);
+                        _navigator.dismissModal();
+                        restartApplication();
+                    },
+                    () -> {
+                        // Cancel
+                        _navigator.dismissModal();
+                        _uncapCheckbox.setState(true);
+                    },
+                    () -> _settingsService.getCurrentTheme().modal());
+        }
+        _navigator.openModal(modal);
     }
 
     @Override

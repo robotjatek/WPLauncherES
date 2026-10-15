@@ -91,5 +91,10 @@ public interface ITheme {
         return _notificationCountStyle;
     }
 
+    TextBlockStyle _textBlock = new TextBlockStyle(52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    default TextBlockStyle notificationDescriptionTextblockStyle() {
+        return _textBlock;
+    }
+
     // TODO: separate listview and listpage styles?
 }

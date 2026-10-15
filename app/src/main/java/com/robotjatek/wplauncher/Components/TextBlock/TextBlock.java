@@ -47,19 +47,6 @@ public class TextBlock implements UIElement {
         _maxHeight = maxHeight;
     }
 
-    // TODO: Legacy constructors: used only in modal and notificationelement (delete later)
-    public TextBlock(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth) {
-        this(text, textSize, typeFace, textColor, bgColor, maxWidth, -1);
-    }
-
-    public TextBlock(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, int maxHeight) {
-        this(text, constant(new ITheme.TextBlockStyle(textSize, typeFace, textColor, bgColor)), maxWidth, maxHeight);
-    }
-
-    private static Supplier<ITheme.TextBlockStyle> constant(ITheme.TextBlockStyle style) {
-        return () -> style;
-    }
-
     private void syncStyle() {
         var style = _styleSupplier.get();
         if (!style.equals(_currentStyle)) {

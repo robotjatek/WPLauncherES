@@ -253,9 +253,7 @@ Cleaning up the accumulated mess
 - [x] Fix: Opening pages overlap with spinning tiles
 - [x] Kill all theme-unaware legacy constructors
   - [x] Label
-  - [ ] TextBlock
-  - [ ] AbsoluteLayout
-  - [ ] StackLayout
+  - [x] TextBlock
 - [x] Fix: Top of the color picker screen is cut off
 - [x] Fix: Fade overlay on opening a modal is not fullscreen
 - [x] pushLayers/popLayers should be merged into one call

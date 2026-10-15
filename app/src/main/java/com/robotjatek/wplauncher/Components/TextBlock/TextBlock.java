@@ -27,7 +27,8 @@ public class TextBlock implements UIElement {
     private int _maxHeight; // Maximum height (optional, -1 for unlimited)
     private final float _lineSpacing = 1.2f;
     private boolean _dirty = true;
-    private int _textureId = -1;
+    record TextureChunk(int textureId, int width, int height, int xOffset, int yOffset) {}
+    private final List<TextureChunk> _textureChunks = new ArrayList<>();
     private Size<Integer> _cachedSize = new Size<>(0, 0);
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private List<String> _wrappedLines = null; // Cache for wrapped lines
@@ -61,50 +62,74 @@ public class TextBlock implements UIElement {
         var y = drawContext.yOf(this);
 
         syncStyle();
-        if (_dirty || _textureId == -1) {
+        if (_dirty || _textureChunks.isEmpty()) {
             measure();
             if (_cachedSize.width() <= 0 || _cachedSize.height() <= 0 || _wrappedLines == null) {
                 return;
             }
-            if (_textureId != -1) {
-                TileUtil.deleteTexture(_textureId);
-            }
-            _textureId = createMultilineTexture();
+            createChunks(renderer);
             _dirty = false;
         }
 
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, _cachedSize.width(), _cachedSize.height(), 1f);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _textureId);
+        for (var chunk : _textureChunks) {
+            Matrix.setIdentityM(_modelMatrix, 0);
+            Matrix.translateM(_modelMatrix, 0, x + chunk.xOffset, y + chunk.yOffset, 0);
+            Matrix.scaleM(_modelMatrix, 0, chunk.width, chunk.height, 1f);
+            Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
+            renderer.draw(proj, _modelMatrix, chunk.textureId);
+        }
     }
 
-    private int createMultilineTexture() {
+    private void createChunks(QuadRenderer renderer) {
+        clearChunks();
         _paint.setTextAlign(Paint.Align.LEFT);
         _paint.setTypeface(Typeface.create("sans-serif-light", _currentStyle.typeface()));
         _paint.setTextSize(_currentStyle.textSize());
         _paint.setColor(_currentStyle.textColor());
 
-        var lines = _wrappedLines;
+        var totalHeight = _cachedSize.height();
+        var maxTextureSize = renderer.getMaxTextureSize();
+        var numberOfWholeChunks = (int)Math.ceil((float)totalHeight / maxTextureSize);
+
+        // TODO: a szélességet is kezelni kell!
+        if (numberOfWholeChunks > 1) {
+            // Split to chunks
+            var wholeTexture = createTextBitmap(); // TODO: direct per-chunk rendering as this is effin slow!
+            // TODO: handle width too, dupla for ciklussal
+            for (var i = 0; i < numberOfWholeChunks; i++) {
+                var chunkHeight = Math.min(maxTextureSize, totalHeight - i * maxTextureSize);
+                var tempBitmap = Bitmap.createBitmap(wholeTexture, 0, i * maxTextureSize, _cachedSize.width(), chunkHeight);
+                var id = BitmapUtil.createTextureFromBitmap(tempBitmap);
+                var chunk = new TextureChunk(id, tempBitmap.getWidth(), tempBitmap.getHeight(), 0, i * maxTextureSize);
+                _textureChunks.add(chunk);
+            }
+
+            wholeTexture.recycle();
+
+        } else {
+            // No need to split the texture
+            var bitmap = createTextBitmap();
+            var textureId = BitmapUtil.createTextureFromBitmap(bitmap);
+            bitmap.recycle();
+            _textureChunks.add(new TextureChunk(textureId, _cachedSize.width(), totalHeight, 0, 0));
+        }
+    }
+
+    private Bitmap createTextBitmap() {
         var fm = _paint.getFontMetrics();
         var lineHeight = (int) ((fm.descent - fm.ascent) * _lineSpacing);
-        var totalHeight = _cachedSize.height();
 
-        var bitmap = Bitmap.createBitmap(_cachedSize.width(), totalHeight, Bitmap.Config.ARGB_8888);
+        var bitmap = Bitmap.createBitmap(_cachedSize.width(), _cachedSize.height(), Bitmap.Config.ARGB_8888);
         var canvas = new Canvas(bitmap);
         canvas.drawColor(_currentStyle.bgColor());
-
         var baselineY = -fm.ascent;
-        for (var line : lines) {
-            if (baselineY > totalHeight) break;
+        for (var line : _wrappedLines) {
+            if (baselineY > _cachedSize.height()) break;
             canvas.drawText(line, 0, baselineY, _paint);
             baselineY += lineHeight;
         }
 
-        var textureId = BitmapUtil.createTextureFromBitmap(bitmap);
-        bitmap.recycle();
-        return textureId;
+        return bitmap;
     }
 
     private List<String> wrapText(String text, int maxWidth, Paint paint) {
@@ -172,10 +197,7 @@ public class TextBlock implements UIElement {
     private void invalidate() {
         _dirty = true;
         _wrappedLines = null;
-        if (_textureId != -1) {
-            TileUtil.deleteTexture(_textureId);
-            _textureId = -1;
-        }
+        clearChunks();
     }
 
     public void setText(String text) {
@@ -204,11 +226,17 @@ public class TextBlock implements UIElement {
         _parent = parent;
     }
 
+    private void clearChunks() {
+        for (var chunk : _textureChunks) {
+            TileUtil.deleteTexture(chunk.textureId);
+        }
+        _textureChunks.clear();
+    }
+
     @Override
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_textureId);
-            _textureId = -1;
+            clearChunks();
             _disposed = true;
         }
     }

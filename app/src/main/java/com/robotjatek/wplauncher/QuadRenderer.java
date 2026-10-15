@@ -19,6 +19,7 @@ public class QuadRenderer {
     private final int _texCoordVBOId;
     private final Shader _shader;
     private float _offsetLevel = 0f;
+    private int _maxTextureSize = -1;
     private static final int POSITION_LOCATION = 0;
     private static final int TEX_COORD_LOCATION = 1;
 
@@ -96,6 +97,17 @@ public class QuadRenderer {
 
         GLES32.glBindVertexArray(0);
         GLES32.glBindBuffer(GLES32.GL_ARRAY_BUFFER, 0);
+    }
+
+    public int getMaxTextureSize() {
+        if (_maxTextureSize == -1) {
+            // Caching this forever as this won't change in runtime
+            var size = new int[1];
+            GLES32.glGetIntegerv(GLES32.GL_MAX_TEXTURE_SIZE, size, 0);
+            _maxTextureSize = size[0];
+        }
+
+        return _maxTextureSize;
     }
 
     public void draw(float[] projMatrix, float[] modelMatrix, int textureId) {

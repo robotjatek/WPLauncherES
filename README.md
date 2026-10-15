@@ -251,7 +251,9 @@ Cleaning up the accumulated mess
 - [ ] TextBlock wrapping: never start a new line with space
 - [ ] Fix: TextBlock: Opening a large crash-log crashes the launcher on texture creation 
 - [x] Fix: Opening pages overlap with spinning tiles
-- [ ] Kill all theme-unaware legacy constructors
+- [x] Kill all theme-unaware legacy constructors
+  - [x] Label
+  - [x] TextBlock
 - [x] Fix: Top of the color picker screen is cut off
 - [x] Fix: Fade overlay on opening a modal is not fullscreen
 - [x] pushLayers/popLayers should be merged into one call

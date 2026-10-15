@@ -1,5 +1,9 @@
 package com.robotjatek.wplauncher.Theme;
 
+import android.graphics.Typeface;
+
+import com.robotjatek.wplauncher.Colors;
+
 public interface ITheme {
 
     record LabelStyle(int textSize, int typeface, int textColor, int bgColor) {
@@ -71,6 +75,26 @@ public interface ITheme {
     ModalStyle modal();
 
     ContextMenuStyle contextMenu();
+
+    LabelStyle _tileLabel = new LabelStyle(48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+    default LabelStyle tileLabel() {
+        return _tileLabel;
+    }
+
+    LabelStyle _notificationLabelStyle = new LabelStyle(56, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+    default LabelStyle notificationTitleStyle() {
+        return _notificationLabelStyle;
+    }
+
+    LabelStyle _notificationCountStyle = new LabelStyle(64, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+    default LabelStyle notificationCountStyle() {
+        return _notificationCountStyle;
+    }
+
+    TextBlockStyle _textBlock = new TextBlockStyle(52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    default TextBlockStyle notificationDescriptionTextblockStyle() {
+        return _textBlock;
+    }
 
     // TODO: separate listview and listpage styles?
 }

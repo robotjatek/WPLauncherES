@@ -13,6 +13,7 @@ import com.robotjatek.wplauncher.Services.WeatherService.IWeatherListener;
 import com.robotjatek.wplauncher.Services.WeatherService.TemperatureUnit;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherData;
 import com.robotjatek.wplauncher.Services.WeatherService.WeatherService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.Tile;
@@ -37,10 +38,13 @@ public class GlanceTileContent implements ITileContent, IWeatherListener {
     private final WeatherService _weatherService;
     private boolean _subscribedToWeatherService = false;
     private final AbsoluteLayout _layout = new AbsoluteLayout();
-    private final Label _clockLabel = new Label("", 160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
-    private final Label _locationLabel = new Label("", 72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
-    private final Label _temperatureLabel = new Label("", 60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
-    private final Label _weatherCodeLabel = new Label("", 60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    private static final ITheme.LabelStyle _clockLabelStyle = new ITheme.LabelStyle(160, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    private static final ITheme.LabelStyle _locationLabelStyle = new ITheme.LabelStyle(72, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    private static final ITheme.LabelStyle _weatherLabelStyle = new ITheme.LabelStyle(60, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT);
+    private final Label _clockLabel = new Label("", () -> _clockLabelStyle);
+    private final Label _locationLabel = new Label("", () -> _locationLabelStyle);
+    private final Label _temperatureLabel = new Label("", () -> _weatherLabelStyle);
+    private final Label _weatherCodeLabel = new Label("", () -> _weatherLabelStyle);
     private boolean _locationLabelsPresent = false;
     private Tile _tile;
 

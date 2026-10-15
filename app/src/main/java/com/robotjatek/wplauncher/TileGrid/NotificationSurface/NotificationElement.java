@@ -1,8 +1,5 @@
 package com.robotjatek.wplauncher.TileGrid.NotificationSurface;
 
-import android.graphics.Typeface;
-
-import com.robotjatek.wplauncher.Colors;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Layouts.StackLayout.StackLayout;
@@ -11,20 +8,25 @@ import com.robotjatek.wplauncher.Components.TextBlock.TextBlock;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.Position;
+
+import java.util.function.Supplier;
 
 public class NotificationElement implements UIElement {
 
     private boolean _disposed = false;
     private boolean _dirty = true;
-    private final StackLayout _layout = new StackLayout(); // TODO: this is the last call of this legacy constructor
-    private final Label _titleLabel = new Label("Should not be seen", 56, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
-    private final TextBlock _textBlock = new TextBlock("", 52, Typeface.NORMAL, Colors.WHITE, Colors.TRANSPARENT, 400); // TODO: this is the last call to this legacy constuctor
+    private final StackLayout _layout = new StackLayout();
+    private final Label _titleLabel;
+    private final TextBlock _textBlock;
     private Size<Integer> _size = new Size<>(0, 0);
     private int _padding = 0;
     private ILayout _parent;
 
-    public NotificationElement() {
+    public NotificationElement(Supplier<ITheme> themeSupplier) {
+        _titleLabel = new Label("Should not be seen", () -> themeSupplier.get().notificationTitleStyle());
+        _textBlock = new TextBlock("", () -> themeSupplier.get().notificationDescriptionTextblockStyle(), 400);
         _layout.addChild(_titleLabel);
         _layout.addChild(_textBlock);
     }

@@ -54,19 +54,6 @@ public class Label implements UIElement, ITouchable {
         _paint.setTextAlign(Paint.Align.LEFT);
     }
 
-    // TODO: remove legacy constructor?
-    public Label(String text, int textSize, int typeFace, int textColor, int bgColor) {
-        this(text, textSize, typeFace, textColor, bgColor, -1, null);
-    }
-
-    private Label(String text, int textSize, int typeFace, int textColor, int bgColor, int maxWidth, Runnable onTap) {
-        this(text, constant(new ITheme.LabelStyle(textSize, typeFace, textColor, bgColor)), maxWidth, onTap);
-    }
-
-    private static Supplier<ITheme.LabelStyle> constant(ITheme.LabelStyle style) {
-        return () -> style;
-    }
-
     private void syncStyle() {
         var s = _styleSupplier.get();
         if (!s.equals(_currentStyle)) {

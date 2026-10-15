@@ -31,11 +31,10 @@ public class AbsoluteLayout implements ILayout {
         _styleSupplier = style;
     }
 
-    private static final ITheme.LayoutStyle LEGACY = new ITheme.LayoutStyle(Colors.TRANSPARENT);
+    private static final ITheme.LayoutStyle UNSTYLED = new ITheme.LayoutStyle(Colors.TRANSPARENT);
 
-    // TODO: remove legacy constructor
     public AbsoluteLayout() {
-        this(() -> LEGACY);
+        this(() -> UNSTYLED);
     }
 
     public static class PositionedElement {

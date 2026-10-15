@@ -14,6 +14,7 @@ import com.robotjatek.wplauncher.InternalApps.Photos.States.IdleState;
 import com.robotjatek.wplauncher.InternalApps.Photos.States.SwapState;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Services.MediaService;
+import com.robotjatek.wplauncher.Theme.ITheme;
 import com.robotjatek.wplauncher.TileGrid.ITileContent;
 import com.robotjatek.wplauncher.TileGrid.Position;
 import com.robotjatek.wplauncher.TileGrid.Tile;
@@ -24,6 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 public class PhotosTileContent implements ITileContent {
     private Tile _tile;
@@ -62,9 +64,9 @@ public class PhotosTileContent implements ITileContent {
         _state.enter();
     }
 
-    public PhotosTileContent(MediaService mediaService, App app) {
+    public PhotosTileContent(MediaService mediaService, App app, Supplier<ITheme> themeSupplier) {
         _mediaService = mediaService;
-        _titleLabel = new Label(app.name(), 48, Typeface.BOLD, Colors.WHITE, Colors.TRANSPARENT);
+        _titleLabel = new Label(app.name(), () -> themeSupplier.get().tileLabel());
         _icon = new Icon(app.icon(), new Size<>(256, 256));
         _exec.execute(this::loadPicturesInBackground);
     }

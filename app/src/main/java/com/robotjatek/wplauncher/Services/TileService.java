@@ -222,7 +222,6 @@ public class TileService implements OnChangeListener<AccentColor> {
                     null);
         }
 
-        // TODO: probable double call of createTile? maybe its the onSurfaceCreated what runs multiple times
         if (app.packageName().equalsIgnoreCase("com.google.android.apps.photos")) {
             return new Tile(position,
                     size,

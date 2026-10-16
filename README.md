@@ -245,14 +245,13 @@ Feature-creep!
 
 Cleaning up the accumulated mess
 
-- [ ] Fix: Double call of createTile in tileService
 - [x] Make Notification surface layout more symmetric
 - [x] Open system settings from launcher settings
 - [x] TextBlock wrapping: never start a new line with space
 - [x] Fix: TextBlock: Opening a large crash-log crashes the launcher on texture creation
   - [x] Textblock chunks its internal texture into smaller units
 - [x] Fix: Opening pages overlap with spinning tiles
-- [ ] Fix: overlay should be on the absolute top (FPS counter still overlaps with spinning tiles)
+- [x] Fix: overlay should be on the absolute top (FPS counter still overlaps with spinning tiles)
 - [x] Kill all theme-unaware legacy constructors
   - [x] Label
   - [x] TextBlock

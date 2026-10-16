@@ -123,7 +123,7 @@ public class DebugScreen implements IScreen {
             modal = new Modal(
                     "WARNING!",
                     "This will uncap the frame rate, which could affect battery-life negatively." +
-                            " To re-enable frame rate cap you need to restart the app.",
+                            " To re-enable the frame rate cap you'll need to restart the app.",
                     () -> {
                         // OK
                         _settingsService.uncapFrameRate(true);

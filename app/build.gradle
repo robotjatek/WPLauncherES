@@ -5,13 +5,13 @@ plugins {
 android {
     namespace 'com.robotjatek.wplauncher'
     compileSdk {
-        version = release(36)
+        version = release(37)
     }
 
     defaultConfig {
         applicationId "com.robotjatek.wplauncher"
         minSdk 34
-        targetSdk 36
+        targetSdk 37
         versionCode 1
         versionName "M4"
 

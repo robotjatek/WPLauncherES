@@ -121,7 +121,7 @@ public class TextBlock implements UIElement {
                     var lastSpace = paragraph.lastIndexOf(' ', end);
                     if (lastSpace > start) end = lastSpace;
                 }
-                lines.add(paragraph.substring(start, end));
+                lines.add(paragraph.substring(start, end).trim());
                 start = (end == start + count) ? end : end + 1;
             }
         }

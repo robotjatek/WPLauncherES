@@ -249,8 +249,10 @@ Cleaning up the accumulated mess
 - [x] Make Notification surface layout more symmetric
 - [x] Open system settings from launcher settings
 - [x] TextBlock wrapping: never start a new line with space
-- [ ] Fix: TextBlock: Opening a large crash-log crashes the launcher on texture creation 
+- [x] Fix: TextBlock: Opening a large crash-log crashes the launcher on texture creation
+  - [x] Textblock chunks its internal texture into smaller units
 - [x] Fix: Opening pages overlap with spinning tiles
+- [ ] Fix: overlay should be on the absolute top (FPS counter still overlaps with spinning tiles)
 - [x] Kill all theme-unaware legacy constructors
   - [x] Label
   - [x] TextBlock
@@ -298,6 +300,7 @@ Janitor for hire
 - [ ] Discard keyboard on tapping outside the input box
 - [ ] Cache UI element size measurement results
 - [ ] Don't recalculate matrices every frame
+- [ ] Move the contents of TileUtil and BitmapUtil to QuadRenderer
 
 ### M6 - RC
 

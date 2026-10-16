@@ -21,7 +21,7 @@ public class ScrollView implements UIElement {
     private boolean _disposed = false;
     private final float[] _modelMatrix = new float[16];
     private final float[] _clipMatrix = new float[16];
-    private final ScrollViewDrawContext _drawContext = new ScrollViewDrawContext();
+    private final ScrollViewDrawContext _drawContext = new ScrollViewDrawContext(_scroll);
     private Size<Integer> _size;
     private Size<Integer> _measuredChildSize = new Size<>(-1, -1);
     private boolean _dirty = true;
@@ -133,6 +133,12 @@ public class ScrollView implements UIElement {
 
     static class ScrollViewDrawContext implements IDrawContext<UIElement> {
 
+        private final ScrollController _scroll;
+
+        public ScrollViewDrawContext(ScrollController scroll) {
+            _scroll = scroll;
+        }
+
         @Override
         public float xOf(UIElement element) {
             return 0;
@@ -151,6 +157,11 @@ public class ScrollView implements UIElement {
         @Override
         public float heightOf(UIElement element) {
             return element.measure().height();
+        }
+
+        @Override
+        public float getScrollOffset() {
+            return _scroll.getScrollOffset();
         }
     }
 }

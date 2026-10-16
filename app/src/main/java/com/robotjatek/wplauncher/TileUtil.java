@@ -10,6 +10,7 @@ import android.opengl.GLUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+// TODO: move these to QuadRenderer
 public class TileUtil {
 
     private static final int CONTENT_PADDING_PX = 0;

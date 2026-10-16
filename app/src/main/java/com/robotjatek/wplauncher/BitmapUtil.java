@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.opengl.GLES32;
 import android.opengl.GLUtils;
 
+// TODO: move these to QuadRenderer
 public class BitmapUtil {
 
     // https://developer.android.com/guide/practices/ui_guidelines/icon_design_adaptive
@@ -17,7 +18,7 @@ public class BitmapUtil {
 
     /**
      * Converts a drawable (possibly an application icon) to an OpenGL texture.
-     * Do not call this method off-main-thread!
+     * Do not call this method off-gl-thread!
      * @return Texture handle >0 on SUCCESS, <1 otherwise
      */
     public static int createTextureFromDrawable(Drawable drawable, int width, int height) {

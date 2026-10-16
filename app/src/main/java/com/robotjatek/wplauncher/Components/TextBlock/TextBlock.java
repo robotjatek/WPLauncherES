@@ -11,9 +11,9 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Theme.ITheme;
-import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,6 @@ public class TextBlock implements UIElement {
     private int _maxHeight; // Maximum height (optional, -1 for unlimited)
     private final float _lineSpacing = 1.2f;
     private boolean _dirty = true;
-    record TextureChunk(int textureId, int width, int height, int xOffset, int yOffset) {}
     private final List<TextureChunk> _textureChunks = new ArrayList<>();
     private Size<Integer> _cachedSize = new Size<>(0, 0);
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -71,17 +70,27 @@ public class TextBlock implements UIElement {
             _dirty = false;
         }
 
-        // TODO: only render visible chunks
         for (var chunk : _textureChunks) {
+            var chunkLeft = x + chunk.getXOffset();
+            var chunkRight = chunkLeft + chunk.getWidth();
+            var scrollOffset = drawContext.getScrollOffset();
+
+            var chunkTop = y + chunk.getYOffset() + scrollOffset;
+            var chunkBottom = chunkTop + chunk.getHeight();
+            // TODO: this should not be the hard-coded screen coordinates but the size of the viewport of the view this block resides in
+            var isOffScreen = chunkRight <= 0 || chunkLeft >= LauncherRenderer.SCREEN_DATA.screenWidth || chunkBottom <= 0 || chunkTop >= LauncherRenderer.SCREEN_DATA.screenHeight;
+            if (isOffScreen) {
+                continue;
+            }
+
             Matrix.setIdentityM(_modelMatrix, 0);
-            Matrix.translateM(_modelMatrix, 0, x + chunk.xOffset, y + chunk.yOffset, 0);
-            Matrix.scaleM(_modelMatrix, 0, chunk.width, chunk.height, 1f);
+            Matrix.translateM(_modelMatrix, 0, x + chunk.getXOffset(), y + chunk.getYOffset(), 0);
+            Matrix.scaleM(_modelMatrix, 0, chunk.getWidth(), chunk.getHeight(), 1f);
             Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-            renderer.draw(proj, _modelMatrix, chunk.textureId);
+            renderer.draw(proj, _modelMatrix, chunk.getTextureId());
         }
     }
 
-    // TODO: only create chunks that are actually visible
     private void createChunks(QuadRenderer renderer) {
         clearChunks();
 
@@ -103,28 +112,29 @@ public class TextBlock implements UIElement {
         for (var yId = 0; yId < numberOfYChunks; yId++) {
             var startY = yId * maxTextureSize;
             var chunkHeight = Math.min(maxTextureSize, totalHeight - startY);
-            var endY = startY + chunkHeight;
 
             var startLineIdx = Math.max(0, (int) Math.floor((startY - firstLineBaseline) / (double) lineHeight));
-            var endLineIdx = Math.min(_wrappedLines.size(), (int) Math.ceil((endY - firstLineBaseline) / (double) lineHeight));
+            var endLineIdx = Math.min(_wrappedLines.size(), startLineIdx + (int) Math.ceil((double) chunkHeight / lineHeight) + 1);
 
             for (var xId = 0; xId < numberOfXChunks; xId++) {
                 var startX = xId * maxTextureSize;
                 var chunkWidth = Math.min(maxTextureSize, totalWidth - startX);
 
-                var chunkBitmap = Bitmap.createBitmap(chunkWidth, chunkHeight, Bitmap.Config.ARGB_8888);
-                var canvas = new Canvas(chunkBitmap);
-                canvas.drawColor(_currentStyle.bgColor());
+                Supplier<Integer> fnc = () -> {
+                    var chunkBitmap = Bitmap.createBitmap(chunkWidth, chunkHeight, Bitmap.Config.ARGB_8888);
+                    var canvas = new Canvas(chunkBitmap);
+                    canvas.drawColor(_currentStyle.bgColor());
 
-                var baseLineY = firstLineBaseline + (startLineIdx * lineHeight);
-                for (var i = startLineIdx; i < endLineIdx; i++) {
-                    canvas.drawText(_wrappedLines.get(i), -startX, baseLineY - startY, _paint);
-                    baseLineY += lineHeight;
-                }
-
-                var textureId = BitmapUtil.createTextureFromBitmap(chunkBitmap);
-                _textureChunks.add(new TextureChunk(textureId, chunkWidth, chunkHeight, startX, startY));
-                chunkBitmap.recycle();
+                    var baseLineY = firstLineBaseline + (startLineIdx * lineHeight);
+                    for (var i = startLineIdx; i < endLineIdx; i++) {
+                        canvas.drawText(_wrappedLines.get(i), -startX, baseLineY - startY, _paint);
+                        baseLineY += lineHeight;
+                    }
+                    var id = BitmapUtil.createTextureFromBitmap(chunkBitmap);
+                    chunkBitmap.recycle();
+                    return id;
+                };
+                _textureChunks.add(new TextureChunk(fnc, chunkWidth, chunkHeight, startX, startY));
             }
         }
     }
@@ -225,7 +235,7 @@ public class TextBlock implements UIElement {
 
     private void clearChunks() {
         for (var chunk : _textureChunks) {
-            TileUtil.deleteTexture(chunk.textureId);
+            chunk.dispose();
         }
         _textureChunks.clear();
     }

@@ -129,9 +129,8 @@ public class ScreenNavigator implements IScreenNavigator, IOverlay {
 
         if (_overlay.hasContent()) {
             Matrix.setIdentityM(_model, 0);
-            renderer.pushLayers(300, () -> {
-                _overlay.draw(delta, proj, _model, renderer, Position.ZERO, size);
-            });
+            renderer.clearDepthBuffer();
+            _overlay.draw(delta, proj, _model, renderer, Position.ZERO, size);
         }
     }
 

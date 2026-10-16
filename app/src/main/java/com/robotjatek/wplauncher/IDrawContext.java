@@ -29,4 +29,8 @@ public interface IDrawContext<T> {
      * @return Screen space height of the UI element
      */
     float heightOf(T element);
+
+    default float getScrollOffset() {
+        return 0;
+    }
 }

@@ -11,9 +11,9 @@ import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
 import com.robotjatek.wplauncher.Components.UIElement;
 import com.robotjatek.wplauncher.IDrawContext;
+import com.robotjatek.wplauncher.LauncherRenderer;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.Theme.ITheme;
-import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class TextBlock implements UIElement {
     private int _maxHeight; // Maximum height (optional, -1 for unlimited)
     private final float _lineSpacing = 1.2f;
     private boolean _dirty = true;
-    private int _textureId = -1;
+    private final List<TextureChunk> _textureChunks = new ArrayList<>();
     private Size<Integer> _cachedSize = new Size<>(0, 0);
     private final Paint _paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private List<String> _wrappedLines = null; // Cache for wrapped lines
@@ -61,50 +61,82 @@ public class TextBlock implements UIElement {
         var y = drawContext.yOf(this);
 
         syncStyle();
-        if (_dirty || _textureId == -1) {
+        if (_dirty || _textureChunks.isEmpty()) {
             measure();
             if (_cachedSize.width() <= 0 || _cachedSize.height() <= 0 || _wrappedLines == null) {
                 return;
             }
-            if (_textureId != -1) {
-                TileUtil.deleteTexture(_textureId);
-            }
-            _textureId = createMultilineTexture();
+            createChunks(renderer);
             _dirty = false;
         }
 
-        Matrix.setIdentityM(_modelMatrix, 0);
-        Matrix.translateM(_modelMatrix, 0, x, y, 0);
-        Matrix.scaleM(_modelMatrix, 0, _cachedSize.width(), _cachedSize.height(), 1f);
-        Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
-        renderer.draw(proj, _modelMatrix, _textureId);
+        for (var chunk : _textureChunks) {
+            var chunkLeft = x + chunk.getXOffset();
+            var chunkRight = chunkLeft + chunk.getWidth();
+            var scrollOffset = drawContext.getScrollOffset();
+
+            var chunkTop = y + chunk.getYOffset() + scrollOffset;
+            var chunkBottom = chunkTop + chunk.getHeight();
+            // TODO: shouldn't use hard-coded screen coordinates but the size of the viewport this Textblock resides in
+            var isOffScreen = chunkRight <= 0 || chunkLeft >= LauncherRenderer.SCREEN_DATA.screenWidth || chunkBottom <= 0 || chunkTop >= LauncherRenderer.SCREEN_DATA.screenHeight;
+            if (isOffScreen) {
+                continue;
+            }
+
+            Matrix.setIdentityM(_modelMatrix, 0);
+            Matrix.translateM(_modelMatrix, 0, x + chunk.getXOffset(), y + chunk.getYOffset(), 0);
+            Matrix.scaleM(_modelMatrix, 0, chunk.getWidth(), chunk.getHeight(), 1f);
+            Matrix.multiplyMM(_modelMatrix, 0, view, 0, _modelMatrix, 0);
+            renderer.draw(proj, _modelMatrix, chunk.getTextureId());
+        }
     }
 
-    private int createMultilineTexture() {
+    private void createChunks(QuadRenderer renderer) {
+        clearChunks();
+
         _paint.setTextAlign(Paint.Align.LEFT);
         _paint.setTypeface(Typeface.create("sans-serif-light", _currentStyle.typeface()));
         _paint.setTextSize(_currentStyle.textSize());
         _paint.setColor(_currentStyle.textColor());
 
-        var lines = _wrappedLines;
-        var fm = _paint.getFontMetrics();
-        var lineHeight = (int) ((fm.descent - fm.ascent) * _lineSpacing);
         var totalHeight = _cachedSize.height();
+        var totalWidth = _cachedSize.width();
+        var maxTextureSize = renderer.getMaxTextureSize();
+        var numberOfXChunks = (int)Math.ceil((float)totalWidth / maxTextureSize);
+        var numberOfYChunks = (int)Math.ceil((float)totalHeight / maxTextureSize);
 
-        var bitmap = Bitmap.createBitmap(_cachedSize.width(), totalHeight, Bitmap.Config.ARGB_8888);
-        var canvas = new Canvas(bitmap);
-        canvas.drawColor(_currentStyle.bgColor());
+        var fm = _paint.getFontMetrics();
+        var lineHeight = (int)((fm.descent - fm.ascent) * _lineSpacing);
+        var firstLineBaseline = -fm.ascent;
 
-        var baselineY = -fm.ascent;
-        for (var line : lines) {
-            if (baselineY > totalHeight) break;
-            canvas.drawText(line, 0, baselineY, _paint);
-            baselineY += lineHeight;
+        for (var yId = 0; yId < numberOfYChunks; yId++) {
+            var startY = yId * maxTextureSize;
+            var chunkHeight = Math.min(maxTextureSize, totalHeight - startY);
+
+            var startLineIdx = Math.max(0, (int) Math.floor((startY - firstLineBaseline) / (double) lineHeight));
+            var endLineIdx = Math.min(_wrappedLines.size(), startLineIdx + (int) Math.ceil((double) chunkHeight / lineHeight) + 1);
+
+            for (var xId = 0; xId < numberOfXChunks; xId++) {
+                var startX = xId * maxTextureSize;
+                var chunkWidth = Math.min(maxTextureSize, totalWidth - startX);
+
+                Supplier<Integer> fnc = () -> {
+                    var chunkBitmap = Bitmap.createBitmap(chunkWidth, chunkHeight, Bitmap.Config.ARGB_8888);
+                    var canvas = new Canvas(chunkBitmap);
+                    canvas.drawColor(_currentStyle.bgColor());
+
+                    var baseLineY = firstLineBaseline + (startLineIdx * lineHeight);
+                    for (var i = startLineIdx; i < endLineIdx; i++) {
+                        canvas.drawText(_wrappedLines.get(i), -startX, baseLineY - startY, _paint);
+                        baseLineY += lineHeight;
+                    }
+                    var id = BitmapUtil.createTextureFromBitmap(chunkBitmap);
+                    chunkBitmap.recycle();
+                    return id;
+                };
+                _textureChunks.add(new TextureChunk(fnc, chunkWidth, chunkHeight, startX, startY));
+            }
         }
-
-        var textureId = BitmapUtil.createTextureFromBitmap(bitmap);
-        bitmap.recycle();
-        return textureId;
     }
 
     private List<String> wrapText(String text, int maxWidth, Paint paint) {
@@ -172,10 +204,7 @@ public class TextBlock implements UIElement {
     private void invalidate() {
         _dirty = true;
         _wrappedLines = null;
-        if (_textureId != -1) {
-            TileUtil.deleteTexture(_textureId);
-            _textureId = -1;
-        }
+        clearChunks();
     }
 
     public void setText(String text) {
@@ -204,11 +233,17 @@ public class TextBlock implements UIElement {
         _parent = parent;
     }
 
+    private void clearChunks() {
+        for (var chunk : _textureChunks) {
+            chunk.dispose();
+        }
+        _textureChunks.clear();
+    }
+
     @Override
     public void dispose() {
         if (!_disposed) {
-            TileUtil.deleteTexture(_textureId);
-            _textureId = -1;
+            clearChunks();
             _disposed = true;
         }
     }

@@ -1,11 +1,13 @@
 package com.robotjatek.wplauncher.Components.TextBlock;
 
+import androidx.annotation.NonNull;
+
 import com.robotjatek.wplauncher.TileUtil;
 
 import java.util.function.Supplier;
 
 public class TextureChunk {
-    private final Supplier<Integer> _textureIdSupplier;
+    private Supplier<Integer> _textureIdSupplier;
     private Integer _textureId = null;
     private final int _width;
     private final int _height;
@@ -13,7 +15,7 @@ public class TextureChunk {
     private final int _yOffset;
 
     TextureChunk(Supplier<Integer> textureIdSupplier, int width, int height, int xOffset, int yOffset) {
-        this._textureIdSupplier = textureIdSupplier;
+        _textureIdSupplier = textureIdSupplier;
         _width = width;
         _height = height;
         _xOffset = xOffset;
@@ -21,8 +23,9 @@ public class TextureChunk {
     }
 
     public Integer getTextureId() {
-        if (_textureId == null) {
+        if (_textureId == null && _textureIdSupplier != null) {
             _textureId = _textureIdSupplier.get();
+            _textureIdSupplier = null;
         }
         return _textureId;
     }
@@ -50,6 +53,7 @@ public class TextureChunk {
         }
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "TextureChunk{" +

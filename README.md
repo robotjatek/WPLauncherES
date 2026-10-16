@@ -301,6 +301,7 @@ Janitor for hire
 - [ ] Cache UI element size measurement results
 - [ ] Don't recalculate matrices every frame
 - [ ] Move the contents of TileUtil and BitmapUtil to QuadRenderer
+- [ ] Fix: Google Drive icon disappears on small tiles 
 
 ### M6 - RC
 
@@ -343,3 +344,4 @@ Nice to have, but I feel no pressure to implement them for now, or I have no ide
 - [ ] Gesture handling is a hot garbage
 - [ ] Fix: Scroll/drag lags behind finger movement
 - [ ] Kill TileUtil.java
+- [ ] Textblock shouldn't use fullscreen coordinates for calculating culling

@@ -77,7 +77,7 @@ public class TextBlock implements UIElement {
 
             var chunkTop = y + chunk.getYOffset() + scrollOffset;
             var chunkBottom = chunkTop + chunk.getHeight();
-            // TODO: this should not be the hard-coded screen coordinates but the size of the viewport of the view this block resides in
+            // TODO: shouldn't use hard-coded screen coordinates but the size of the viewport this Textblock resides in
             var isOffScreen = chunkRight <= 0 || chunkLeft >= LauncherRenderer.SCREEN_DATA.screenWidth || chunkBottom <= 0 || chunkTop >= LauncherRenderer.SCREEN_DATA.screenHeight;
             if (isOffScreen) {
                 continue;

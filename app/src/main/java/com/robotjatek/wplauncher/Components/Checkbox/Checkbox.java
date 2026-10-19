@@ -5,13 +5,17 @@ import android.content.Context;
 import androidx.core.content.ContextCompat;
 
 import com.robotjatek.wplauncher.Colors;
+import com.robotjatek.wplauncher.Components.ITouchable;
 import com.robotjatek.wplauncher.Components.Icon.Icon;
 import com.robotjatek.wplauncher.Components.Label.Label;
 import com.robotjatek.wplauncher.Components.Layouts.AbsoluteLayout.AbsoluteLayout;
 import com.robotjatek.wplauncher.Components.Layouts.ILayout;
 import com.robotjatek.wplauncher.Components.Size;
+import com.robotjatek.wplauncher.Components.TouchHandler;
 import com.robotjatek.wplauncher.Components.UIElement;
-import com.robotjatek.wplauncher.Gestures.TapGesture;
+import com.robotjatek.wplauncher.Gestures.DownGesture;
+import com.robotjatek.wplauncher.Gestures.MoveGesture;
+import com.robotjatek.wplauncher.Gestures.UpGesture;
 import com.robotjatek.wplauncher.IDrawContext;
 import com.robotjatek.wplauncher.QuadRenderer;
 import com.robotjatek.wplauncher.R;
@@ -21,9 +25,10 @@ import com.robotjatek.wplauncher.TileGrid.Position;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class Checkbox implements UIElement {
+public class Checkbox implements UIElement, ITouchable {
     private static final int BORDER_SIZE_PX = 4; // TODO: make this DP aware
     private static final int TOGGLE_SIZE = 100;
+    private final TouchHandler _touchHandler = new TouchHandler(this);
     private boolean _disposed = false;
     private boolean _state;
     private final Consumer<Boolean> _onChange;
@@ -75,6 +80,8 @@ public class Checkbox implements UIElement {
 
     @Override
     public void draw(float delta, float[] proj, float[] view, IDrawContext<UIElement> drawContext, QuadRenderer renderer) {
+        _touchHandler.update(delta);
+
         // Available draw space
         var x = drawContext.xOf(this);
         var y = drawContext.yOf(this);
@@ -127,8 +134,20 @@ public class Checkbox implements UIElement {
     }
 
     @Override
-    public boolean handleTap(TapGesture gesture) {
-        toggleState();
+    public boolean handleDown(DownGesture gesture) {
+        _touchHandler.onDown(gesture.getX(), gesture.getY());
+        return true;
+    }
+
+    @Override
+    public boolean handleUp(UpGesture gesture) {
+        _touchHandler.onUp();
+        return true;
+    }
+
+    @Override
+    public boolean handleMove(MoveGesture gesture) {
+        _touchHandler.onMove(gesture.getX(), gesture.getY());
         return true;
     }
 
@@ -154,5 +173,22 @@ public class Checkbox implements UIElement {
             _tickIcon.dispose();
             _disposed = true;
         }
+    }
+
+    @Override
+    public void onPress() {
+        _checkboxBackground.setBgColor(_currentStyle.borderColor());
+        _tickIcon.setTint(_currentStyle.bgColor());
+    }
+
+    @Override
+    public void onRelease() {
+        _checkboxBackground.setBgColor(null);
+        _tickIcon.setTint(_currentStyle.textColor());
+    }
+
+    @Override
+    public void onAction() {
+        toggleState();
     }
 }

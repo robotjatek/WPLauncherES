@@ -119,8 +119,7 @@ public class Icon implements UIElement {
 
     public void setTint(int color) {
         if (_iconDrawable != null) {
-            _iconDrawable.mutate();
-            _iconDrawable.setTint(color);
+            _iconDrawable.mutate().setTint(color);
             _dirty = true;
         }
     }

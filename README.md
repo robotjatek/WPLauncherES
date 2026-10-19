@@ -291,7 +291,7 @@ Creep got too big
 - [ ] 120 Hz setting
 - [ ] SettingsService: separate load logic for each setting with defaults
 - [x] Fix: Dismissing a modal via the back button does not set the state of the checkbox back on the debug screen
-- [ ] Checkbox: Feedback on tap
+- [x] Checkbox: Feedback on tap
 
 ### M5.5
 

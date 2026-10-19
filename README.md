@@ -27,7 +27,7 @@ https://github.com/user-attachments/assets/f7e517bb-9137-413f-a910-b41aa54a9deb
 
 ## Milestones
 
-This is a living roadmap, all future milestones are refined as I go, and subject to change. [M4](README.md#m4---beta) is in progress
+This is a living roadmap, all future milestones are refined as I go, and subject to change. [M5](README.md#m5---beta-2) is in progress
 
 ### M1 - POC / pre-alpha
 
@@ -289,6 +289,9 @@ Creep got too big
 - [ ] Apps can pin their shortcuts to the home screen
 - [ ] Navigating away from the launcher and returning shouldn't reset its state
 - [ ] 120 Hz setting
+- [ ] SettingsService: separate load logic for each setting with defaults
+- [x] Fix: Dismissing a modal via the back button does not set the state of the checkbox back on the debug screen
+- [ ] Checkbox: Feedback on tap
 
 ### M5.5
 

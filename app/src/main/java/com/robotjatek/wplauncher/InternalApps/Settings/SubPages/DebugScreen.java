@@ -67,6 +67,7 @@ public class DebugScreen implements IScreen {
 
     @Override
     public void draw(float delta, float[] projMatrix, float[] view, QuadRenderer renderer) {
+        _uncapCheckbox.setState(_settingsService.uncapFrameRate());
         _layout.draw(delta, projMatrix, view, renderer, Position.ZERO, _size);
     }
 

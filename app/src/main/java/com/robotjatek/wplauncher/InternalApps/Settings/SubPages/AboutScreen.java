@@ -43,7 +43,7 @@ public class AboutScreen implements IScreen {
         _layout.addChild(new Label("about", () -> settings.getCurrentTheme().label(ITheme.TextRole.SUBTITLE)));
         _layout.addChild(new Spacer(0, 48));
         Supplier<ITheme.LabelStyle> appLabelStyle = () -> settings.getCurrentTheme().label(ITheme.TextRole.TEXT).withTypeFace(Typeface.BOLD).withTextSize(60);
-        _layout.addChild(new Label("WP Launcher ES Beta", appLabelStyle));
+        _layout.addChild(new Label("WP Launcher ES Beta 2", appLabelStyle));
         _versionLabel = new Label("", () -> settings.getCurrentTheme().label(ITheme.TextRole.CAPTION));
         _layout.addChild(_versionLabel);
         _layout.addChild(new Spacer(0, 48));

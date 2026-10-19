@@ -144,6 +144,7 @@ public class SettingsService {
             return;
         }
 
+        // TODO: separate load logic for each setting with defaults
         try {
             var settings = new JSONObject(settingsJson);
             var color = settings.getInt("accentColor");
